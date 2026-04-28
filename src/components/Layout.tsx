@@ -98,7 +98,7 @@ export const SiteHeader = () => {
 
 export const SiteFooter = () => (
   <footer className="border-t border-border bg-ink text-ivory mt-20">
-    <div className="container-editorial py-10 grid grid-cols-1 md:grid-cols-[2fr_1fr_1fr] gap-8 md:gap-10 items-start">
+    <div className="container-editorial py-10 grid grid-cols-1 md:grid-cols-[2fr_1fr] gap-8 md:gap-10 items-start">
       <div className="flex items-center self-stretch">
         <Link to="/" className="inline-block" aria-label="WMG Records — Wareham Music Group">
           <img
@@ -119,16 +119,6 @@ export const SiteFooter = () => (
               </Link>
             </li>
           ))}
-        </ul>
-      </div>
-
-      <div>
-        <p className="eyebrow mb-3 text-gold">Elsewhere</p>
-        <ul className="space-y-1.5 text-sm">
-          <li><a href="#" className="link-underline text-ivory/70 hover:text-ivory transition-colors">Instagram</a></li>
-          <li><a href="#" className="link-underline text-ivory/70 hover:text-ivory transition-colors">YouTube</a></li>
-          <li><a href="#" className="link-underline text-ivory/70 hover:text-ivory transition-colors">Spotify</a></li>
-          <li><a href="#" className="link-underline text-ivory/70 hover:text-ivory transition-colors">Apple Music</a></li>
         </ul>
       </div>
     </div>
