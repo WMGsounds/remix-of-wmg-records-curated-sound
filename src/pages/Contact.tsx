@@ -2,7 +2,7 @@ import { useState } from "react";
 import { toast } from "sonner";
 
 const channels = [
-  { label: "General Enquiries", email: "hello@wmgrecords.com" },
+  { label: "General Enquiries", email: "info@wmgsounds.com" },
   { label: "Press", email: "press@wmgrecords.com" },
   { label: "Licensing / Sync", email: "sync@wmgrecords.com" },
   { label: "Artist & Demo Submissions", email: "demos@wmgrecords.com" },
