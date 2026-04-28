@@ -4,7 +4,7 @@ import { toast } from "sonner";
 const channels = [
   { label: "General Enquiries", email: "info@wmgsounds.com" },
   { label: "Press", email: "press@wmgsounds.com" },
-  { label: "Licensing / Sync", email: "sync@wmgsounds.com" },
+  { label: "Licensing / Sync", email: "sync@wmg.com" },
   { label: "Artist & Demo Submissions", email: "demos@wmgrecords.com" },
 ];
 
