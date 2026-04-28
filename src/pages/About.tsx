@@ -18,9 +18,8 @@ const About = () => (
       </div>
       <div className="lg:col-span-8 space-y-6 text-lg md:text-xl leading-relaxed font-light">
         <p>
-          WMG Records — Wareham Music Group — was founded on a simple instinct: that the most
-          enduring records still come from a small room, a careful ear, and an artist with
-          something to say.
+          WMG (Wareham Music Group) was founded on a simple instinct: that the most enduring
+          records still come from a small room, a careful ear, and an artist with something to say.
         </p>
         <p>
           We work from London, releasing music we believe in and building it
