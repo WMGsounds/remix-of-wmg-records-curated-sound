@@ -30,12 +30,15 @@ const Releases = () => {
   if (isError) return <PageError message="Couldn't load the catalogue." />;
 
   return (
-    <div className="pt-40 pb-32">
+    <div className="relative overflow-hidden bg-ink text-ivory pt-40 pb-32">
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_74%_38%,hsl(var(--golden-brown)/0.38),transparent_34%),radial-gradient(circle_at_18%_78%,hsl(var(--gold)/0.16),transparent_28%)]" aria-hidden="true" />
+      <div className="absolute inset-0 opacity-[0.08] [background-image:linear-gradient(90deg,hsl(var(--ivory)/0.8)_1px,transparent_1px),linear-gradient(0deg,hsl(var(--ivory)/0.8)_1px,transparent_1px)] [background-size:3px_3px]" aria-hidden="true" />
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,transparent_42%,hsl(var(--ink)/0.72)_100%)]" aria-hidden="true" />
       <PageTitle title="Releases" />
-      <div className="container-editorial">
-        <p className="eyebrow mb-6">The Catalogue</p>
+      <div className="relative container-editorial">
+        <p className="eyebrow text-gold-soft mb-6">The Catalogue</p>
         <h1 className="display-serif text-6xl md:text-8xl lg:text-9xl mb-10">Releases</h1>
-        <p className="max-w-2xl text-lg text-muted-foreground mb-16">
+        <p className="max-w-2xl text-lg text-ivory/70 mb-16">
           Every WMG release is built to last — from the songwriting to the sleeve. Browse the full
           catalogue below.
         </p>
