@@ -4,7 +4,7 @@ import type { Artist, Release } from "@/lib/types";
 export const ArtistCard = ({ artist }: { artist: Artist }) => (
   <Link
     to={`/artists/${encodeURIComponent(artist.slug)}`}
-    className="group block hover-zoom cursor-pointer focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-foreground"
+    className="group block hover-zoom cursor-pointer focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-current"
     aria-label={`View ${artist.name}`}
   >
     <div className="relative overflow-hidden bg-muted aspect-[3/4]">
@@ -24,9 +24,9 @@ export const ArtistCard = ({ artist }: { artist: Artist }) => (
     </div>
     <div className="pt-5">
       <h3 className="font-serif text-2xl md:text-3xl">{artist.name}</h3>
-      <p className="eyebrow mt-2">{artist.genre}</p>
+        <p className="eyebrow mt-2 text-current/60">{artist.genre}</p>
       {artist.shortDescription && (
-        <p className="text-sm text-muted-foreground mt-3 line-clamp-2">{artist.shortDescription}</p>
+        <p className="text-sm text-current/60 mt-3 line-clamp-2">{artist.shortDescription}</p>
       )}
     </div>
   </Link>
@@ -38,7 +38,7 @@ export const ReleaseCard = ({ release }: { release: Release }) => {
   return (
     <Link
       to={`/releases/${encodeURIComponent(release.slug)}`}
-      className="group block hover-zoom cursor-pointer focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-foreground"
+      className="group block hover-zoom cursor-pointer focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-current"
       aria-label={`View ${release.title}`}
     >
       <div className="relative overflow-hidden bg-muted aspect-square">
@@ -58,11 +58,11 @@ export const ReleaseCard = ({ release }: { release: Release }) => {
       <div className="pt-5 flex items-start justify-between gap-4">
         <div>
           <h3 className="font-serif text-xl md:text-2xl leading-tight">{release.title}</h3>
-          <p className="text-sm text-muted-foreground mt-1">{release.artistName}</p>
+          <p className="text-sm text-current/60 mt-1">{release.artistName}</p>
         </div>
         <div className="text-right shrink-0">
-          <p className="eyebrow">{release.releaseType}</p>
-          <p className="text-xs text-muted-foreground mt-1">{year}</p>
+          <p className="eyebrow text-current/60">{release.releaseType}</p>
+          <p className="text-xs text-current/60 mt-1">{year}</p>
         </div>
       </div>
     </Link>
