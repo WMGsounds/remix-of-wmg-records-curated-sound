@@ -8,7 +8,7 @@ const About = () => (
   <div>
     <PageTitle title="About" />
     <section className="relative h-[82vh] min-h-[620px] bg-ink text-ivory overflow-hidden">
-      <img src={hero} alt="Low-lit studio atmosphere" className="absolute inset-0 h-[112%] w-full object-cover opacity-55 motion-safe:scale-105" />
+      <img src={hero} alt="Low-lit studio atmosphere" loading="eager" fetchPriority="high" width={1920} height={1080} className="absolute inset-0 h-[112%] w-full object-cover opacity-55 motion-safe:scale-105" />
       <div className="absolute inset-0 bg-gradient-to-t from-ink via-ink/35 to-ink/10" />
       <div className="relative z-10 h-full container-editorial grid grid-cols-1 lg:grid-cols-12 items-end gap-10 pb-16 md:pb-24">
         <div className="lg:col-span-8 animate-fade-up">
@@ -44,7 +44,7 @@ const About = () => (
     </section>
 
     <section className="relative overflow-hidden bg-ink py-16 md:py-24 text-ivory">
-      <img src={aboutSoundBg} alt="Singer recording in a warm studio" className="absolute inset-0 h-full w-full object-cover object-center opacity-15" />
+      <img src={aboutSoundBg} alt="Singer recording in a warm studio" loading="lazy" width={1536} height={1024} className="absolute inset-0 h-full w-full object-cover object-center opacity-15" />
       <div className="absolute inset-0 bg-ink/86" />
       <div className="relative container-editorial grid grid-cols-1 lg:grid-cols-2 gap-x-12 gap-y-10 md:gap-x-16">
           <p className="lg:col-span-2 display-serif text-3xl md:text-5xl lg:text-6xl leading-[1.02] reveal-on-scroll">
@@ -132,7 +132,7 @@ const About = () => (
       <div className="container-editorial grid grid-cols-1 lg:grid-cols-12 gap-12 md:gap-16 items-center">
         <div className="lg:col-span-5 reveal-on-scroll">
           <div className="aspect-[4/5] overflow-hidden bg-ivory/10">
-            <img src={artist3} alt="Portrait placeholder for WMG founders" className="h-full w-full object-cover opacity-85 grayscale" />
+            <img src={artist3} alt="Portrait placeholder for WMG founders" loading="lazy" width={1200} height={1500} className="h-full w-full object-cover opacity-85 grayscale" />
           </div>
         </div>
         <div className="lg:col-span-6 lg:col-start-7 reveal-on-scroll">
@@ -148,7 +148,7 @@ const About = () => (
     </section>
 
     <section className="relative bg-ink text-ivory overflow-hidden py-24 md:py-32">
-      <img src={artist1} alt="Artist in a moody performance setting" className="absolute inset-0 h-[120%] w-full object-cover opacity-35 motion-safe:translate-y-[-4%]" />
+      <img src={artist1} alt="Artist in a moody performance setting" loading="lazy" width={1920} height={1280} className="absolute inset-0 h-[120%] w-full object-cover opacity-35 motion-safe:translate-y-[-4%]" />
       <div className="absolute inset-0 bg-ink/55" />
       <div className="relative container-editorial grid grid-cols-1 lg:grid-cols-12 gap-12 items-end">
         <blockquote className="lg:col-span-8 display-serif text-5xl md:text-7xl leading-[1.03] reveal-on-scroll">
