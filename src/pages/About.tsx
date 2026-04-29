@@ -57,8 +57,8 @@ const About = () => (
     </section>
 
     <section className="relative overflow-hidden bg-ink py-16 md:py-24 text-ivory">
-      <img src={aboutSoundBg} alt="Singer recording in a warm studio" className="absolute inset-0 h-full w-full object-cover object-center opacity-34" />
-      <div className="absolute inset-0 bg-ink/68" />
+      <img src={aboutSoundBg} alt="Singer recording in a warm studio" className="absolute inset-0 h-full w-full object-cover object-center opacity-22" />
+      <div className="absolute inset-0 bg-ink/76" />
       <div className="relative container-editorial grid grid-cols-1 lg:grid-cols-2 gap-12 md:gap-16">
           <div className="reveal-on-scroll">
             <p className="eyebrow text-gold-soft mb-3">Our Sound</p>
