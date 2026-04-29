@@ -7,7 +7,7 @@ const paragraphs = (p: any): string[] =>
   text(p).split(/\n\s*\n/).map((s) => s.trim()).filter(Boolean);
 
 const num = (p: any): number => p?.number ?? 0;
-const bool = (p: any): boolean => !!p?.checkbox;
+const bool = (p: any): boolean => p?.type === "checkbox" && p.checkbox === true;
 const url = (p: any): string | undefined => p?.url ?? undefined;
 const select = (p: any): string => p?.select?.name ?? "";
 const multiSelect = (p: any): string => (p?.multi_select ?? []).map((o: any) => o.name).filter(Boolean).join(", ");
