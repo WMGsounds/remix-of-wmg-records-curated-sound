@@ -87,19 +87,34 @@ const About = () => (
       </div>
     </section>
 
-    <section className="relative overflow-hidden bg-golden-brown py-20 md:py-28 text-ivory">
-      <div className="absolute inset-0 bg-ivory/10" aria-hidden="true" />
-      <div className="relative container-editorial reveal-on-scroll">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-y-14 md:gap-x-16 lg:gap-x-24 border-y border-ivory/22 py-12 md:py-14">
+    <section className="relative overflow-hidden bg-ink py-28 md:py-40 text-ivory">
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_74%_38%,hsl(var(--golden-brown)/0.38),transparent_34%),radial-gradient(circle_at_18%_78%,hsl(var(--gold)/0.16),transparent_28%)]" aria-hidden="true" />
+      <div className="absolute inset-0 opacity-[0.08] [background-image:linear-gradient(90deg,hsl(var(--ivory)/0.8)_1px,transparent_1px),linear-gradient(0deg,hsl(var(--ivory)/0.8)_1px,transparent_1px)] [background-size:3px_3px]" aria-hidden="true" />
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,transparent_42%,hsl(var(--ink)/0.72)_100%)]" aria-hidden="true" />
+      <div className="relative container-editorial">
+        <div className="max-w-4xl reveal-on-scroll">
+          <p className="eyebrow text-gold mb-5">How we work</p>
+          <p className="display-serif text-4xl md:text-6xl lg:text-7xl leading-[1.02] text-ivory">
+            Three things we hold to.
+          </p>
+        </div>
+        <div className="mt-20 md:mt-28 grid grid-cols-1 md:grid-cols-12 gap-y-20 md:gap-y-28">
           {[
-            ["01", "Build slowly", "No trend-chasing, no disposable campaigns. Only catalogue with a lasting future."],
-            ["02", "Listen closely", "The song leads; production, image, and strategy follow with restraint."],
-            ["03", "Outlast the moment", "We're not here for the cycle. We're here for the catalogue that survives it."],
-          ].map(([number, title, text]) => (
-            <div key={number} className="relative md:pt-4">
-              <p className="text-gold-soft font-serif text-2xl mb-8">{number}</p>
-              <h2 className="font-serif text-3xl md:text-4xl mb-5">{title}</h2>
-              <p className="text-ivory/88 leading-relaxed max-w-sm">{text}</p>
+            ["01", "Build", "slowly", "No trend-chasing, no disposable campaigns. Only catalogue with a lasting future.", "md:col-span-5 md:col-start-1", "0ms"],
+            ["02", "Listen", "closely", "The song leads; production, image, and strategy follow with restraint.", "md:col-span-5 md:col-start-5 md:translate-y-12", "140ms"],
+            ["03", "Outlast the", "moment", "We're not here for the cycle. We're here for the catalogue that survives it.", "md:col-span-5 md:col-start-8", "280ms"],
+          ].map(([number, title, accent, text, placement, delay]) => (
+            <div key={number} className={`relative reveal-on-scroll ${placement}`} style={{ animationDelay: delay }}>
+              <p className="pointer-events-none absolute -left-3 -top-14 font-serif text-[8rem] leading-none text-gold-soft/10 md:-left-10 md:-top-20 md:text-[12rem]">
+                {number}
+              </p>
+              <div className="relative border-t border-ivory/18 pt-8">
+                <p className="mb-8 font-serif text-4xl text-gold-soft/80 md:text-5xl">{number}</p>
+                <h2 className="font-serif text-4xl md:text-5xl mb-6">
+                  {title} <span className="italic text-gold-soft">{accent}</span>
+                </h2>
+                <p className="text-base md:text-lg leading-relaxed text-ivory/82 max-w-md">{text}</p>
+              </div>
             </div>
           ))}
         </div>
