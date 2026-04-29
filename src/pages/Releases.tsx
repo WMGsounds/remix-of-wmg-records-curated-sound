@@ -43,14 +43,14 @@ const Releases = () => {
           catalogue below.
         </p>
 
-        <div className="flex flex-wrap items-center justify-between gap-4 mb-16 border-y border-border py-5">
+        <div className="flex flex-wrap items-center justify-between gap-4 mb-16 border-y border-ivory/18 py-5">
           <div className="flex flex-wrap gap-2">
             {filters.map((f) => (
               <button
                 key={f}
                 onClick={() => setFilter(f)}
                 className={`text-[11px] uppercase tracking-[0.24em] px-4 py-2 transition-colors duration-300 ${
-                  filter === f ? "bg-foreground text-background" : "text-muted-foreground hover:text-foreground"
+                  filter === f ? "bg-ivory text-ink" : "text-ivory/60 hover:text-ivory"
                 }`}
               >
                 {f}
@@ -58,14 +58,14 @@ const Releases = () => {
             ))}
           </div>
           <div className="flex items-center gap-3">
-            <label className="text-[11px] uppercase tracking-[0.24em] text-muted-foreground">Sort by</label>
+            <label className="text-[11px] uppercase tracking-[0.24em] text-ivory/60">Sort by</label>
             <select
               value={sort}
               onChange={(e) => setSort(e.target.value as (typeof sortOptions)[number])}
-              className="bg-transparent border border-border text-[11px] uppercase tracking-[0.24em] px-3 py-2 text-foreground focus:outline-none focus:ring-1 focus:ring-foreground cursor-pointer"
+              className="bg-transparent border border-ivory/24 text-[11px] uppercase tracking-[0.24em] px-3 py-2 text-ivory focus:outline-none focus:ring-1 focus:ring-ivory cursor-pointer"
             >
               {sortOptions.map((o) => (
-                <option key={o} value={o} className="bg-background text-foreground">
+                <option key={o} value={o} className="bg-ink text-ivory">
                   {o}
                 </option>
               ))}
@@ -76,7 +76,7 @@ const Releases = () => {
         {isLoading ? (
           <InlineSkeleton count={8} />
         ) : visible.length === 0 ? (
-          <p className="text-muted-foreground py-20">No releases match this filter.</p>
+          <p className="text-ivory/60 py-20">No releases match this filter.</p>
         ) : (
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8 md:gap-10">
             {visible.map((r) => <ReleaseCard key={r.slug} release={r} />)}
