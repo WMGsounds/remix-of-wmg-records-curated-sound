@@ -49,7 +49,7 @@ const Artists = () => {
             </p>
           </div>
           <div className="relative hidden min-h-[360px] lg:block">
-            <div className="absolute right-0 top-1/2 h-[560px] w-full -translate-y-1/2 overflow-hidden [-webkit-mask-image:radial-gradient(ellipse_at_center,black_40%,transparent_95%)] [mask-image:radial-gradient(ellipse_at_center,black_40%,transparent_95%)] [mask-repeat:no-repeat] [mask-size:100%_100%]">
+            <div className="absolute right-0 top-1/2 h-[560px] w-full -translate-y-1/2 overflow-hidden [-webkit-mask-image:radial-gradient(ellipse_at_center,black_28%,rgba(0,0,0,0.72)_52%,rgba(0,0,0,0.28)_74%,transparent_90%)] [mask-image:radial-gradient(ellipse_at_center,black_28%,rgba(0,0,0,0.72)_52%,rgba(0,0,0,0.28)_74%,transparent_90%)] [mask-repeat:no-repeat] [mask-size:100%_100%]">
               <img
                 src={artistsHeroStudio}
                 alt="Monochrome studio detail with microphone and vinyl"
