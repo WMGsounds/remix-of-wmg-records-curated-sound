@@ -2,7 +2,6 @@ import { Link } from "react-router-dom";
 import { ArrowRight } from "lucide-react";
 import hero from "@/assets/hero-cinematic.jpg";
 import { ArtistCard, ReleaseCard } from "@/components/Cards";
-import { NewsletterForm } from "@/components/NewsletterForm";
 import { useHomepageData } from "@/lib/queries";
 import { InlineSkeleton } from "@/components/UIStates";
 
@@ -200,21 +199,6 @@ const Index = () => {
         </div>
       </section>
 
-      {/* NEWSLETTER */}
-      <section className="container-editorial py-28 md:py-40">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-20 items-center">
-          <div>
-            <p className="eyebrow mb-4">Stay Close</p>
-            <h2 className="display-serif text-5xl md:text-7xl">Join the List</h2>
-          </div>
-          <div>
-            <p className="text-lg text-foreground/80 max-w-md mb-8">
-              New releases. Limited editions. First access. Sent rarely, only when it matters.
-            </p>
-            <NewsletterForm />
-          </div>
-        </div>
-      </section>
     </div>
   );
 };
