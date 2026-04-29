@@ -15,15 +15,11 @@ const nav = [
 
 export const SiteHeader = () => {
   const [open, setOpen] = useState(false);
-  const [scrolled, setScrolled] = useState(false);
   const location = useLocation();
-
-  useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 20);
-    onScroll();
-    window.addEventListener("scroll", onScroll);
-    return () => window.removeEventListener("scroll", onScroll);
-  }, []);
+  const usesImageLedTopSection = location.pathname === "/"
+    || location.pathname === "/about"
+    || /^\/artists\/[^/]+/.test(location.pathname)
+    || /^\/releases\/[^/]+/.test(location.pathname);
 
   useEffect(() => {
     setOpen(false);
@@ -33,13 +29,15 @@ export const SiteHeader = () => {
     <header
       className="fixed top-0 left-0 right-0 z-50 overflow-hidden backdrop-blur-md border-b border-ivory/10 text-ivory shadow-sm"
     >
-      <img
-        src={hero}
-        alt=""
-        aria-hidden="true"
-        className="pointer-events-none absolute inset-0 h-full w-full object-cover object-top opacity-70"
-      />
-      <div className="pointer-events-none absolute inset-0 bg-black/70" />
+      {!usesImageLedTopSection && (
+        <img
+          src={hero}
+          alt=""
+          aria-hidden="true"
+          className="pointer-events-none absolute inset-0 h-full w-full object-cover object-top opacity-70"
+        />
+      )}
+      <div className="pointer-events-none absolute inset-0 bg-ink/70" />
 
       <div className="container-editorial relative z-10 flex items-center justify-between py-5">
         <Link to="/" className="flex items-center gap-3" aria-label="WMG Records home">
