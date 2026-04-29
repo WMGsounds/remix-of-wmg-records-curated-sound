@@ -18,7 +18,7 @@ import type {
 import { getMockDataForPath } from "./mockData";
 
 const API_BASE = import.meta.env.VITE_API_BASE_URL ?? "";
-const ALLOW_MOCK_DATA = import.meta.env.DEV || import.meta.env.VITE_VERCEL_ENV === "preview";
+const ALLOW_MOCK_DATA = import.meta.env.DEV;
 
 async function fetchJson<T>(path: string): Promise<T> {
   const res = await fetch(`${API_BASE}${path}`, {
