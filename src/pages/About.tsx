@@ -105,9 +105,6 @@ const About = () => (
             ["03", "Outlast the", "moment", "We're not here for the cycle. We're here for the catalogue that survives it.", "md:col-span-5 md:col-start-8", "280ms"],
           ].map(([number, title, accent, text, placement, delay]) => (
             <div key={number} className={`relative reveal-on-scroll ${placement}`} style={{ animationDelay: delay }}>
-              <p className="pointer-events-none absolute -left-2 -top-8 font-serif text-[5.5rem] leading-none text-gold-soft/10 md:-left-6 md:-top-10 md:text-[7.5rem]">
-                {number}
-              </p>
               <div className="relative border-t border-ivory/18 pt-6">
                 <p className="mb-5 font-serif text-4xl text-gold-soft/80 md:text-5xl">{number}</p>
                 <h2 className="font-serif text-4xl md:text-5xl mb-4">
