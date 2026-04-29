@@ -57,25 +57,38 @@ const About = () => (
       </div>
     </section>
 
-    <section className="bg-secondary py-24 md:py-36">
-      <div className="container-editorial grid grid-cols-1 lg:grid-cols-12 gap-10 md:gap-16 items-center">
+    <section className="bg-golden-brown/82 py-24 md:py-36">
+      <div className="container-editorial grid grid-cols-1 lg:grid-cols-12 gap-10 md:gap-16 items-stretch">
         <div className="lg:col-span-5 order-2 lg:order-1 reveal-on-scroll">
-          <div className="aspect-[4/5] overflow-hidden bg-muted">
-            <img src={release1} alt="Vinyl and recording materials" className="h-full w-full object-cover grayscale-[15%]" />
+          <div className="h-full min-h-[520px] overflow-hidden bg-muted">
+            <img src={studioSingingJoy} alt="Singer recording in a warm studio" className="h-full w-full object-cover" />
           </div>
         </div>
-        <div className="lg:col-span-6 lg:col-start-7 order-1 lg:order-2 reveal-on-scroll">
-          <p className="eyebrow text-gold mb-5">Our Sound</p>
-          <div className="gold-rule mb-10" />
-          <p className="display-serif text-4xl md:text-6xl leading-[1.03] mb-8">
-            Warmth, restraint, and respect for the song.
-          </p>
-          <div className="space-y-6 text-lg md:text-xl leading-relaxed font-light">
-            <p>
-              We don't sit inside a single genre. Our roster spans soul and gospel, country and
-              americana, reggae and contemporary classical — but every record shares a sensibility:
-              warmth, restraint, and a respect for the song.
+        <div className="lg:col-span-6 lg:col-start-7 order-1 lg:order-2 reveal-on-scroll grid grid-rows-1 lg:grid-rows-2 gap-12 text-ivory">
+          <div className="border-b border-ivory/25 pb-12 lg:pb-14">
+            <p className="eyebrow text-gold-soft mb-5">Our Sound</p>
+            <div className="gold-rule mb-10" />
+            <p className="display-serif text-4xl md:text-6xl leading-[1.03] mb-8">
+              Warmth, restraint, and respect for the song.
             </p>
+            <div className="space-y-6 text-lg md:text-xl leading-relaxed font-light text-ivory/88">
+              <p>
+                We don't sit inside a single genre. Our roster spans soul and gospel, country and
+                americana, reggae and contemporary classical — but every record shares a sensibility:
+                warmth, restraint, and a respect for the song.
+              </p>
+            </div>
+          </div>
+          <div>
+            <p className="eyebrow text-gold-soft mb-5">Our Artists</p>
+            <div className="gold-rule mb-10" />
+            <div className="space-y-6 text-lg md:text-xl leading-relaxed font-light text-ivory/88">
+              <p>
+                We sign artists, not songs. Each WMG signing is a long-form commitment — to a body of
+                work, to a visual language, to the world an artist is trying to build. We are
+                collaborators, not gatekeepers.
+              </p>
+            </div>
           </div>
         </div>
       </div>
@@ -94,27 +107,6 @@ const About = () => (
             <p className="text-muted-foreground leading-relaxed max-w-sm">{text}</p>
           </div>
         ))}
-      </div>
-    </section>
-
-    <section className="bg-background pb-24 md:pb-36">
-      <div className="container-editorial grid grid-cols-1 lg:grid-cols-12 gap-10 md:gap-16 items-start">
-        <div className="lg:col-span-6 reveal-on-scroll">
-          <p className="eyebrow text-gold mb-5">Our Artists</p>
-          <div className="gold-rule mb-10" />
-          <div className="space-y-6 text-lg md:text-xl leading-relaxed font-light">
-            <p>
-              We sign artists, not songs. Each WMG signing is a long-form commitment — to a body of
-              work, to a visual language, to the world an artist is trying to build. We are
-              collaborators, not gatekeepers.
-            </p>
-          </div>
-        </div>
-        <div className="lg:col-span-5 lg:col-start-8 reveal-on-scroll">
-          <div className="aspect-[5/6] overflow-hidden bg-muted">
-            <img src={artist2} alt="Artist portrait silhouette" className="h-full w-full object-cover" />
-          </div>
-        </div>
       </div>
     </section>
 
