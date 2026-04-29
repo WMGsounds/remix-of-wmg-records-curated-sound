@@ -24,6 +24,17 @@ export const getEnvStatus = () =>
     boolean
   >;
 
+const summarizeError = (error: unknown) => {
+  const e = error as { name?: string; message?: string; stack?: string; code?: string; status?: number };
+  return {
+    name: e?.name,
+    message: e?.message ?? String(error),
+    code: e?.code,
+    status: e?.status,
+    stack: e?.stack,
+  };
+};
+
 export function validateNotionEnv(route: string) {
   const missing = REQUIRED_ENV.filter((name) => !process.env[name]);
   if (missing.length > 0) {
@@ -37,18 +48,30 @@ export function validateNotionEnv(route: string) {
 }
 
 export function logApiError(route: string, error: unknown, context: Record<string, unknown> = {}) {
-  const e = error as { name?: string; message?: string; stack?: string; code?: string; status?: number };
   console.error("[notion-api] Route failed", {
     route,
     ...context,
     envStatus: getEnvStatus(),
-    error: {
-      name: e?.name,
-      message: e?.message ?? String(error),
-      code: e?.code,
-      status: e?.status,
-      stack: e?.stack,
-    },
+    error: summarizeError(error),
+  });
+}
+
+export function logApiSuccess(route: string, context: Record<string, unknown> = {}) {
+  console.log("[notion-api] Returning real Notion data", {
+    route,
+    ...context,
+    envStatus: getEnvStatus(),
+  });
+}
+
+export function logApiFallback(route: string, error: unknown, context: Record<string, unknown> = {}) {
+  const summary = summarizeError(error);
+  console.warn("[notion-api] Returning fallback mock data", {
+    route,
+    reason: summary.message,
+    ...context,
+    envStatus: getEnvStatus(),
+    error: summary,
   });
 }
 
@@ -63,4 +86,5 @@ export const DBS = {
 export const CACHE_HEADERS = {
   "Cache-Control": "public, s-maxage=3000, stale-while-revalidate=600",
   "Content-Type": "application/json",
+  "X-Data-Source": "notion",
 };
