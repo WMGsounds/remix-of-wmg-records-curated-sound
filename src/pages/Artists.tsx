@@ -3,6 +3,7 @@ import { ArtistCard } from "@/components/Cards";
 import { PageTitle } from "@/components/PageTitle";
 import { useArtists } from "@/lib/queries";
 import { InlineSkeleton, PageError } from "@/components/UIStates";
+import artistsHeroStudio from "@/assets/artists-hero-studio.jpg";
 
 const sortOptions = ["Artist Name", "Genre"] as const;
 
@@ -32,15 +33,39 @@ const Artists = () => {
   if (isError) return <PageError message="Couldn't load the roster." />;
 
   return (
-    <div className="bg-ink text-ivory pt-40 pb-32">
+    <div className="bg-ink text-ivory pb-32">
       <PageTitle title="Artists" />
-      <div className="container-editorial">
-        <p className="eyebrow text-ivory/60 mb-6">The Roster</p>
-        <h1 className="display-serif text-6xl md:text-8xl lg:text-9xl mb-10">Artists</h1>
-        <p className="max-w-2xl text-lg text-ivory/65 mb-16">
-          Singular voices, carefully chosen. Each artist on WMG is given the space and time to build
-          a body of work — without compromise.
-        </p>
+      <section className="relative overflow-hidden bg-ink pt-40 pb-24 md:pb-28">
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_78%_22%,hsl(var(--golden-brown)/0.24),transparent_28%),radial-gradient(circle_at_30%_36%,hsl(var(--gold)/0.10),transparent_30%)]" aria-hidden="true" />
+        <div className="absolute inset-0 opacity-[0.07] [background-image:linear-gradient(90deg,hsl(var(--ivory)/0.72)_1px,transparent_1px),linear-gradient(0deg,hsl(var(--ivory)/0.72)_1px,transparent_1px)] [background-size:3px_3px]" aria-hidden="true" />
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,transparent_38%,hsl(var(--ink)/0.72)_100%)]" aria-hidden="true" />
+        <div className="relative container-editorial grid items-center gap-14 lg:grid-cols-[0.9fr_1.1fr]">
+          <div>
+            <p className="eyebrow text-ivory/60 mb-6">The Roster</p>
+            <h1 className="display-serif text-6xl md:text-8xl lg:text-9xl mb-10">Artists</h1>
+            <p className="max-w-2xl text-lg text-ivory/65">
+              Singular voices, carefully chosen. Each artist on WMG is given the space and time to build
+              a body of work — without compromise.
+            </p>
+          </div>
+          <div className="relative hidden min-h-[360px] lg:block">
+            <div className="absolute -right-32 top-1/2 h-[440px] w-[74%] -translate-y-1/2 overflow-hidden shadow-soft">
+              <img
+                src={artistsHeroStudio}
+                alt="Monochrome studio detail with microphone and vinyl"
+                width={1280}
+                height={960}
+                className="h-full w-full object-cover grayscale opacity-72 mix-blend-screen"
+              />
+              <div className="absolute inset-0 bg-[linear-gradient(90deg,hsl(var(--ink)/0.92),transparent_38%,hsl(var(--ink)/0.18)),radial-gradient(circle_at_74%_18%,hsl(var(--gold)/0.18),transparent_34%)]" aria-hidden="true" />
+            </div>
+          </div>
+        </div>
+        <div className="absolute inset-x-0 bottom-0 h-20 bg-gradient-to-b from-transparent to-ink" aria-hidden="true" />
+        <div className="absolute inset-x-0 bottom-0 h-px bg-gold/35" aria-hidden="true" />
+      </section>
+
+      <div className="container-editorial pt-16">
 
         {!isLoading && genres.length > 1 && (
           <div className="flex flex-wrap items-center justify-between gap-4 mb-16 border-y border-ivory/18 py-5">
