@@ -74,9 +74,9 @@ const About = () => (
           <div className="reveal-on-scroll">
             <div className="space-y-4 text-sm md:text-base leading-relaxed font-light text-ivory/88">
               <p>
-                We sign artists, not songs. Each WMG signing is a long-form commitment - to a body of
-                work, to a visual language, to the world an artist is trying to build. We are
-                collaborators, not gatekeepers.
+                We sign artists, not songs. Each WMG signing is a long-form commitment.
+                To a body of work, to a visual language, to the world an artist is trying to build
+                and to the sound they are working to capture. We are collaborators, not gatekeepers.
               </p>
               <p>
                 The aim is not to force an artist into shape, but to protect what already makes them
