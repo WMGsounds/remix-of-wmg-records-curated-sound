@@ -22,7 +22,7 @@ const ArtistPage = () => {
       {/* Hero */}
       <section className="relative h-[85vh] min-h-[600px] bg-ink text-ivory overflow-hidden">
         {heroImage ? (
-          <img src={heroImage} alt={artist.name} className="absolute inset-0 h-full w-full object-cover opacity-80" />
+          <img src={heroImage} alt={artist.name} loading="eager" fetchPriority="high" width={1920} height={1280} className="absolute inset-0 h-full w-full object-cover opacity-80" />
         ) : (
           <div className="absolute inset-0 bg-secondary" />
         )}
@@ -62,7 +62,7 @@ const ArtistPage = () => {
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center mt-8">
             <div className="lg:col-span-5 hover-zoom overflow-hidden">
               {featured.coverArt ? (
-                <img src={featured.coverArt} alt={featured.title} className="w-full aspect-square object-cover" />
+                <img src={featured.coverArt} alt={featured.title} loading="lazy" width={1200} height={1200} className="w-full aspect-square object-cover" />
               ) : (
                 <div className="w-full aspect-square bg-muted flex items-center justify-center text-muted-foreground">Artwork coming soon.</div>
               )}
@@ -96,7 +96,7 @@ const ArtistPage = () => {
                 <Link key={r.slug} to={`/releases/${encodeURIComponent(r.slug)}`} className="group block hover-zoom cursor-pointer focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-ivory">
                   <div className="overflow-hidden aspect-square">
                     {r.coverArt ? (
-                      <img src={r.coverArt} alt={r.title} loading="lazy" className="h-full w-full object-cover" />
+                      <img src={r.coverArt} alt={r.title} loading="lazy" width={1200} height={1200} className="h-full w-full object-cover" />
                     ) : (
                       <div className="h-full w-full bg-ivory/10 flex items-center justify-center p-4 text-center text-ivory/60">Artwork coming soon.</div>
                     )}
