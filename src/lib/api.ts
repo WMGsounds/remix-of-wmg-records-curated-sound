@@ -18,6 +18,7 @@ import type {
 import { getMockDataForPath } from "./mockData";
 
 const API_BASE = import.meta.env.VITE_API_BASE_URL ?? "";
+const ALLOW_MOCK_DATA = import.meta.env.DEV;
 
 async function fetchJson<T>(path: string): Promise<T> {
   const res = await fetch(`${API_BASE}${path}`, {
@@ -25,7 +26,7 @@ async function fetchJson<T>(path: string): Promise<T> {
   });
   if (!res.ok) {
     const mock = getMockDataForPath(path);
-    if (mock !== null) {
+    if (ALLOW_MOCK_DATA && mock !== null) {
       console.warn(`[cms-api] ${res.status} preview response for ${path}; using MOCK DATA.`);
       return mock as T;
     }
@@ -36,7 +37,7 @@ async function fetchJson<T>(path: string): Promise<T> {
     return JSON.parse(text) as T;
   } catch (error) {
     const mock = getMockDataForPath(path);
-    if (mock !== null && text.trim().startsWith("import ")) {
+    if (ALLOW_MOCK_DATA && mock !== null && text.trim().startsWith("import ")) {
       console.warn(`[cms-api] Non-JSON preview response for ${path}; using MOCK DATA.`, error);
       return mock as T;
     }

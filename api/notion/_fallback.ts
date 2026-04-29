@@ -1,6 +1,6 @@
 const image = (name: string) => `/mock/${name}`;
 
-// MOCK DATA — returned with HTTP 200 when Notion env vars are missing or Notion calls fail.
+// MOCK DATA — returned with HTTP 200 only when route handlers catch a genuine Notion/env error.
 export const fallbackArtists = [
   {
     id: "mock-artist-aurora-vale",
