@@ -24,6 +24,11 @@ async function fetchJson<T>(path: string): Promise<T> {
     headers: { Accept: "application/json" },
   });
   if (!res.ok) {
+    const mock = getMockDataForPath(path);
+    if (mock !== null) {
+      console.warn(`[cms-api] ${res.status} preview response for ${path}; using MOCK DATA.`);
+      return mock as T;
+    }
     throw new Error(`Request failed (${res.status}): ${path}`);
   }
   const text = await res.text();
