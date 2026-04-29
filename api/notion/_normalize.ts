@@ -13,8 +13,22 @@ const select = (p: any): string => p?.select?.name ?? "";
 const multiSelect = (p: any): string => (p?.multi_select ?? []).map((o: any) => o.name).filter(Boolean).join(", ");
 const date = (p: any): string => p?.date?.start ?? "";
 
-const fileUrl = (f: any): string =>
-  f?.type === "external" ? f.external.url : f?.file?.url ?? "";
+const shouldProxyImageUrl = (rawUrl: string): boolean => {
+  try {
+    const parsed = new URL(rawUrl);
+    return parsed.protocol === "https:" && parsed.hostname === "prod-files-secure.s3.us-west-2.amazonaws.com";
+  } catch {
+    return false;
+  }
+};
+
+const proxiedImageUrl = (rawUrl: string): string =>
+  shouldProxyImageUrl(rawUrl) ? `/api/image-proxy?url=${encodeURIComponent(rawUrl)}` : rawUrl;
+
+const fileUrl = (f: any): string => {
+  const rawUrl = f?.type === "external" ? f.external.url : f?.file?.url ?? "";
+  return rawUrl ? proxiedImageUrl(rawUrl) : "";
+};
 
 const files = (p: any): string[] => (p?.files ?? []).map(fileUrl).filter(Boolean);
 const firstFile = (p: any): string => files(p)[0] ?? "";
