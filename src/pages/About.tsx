@@ -87,7 +87,7 @@ const About = () => (
       </div>
     </section>
 
-    <section className="relative overflow-hidden bg-ink py-28 md:py-40 text-ivory">
+    <section className="relative overflow-hidden bg-ink py-20 md:py-28 text-ivory">
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_74%_38%,hsl(var(--golden-brown)/0.38),transparent_34%),radial-gradient(circle_at_18%_78%,hsl(var(--gold)/0.16),transparent_28%)]" aria-hidden="true" />
       <div className="absolute inset-0 opacity-[0.08] [background-image:linear-gradient(90deg,hsl(var(--ivory)/0.8)_1px,transparent_1px),linear-gradient(0deg,hsl(var(--ivory)/0.8)_1px,transparent_1px)] [background-size:3px_3px]" aria-hidden="true" />
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,transparent_42%,hsl(var(--ink)/0.72)_100%)]" aria-hidden="true" />
@@ -98,10 +98,10 @@ const About = () => (
             Three things we hold to.
           </p>
         </div>
-        <div className="mt-20 md:mt-28 grid grid-cols-1 md:grid-cols-12 gap-y-20 md:gap-y-28">
+        <div className="mt-14 md:mt-20 grid grid-cols-1 md:grid-cols-12 gap-y-16 md:gap-y-20">
           {[
             ["01", "Build", "slowly", "No trend-chasing, no disposable campaigns. Only catalogue with a lasting future.", "md:col-span-5 md:col-start-1", "0ms"],
-            ["02", "Listen", "closely", "The song leads; production, image, and strategy follow with restraint.", "md:col-span-5 md:col-start-5 md:translate-y-12", "140ms"],
+            ["02", "Listen", "closely", "The song leads; production, image, and strategy follow with restraint.", "md:col-span-5 md:col-start-5 md:translate-y-8", "140ms"],
             ["03", "Outlast the", "moment", "We're not here for the cycle. We're here for the catalogue that survives it.", "md:col-span-5 md:col-start-8", "280ms"],
           ].map(([number, title, accent, text, placement, delay]) => (
             <div key={number} className={`relative reveal-on-scroll ${placement}`} style={{ animationDelay: delay }}>
