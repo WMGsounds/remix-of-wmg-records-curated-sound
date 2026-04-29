@@ -32,8 +32,8 @@ export default async function handler(req: any, res: any) {
     res.writeHead(200, CACHE_HEADERS).end(
       JSON.stringify({ release, artist, tracks, related }),
     );
-  } catch (e: any) {
+  } catch (e: unknown) {
     logApiError(route, e, { slug });
-    res.status(500).json({ error: e.message });
+    res.status(500).json({ error: e instanceof Error ? e.message : String(e) });
   }
 }

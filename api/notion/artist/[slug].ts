@@ -21,8 +21,8 @@ export default async function handler(req: any, res: any) {
       .sort((a, b) => +new Date(b.releaseDate) - +new Date(a.releaseDate));
 
     res.writeHead(200, CACHE_HEADERS).end(JSON.stringify({ artist, discography }));
-  } catch (e: any) {
+  } catch (e: unknown) {
     logApiError(route, e, { slug });
-    res.status(500).json({ error: e.message });
+    res.status(500).json({ error: e instanceof Error ? e.message : String(e) });
   }
 }
