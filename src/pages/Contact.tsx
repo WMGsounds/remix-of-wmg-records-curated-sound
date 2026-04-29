@@ -105,7 +105,7 @@ const Contact = () => {
       </section>
 
       <section className="bg-ink px-6 py-16 text-center text-ivory md:px-12">
-        <p className="font-serif text-3xl italic text-ivory/85 md:text-4xl">Music made with intent. — WMG</p>
+        <p className="font-serif text-3xl italic text-ivory/85 md:text-4xl">Music made with purpose.</p>
       </section>
     </main>
   );
