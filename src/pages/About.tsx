@@ -43,19 +43,6 @@ const About = () => (
       </div>
     </section>
 
-    <section className="relative bg-ink text-ivory overflow-hidden py-24 md:py-32">
-      <img src={artist1} alt="Artist in a moody performance setting" className="absolute inset-0 h-[120%] w-full object-cover opacity-35 motion-safe:translate-y-[-4%]" />
-      <div className="absolute inset-0 bg-ink/55" />
-      <div className="relative container-editorial grid grid-cols-1 lg:grid-cols-12 gap-12 items-end">
-        <blockquote className="lg:col-span-8 display-serif text-5xl md:text-7xl leading-[1.03] reveal-on-scroll">
-          “We sign artists, <span className="italic text-gold">not songs</span>.”
-        </blockquote>
-        <div className="lg:col-span-4 text-ivory/76 text-lg leading-relaxed reveal-on-scroll">
-          Each signing is treated as a world to build: sound, image, patience, and the long arc of a catalogue.
-        </div>
-      </div>
-    </section>
-
     <section className="relative overflow-hidden bg-ink py-16 md:py-24 text-ivory">
       <img src={aboutSoundBg} alt="Singer recording in a warm studio" className="absolute inset-0 h-full w-full object-cover object-center opacity-15" />
       <div className="absolute inset-0 bg-ink/86" />
@@ -112,6 +99,16 @@ const About = () => (
       </div>
     </section>
 
+    <section className="bg-ink text-ivory pt-10 pb-32 md:pb-40">
+      <div className="container-editorial max-w-5xl reveal-on-scroll">
+        <div className="gold-rule mb-10" />
+        <p className="display-serif text-4xl md:text-7xl leading-[1.08]">
+          Make records that <span className="italic text-gold">outlast</span> the moment they were
+          made in.
+        </p>
+      </div>
+    </section>
+
     <section className="bg-ink text-ivory py-24 md:py-32">
       <div className="container-editorial grid grid-cols-1 lg:grid-cols-12 gap-12 md:gap-16 items-center">
         <div className="lg:col-span-5 reveal-on-scroll">
@@ -131,13 +128,16 @@ const About = () => (
       </div>
     </section>
 
-    <section className="bg-ink text-ivory pt-10 pb-32 md:pb-40">
-      <div className="container-editorial max-w-5xl reveal-on-scroll">
-        <div className="gold-rule mb-10" />
-        <p className="display-serif text-4xl md:text-7xl leading-[1.08]">
-          Make records that <span className="italic text-gold">outlast</span> the moment they were
-          made in.
-        </p>
+    <section className="relative bg-ink text-ivory overflow-hidden py-24 md:py-32">
+      <img src={artist1} alt="Artist in a moody performance setting" className="absolute inset-0 h-[120%] w-full object-cover opacity-35 motion-safe:translate-y-[-4%]" />
+      <div className="absolute inset-0 bg-ink/55" />
+      <div className="relative container-editorial grid grid-cols-1 lg:grid-cols-12 gap-12 items-end">
+        <blockquote className="lg:col-span-8 display-serif text-5xl md:text-7xl leading-[1.03] reveal-on-scroll">
+          “We sign artists, <span className="italic text-gold">not songs</span>.”
+        </blockquote>
+        <div className="lg:col-span-4 text-ivory/76 text-lg leading-relaxed reveal-on-scroll">
+          Each signing is treated as a world to build: sound, image, patience, and the long arc of a catalogue.
+        </div>
       </div>
     </section>
   </div>
