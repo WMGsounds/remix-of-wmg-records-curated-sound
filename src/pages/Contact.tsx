@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { ArrowRight } from "lucide-react";
-import contactImage from "@/assets/hero-cinematic.jpg";
+import contactImage from "@/assets/contact-editorial.jpg";
 import { PageTitle } from "@/components/PageTitle";
 
 const channels = [
@@ -27,9 +27,11 @@ const Contact = () => {
         <div className="relative min-h-[44vh] overflow-hidden bg-ink lg:min-h-screen">
           <img
             src={contactImage}
-            alt="Dimly lit recording studio microphone"
-            className="absolute inset-0 h-full w-full object-cover grayscale sepia opacity-60 contrast-125 saturate-50"
+            alt="Moody vintage telephone and notebook"
+            className="absolute inset-0 h-full w-full object-cover grayscale sepia opacity-75 contrast-125 saturate-50"
             loading="eager"
+            width={1024}
+            height={1536}
           />
           <div className="absolute inset-0 bg-[radial-gradient(circle_at_46%_34%,transparent_0,hsl(var(--ink)/0.10)_30%,hsl(var(--ink)/0.88)_100%)]" aria-hidden="true" />
           <div className="absolute inset-0 bg-gold/10 mix-blend-color" aria-hidden="true" />
