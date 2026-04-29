@@ -1,7 +1,7 @@
 import hero from "@/assets/hero-cinematic.jpg";
 import artist1 from "@/assets/artist-1.jpg";
-import artist3 from "@/assets/artist-3.jpg";
 import aboutSoundBg from "@/assets/about-sound-bg.png";
+import wmgTeam from "@/assets/wmg-team.png";
 import { PageTitle } from "@/components/PageTitle";
 
 const About = () => (
@@ -132,7 +132,7 @@ const About = () => (
       <div className="container-editorial grid grid-cols-1 lg:grid-cols-12 gap-12 md:gap-16 items-center">
         <div className="lg:col-span-5 reveal-on-scroll">
           <div className="aspect-[4/5] overflow-hidden bg-ivory/10">
-            <img src={artist3} alt="Portrait placeholder for WMG founders" loading="lazy" width={1200} height={1500} className="h-full w-full object-cover opacity-85 grayscale" />
+            <img src={wmgTeam} alt="WMG team gathered in a warm recording studio" loading="lazy" width={1254} height={1254} className="h-full w-full object-cover opacity-90" />
           </div>
         </div>
         <div className="lg:col-span-6 lg:col-start-7 reveal-on-scroll">

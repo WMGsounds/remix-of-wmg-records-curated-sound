@@ -39,17 +39,17 @@ const ArtistPage = () => {
       </section>
 
       {/* Bio */}
-      <section className="container-editorial py-28 md:py-36 grid grid-cols-1 lg:grid-cols-12 gap-12">
+      <section className="container-editorial py-20 md:py-28 grid grid-cols-1 lg:grid-cols-12 gap-10">
         <div className="lg:col-span-4">
           <p className="eyebrow mb-4">About</p>
           <div className="gold-rule" />
         </div>
-        <div className="lg:col-span-8 space-y-6">
+        <div className="lg:col-span-8 space-y-5">
           {artist.fullBio.length === 0 ? (
-            <p className="text-lg md:text-xl leading-relaxed font-light text-muted-foreground">Artist bio coming soon.</p>
+            <p className="text-base md:text-lg leading-relaxed font-light text-muted-foreground">Artist bio coming soon.</p>
           ) : (
             artist.fullBio.map((p, i) => (
-              <p key={i} className="text-lg md:text-xl leading-relaxed font-light">{p}</p>
+              <p key={i} className="text-base md:text-lg leading-relaxed font-light">{p}</p>
             ))
           )}
         </div>
@@ -57,28 +57,33 @@ const ArtistPage = () => {
 
       {/* Featured (latest) Release */}
       {featured && (
-        <section className="container-editorial py-28 md:py-36">
-          <p className="eyebrow mb-4">Latest Release</p>
+        <section className="relative overflow-hidden bg-ink py-28 md:py-36 text-ivory">
+          <div className="absolute inset-0 bg-[radial-gradient(circle_at_74%_38%,hsl(var(--golden-brown)/0.38),transparent_34%),radial-gradient(circle_at_18%_78%,hsl(var(--gold)/0.16),transparent_28%)]" aria-hidden="true" />
+          <div className="absolute inset-0 opacity-[0.08] [background-image:linear-gradient(90deg,hsl(var(--ivory)/0.8)_1px,transparent_1px),linear-gradient(0deg,hsl(var(--ivory)/0.8)_1px,transparent_1px)] [background-size:3px_3px]" aria-hidden="true" />
+          <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,transparent_42%,hsl(var(--ink)/0.72)_100%)]" aria-hidden="true" />
+          <div className="relative container-editorial">
+          <p className="eyebrow text-gold-soft mb-4">Latest Release</p>
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center mt-8">
             <div className="lg:col-span-5 hover-zoom overflow-hidden">
               {featured.coverArt ? (
                 <img src={featured.coverArt} alt={featured.title} loading="lazy" width={1200} height={1200} className="w-full aspect-square object-cover" />
               ) : (
-                <div className="w-full aspect-square bg-muted flex items-center justify-center text-muted-foreground">Artwork coming soon.</div>
+                <div className="w-full aspect-square bg-ivory/10 flex items-center justify-center text-ivory/60">Artwork coming soon.</div>
               )}
             </div>
             <div className="lg:col-span-7">
               <h2 className="display-serif text-5xl md:text-6xl mb-4">{featured.title}</h2>
-              <p className="text-muted-foreground mb-6">
+              <p className="text-ivory/64 mb-6">
                 {featured.releaseType} · {new Date(featured.releaseDate).getFullYear()}
               </p>
-              <p className="text-lg leading-relaxed mb-8 max-w-xl">
+              <p className="text-lg leading-relaxed mb-8 max-w-xl text-ivory/82">
                 {featured.fullDescription || featured.shortDescription}
               </p>
-              <Link to={`/releases/${encodeURIComponent(featured.slug)}`} className="inline-flex items-center gap-3 border-b border-foreground pb-2 text-[12px] uppercase tracking-[0.24em] hover:text-accent hover:border-accent transition-colors duration-500">
+              <Link to={`/releases/${encodeURIComponent(featured.slug)}`} className="inline-flex items-center gap-3 border-b border-ivory/70 pb-2 text-[12px] uppercase tracking-[0.24em] hover:text-gold hover:border-gold transition-colors duration-500">
                 Open Release <ArrowRight className="h-4 w-4" />
               </Link>
             </div>
+          </div>
           </div>
         </section>
       )}
