@@ -71,7 +71,11 @@ const Index = () => {
               </Link>
             </div>
             <div className="lg:col-span-5 order-1 lg:order-2 hover-zoom overflow-hidden">
-              <img src={featured.coverArt} alt={featured.title} loading="lazy" className="w-full aspect-square object-cover" />
+              {featured.coverArt ? (
+                <img src={featured.coverArt} alt={featured.title} loading="lazy" className="w-full aspect-square object-cover" />
+              ) : (
+                <div className="w-full aspect-square bg-muted flex items-center justify-center text-muted-foreground">Artwork coming soon.</div>
+              )}
             </div>
           </div>
         </section>
@@ -107,7 +111,11 @@ const Index = () => {
               {featuredArtists.map((a) => (
                 <Link key={a.slug} to={`/artists/${a.slug}`} className="group block hover-zoom">
                   <div className="relative overflow-hidden bg-secondary aspect-[3/4]">
-                    <img src={a.heroImage} alt={a.name} loading="lazy" className="h-full w-full object-cover" />
+                    {a.heroImage ? (
+                      <img src={a.heroImage} alt={a.name} loading="lazy" className="h-full w-full object-cover" />
+                    ) : (
+                      <div className="h-full w-full flex items-center justify-center p-6 text-center text-ivory/60">Image coming soon.</div>
+                    )}
                   </div>
                   <div className="pt-5">
                     <h3 className="font-serif text-2xl">{a.name}</h3>
