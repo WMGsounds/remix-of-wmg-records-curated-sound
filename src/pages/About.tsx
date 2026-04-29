@@ -125,7 +125,7 @@ const About = () => (
           <h2 className="display-serif text-5xl md:text-7xl mb-8">A small team with a long view.</h2>
           <p>
             Founded and run by people who believe records deserve time, context, and care. This space
-            can introduce the label's founders, creative leads, and collaborators — the ears behind the catalogue.
+            can introduce the label's founders, creative leads, and collaborators - the ears behind the catalogue.
           </p>
         </div>
       </div>
