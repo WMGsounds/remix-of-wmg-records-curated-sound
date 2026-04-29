@@ -113,7 +113,8 @@ export const SiteHeader = () => {
 };
 
 export const SiteFooter = () => (
-  <footer className="border-t border-gold bg-ink text-ivory">
+  <footer className="relative bg-ink text-ivory">
+    <div className="absolute inset-x-0 top-0 h-px bg-gold" aria-hidden="true" />
     <div className="container-editorial py-10 grid grid-cols-1 md:grid-cols-[2fr_1fr] gap-8 md:gap-10 items-start">
       <div className="flex items-center self-stretch">
         <Link to="/" className="inline-block" aria-label="WMG Records — Wareham Music Group">
