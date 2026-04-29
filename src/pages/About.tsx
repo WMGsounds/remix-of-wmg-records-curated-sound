@@ -21,8 +21,8 @@ const About = () => (
       </div>
     </section>
 
-    <section className="container-editorial py-24 md:py-36">
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 md:gap-16 items-start">
+    <section className="bg-gold/10 py-24 md:py-36">
+      <div className="container-editorial grid grid-cols-1 lg:grid-cols-12 gap-12 md:gap-16 items-start">
         <div className="lg:col-span-5 reveal-on-scroll">
           <p className="eyebrow text-gold mb-5">Our Story</p>
           <div className="gold-rule mb-10" />
