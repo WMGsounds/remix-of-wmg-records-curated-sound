@@ -8,51 +8,51 @@
 
 @layer base {
   :root {
-    --background: 32 12% 11%;          /* warm charcoal */
-    --foreground: 38 18% 86%;          /* softened parchment */
+    --background: 38 30% 96%;          /* warm ivory */
+    --foreground: 0 0% 7%;             /* near-black */
 
-    --card: 32 10% 14%;
-    --card-foreground: 38 18% 86%;
+    --card: 38 30% 96%;
+    --card-foreground: 0 0% 7%;
 
-    --popover: 32 10% 14%;
-    --popover-foreground: 38 18% 86%;
+    --popover: 38 30% 96%;
+    --popover-foreground: 0 0% 7%;
 
-    --primary: 38 18% 86%;
-    --primary-foreground: 32 12% 11%;
+    --primary: 0 0% 7%;                /* charcoal black */
+    --primary-foreground: 38 30% 96%;
 
-    --secondary: 32 10% 16%;
-    --secondary-foreground: 38 18% 86%;
+    --secondary: 38 20% 90%;
+    --secondary-foreground: 0 0% 7%;
 
-    --muted: 32 8% 20%;
-    --muted-foreground: 38 10% 62%;
+    --muted: 38 15% 88%;
+    --muted-foreground: 0 0% 35%;
 
     --accent: 40 45% 52%;              /* subtle gold */
-    --accent-foreground: 32 12% 11%;
+    --accent-foreground: 0 0% 7%;
 
     --gold: 40 45% 52%;
     --gold-soft: 40 35% 70%;
     --ink: 0 0% 7%;
-    --ivory: 38 18% 86%;
+    --ivory: 38 30% 96%;
 
     --destructive: 0 60% 45%;
-    --destructive-foreground: 38 18% 86%;
+    --destructive-foreground: 38 30% 96%;
 
-    --border: 34 8% 25%;
-    --input: 34 8% 25%;
-    --ring: 38 18% 86%;
+    --border: 0 0% 85%;
+    --input: 0 0% 85%;
+    --ring: 0 0% 7%;
 
     --radius: 0;
 
     --shadow-soft: 0 30px 80px -20px hsl(0 0% 0% / 0.25);
     --transition-elegant: cubic-bezier(0.22, 1, 0.36, 1);
 
-    --sidebar-background: 32 12% 11%;
-    --sidebar-foreground: 38 18% 86%;
-    --sidebar-primary: 38 18% 86%;
-    --sidebar-primary-foreground: 32 12% 11%;
-    --sidebar-accent: 32 10% 16%;
-    --sidebar-accent-foreground: 38 18% 86%;
-    --sidebar-border: 34 8% 25%;
+    --sidebar-background: 0 0% 98%;
+    --sidebar-foreground: 240 5.3% 26.1%;
+    --sidebar-primary: 240 5.9% 10%;
+    --sidebar-primary-foreground: 0 0% 98%;
+    --sidebar-accent: 240 4.8% 95.9%;
+    --sidebar-accent-foreground: 240 5.9% 10%;
+    --sidebar-border: 220 13% 91%;
     --sidebar-ring: 217.2 91.2% 59.8%;
   }
 
