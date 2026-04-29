@@ -87,7 +87,7 @@ const About = () => (
       </div>
     </section>
 
-    <section className="bg-golden-brown/88 py-18 md:py-26 text-ivory">
+    <section className="bg-golden-brown/88 py-20 md:py-24 text-ivory">
       <div className="container-editorial reveal-on-scroll">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-y-12 md:gap-x-14 lg:gap-x-20 border-y border-ivory/18 py-10 md:py-12">
           {[
