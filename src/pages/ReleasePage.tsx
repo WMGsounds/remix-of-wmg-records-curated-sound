@@ -66,7 +66,7 @@ const ReleasePage = () => {
         <div className="lg:col-span-6">
           <div className="overflow-hidden aspect-square shadow-[var(--shadow-soft)]">
             {release.coverArt ? (
-              <img src={release.coverArt} alt={release.title} className="h-full w-full object-cover" />
+              <img src={release.coverArt} alt={release.title} loading="eager" fetchPriority="high" width={1200} height={1200} className="h-full w-full object-cover" />
             ) : (
               <div className="h-full w-full bg-muted flex items-center justify-center text-muted-foreground">Artwork coming soon.</div>
             )}
@@ -128,7 +128,7 @@ const ReleasePage = () => {
                 <Link key={r.slug} to={`/releases/${encodeURIComponent(r.slug)}`} className="group block hover-zoom cursor-pointer focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-ivory">
                   <div className="overflow-hidden aspect-square">
                     {r.coverArt ? (
-                      <img src={r.coverArt} alt={r.title} loading="lazy" className="h-full w-full object-cover" />
+                      <img src={r.coverArt} alt={r.title} loading="lazy" width={1200} height={1200} className="h-full w-full object-cover" />
                     ) : (
                       <div className="h-full w-full bg-ivory/10 flex items-center justify-center p-4 text-center text-ivory/60">Artwork coming soon.</div>
                     )}
