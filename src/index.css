@@ -167,4 +167,18 @@
     from { opacity: 0; }
     to { opacity: 1; }
   }
+
+  .reveal-on-scroll {
+    animation: fadeUp 0.9s var(--transition-elegant) both;
+    animation-timeline: view();
+    animation-range: entry 10% cover 28%;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .animate-fade-up,
+    .animate-fade-in,
+    .reveal-on-scroll {
+      animation: none;
+    }
+  }
 }
