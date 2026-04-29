@@ -109,7 +109,12 @@ const Index = () => {
           ) : (
             <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 md:gap-10">
               {featuredArtists.map((a) => (
-                <Link key={a.slug} to={`/artists/${a.slug}`} className="group block hover-zoom">
+                <Link
+                  key={a.slug}
+                  to={`/artists/${encodeURIComponent(a.slug)}`}
+                  className="group block hover-zoom cursor-pointer focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-ivory"
+                  aria-label={`View ${a.name}`}
+                >
                   <div className="relative overflow-hidden bg-secondary aspect-[3/4]">
                     {a.heroImage ? (
                       <img src={a.heroImage} alt={a.name} loading="lazy" className="h-full w-full object-cover" />
