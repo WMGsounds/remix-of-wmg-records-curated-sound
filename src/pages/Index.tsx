@@ -171,7 +171,7 @@ const Index = () => {
       </section>
 
       {/* JOURNAL */}
-      <section className="bg-secondary py-28 md:py-40">
+      <section className="bg-background border-t border-border pt-24 pb-16 md:pt-32 md:pb-20">
         <div className="container-editorial">
           <div className="flex items-end justify-between mb-16">
             <div>
