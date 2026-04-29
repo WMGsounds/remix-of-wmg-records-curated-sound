@@ -1,7 +1,7 @@
 import hero from "@/assets/hero-cinematic.jpg";
 import artist1 from "@/assets/artist-1.jpg";
 import artist3 from "@/assets/artist-3.jpg";
-import studioSingingJoy from "@/assets/studio-singing-joy.png";
+import aboutSoundBg from "@/assets/about-sound-bg.png";
 import { PageTitle } from "@/components/PageTitle";
 
 const About = () => (
@@ -56,15 +56,11 @@ const About = () => (
       </div>
     </section>
 
-    <section className="bg-golden-brown/95 py-12 md:py-16">
-      <div className="container-editorial max-w-[1180px] grid grid-cols-1 lg:grid-cols-12 gap-9 md:gap-12 items-center">
-        <div className="lg:col-span-5 order-2 lg:order-1 reveal-on-scroll">
-          <div className="aspect-[4/3] lg:aspect-[5/4] overflow-hidden bg-muted">
-            <img src={studioSingingJoy} alt="Singer recording in a warm studio" className="h-full w-full object-cover object-top" />
-          </div>
-        </div>
-        <div className="lg:col-span-6 lg:col-start-7 order-1 lg:order-2 reveal-on-scroll space-y-7 text-ivory">
-          <div className="border-b border-ivory/25 pb-7">
+    <section className="relative overflow-hidden bg-ink py-16 md:py-24 text-ivory">
+      <img src={aboutSoundBg} alt="Singer recording in a warm studio" className="absolute inset-0 h-full w-full object-cover object-center opacity-34" />
+      <div className="absolute inset-0 bg-ink/68" />
+      <div className="relative container-editorial grid grid-cols-1 lg:grid-cols-2 gap-12 md:gap-16">
+          <div className="reveal-on-scroll">
             <p className="eyebrow text-gold-soft mb-3">Our Sound</p>
             <div className="gold-rule mb-6" />
             <p className="display-serif text-3xl md:text-5xl leading-[1.02] mb-5">
@@ -82,7 +78,7 @@ const About = () => (
               </p>
             </div>
           </div>
-          <div>
+          <div className="reveal-on-scroll">
             <p className="eyebrow text-gold-soft mb-3">Our Artists</p>
             <div className="gold-rule mb-6" />
             <div className="space-y-4 text-sm md:text-base leading-relaxed font-light text-ivory/88">
@@ -97,21 +93,20 @@ const About = () => (
               </p>
             </div>
           </div>
-        </div>
       </div>
     </section>
 
-    <section className="container-editorial py-24 md:py-32">
-      <div className="grid grid-cols-1 md:grid-cols-3 border-y border-border reveal-on-scroll">
+    <section className="bg-golden-brown/95 py-20 md:py-28 text-ivory">
+      <div className="container-editorial grid grid-cols-1 md:grid-cols-3 border-y border-ivory/25 reveal-on-scroll">
         {[
           ["01", "Build slowly", "No trend-chasing, no disposable campaigns — only catalogue with a future."],
           ["02", "Listen closely", "The song leads; production, image, and strategy follow with restraint."],
           ["03", "Outlast the moment", "We're not here for the cycle. We're here for the catalogue that survives it."],
         ].map(([number, title, text]) => (
-          <div key={number} className="py-10 md:p-10 md:border-l first:border-l-0 border-border">
-            <p className="text-gold font-serif text-3xl mb-8">{number}</p>
+          <div key={number} className="py-10 md:p-10 md:border-l first:border-l-0 border-ivory/25">
+            <p className="text-gold-soft font-serif text-3xl mb-8">{number}</p>
             <h2 className="font-serif text-3xl md:text-4xl mb-4">{title}</h2>
-            <p className="text-muted-foreground leading-relaxed max-w-sm">{text}</p>
+            <p className="text-ivory/82 leading-relaxed max-w-sm">{text}</p>
           </div>
         ))}
       </div>
