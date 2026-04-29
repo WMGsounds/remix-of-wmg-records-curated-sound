@@ -126,6 +126,12 @@ export const SiteFooter = () => (
             </li>
           ))}
         </ul>
+        <Link
+          to="/store"
+          className="mt-5 inline-flex border border-gold px-5 py-2.5 text-[11px] uppercase tracking-[0.24em] text-gold transition-colors duration-500 hover:bg-gold hover:text-ink"
+        >
+          Store
+        </Link>
       </div>
     </div>
 
