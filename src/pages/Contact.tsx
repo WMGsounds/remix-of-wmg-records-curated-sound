@@ -1,5 +1,6 @@
 import { useState } from "react";
-import { toast } from "sonner";
+import { ArrowRight } from "lucide-react";
+import contactImage from "@/assets/hero-cinematic.jpg";
 import { PageTitle } from "@/components/PageTitle";
 
 const channels = [
@@ -11,47 +12,63 @@ const channels = [
 
 const Contact = () => {
   const [form, setForm] = useState({ name: "", email: "", subject: "General", message: "" });
+  const [sent, setSent] = useState(false);
 
   const onSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    toast.success("Message sent", { description: "We'll be in touch shortly." });
+    setSent(true);
     setForm({ name: "", email: "", subject: "General", message: "" });
   };
 
   return (
-    <div className="bg-gold/10 pt-40 pb-32">
+    <main className="bg-background">
       <PageTitle title="Contact" />
-      <div className="container-editorial">
-        <p className="eyebrow mb-6">Contact</p>
-        <h1 className="display-serif text-6xl md:text-8xl lg:text-9xl mb-6">Get in touch.</h1>
-        <p className="font-serif text-2xl md:text-3xl leading-tight max-w-3xl mb-16">
-          Email us direct, or just fill out the contact form and we'll get back to you.
-        </p>
+      <section className="grid min-h-screen grid-cols-1 lg:grid-cols-[43%_57%]">
+        <div className="relative min-h-[44vh] overflow-hidden bg-ink lg:min-h-screen">
+          <img
+            src={contactImage}
+            alt="Dimly lit recording studio microphone"
+            className="absolute inset-0 h-full w-full object-cover grayscale sepia opacity-60 contrast-125 saturate-50"
+            loading="eager"
+          />
+          <div className="absolute inset-0 bg-[radial-gradient(circle_at_46%_34%,transparent_0,hsl(var(--ink)/0.10)_30%,hsl(var(--ink)/0.88)_100%)]" aria-hidden="true" />
+          <div className="absolute inset-0 bg-gold/10 mix-blend-color" aria-hidden="true" />
+          <div className="absolute inset-0 opacity-[0.12] [background-image:linear-gradient(90deg,hsl(var(--ivory)/0.8)_1px,transparent_1px),linear-gradient(0deg,hsl(var(--ivory)/0.8)_1px,transparent_1px)] [background-size:3px_3px]" aria-hidden="true" />
+        </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-16">
-          <div className="lg:col-span-5 space-y-10">
-            {channels.map((c) => (
-              <div key={c.label}>
-                <p className="eyebrow mb-2">{c.label}</p>
-                <a href={`mailto:${c.email}`} className="font-serif text-2xl md:text-3xl link-underline">
-                  {c.email}
-                </a>
+        <div className="relative overflow-hidden bg-gold/10 px-6 pb-24 pt-28 md:px-12 md:pb-32 md:pt-36 lg:px-16 xl:px-24">
+          <div className="pointer-events-none absolute inset-0 opacity-[0.18] [background-image:linear-gradient(90deg,hsl(var(--ink)/0.16)_1px,transparent_1px),linear-gradient(0deg,hsl(var(--ink)/0.12)_1px,transparent_1px)] [background-size:4px_4px]" aria-hidden="true" />
+          <div className="relative mx-auto max-w-4xl">
+            <p className="eyebrow mb-5 text-golden-brown">Contact</p>
+            <h1 className="display-serif text-6xl md:text-8xl lg:text-9xl mb-6">Get in touch.</h1>
+            <p className="font-serif text-2xl md:text-3xl leading-tight max-w-2xl mb-14">
+              Send us a note. Whether it's press, sync, or new music, we read every message.
+            </p>
+
+            <div className="grid grid-cols-1 gap-14 xl:grid-cols-12 xl:gap-16">
+              <div className="xl:col-span-5">
+                {channels.map((c) => (
+                  <div key={c.label} className="border-t border-gold/40 py-5 last:border-b">
+                    <p className="eyebrow mb-2 text-golden-brown">{c.label}</p>
+                    <a href={`mailto:${c.email}`} className="font-serif text-2xl leading-tight link-underline md:text-3xl">
+                      {c.email}
+                    </a>
+                  </div>
+                ))}
               </div>
-            ))}
-          </div>
 
-          <form onSubmit={onSubmit} className="lg:col-span-7 space-y-8">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-              <Field label="Name" value={form.name} onChange={(v) => setForm({ ...form, name: v })} />
-              <Field label="Email" type="email" value={form.email} onChange={(v) => setForm({ ...form, email: v })} />
-            </div>
+              <form onSubmit={onSubmit} className="xl:col-span-7 space-y-8">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                  <Field label="Name" value={form.name} onChange={(v) => setForm({ ...form, name: v })} />
+                  <Field label="Email" type="email" value={form.email} onChange={(v) => setForm({ ...form, email: v })} />
+                </div>
 
             <div>
               <label className="eyebrow mb-3 block">Subject</label>
               <select
                 value={form.subject}
                 onChange={(e) => setForm({ ...form, subject: e.target.value })}
-                className="w-full bg-transparent border-b border-foreground py-3 text-base focus:outline-none"
+                className="w-full bg-transparent border-b border-foreground py-3 text-base focus:border-gold focus:outline-none transition-colors duration-300"
               >
                 {["General", "Press", "Sync / Licensing", "Demo Submission", "Support"].map((o) => (
                   <option key={o}>{o}</option>
@@ -66,20 +83,29 @@ const Contact = () => {
                 rows={6}
                 value={form.message}
                 onChange={(e) => setForm({ ...form, message: e.target.value })}
-                className="w-full bg-transparent border-b border-foreground py-3 text-base focus:outline-none resize-none"
+                className="w-full bg-transparent border-b border-foreground py-3 text-base focus:border-gold focus:outline-none resize-none transition-colors duration-300"
               />
             </div>
 
-            <button
-              type="submit"
-              className="bg-foreground text-background px-10 py-4 text-[12px] uppercase tracking-[0.24em] hover:bg-accent hover:text-ink transition-colors duration-500"
-            >
-              Send Message
-            </button>
-          </form>
+                <div className="flex flex-wrap items-center gap-5">
+                  <button
+                    type="submit"
+                    className="inline-flex items-center gap-3 border border-foreground bg-foreground px-9 py-4 text-[12px] font-medium uppercase tracking-[0.24em] text-gold hover:border-gold hover:bg-transparent hover:text-foreground transition-colors duration-500"
+                  >
+                    Send Message <ArrowRight className="h-4 w-4" />
+                  </button>
+                  {sent && <p className="font-serif text-xl italic text-golden-brown">Message sent. We'll be in touch.</p>}
+                </div>
+              </form>
+            </div>
+          </div>
         </div>
-      </div>
-    </div>
+      </section>
+
+      <section className="bg-ink px-6 py-16 text-center text-ivory md:px-12">
+        <p className="font-serif text-3xl italic text-ivory/85 md:text-4xl">Music made with intent. — WMG</p>
+      </section>
+    </main>
   );
 };
 
@@ -93,7 +119,7 @@ const Field = ({
       required
       value={value}
       onChange={(e) => onChange(e.target.value)}
-      className="w-full bg-transparent border-b border-foreground py-3 text-base focus:outline-none"
+      className="w-full bg-transparent border-b border-foreground py-3 text-base focus:border-gold focus:outline-none transition-colors duration-300"
     />
   </div>
 );
