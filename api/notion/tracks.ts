@@ -1,5 +1,5 @@
-import { notion, DBS, CACHE_HEADERS } from "./_client";
-import { loadAll, normalizeRelease, normalizeArtist, normalizeTrack } from "./_normalize";
+import { notion, DBS, CACHE_HEADERS } from "./_client.js";
+import { loadAll, normalizeRelease, normalizeArtist, normalizeTrack } from "./_normalize.js";
 
 export default async function handler(_req: any, res: any) {
   try {

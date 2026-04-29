@@ -1,5 +1,5 @@
-import { notion, DBS, CACHE_HEADERS } from "../_client";
-import { loadAll, normalizeArtist, normalizeRelease, normalizeTrack } from "../_normalize";
+import { notion, DBS, CACHE_HEADERS } from "../_client.js";
+import { loadAll, normalizeArtist, normalizeRelease, normalizeTrack } from "../_normalize.js";
 
 export default async function handler(req: any, res: any) {
   const { slug } = req.query;
