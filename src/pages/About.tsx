@@ -46,13 +46,19 @@ const About = () => (
     <section className="relative overflow-hidden bg-ink py-16 md:py-24 text-ivory">
       <img src={aboutSoundBg} alt="Singer recording in a warm studio" className="absolute inset-0 h-full w-full object-cover object-center opacity-15" />
       <div className="absolute inset-0 bg-ink/86" />
-      <div className="relative container-editorial grid grid-cols-1 lg:grid-cols-2 gap-12 md:gap-16">
+      <div className="relative container-editorial grid grid-cols-1 lg:grid-cols-2 gap-x-12 gap-y-10 md:gap-x-16">
           <div className="reveal-on-scroll">
             <p className="eyebrow text-gold-soft mb-3">Our Sound</p>
-            <div className="gold-rule mb-6" />
-            <p className="display-serif text-3xl md:text-5xl leading-[1.02] mb-5">
+            <div className="gold-rule" />
+          </div>
+          <div className="reveal-on-scroll">
+            <p className="eyebrow text-gold-soft mb-3">Our Artists</p>
+            <div className="gold-rule" />
+          </div>
+          <p className="lg:col-span-2 display-serif text-3xl md:text-5xl lg:text-6xl leading-[1.02] reveal-on-scroll">
               Warmth, restraint, and respect for the song.
-            </p>
+          </p>
+          <div className="reveal-on-scroll">
             <div className="space-y-4 text-sm md:text-base leading-relaxed font-light text-ivory/88">
               <p>
                 We don't sit inside a single genre. Our roster spans soul and gospel, country and
@@ -66,8 +72,6 @@ const About = () => (
             </div>
           </div>
           <div className="reveal-on-scroll">
-            <p className="eyebrow text-gold-soft mb-3">Our Artists</p>
-            <div className="gold-rule mb-6" />
             <div className="space-y-4 text-sm md:text-base leading-relaxed font-light text-ivory/88">
               <p>
                 We sign artists, not songs. Each WMG signing is a long-form commitment - to a body of
