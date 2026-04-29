@@ -9,6 +9,8 @@ export type StreamingLinks = {
   bandcamp?: string;
   tidal?: string;
   youtube?: string;
+  youtubeMusic?: string;
+  amazonMusic?: string;
 };
 
 export type Artist = {

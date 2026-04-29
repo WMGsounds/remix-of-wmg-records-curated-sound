@@ -71,7 +71,11 @@ const Index = () => {
               </Link>
             </div>
             <div className="lg:col-span-5 order-1 lg:order-2 hover-zoom overflow-hidden">
-              <img src={featured.coverArt} alt={featured.title} loading="lazy" className="w-full aspect-square object-cover" />
+              {featured.coverArt ? (
+                <img src={featured.coverArt} alt={featured.title} loading="lazy" className="w-full aspect-square object-cover" />
+              ) : (
+                <div className="w-full aspect-square bg-muted flex items-center justify-center text-muted-foreground">Artwork coming soon.</div>
+              )}
             </div>
           </div>
         </section>
@@ -107,7 +111,11 @@ const Index = () => {
               {featuredArtists.map((a) => (
                 <Link key={a.slug} to={`/artists/${a.slug}`} className="group block hover-zoom">
                   <div className="relative overflow-hidden bg-secondary aspect-[3/4]">
-                    <img src={a.heroImage} alt={a.name} loading="lazy" className="h-full w-full object-cover" />
+                    {a.heroImage ? (
+                      <img src={a.heroImage} alt={a.name} loading="lazy" className="h-full w-full object-cover" />
+                    ) : (
+                      <div className="h-full w-full flex items-center justify-center p-6 text-center text-ivory/60">Image coming soon.</div>
+                    )}
                   </div>
                   <div className="pt-5">
                     <h3 className="font-serif text-2xl">{a.name}</h3>
@@ -162,8 +170,8 @@ const Index = () => {
         <h2 className="display-serif text-5xl md:text-7xl mb-12">In Session</h2>
         <div className="relative aspect-video bg-ink overflow-hidden group cursor-pointer">
           <img
-            src={hero}
-            alt="WMG Sessions"
+            src={featured?.coverArt || latestReleases[0]?.coverArt || hero}
+            alt={featured?.title || latestReleases[0]?.title || "WMG Records"}
             loading="lazy"
             className="absolute inset-0 h-full w-full object-cover opacity-60 group-hover:opacity-50 transition-opacity duration-700"
           />
@@ -173,8 +181,12 @@ const Index = () => {
             </div>
           </div>
           <div className="absolute bottom-8 left-8 text-ivory">
-            <p className="font-serif text-2xl md:text-3xl">Marcus Vale — Live at Studio Aurum</p>
-            <p className="text-sm text-ivory/70 mt-1">A WMG Session · 12 min</p>
+            <p className="font-serif text-2xl md:text-3xl">
+              {featured ? `${featured.artistName} — ${featured.title}` : latestReleases[0] ? `${latestReleases[0].artistName} — ${latestReleases[0].title}` : "WMG Records"}
+            </p>
+            <p className="text-sm text-ivory/70 mt-1">
+              {featured?.releaseType || latestReleases[0]?.releaseType || "Release"}
+            </p>
           </div>
         </div>
       </section>
@@ -188,21 +200,25 @@ const Index = () => {
               <h2 className="display-serif text-5xl md:text-7xl">Notes & Stories</h2>
             </div>
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-12">
-            {[
-              { kicker: "Essay", title: "On building artist worlds in a streaming age", date: "April 2026" },
-              { kicker: "In the Studio", title: "Recording 'After the Room' to tape, in one weekend", date: "March 2026" },
-              { kicker: "Conversation", title: "Iris Naoko on silence, breath, and the cello", date: "February 2026" },
-            ].map((p) => (
-              <article key={p.title} className="group cursor-pointer">
-                <p className="eyebrow mb-4">{p.kicker}</p>
-                <h3 className="font-serif text-3xl leading-tight group-hover:text-accent transition-colors duration-500">
-                  {p.title}
-                </h3>
-                <p className="text-sm text-muted-foreground mt-6">{p.date}</p>
-              </article>
-            ))}
-          </div>
+          {isLoading ? (
+            <InlineSkeleton count={3} />
+          ) : latestReleases.length === 0 ? (
+            <p className="text-muted-foreground">No release stories yet.</p>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-12">
+              {latestReleases.slice(0, 3).map((release) => (
+                <Link key={release.slug} to={`/releases/${release.slug}`} className="group cursor-pointer">
+                  <p className="eyebrow mb-4">{release.releaseType}</p>
+                  <h3 className="font-serif text-3xl leading-tight group-hover:text-accent transition-colors duration-500">
+                    {release.title}
+                  </h3>
+                  <p className="text-sm text-muted-foreground mt-6">
+                    {release.releaseDate ? new Date(release.releaseDate).toLocaleDateString(undefined, { month: "long", year: "numeric" }) : "Date TBC"}
+                  </p>
+                </Link>
+              ))}
+            </div>
+          )}
         </div>
       </section>
 

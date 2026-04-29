@@ -4,12 +4,16 @@ import type { Artist, Release } from "@/lib/types";
 export const ArtistCard = ({ artist }: { artist: Artist }) => (
   <Link to={`/artists/${artist.slug}`} className="group block hover-zoom">
     <div className="relative overflow-hidden bg-muted aspect-[3/4]">
-      <img
-        src={artist.heroImage}
-        alt={artist.name}
-        loading="lazy"
-        className="h-full w-full object-cover"
-      />
+      {artist.heroImage ? (
+        <img
+          src={artist.heroImage}
+          alt={artist.name}
+          loading="lazy"
+          className="h-full w-full object-cover"
+        />
+      ) : (
+        <div className="h-full w-full flex items-center justify-center p-6 text-center text-muted-foreground">Image coming soon.</div>
+      )}
       <div className="absolute inset-0 bg-gradient-to-t from-ink/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-700" />
     </div>
     <div className="pt-5">
@@ -23,16 +27,21 @@ export const ArtistCard = ({ artist }: { artist: Artist }) => (
 );
 
 export const ReleaseCard = ({ release }: { release: Release }) => {
-  const year = new Date(release.releaseDate).getFullYear();
+  const date = release.releaseDate ? new Date(release.releaseDate) : null;
+  const year = date && !Number.isNaN(date.getTime()) ? date.getFullYear() : "TBC";
   return (
     <Link to={`/releases/${release.slug}`} className="group block hover-zoom">
       <div className="relative overflow-hidden bg-muted aspect-square">
-        <img
-          src={release.coverArt}
-          alt={`${release.title} by ${release.artistName}`}
-          loading="lazy"
-          className="h-full w-full object-cover"
-        />
+        {release.coverArt ? (
+          <img
+            src={release.coverArt}
+            alt={`${release.title} by ${release.artistName}`}
+            loading="lazy"
+            className="h-full w-full object-cover"
+          />
+        ) : (
+          <div className="h-full w-full flex items-center justify-center p-6 text-center text-muted-foreground">Artwork coming soon.</div>
+        )}
       </div>
       <div className="pt-5 flex items-start justify-between gap-4">
         <div>

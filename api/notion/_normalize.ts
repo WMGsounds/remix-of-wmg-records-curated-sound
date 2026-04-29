@@ -10,6 +10,7 @@ const num = (p: any): number => p?.number ?? 0;
 const bool = (p: any): boolean => !!p?.checkbox;
 const url = (p: any): string | undefined => p?.url ?? undefined;
 const select = (p: any): string => p?.select?.name ?? "";
+const multiSelect = (p: any): string => (p?.multi_select ?? []).map((o: any) => o.name).filter(Boolean).join(", ");
 const date = (p: any): string => p?.date?.start ?? "";
 
 const fileUrl = (f: any): string =>
@@ -17,6 +18,8 @@ const fileUrl = (f: any): string =>
 
 const files = (p: any): string[] => (p?.files ?? []).map(fileUrl).filter(Boolean);
 const firstFile = (p: any): string => files(p)[0] ?? "";
+const titleProp = (props: Record<string, any>): any =>
+  Object.values(props).find((p: any) => p?.type === "title") ?? props["Title"] ?? props["Name"];
 
 export function normalizeArtist(page: any) {
   const props = page.properties;
@@ -24,7 +27,7 @@ export function normalizeArtist(page: any) {
     id: page.id,
     slug: text(props["Slug"]),
     name: text(props["Name"]),
-    genre: select(props["Genre"]) || text(props["Genre"]),
+    genre: multiSelect(props["Genre"]) || select(props["Genre"]) || text(props["Genre"]),
     shortDescription: text(props["Short Description"]),
     fullBio: paragraphs(props["Full Bio"]),
     heroImage: firstFile(props["Hero Image"]),
@@ -42,7 +45,7 @@ export function normalizeRelease(page: any, artistLookup: Map<string, any>) {
   return {
     id: page.id,
     slug: text(props["Slug"]),
-    title: text(props["Title"]),
+    title: text(titleProp(props)),
     artistId: artistRel,
     artistSlug: artist?.slug ?? "",
     artistName: artist?.name ?? "",
@@ -58,7 +61,9 @@ export function normalizeRelease(page: any, artistLookup: Map<string, any>) {
       appleMusic: url(props["Apple Music URL"]),
       bandcamp: url(props["Bandcamp URL"]),
       tidal: url(props["Tidal URL"]),
-      youtube: url(props["YouTube URL"]),
+      youtube: url(props["YouTube Music URL"]) || url(props["YouTube URL"]),
+      youtubeMusic: url(props["YouTube Music URL"]) || url(props["YouTube URL"]),
+      amazonMusic: url(props["Amazon Music URL"]),
     },
     catalogueId: text(props["Catalogue ID"]) || null,
     displayOrder: num(props["Display Order"]),
@@ -71,7 +76,7 @@ export function normalizeTrack(page: any, releaseLookup: Map<string, any>) {
   const release = releaseLookup.get(releaseRel);
   return {
     id: page.id,
-    trackTitle: text(props["Track Title"]),
+    trackTitle: text(props["Track Title"]) || text(titleProp(props)),
     releaseId: releaseRel,
     releaseSlug: release?.slug ?? "",
     trackNumber: num(props["Track Number"]),

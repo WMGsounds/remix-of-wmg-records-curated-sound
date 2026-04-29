@@ -32,13 +32,8 @@ All pages call the API helpers in `src/lib/api.ts`:
 - `fetchArtistBySlug(slug)`     → `GET /api/notion/artist/[slug]`
 - `fetchReleaseBySlug(slug)`    → `GET /api/notion/release/[slug]`
 
-While running inside Lovable / locally, the helpers return mock data shaped exactly
-like the production responses (see `src/lib/mockData.ts`). To switch them to live
-Vercel endpoints, set the env var:
-
-```
-VITE_USE_MOCKS=false
-```
+The helpers call the live Vercel endpoints directly; no local mock catalogue is
+used by the app.
 
 The shared TypeScript shape lives in `src/lib/types.ts`. Your serverless routes
 must return JSON matching this shape.
@@ -55,7 +50,6 @@ Add these in the Vercel project dashboard → **Settings → Environment Variabl
 | `NOTION_ARTISTS_DB_ID`   | yes      | 32-char Artists database ID                            |
 | `NOTION_RELEASES_DB_ID`  | yes      | 32-char Releases database ID                           |
 | `NOTION_TRACKS_DB_ID`    | yes      | 32-char Tracks database ID                             |
-| `VITE_USE_MOCKS`         | yes      | Set to `false` in production                            |
 
 > Get database IDs from the Notion URL: `notion.so/.../<32-char-id>?v=...`
 > Make sure each database is **shared with your Notion integration**.
@@ -444,8 +438,7 @@ export default async function handler(req: any, res: any) {
 3. Create the `/api/notion/*` files above.
 4. In Notion: open each database → **`···` menu → Add connections** → select your integration so it can read the data.
 5. Add the env vars listed above in **Vercel → Settings → Environment Variables**.
-6. Set `VITE_USE_MOCKS=false` for Production (and Preview if you want live data there too).
-7. Deploy. Visit `/api/notion/artists` to confirm a JSON response — then load the site.
+6. Deploy. Visit `/api/notion/artists` to confirm a JSON response — then load the site.
 
 ---
 
