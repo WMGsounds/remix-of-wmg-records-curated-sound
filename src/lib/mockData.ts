@@ -119,18 +119,23 @@ export const mockHomepage = (): HomepageData => ({
 });
 
 export const mockArtistPage = (slug: string): ArtistPageData | null => {
-  const artist = mockArtists.find((a) => a.slug === slug);
+  const artist = mockArtists.find((a) => a.slug === slug) ?? mockArtists[0];
   if (!artist) return null;
-  return { artist, discography: mockReleases.filter((r) => r.artistSlug === slug) };
+  return {
+    artist,
+    discography: mockReleases
+      .filter((r) => r.artistSlug === artist.slug)
+      .sort((a, b) => +new Date(b.releaseDate) - +new Date(a.releaseDate)),
+  };
 };
 
 export const mockReleasePage = (slug: string): ReleasePageData | null => {
-  const release = mockReleases.find((r) => r.slug === slug);
+  const release = mockReleases.find((r) => r.slug === slug) ?? mockReleases[0];
   if (!release) return null;
   return {
     release,
     artist: mockArtists.find((a) => a.id === release.artistId) ?? null,
-    tracks: mockTracks.filter((t) => t.releaseSlug === slug).sort((a, b) => a.trackNumber - b.trackNumber),
+    tracks: mockTracks.filter((t) => t.releaseSlug === release.slug).sort((a, b) => a.trackNumber - b.trackNumber),
     related: mockReleases.filter((r) => r.artistSlug === release.artistSlug && r.slug !== slug).slice(0, 3),
   };
 };
