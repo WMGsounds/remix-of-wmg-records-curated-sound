@@ -1,6 +1,5 @@
 import hero from "@/assets/hero-cinematic.jpg";
 import artist1 from "@/assets/artist-1.jpg";
-import artist2 from "@/assets/artist-2.jpg";
 import artist3 from "@/assets/artist-3.jpg";
 import studioSingingJoy from "@/assets/studio-singing-joy.png";
 import { PageTitle } from "@/components/PageTitle";
