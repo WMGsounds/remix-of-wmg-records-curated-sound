@@ -64,7 +64,7 @@ const Index = () => {
                 {featured.fullDescription || featured.shortDescription}
               </p>
               <Link
-                to={`/releases/${featured.slug}`}
+                to={`/releases/${encodeURIComponent(featured.slug)}`}
                 className="inline-flex items-center gap-3 border-b border-foreground pb-2 text-[12px] uppercase tracking-[0.24em] font-medium hover:text-accent hover:border-accent transition-colors duration-500"
               >
                 Explore Release <ArrowRight className="h-4 w-4" />
@@ -109,7 +109,12 @@ const Index = () => {
           ) : (
             <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 md:gap-10">
               {featuredArtists.map((a) => (
-                <Link key={a.slug} to={`/artists/${a.slug}`} className="group block hover-zoom">
+                <Link
+                  key={a.slug}
+                  to={`/artists/${encodeURIComponent(a.slug)}`}
+                  className="group block hover-zoom cursor-pointer focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-ivory"
+                  aria-label={`View ${a.name}`}
+                >
                   <div className="relative overflow-hidden bg-secondary aspect-[3/4]">
                     {a.heroImage ? (
                       <img src={a.heroImage} alt={a.name} loading="lazy" className="h-full w-full object-cover" />
@@ -207,7 +212,7 @@ const Index = () => {
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-3 gap-12">
               {latestReleases.slice(0, 3).map((release) => (
-                <Link key={release.slug} to={`/releases/${release.slug}`} className="group cursor-pointer">
+                <Link key={release.slug} to={`/releases/${encodeURIComponent(release.slug)}`} className="group cursor-pointer">
                   <p className="eyebrow mb-4">{release.releaseType}</p>
                   <h3 className="font-serif text-3xl leading-tight group-hover:text-accent transition-colors duration-500">
                     {release.title}

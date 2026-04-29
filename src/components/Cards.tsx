@@ -2,7 +2,11 @@ import { Link } from "react-router-dom";
 import type { Artist, Release } from "@/lib/types";
 
 export const ArtistCard = ({ artist }: { artist: Artist }) => (
-  <Link to={`/artists/${artist.slug}`} className="group block hover-zoom">
+  <Link
+    to={`/artists/${encodeURIComponent(artist.slug)}`}
+    className="group block hover-zoom cursor-pointer focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-foreground"
+    aria-label={`View ${artist.name}`}
+  >
     <div className="relative overflow-hidden bg-muted aspect-[3/4]">
       {artist.heroImage ? (
         <img
@@ -30,7 +34,11 @@ export const ReleaseCard = ({ release }: { release: Release }) => {
   const date = release.releaseDate ? new Date(release.releaseDate) : null;
   const year = date && !Number.isNaN(date.getTime()) ? date.getFullYear() : "TBC";
   return (
-    <Link to={`/releases/${release.slug}`} className="group block hover-zoom">
+    <Link
+      to={`/releases/${encodeURIComponent(release.slug)}`}
+      className="group block hover-zoom cursor-pointer focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-foreground"
+      aria-label={`View ${release.title}`}
+    >
       <div className="relative overflow-hidden bg-muted aspect-square">
         {release.coverArt ? (
           <img
