@@ -1,4 +1,5 @@
 import { notion, DBS, CACHE_HEADERS, logApiError, validateNotionEnv, type ApiResponse } from "./_client.js";
+import { FALLBACK_HEADERS, fallbackTracks } from "./_fallback.js";
 import { loadAll, normalizeRelease, normalizeArtist, normalizeTrack } from "./_normalize.js";
 
 export default async function handler(_req: unknown, res: ApiResponse) {
@@ -20,6 +21,6 @@ export default async function handler(_req: unknown, res: ApiResponse) {
     res.writeHead(200, CACHE_HEADERS).end(JSON.stringify(tracks));
   } catch (e: unknown) {
     logApiError(route, e);
-    res.status(500).json({ error: e instanceof Error ? e.message : String(e) });
+    res.writeHead(200, FALLBACK_HEADERS).end(JSON.stringify(fallbackTracks));
   }
 }
