@@ -87,19 +87,20 @@ const About = () => (
       </div>
     </section>
 
-    <section className="bg-golden-brown/88 py-20 md:py-24 text-ivory">
-      <div className="container-editorial reveal-on-scroll">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-y-12 md:gap-x-14 lg:gap-x-20 border-y border-ivory/18 py-10 md:py-12">
+    <section className="relative overflow-hidden bg-golden-brown py-20 md:py-28 text-ivory">
+      <div className="absolute inset-0 bg-ivory/10" aria-hidden="true" />
+      <div className="relative container-editorial reveal-on-scroll">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-y-14 md:gap-x-16 lg:gap-x-24 border-y border-ivory/22 py-12 md:py-14">
           {[
-          ["01", "Build slowly", "No trend-chasing, no disposable campaigns. Only catalogue with a lasting future."],
-          ["02", "Listen closely", "The song leads; production, image, and strategy follow with restraint."],
-          ["03", "Outlast the moment", "We're not here for the cycle. We're here for the catalogue that survives it."],
+            ["01", "Build slowly", "No trend-chasing, no disposable campaigns. Only catalogue with a lasting future."],
+            ["02", "Listen closely", "The song leads; production, image, and strategy follow with restraint."],
+            ["03", "Outlast the moment", "We're not here for the cycle. We're here for the catalogue that survives it."],
           ].map(([number, title, text]) => (
-          <div key={number} className="relative md:pt-6">
-            <p className="text-gold-soft font-serif text-2xl mb-6">{number}</p>
-            <h2 className="font-serif text-3xl md:text-4xl mb-5">{title}</h2>
-            <p className="text-ivory/88 leading-relaxed max-w-sm">{text}</p>
-          </div>
+            <div key={number} className="relative md:pt-4">
+              <p className="text-gold-soft font-serif text-2xl mb-8">{number}</p>
+              <h2 className="font-serif text-3xl md:text-4xl mb-5">{title}</h2>
+              <p className="text-ivory/88 leading-relaxed max-w-sm">{text}</p>
+            </div>
           ))}
         </div>
       </div>
