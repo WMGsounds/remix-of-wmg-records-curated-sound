@@ -87,6 +87,8 @@ export function normalizeTrack(page: any, releaseLookup: Map<string, any>) {
 
 const dataSourceIdCache = new Map<string, Promise<string>>();
 
+type NotionApiError = { status?: number; code?: string };
+
 async function resolveDataSourceId(notion: any, dbId: string) {
   if (!dataSourceIdCache.has(dbId)) {
     dataSourceIdCache.set(dbId, (async () => {
@@ -99,8 +101,12 @@ async function resolveDataSourceId(notion: any, dbId: string) {
           throw new Error(`No data sources found for Notion database ${dbId}`);
         }
         return dataSourceId;
-      } catch (error: any) {
-        if (error?.status !== 404 && error?.code !== "object_not_found") {
+      } catch (error: unknown) {
+        const notionError = error as NotionApiError;
+        const canFallbackToDataSourceId = notionError.status === 404
+          || notionError.code === "object_not_found"
+          || notionError.code === "validation_error";
+        if (!canFallbackToDataSourceId) {
           throw error;
         }
         return dbId;
