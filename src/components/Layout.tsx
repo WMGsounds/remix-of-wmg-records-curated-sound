@@ -30,7 +30,7 @@ export const SiteHeader = () => {
 
   return (
     <header
-      className="fixed top-0 left-0 right-0 z-50 bg-ink/70 backdrop-blur-md border-b border-ivory/10 text-ivory shadow-sm"
+      className="fixed top-0 left-0 right-0 z-50 bg-black/70 backdrop-blur-md border-b border-ivory/10 text-ivory shadow-sm"
     >
       <div className="container-editorial flex items-center justify-between py-5">
         <Link to="/" className="flex items-center gap-3" aria-label="WMG Records home">
