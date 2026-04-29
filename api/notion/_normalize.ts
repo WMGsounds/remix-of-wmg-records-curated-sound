@@ -31,6 +31,7 @@ export function normalizeArtist(page: any) {
     shortDescription: text(props["Short Description"]),
     fullBio: paragraphs(props["Full Bio"]),
     heroImage: firstFile(props["Hero Image"]),
+    heroImage2: firstFile(props["Hero Image 2"]),
     gallery: files(props["Gallery"]),
     featured: bool(props["Featured"]),
     displayOrder: num(props["Display Order"]),
