@@ -1,5 +1,14 @@
 import { Client } from "@notionhq/client";
 
+export type ApiRequest = {
+  query: Record<string, string | string[] | undefined>;
+};
+
+export type ApiResponse = {
+  status: (code: number) => { json: (body: unknown) => void };
+  writeHead: (code: number, headers: Record<string, string>) => { end: (body: string) => void };
+};
+
 export const notion = new Client({ auth: process.env.NOTION_TOKEN });
 
 const REQUIRED_ENV = [
