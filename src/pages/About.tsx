@@ -16,7 +16,7 @@ const About = () => (
           <h1 className="display-serif text-6xl md:text-8xl lg:text-9xl max-w-5xl">A label, not a factory.</h1>
         </div>
         <p className="lg:col-span-4 max-w-md text-base md:text-lg leading-relaxed text-gold italic animate-fade-in">
-          Built for records with atmosphere, patience, and a point of view — a small room for lasting work.
+          Built for records with atmosphere, patience, and a point of view. A small room for lasting work.
         </p>
       </div>
     </section>
