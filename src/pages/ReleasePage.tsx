@@ -3,16 +3,7 @@ import { Link, useParams, Navigate } from "react-router-dom";
 import { ChevronDown } from "lucide-react";
 import { useReleaseBySlug } from "@/lib/queries";
 import { PageLoading, PageError } from "@/components/UIStates";
-import type { Track, StreamingLinks } from "@/lib/types";
-
-const STREAMING_LABELS: { key: keyof StreamingLinks; label: string }[] = [
-  { key: "spotify", label: "Spotify" },
-  { key: "appleMusic", label: "Apple Music" },
-  { key: "bandcamp", label: "Bandcamp" },
-  { key: "tidal", label: "Tidal" },
-  { key: "youtubeMusic", label: "YouTube Music" },
-  { key: "amazonMusic", label: "Amazon Music" },
-];
+import type { Track } from "@/lib/types";
 
 const TrackRow = ({ track }: { track: Track }) => {
   const [open, setOpen] = useState(false);
@@ -65,8 +56,6 @@ const ReleasePage = () => {
     month: "long",
     day: "numeric",
   }) : "Release date TBC";
-
-  const streamingEntries = STREAMING_LABELS.filter(({ key }) => release.streamingLinks[key]);
 
   return (
     <div className="pt-32">
@@ -123,24 +112,6 @@ const ReleasePage = () => {
             <li className="text-muted-foreground italic text-sm pt-2">Additional credits coming soon.</li>
           </ul>
 
-          <p className="eyebrow mt-14 mb-6">Listen</p>
-          {streamingEntries.length === 0 ? (
-            <p className="text-muted-foreground text-sm">Streaming links coming soon.</p>
-          ) : (
-            <div className="flex flex-wrap gap-3">
-              {streamingEntries.map(({ key, label }) => (
-                <a
-                  key={key}
-                  href={release.streamingLinks[key]}
-                  target="_blank"
-                  rel="noreferrer noopener"
-                  className="border border-foreground px-5 py-2.5 text-[11px] uppercase tracking-[0.24em] hover:bg-foreground hover:text-background transition-colors duration-500"
-                >
-                  {label}
-                </a>
-              ))}
-            </div>
-          )}
         </div>
       </section>
 
