@@ -154,7 +154,11 @@ const ReleasePage = () => {
               {related.map((r) => (
                 <Link key={r.slug} to={`/releases/${r.slug}`} className="group block hover-zoom">
                   <div className="overflow-hidden aspect-square">
-                    <img src={r.coverArt} alt={r.title} loading="lazy" className="h-full w-full object-cover" />
+                    {r.coverArt ? (
+                      <img src={r.coverArt} alt={r.title} loading="lazy" className="h-full w-full object-cover" />
+                    ) : (
+                      <div className="h-full w-full bg-ivory/10 flex items-center justify-center p-4 text-center text-ivory/60">Artwork coming soon.</div>
+                    )}
                   </div>
                   <h3 className="font-serif text-2xl mt-4">{r.title}</h3>
                   <p className="text-xs text-ivory/60 mt-1">{r.artistName}</p>
