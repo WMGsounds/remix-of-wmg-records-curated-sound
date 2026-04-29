@@ -99,7 +99,7 @@ const About = () => (
       </div>
     </section>
 
-    <section className="bg-ink text-ivory pt-10 pb-32 md:pb-40">
+    <section className="bg-ink text-ivory pt-10 pb-14 md:pb-20">
       <div className="container-editorial max-w-5xl reveal-on-scroll">
         <div className="gold-rule mb-10" />
         <p className="display-serif text-4xl md:text-7xl leading-[1.08]">
@@ -109,7 +109,7 @@ const About = () => (
       </div>
     </section>
 
-    <section className="bg-ink text-ivory py-24 md:py-32">
+    <section className="bg-ink text-ivory pt-8 pb-24 md:pt-10 md:pb-32">
       <div className="container-editorial grid grid-cols-1 lg:grid-cols-12 gap-12 md:gap-16 items-center">
         <div className="lg:col-span-5 reveal-on-scroll">
           <div className="aspect-[4/5] overflow-hidden bg-ivory/10">
