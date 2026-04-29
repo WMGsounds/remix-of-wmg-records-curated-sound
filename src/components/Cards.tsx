@@ -13,6 +13,8 @@ export const ArtistCard = ({ artist }: { artist: Artist }) => (
           src={artist.heroImage}
           alt={artist.name}
           loading="lazy"
+          width={900}
+          height={1200}
           className="h-full w-full object-cover"
         />
       ) : (
@@ -45,6 +47,8 @@ export const ReleaseCard = ({ release }: { release: Release }) => {
             src={release.coverArt}
             alt={`${release.title} by ${release.artistName}`}
             loading="lazy"
+            width={1200}
+            height={1200}
             className="h-full w-full object-cover"
           />
         ) : (

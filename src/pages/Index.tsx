@@ -20,6 +20,8 @@ const Index = () => {
         <img
           src={hero}
           alt="WMG Records"
+          loading="eager"
+          fetchPriority="high"
           className="absolute inset-0 h-full w-full object-cover opacity-70"
           width={1920}
           height={1080}
@@ -76,7 +78,7 @@ const Index = () => {
             </div>
             <div className="lg:col-span-5 order-1 lg:order-2 hover-zoom overflow-hidden">
               {featured.coverArt ? (
-                <img src={featured.coverArt} alt={featured.title} loading="lazy" className="w-full aspect-square object-cover" />
+                <img src={featured.coverArt} alt={featured.title} loading="lazy" width={1200} height={1200} className="w-full aspect-square object-cover" />
               ) : (
                 <div className="w-full aspect-square bg-muted flex items-center justify-center text-muted-foreground">Artwork coming soon.</div>
               )}
@@ -121,7 +123,7 @@ const Index = () => {
                 >
                   <div className="relative overflow-hidden bg-secondary aspect-[3/4]">
                     {a.heroImage ? (
-                      <img src={a.heroImage} alt={a.name} loading="lazy" className="h-full w-full object-cover" />
+                      <img src={a.heroImage} alt={a.name} loading="lazy" width={900} height={1200} className="h-full w-full object-cover" />
                     ) : (
                       <div className="h-full w-full flex items-center justify-center p-6 text-center text-ivory/60">Image coming soon.</div>
                     )}
