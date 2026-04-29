@@ -85,15 +85,54 @@ export function normalizeTrack(page: any, releaseLookup: Map<string, any>) {
   };
 }
 
+const dataSourceIdCache = new Map<string, Promise<string>>();
+
+type NotionApiError = { status?: number; code?: string };
+
+async function resolveDataSourceId(notion: any, dbId: string) {
+  if (!dataSourceIdCache.has(dbId)) {
+    dataSourceIdCache.set(dbId, (async () => {
+      if (!notion.databases?.retrieve) return dbId;
+
+      try {
+        const database = await notion.databases.retrieve({ database_id: dbId });
+        const dataSourceId = database?.data_sources?.[0]?.id;
+        if (!dataSourceId) {
+          throw new Error(`No data sources found for Notion database ${dbId}`);
+        }
+        return dataSourceId;
+      } catch (error: unknown) {
+        const notionError = error as NotionApiError;
+        const canFallbackToDataSourceId = notionError.status === 404
+          || notionError.code === "object_not_found"
+          || notionError.code === "validation_error";
+        if (!canFallbackToDataSourceId) {
+          throw error;
+        }
+        return dbId;
+      }
+    })());
+  }
+
+  return dataSourceIdCache.get(dbId)!;
+}
+
 export async function loadAll(notion: any, dbId: string) {
   const results: any[] = [];
   let cursor: string | undefined;
+  const dataSourceId = notion.dataSources?.query ? await resolveDataSourceId(notion, dbId) : dbId;
   do {
-    const r = await notion.databases.query({
-      database_id: dbId,
-      start_cursor: cursor,
-      page_size: 100,
-    });
+    const r = notion.dataSources?.query
+      ? await notion.dataSources.query({
+        data_source_id: dataSourceId,
+        start_cursor: cursor,
+        page_size: 100,
+      })
+      : await notion.databases.query({
+        database_id: dbId,
+        start_cursor: cursor,
+        page_size: 100,
+      });
     results.push(...r.results);
     cursor = r.has_more ? r.next_cursor : undefined;
   } while (cursor);
