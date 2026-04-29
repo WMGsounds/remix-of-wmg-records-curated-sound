@@ -49,15 +49,16 @@ const Artists = () => {
             </p>
           </div>
           <div className="relative hidden min-h-[360px] lg:block">
-            <div className="absolute -right-32 top-1/2 h-[440px] w-[74%] -translate-y-1/2 overflow-hidden shadow-soft">
+            <div className="absolute -right-44 top-1/2 h-[520px] w-[86%] -translate-y-1/2 overflow-hidden [mask-image:radial-gradient(ellipse_at_58%_48%,black_0%,black_24%,rgba(0,0,0,0.55)_42%,transparent_70%)] [mask-repeat:no-repeat] [mask-size:100%_100%]">
               <img
                 src={artistsHeroStudio}
                 alt="Monochrome studio detail with microphone and vinyl"
                 width={1280}
                 height={960}
-                className="h-full w-full object-cover grayscale opacity-72 mix-blend-screen"
+                className="h-full w-full object-cover grayscale saturate-50 opacity-42 mix-blend-lighten"
               />
-              <div className="absolute inset-0 bg-[linear-gradient(90deg,hsl(var(--ink)/0.92),transparent_38%,hsl(var(--ink)/0.18)),radial-gradient(circle_at_74%_18%,hsl(var(--gold)/0.18),transparent_34%)]" aria-hidden="true" />
+              <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_58%_48%,transparent_0%,hsl(var(--ink)/0.12)_34%,hsl(var(--ink))_76%),linear-gradient(90deg,hsl(var(--ink))_0%,transparent_34%,transparent_58%,hsl(var(--ink))_100%),linear-gradient(180deg,hsl(var(--ink))_0%,transparent_24%,transparent_70%,hsl(var(--ink))_100%)]" aria-hidden="true" />
+              <div className="absolute inset-0 bg-ink/35 mix-blend-multiply" aria-hidden="true" />
             </div>
           </div>
         </div>
