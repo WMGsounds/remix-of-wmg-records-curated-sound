@@ -14,8 +14,6 @@ const ArtistPage = () => {
 
   const { artist, discography } = data;
   const featured = discography[0];
-  const gallery = artist.gallery.filter(Boolean);
-
   return (
     <div>
       {/* Hero */}
@@ -110,23 +108,6 @@ const ArtistPage = () => {
             )}
           </div>
         </section>
-
-      {/* Listen */}
-      {/* Gallery */}
-      <section className="container-editorial py-28">
-        <p className="eyebrow mb-4">Gallery</p>
-        {gallery.length === 0 ? (
-          <p className="text-muted-foreground mt-8">Gallery coming soon.</p>
-        ) : (
-          <div className="grid grid-cols-2 md:grid-cols-3 gap-4 mt-8">
-          {gallery.map((img, i) => (
-            <div key={i} className="hover-zoom overflow-hidden aspect-[3/4]">
-              <img src={img} alt={`${artist.name} ${i+1}`} loading="lazy" className="h-full w-full object-cover" />
-            </div>
-          ))}
-          </div>
-        )}
-      </section>
 
       {/* Newsletter */}
       <section className="border-t border-border py-24">
