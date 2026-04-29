@@ -23,7 +23,10 @@ const Contact = () => {
       <PageTitle title="Contact" />
       <div className="container-editorial">
         <p className="eyebrow mb-6">Contact</p>
-        <h1 className="display-serif text-6xl md:text-8xl lg:text-9xl mb-16">Get in touch.</h1>
+        <h1 className="display-serif text-6xl md:text-8xl lg:text-9xl mb-6">Get in touch.</h1>
+        <p className="font-serif text-2xl md:text-3xl leading-tight max-w-3xl mb-16">
+          Email us direct, or just fill out the contact form and we'll get back to you.
+        </p>
 
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-16">
           <div className="lg:col-span-5 space-y-10">
