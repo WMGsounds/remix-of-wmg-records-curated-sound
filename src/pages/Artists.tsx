@@ -3,7 +3,7 @@ import { ArtistCard } from "@/components/Cards";
 import { PageTitle } from "@/components/PageTitle";
 import { useArtists } from "@/lib/queries";
 import { InlineSkeleton, PageError } from "@/components/UIStates";
-import artistsHeroStudio from "@/assets/artists-hero-studio.jpg";
+import artistsHeroStudio from "@/assets/artists-hero-microphone-vinyl.png";
 
 const sortOptions = ["Artist Name", "Genre"] as const;
 
