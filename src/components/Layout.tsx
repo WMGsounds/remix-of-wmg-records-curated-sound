@@ -34,6 +34,9 @@ export const SiteHeader = () => {
           src={hero}
           alt=""
           aria-hidden="true"
+          loading="lazy"
+          width={1920}
+          height={1080}
           className="pointer-events-none absolute inset-0 h-full w-full object-cover object-top opacity-70"
         />
       )}
@@ -41,7 +44,7 @@ export const SiteHeader = () => {
 
       <div className="container-editorial relative z-10 flex items-center justify-between py-5">
         <Link to="/" className="flex items-center gap-3" aria-label="WMG Records home">
-          <img src={logo} alt="WMG Records" className="h-16 md:h-20 w-auto" />
+          <img src={logo} alt="WMG Records" loading="eager" width={240} height={320} className="h-16 md:h-20 w-auto" />
         </Link>
 
         <nav className="hidden md:flex items-center gap-10">
@@ -121,6 +124,9 @@ export const SiteFooter = () => (
           <img
             src={footerLogo}
             alt="WMG Records — Wareham Music Group"
+            loading="lazy"
+            width={640}
+            height={220}
             className="w-full max-w-[280px] h-auto"
           />
         </Link>
