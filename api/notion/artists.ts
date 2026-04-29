@@ -10,8 +10,8 @@ export default async function handler(_req: any, res: any) {
       .map(normalizeArtist)
       .sort((a, b) => (a.displayOrder - b.displayOrder) || a.name.localeCompare(b.name));
     res.writeHead(200, CACHE_HEADERS).end(JSON.stringify(artists));
-  } catch (e: any) {
+  } catch (e: unknown) {
     logApiError(route, e);
-    res.status(500).json({ error: e.message });
+    res.status(500).json({ error: e instanceof Error ? e.message : String(e) });
   }
 }

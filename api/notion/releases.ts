@@ -16,8 +16,8 @@ export default async function handler(_req: any, res: any) {
       .map((p) => normalizeRelease(p, artistLookup))
       .sort((a, b) => +new Date(b.releaseDate) - +new Date(a.releaseDate));
     res.writeHead(200, CACHE_HEADERS).end(JSON.stringify(releases));
-  } catch (e: any) {
+  } catch (e: unknown) {
     logApiError(route, e);
-    res.status(500).json({ error: e.message });
+    res.status(500).json({ error: e instanceof Error ? e.message : String(e) });
   }
 }
