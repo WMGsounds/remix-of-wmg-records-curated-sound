@@ -68,7 +68,11 @@ const ArtistPage = () => {
           <p className="eyebrow mb-4">Latest Release</p>
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center mt-8">
             <div className="lg:col-span-5 hover-zoom overflow-hidden">
-              <img src={featured.coverArt} alt={featured.title} className="w-full aspect-square object-cover" />
+              {featured.coverArt ? (
+                <img src={featured.coverArt} alt={featured.title} className="w-full aspect-square object-cover" />
+              ) : (
+                <div className="w-full aspect-square bg-muted flex items-center justify-center text-muted-foreground">Artwork coming soon.</div>
+              )}
             </div>
             <div className="lg:col-span-7">
               <h2 className="display-serif text-5xl md:text-6xl mb-4">{featured.title}</h2>
@@ -98,7 +102,11 @@ const ArtistPage = () => {
               {discography.map((r) => (
                 <Link key={r.slug} to={`/releases/${r.slug}`} className="group block hover-zoom">
                   <div className="overflow-hidden aspect-square">
-                    <img src={r.coverArt} alt={r.title} loading="lazy" className="h-full w-full object-cover" />
+                    {r.coverArt ? (
+                      <img src={r.coverArt} alt={r.title} loading="lazy" className="h-full w-full object-cover" />
+                    ) : (
+                      <div className="h-full w-full bg-ivory/10 flex items-center justify-center p-4 text-center text-ivory/60">Artwork coming soon.</div>
+                    )}
                   </div>
                   <h3 className="font-serif text-xl mt-4">{r.title}</h3>
                   <p className="text-xs text-ivory/60 mt-1">
