@@ -1,5 +1,6 @@
 import { useMemo, useState } from "react";
 import { ReleaseCard } from "@/components/Cards";
+import { PageTitle } from "@/components/PageTitle";
 import { useReleases } from "@/lib/queries";
 import { InlineSkeleton, PageError } from "@/components/UIStates";
 
@@ -30,6 +31,7 @@ const Releases = () => {
 
   return (
     <div className="pt-40 pb-32">
+      <PageTitle title="Releases" />
       <div className="container-editorial">
         <p className="eyebrow mb-6">The Catalogue</p>
         <h1 className="display-serif text-6xl md:text-8xl lg:text-9xl mb-10">Releases</h1>
