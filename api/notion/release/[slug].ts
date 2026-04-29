@@ -1,4 +1,5 @@
 import { notion, DBS, CACHE_HEADERS, logApiError, validateNotionEnv, type ApiRequest, type ApiResponse } from "../_client.js";
+import { FALLBACK_HEADERS, fallbackReleasePage } from "../_fallback.js";
 import { loadAll, normalizeArtist, normalizeRelease, normalizeTrack } from "../_normalize.js";
 
 export default async function handler(req: ApiRequest, res: ApiResponse) {
@@ -34,6 +35,8 @@ export default async function handler(req: ApiRequest, res: ApiResponse) {
     );
   } catch (e: unknown) {
     logApiError(route, e, { slug });
-    res.status(500).json({ error: e instanceof Error ? e.message : String(e) });
+    const fallback = fallbackReleasePage(String(slug ?? ""));
+    if (!fallback) return res.status(404).json(null);
+    res.writeHead(200, FALLBACK_HEADERS).end(JSON.stringify(fallback));
   }
 }
