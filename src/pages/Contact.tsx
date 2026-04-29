@@ -19,7 +19,7 @@ const Contact = () => {
   };
 
   return (
-    <div className="pt-40 pb-32">
+    <div className="bg-gold/10 pt-40 pb-32">
       <PageTitle title="Contact" />
       <div className="container-editorial">
         <p className="eyebrow mb-6">Contact</p>
