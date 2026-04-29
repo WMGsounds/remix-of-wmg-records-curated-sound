@@ -89,18 +89,37 @@ const dataSourceIdCache = new Map<string, Promise<string>>();
 
 type NotionApiError = { status?: number; code?: string };
 
+export function formatNotionUuid(id: string) {
+  const cleanId = id.trim();
+  const compactId = cleanId.replace(/-/g, "");
+
+  if (/^[0-9a-fA-F]{32}$/.test(compactId)) {
+    return [
+      compactId.slice(0, 8),
+      compactId.slice(8, 12),
+      compactId.slice(12, 16),
+      compactId.slice(16, 20),
+      compactId.slice(20),
+    ].join("-");
+  }
+
+  return cleanId;
+}
+
 async function resolveDataSourceId(notion: any, dbId: string) {
-  if (!dataSourceIdCache.has(dbId)) {
-    dataSourceIdCache.set(dbId, (async () => {
+  const databaseId = formatNotionUuid(dbId);
+
+  if (!dataSourceIdCache.has(databaseId)) {
+    dataSourceIdCache.set(databaseId, (async () => {
       if (!notion.databases?.retrieve) return dbId;
 
       try {
-        const database = await notion.databases.retrieve({ database_id: dbId });
+        const database = await notion.databases.retrieve({ database_id: databaseId });
         const dataSourceId = database?.data_sources?.[0]?.id;
         if (!dataSourceId) {
-          throw new Error(`No data sources found for Notion database ${dbId}`);
+          throw new Error(`No data sources found for Notion database ${databaseId}`);
         }
-        return dataSourceId;
+        return formatNotionUuid(dataSourceId);
       } catch (error: unknown) {
         const notionError = error as NotionApiError;
         const canFallbackToDataSourceId = notionError.status === 404
@@ -109,18 +128,19 @@ async function resolveDataSourceId(notion: any, dbId: string) {
         if (!canFallbackToDataSourceId) {
           throw error;
         }
-        return dbId;
+        return databaseId;
       }
     })());
   }
 
-  return dataSourceIdCache.get(dbId)!;
+  return dataSourceIdCache.get(databaseId)!;
 }
 
 export async function loadAll(notion: any, dbId: string) {
   const results: any[] = [];
   let cursor: string | undefined;
-  const dataSourceId = notion.dataSources?.query ? await resolveDataSourceId(notion, dbId) : dbId;
+  const databaseId = formatNotionUuid(dbId);
+  const dataSourceId = notion.dataSources?.query ? await resolveDataSourceId(notion, databaseId) : databaseId;
   do {
     const r = notion.dataSources?.query
       ? await notion.dataSources.query({
@@ -129,7 +149,7 @@ export async function loadAll(notion: any, dbId: string) {
         page_size: 100,
       })
       : await notion.databases.query({
-        database_id: dbId,
+        database_id: databaseId,
         start_cursor: cursor,
         page_size: 100,
       });
