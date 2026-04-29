@@ -82,7 +82,7 @@ const ArtistPage = () => {
               <p className="text-lg leading-relaxed mb-8 max-w-xl">
                 {featured.fullDescription || featured.shortDescription}
               </p>
-              <Link to={`/releases/${featured.slug}`} className="inline-flex items-center gap-3 border-b border-foreground pb-2 text-[12px] uppercase tracking-[0.24em] hover:text-accent hover:border-accent transition-colors duration-500">
+              <Link to={`/releases/${encodeURIComponent(featured.slug)}`} className="inline-flex items-center gap-3 border-b border-foreground pb-2 text-[12px] uppercase tracking-[0.24em] hover:text-accent hover:border-accent transition-colors duration-500">
                 Open Release <ArrowRight className="h-4 w-4" />
               </Link>
             </div>
@@ -100,7 +100,7 @@ const ArtistPage = () => {
             ) : (
             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
               {discography.map((r) => (
-                <Link key={r.slug} to={`/releases/${r.slug}`} className="group block hover-zoom">
+                <Link key={r.slug} to={`/releases/${encodeURIComponent(r.slug)}`} className="group block hover-zoom cursor-pointer focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-ivory">
                   <div className="overflow-hidden aspect-square">
                     {r.coverArt ? (
                       <img src={r.coverArt} alt={r.title} loading="lazy" className="h-full w-full object-cover" />
