@@ -1,8 +1,10 @@
-import { notion, DBS, CACHE_HEADERS } from "./_client.js";
+import { notion, DBS, CACHE_HEADERS, logApiError, validateNotionEnv } from "./_client.js";
 import { loadAll, normalizeRelease, normalizeArtist, normalizeTrack } from "./_normalize.js";
 
 export default async function handler(_req: any, res: any) {
+  const route = "/api/notion/tracks";
   try {
+    validateNotionEnv(route);
     const [artistPages, releasePages, trackPages] = await Promise.all([
       loadAll(notion, DBS.artists),
       loadAll(notion, DBS.releases),
@@ -17,6 +19,7 @@ export default async function handler(_req: any, res: any) {
       .sort((a, b) => a.trackNumber - b.trackNumber);
     res.writeHead(200, CACHE_HEADERS).end(JSON.stringify(tracks));
   } catch (e: any) {
+    logApiError(route, e);
     res.status(500).json({ error: e.message });
   }
 }
