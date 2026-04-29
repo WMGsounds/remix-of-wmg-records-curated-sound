@@ -21,6 +21,7 @@ export type Artist = {
   shortDescription: string;
   fullBio: string[]; // paragraphs
   heroImage: string;
+  heroImage2?: string;
   gallery: string[];
   featured: boolean;
   displayOrder: number;

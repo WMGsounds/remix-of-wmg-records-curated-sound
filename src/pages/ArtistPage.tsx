@@ -13,13 +13,14 @@ const ArtistPage = () => {
   if (!data) return <Navigate to="/artists" replace />;
 
   const { artist, discography } = data;
+  const heroImage = artist.heroImage2 || artist.heroImage;
   const featured = discography[0];
   return (
     <div>
       {/* Hero */}
       <section className="relative h-[85vh] min-h-[600px] bg-ink text-ivory overflow-hidden">
-        {artist.heroImage ? (
-          <img src={artist.heroImage} alt={artist.name} className="absolute inset-0 h-full w-full object-cover opacity-80" />
+        {heroImage ? (
+          <img src={heroImage} alt={artist.name} className="absolute inset-0 h-full w-full object-cover opacity-80" />
         ) : (
           <div className="absolute inset-0 bg-secondary" />
         )}
