@@ -169,7 +169,7 @@ const Index = () => {
       </section>
 
       {/* LABEL STATEMENT */}
-      <section className="bg-secondary py-28 md:py-40">
+      <section className="bg-gold/10 py-28 md:py-40">
         <div className="container-editorial max-w-4xl">
           <p className="eyebrow mb-6">Our Statement</p>
           <p className="display-serif text-3xl md:text-5xl leading-[1.15]">
