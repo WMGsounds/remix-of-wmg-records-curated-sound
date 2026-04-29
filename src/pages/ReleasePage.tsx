@@ -85,7 +85,7 @@ const ReleasePage = () => {
           <p className="eyebrow mb-4">{release.releaseType} · {year}</p>
           <h1 className="display-serif text-6xl md:text-8xl mb-6">{release.title}</h1>
           {artist && (
-            <Link to={`/artists/${artist.slug}`} className="font-serif italic text-2xl md:text-3xl link-underline">
+            <Link to={`/artists/${encodeURIComponent(artist.slug)}`} className="font-serif italic text-2xl md:text-3xl link-underline">
               {artist.name}
             </Link>
           )}
@@ -152,7 +152,7 @@ const ReleasePage = () => {
             <h2 className="display-serif text-5xl md:text-6xl mb-16">Related Releases</h2>
             <div className="grid grid-cols-2 md:grid-cols-3 gap-8">
               {related.map((r) => (
-                <Link key={r.slug} to={`/releases/${r.slug}`} className="group block hover-zoom">
+                <Link key={r.slug} to={`/releases/${encodeURIComponent(r.slug)}`} className="group block hover-zoom cursor-pointer focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-ivory">
                   <div className="overflow-hidden aspect-square">
                     {r.coverArt ? (
                       <img src={r.coverArt} alt={r.title} loading="lazy" className="h-full w-full object-cover" />
