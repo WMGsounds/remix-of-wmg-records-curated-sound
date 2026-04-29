@@ -54,14 +54,6 @@ const ArtistPage = () => {
         </div>
       </section>
 
-      {/* Signature presentation (genre badge band) */}
-      <section className="bg-secondary py-24">
-        <div className="container-editorial max-w-4xl">
-          <p className="eyebrow mb-4">Signature</p>
-          <p className="display-serif text-3xl md:text-4xl italic">{artist.shortDescription}</p>
-        </div>
-      </section>
-
       {/* Featured (latest) Release */}
       {featured && (
         <section className="container-editorial py-28 md:py-36">
