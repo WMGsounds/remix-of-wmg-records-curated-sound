@@ -10,7 +10,7 @@ const sortOptions = ["Release Date", "Artist Name", "Release Name"] as const;
 const Releases = () => {
   const { data: releases = [], isLoading, isError } = useReleases();
   const [filter, setFilter] = useState<(typeof filters)[number]>("All");
-  const [sort, setSort] = useState<(typeof sortOptions)[number]>("Release Date");
+  const [sort, setSort] = useState<(typeof sortOptions)[number]>("Release Name");
 
   const visible = useMemo(() => {
     const list = filter === "All" ? [...releases] : releases.filter((r) => r.releaseType === filter);
