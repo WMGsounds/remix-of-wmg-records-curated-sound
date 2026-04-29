@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { toast } from "sonner";
+import { PageTitle } from "@/components/PageTitle";
 
 const channels = [
   { label: "General Enquiries", email: "info@wmgsounds.com" },
@@ -19,6 +20,7 @@ const Contact = () => {
 
   return (
     <div className="pt-40 pb-32">
+      <PageTitle title="Contact" />
       <div className="container-editorial">
         <p className="eyebrow mb-6">Contact</p>
         <h1 className="display-serif text-6xl md:text-8xl lg:text-9xl mb-16">Get in touch.</h1>

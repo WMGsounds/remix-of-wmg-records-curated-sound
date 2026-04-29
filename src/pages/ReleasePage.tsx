@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Link, useParams, Navigate } from "react-router-dom";
 import { ChevronDown } from "lucide-react";
 import { useReleaseBySlug } from "@/lib/queries";
+import { PageTitle } from "@/components/PageTitle";
 import { PageLoading, PageError } from "@/components/UIStates";
 import type { Track } from "@/lib/types";
 
@@ -59,6 +60,7 @@ const ReleasePage = () => {
 
   return (
     <div className="pt-32">
+      <PageTitle title={release.title} />
       {/* Hero */}
       <section className="container-editorial pb-20 md:pb-28 grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-20 items-end">
         <div className="lg:col-span-6">

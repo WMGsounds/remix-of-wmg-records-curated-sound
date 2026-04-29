@@ -1,7 +1,9 @@
 import hero from "@/assets/hero-cinematic.jpg";
+import { PageTitle } from "@/components/PageTitle";
 
 const About = () => (
   <div>
+    <PageTitle title="About" />
     <section className="relative h-[60vh] min-h-[420px] bg-ink text-ivory overflow-hidden">
       <img src={hero} alt="WMG" className="absolute inset-0 h-full w-full object-cover opacity-50" />
       <div className="absolute inset-0 bg-gradient-to-t from-ink to-transparent" />
