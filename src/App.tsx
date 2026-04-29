@@ -7,7 +7,6 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { SiteHeader, SiteFooter } from "@/components/Layout";
 import { ScrollToTop } from "@/components/ScrollToTop";
 import Index from "./pages/Index.tsx";
-import Artists from "./pages/Artists.tsx";
 import ArtistPage from "./pages/ArtistPage.tsx";
 import ReleasePage from "./pages/ReleasePage.tsx";
 import About from "./pages/About.tsx";
@@ -16,6 +15,7 @@ import Newsletter from "./pages/Newsletter.tsx";
 import Legal from "./pages/Legal.tsx";
 import NotFound from "./pages/NotFound.tsx";
 
+const Artists = lazy(() => import("./pages/Artists.tsx"));
 const Releases = lazy(() => import("./pages/Releases.tsx"));
 
 const queryClient = new QueryClient();
@@ -31,7 +31,7 @@ const App = () => (
         <main>
           <Routes>
             <Route path="/" element={<Index />} />
-            <Route path="/artists" element={<Artists />} />
+            <Route path="/artists" element={<Suspense fallback={null}><Artists /></Suspense>} />
             <Route path="/artists/:slug" element={<ArtistPage />} />
             <Route path="/releases" element={<Suspense fallback={null}><Releases /></Suspense>} />
             <Route path="/releases/:slug" element={<ReleasePage />} />
