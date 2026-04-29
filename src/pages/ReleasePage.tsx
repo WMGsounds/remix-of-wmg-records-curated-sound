@@ -10,7 +10,8 @@ const STREAMING_LABELS: { key: keyof StreamingLinks; label: string }[] = [
   { key: "appleMusic", label: "Apple Music" },
   { key: "bandcamp", label: "Bandcamp" },
   { key: "tidal", label: "Tidal" },
-  { key: "youtube", label: "YouTube" },
+  { key: "youtubeMusic", label: "YouTube Music" },
+  { key: "amazonMusic", label: "Amazon Music" },
 ];
 
 const TrackRow = ({ track }: { track: Track }) => {
@@ -57,12 +58,13 @@ const ReleasePage = () => {
   if (!data) return <Navigate to="/releases" replace />;
 
   const { release, artist, tracks, related } = data;
-  const year = new Date(release.releaseDate).getFullYear();
-  const dateLabel = new Date(release.releaseDate).toLocaleDateString(undefined, {
+  const releaseDate = release.releaseDate ? new Date(release.releaseDate) : null;
+  const year = releaseDate && !Number.isNaN(releaseDate.getTime()) ? releaseDate.getFullYear() : "TBC";
+  const dateLabel = releaseDate && !Number.isNaN(releaseDate.getTime()) ? releaseDate.toLocaleDateString(undefined, {
     year: "numeric",
     month: "long",
     day: "numeric",
-  });
+  }) : "Release date TBC";
 
   const streamingEntries = STREAMING_LABELS.filter(({ key }) => release.streamingLinks[key]);
 
@@ -72,7 +74,11 @@ const ReleasePage = () => {
       <section className="container-editorial pb-20 md:pb-28 grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-20 items-end">
         <div className="lg:col-span-6">
           <div className="overflow-hidden aspect-square shadow-[var(--shadow-soft)]">
-            <img src={release.coverArt} alt={release.title} className="h-full w-full object-cover" />
+            {release.coverArt ? (
+              <img src={release.coverArt} alt={release.title} className="h-full w-full object-cover" />
+            ) : (
+              <div className="h-full w-full bg-muted flex items-center justify-center text-muted-foreground">Artwork coming soon.</div>
+            )}
           </div>
         </div>
         <div className="lg:col-span-6">
