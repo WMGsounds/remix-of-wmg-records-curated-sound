@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import { Menu, X } from "lucide-react";
 import logo from "@/assets/wmg-logo-stacked.png";
 import footerLogo from "@/assets/wmg-logo-full.png";
+import hero from "@/assets/hero-cinematic.jpg";
 
 const nav = [
   { to: "/", label: "Home" },
@@ -30,9 +31,17 @@ export const SiteHeader = () => {
 
   return (
     <header
-      className="fixed top-0 left-0 right-0 z-50 bg-black/70 backdrop-blur-md border-b border-ivory/10 text-ivory shadow-sm"
+      className="fixed top-0 left-0 right-0 z-50 overflow-hidden backdrop-blur-md border-b border-ivory/10 text-ivory shadow-sm"
     >
-      <div className="container-editorial flex items-center justify-between py-5">
+      <img
+        src={hero}
+        alt=""
+        aria-hidden="true"
+        className="pointer-events-none absolute inset-0 h-full w-full object-cover object-top opacity-70"
+      />
+      <div className="pointer-events-none absolute inset-0 bg-black/70" />
+
+      <div className="container-editorial relative z-10 flex items-center justify-between py-5">
         <Link to="/" className="flex items-center gap-3" aria-label="WMG Records home">
           <img src={logo} alt="WMG Records" className="h-16 md:h-20 w-auto" />
         </Link>
