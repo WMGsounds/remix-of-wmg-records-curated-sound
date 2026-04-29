@@ -1,8 +1,10 @@
-import { notion, DBS, CACHE_HEADERS } from "./_client.js";
+import { notion, DBS, CACHE_HEADERS, logApiError, validateNotionEnv, type ApiResponse } from "./_client.js";
 import { loadAll, normalizeArtist, normalizeRelease } from "./_normalize.js";
 
-export default async function handler(_req: any, res: any) {
+export default async function handler(_req: unknown, res: ApiResponse) {
+  const route = "/api/notion/homepage";
   try {
+    validateNotionEnv(route);
     const [artistPages, releasePages] = await Promise.all([
       loadAll(notion, DBS.artists),
       loadAll(notion, DBS.releases),
@@ -26,7 +28,8 @@ export default async function handler(_req: any, res: any) {
     res.writeHead(200, CACHE_HEADERS).end(
       JSON.stringify({ featuredArtists, latestReleases, featuredRelease }),
     );
-  } catch (e: any) {
-    res.status(500).json({ error: e.message });
+  } catch (e: unknown) {
+    logApiError(route, e);
+    res.status(500).json({ error: e instanceof Error ? e.message : String(e) });
   }
 }

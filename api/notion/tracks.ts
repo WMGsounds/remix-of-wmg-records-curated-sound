@@ -1,8 +1,10 @@
-import { notion, DBS, CACHE_HEADERS } from "./_client.js";
+import { notion, DBS, CACHE_HEADERS, logApiError, validateNotionEnv, type ApiResponse } from "./_client.js";
 import { loadAll, normalizeRelease, normalizeArtist, normalizeTrack } from "./_normalize.js";
 
-export default async function handler(_req: any, res: any) {
+export default async function handler(_req: unknown, res: ApiResponse) {
+  const route = "/api/notion/tracks";
   try {
+    validateNotionEnv(route);
     const [artistPages, releasePages, trackPages] = await Promise.all([
       loadAll(notion, DBS.artists),
       loadAll(notion, DBS.releases),
@@ -16,7 +18,8 @@ export default async function handler(_req: any, res: any) {
       .map((p) => normalizeTrack(p, releaseLookup))
       .sort((a, b) => a.trackNumber - b.trackNumber);
     res.writeHead(200, CACHE_HEADERS).end(JSON.stringify(tracks));
-  } catch (e: any) {
-    res.status(500).json({ error: e.message });
+  } catch (e: unknown) {
+    logApiError(route, e);
+    res.status(500).json({ error: e instanceof Error ? e.message : String(e) });
   }
 }
