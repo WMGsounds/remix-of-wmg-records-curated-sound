@@ -100,9 +100,9 @@ const About = () => (
         </div>
         <div className="mt-10 md:mt-12 grid grid-cols-1 md:grid-cols-12 gap-y-10 md:gap-y-12">
           {[
-            ["\u200B", "Build", "slowly", "No trend-chasing, no disposable campaigns. Only catalogue with a lasting future.", "md:col-span-5 md:col-start-1", "0ms"],
-            ["\u200B", "Listen", "closely", "The song leads; production, image, and strategy follow with restraint.", "md:col-span-5 md:col-start-4 md:translate-y-5", "140ms"],
-            ["\u200B", "Outlast the", "moment", "We're not here for the cycle. We're here for the catalogue that survives it.", "md:col-span-5 md:col-start-8", "280ms"],
+            ["01", "Build", "slowly", "No trend-chasing, no disposable campaigns. Only catalogue with a lasting future.", "md:col-span-5 md:col-start-1", "0ms"],
+            ["02", "Listen", "closely", "The song leads; production, image, and strategy follow with restraint.", "md:col-span-5 md:col-start-4 md:translate-y-5", "140ms"],
+            ["03", "Outlast the", "moment", "We're not here for the cycle. We're here for the catalogue that survives it.", "md:col-span-5 md:col-start-8", "280ms"],
           ].map(([number, title, accent, text, placement, delay]) => (
             <div key={number} className={`relative reveal-on-scroll ${placement}`} style={{ animationDelay: delay }}>
               <p className="pointer-events-none absolute -left-2 -top-8 font-serif text-[5.5rem] leading-none text-gold-soft/10 md:-left-6 md:-top-10 md:text-[7.5rem]">
