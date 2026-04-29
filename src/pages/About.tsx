@@ -2,7 +2,7 @@ import hero from "@/assets/hero-cinematic.jpg";
 import artist1 from "@/assets/artist-1.jpg";
 import artist2 from "@/assets/artist-2.jpg";
 import artist3 from "@/assets/artist-3.jpg";
-import release1 from "@/assets/release-1.jpg";
+import studioSingingJoy from "@/assets/studio-singing-joy.png";
 import { PageTitle } from "@/components/PageTitle";
 
 const About = () => (
@@ -16,7 +16,7 @@ const About = () => (
           <p className="eyebrow text-gold mb-5">About WMG</p>
           <h1 className="display-serif text-6xl md:text-8xl lg:text-9xl max-w-5xl">A label, not a factory.</h1>
         </div>
-        <p className="lg:col-span-4 max-w-md text-base md:text-lg leading-relaxed text-ivory/78 animate-fade-in">
+        <p className="lg:col-span-4 max-w-md text-base md:text-lg leading-relaxed text-gold italic animate-fade-in">
           Built for records with atmosphere, patience, and a point of view — a small room for lasting work.
         </p>
       </div>
@@ -32,7 +32,7 @@ const About = () => (
           </p>
         </div>
         <div className="lg:col-span-6 lg:col-start-7 space-y-7 text-lg md:text-xl leading-relaxed font-light reveal-on-scroll">
-          <p className="first-letter:float-left first-letter:font-serif first-letter:text-7xl first-letter:leading-[0.82] first-letter:pr-3 first-letter:text-gold">
+          <p>
             WMG (Wareham Music Group) was founded on a simple instinct: that the most enduring
             records still come from a small room, a careful ear, and an artist with something to say.
           </p>
