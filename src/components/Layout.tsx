@@ -80,7 +80,7 @@ export const SiteHeader = () => {
       </div>
 
       {open && (
-        <div className="md:hidden border-t border-gold/30 bg-ink text-ivory shadow-soft">
+        <div className="relative z-10 md:hidden border-t border-gold/30 bg-ink text-ivory shadow-soft">
           <nav className="container-editorial flex flex-col py-8 gap-3" aria-label="Mobile navigation">
             {[...nav, { to: "/store", label: "Store" }].map((item) => (
               <NavLink
