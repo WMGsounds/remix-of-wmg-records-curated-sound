@@ -27,6 +27,7 @@ export default {
           DEFAULT: "hsl(var(--gold))",
           soft: "hsl(var(--gold-soft))",
         },
+        "golden-brown": "hsl(var(--golden-brown) / <alpha-value>)",
         ink: "hsl(var(--ink))",
         ivory: "hsl(var(--ivory))",
         primary: {
