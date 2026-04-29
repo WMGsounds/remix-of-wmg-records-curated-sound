@@ -62,12 +62,11 @@ export const SiteHeader = () => {
         </nav>
 
         <div className="hidden md:flex items-center gap-6">
-          {/* Future: Shop link slot */}
           <Link
-            to="/newsletter"
+            to="/store"
             className="text-[12px] uppercase tracking-[0.24em] font-medium border border-ivory/60 text-ivory px-5 py-2.5 hover:bg-ivory hover:text-ink transition-colors duration-500"
           >
-            Newsletter
+            Store
           </Link>
         </div>
 
@@ -93,8 +92,8 @@ export const SiteHeader = () => {
                 {item.label}
               </NavLink>
             ))}
-            <Link to="/newsletter" className="font-serif text-2xl text-accent">
-              Newsletter
+            <Link to="/store" className="font-serif text-2xl text-accent">
+              Store
             </Link>
           </nav>
         </div>
