@@ -2,6 +2,7 @@ import { Link, useParams, Navigate } from "react-router-dom";
 import { ArrowRight } from "lucide-react";
 import { useArtistBySlug } from "@/lib/queries";
 import { NewsletterForm } from "@/components/NewsletterForm";
+import { PageTitle } from "@/components/PageTitle";
 import { PageLoading, PageError } from "@/components/UIStates";
 
 const ArtistPage = () => {
@@ -17,6 +18,7 @@ const ArtistPage = () => {
   const featured = discography[0];
   return (
     <div>
+      <PageTitle title={artist.name} />
       {/* Hero */}
       <section className="relative h-[85vh] min-h-[600px] bg-ink text-ivory overflow-hidden">
         {heroImage ? (
