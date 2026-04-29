@@ -56,7 +56,7 @@ const About = () => (
       </div>
     </section>
 
-    <section className="bg-golden-brown/82 py-24 md:py-36">
+    <section className="bg-golden-brown/95 py-24 md:py-36">
       <div className="container-editorial grid grid-cols-1 lg:grid-cols-12 gap-10 md:gap-16 items-stretch">
         <div className="lg:col-span-5 order-2 lg:order-1 reveal-on-scroll">
           <div className="h-full min-h-[520px] overflow-hidden bg-muted">
@@ -76,6 +76,10 @@ const About = () => (
                 americana, reggae and contemporary classical — but every record shares a sensibility:
                 warmth, restraint, and a respect for the song.
               </p>
+              <p>
+                We look for music with atmosphere and intention: voices that feel lived-in, arrangements
+                that leave room, and records that can carry their own weather.
+              </p>
             </div>
           </div>
           <div>
@@ -86,6 +90,10 @@ const About = () => (
                 We sign artists, not songs. Each WMG signing is a long-form commitment — to a body of
                 work, to a visual language, to the world an artist is trying to build. We are
                 collaborators, not gatekeepers.
+              </p>
+              <p>
+                The aim is not to force an artist into shape, but to protect what already makes them
+                distinct — then give that world the space, care, and context it deserves.
               </p>
             </div>
           </div>
@@ -98,7 +106,7 @@ const About = () => (
         {[
           ["01", "Build slowly", "No trend-chasing, no disposable campaigns — only catalogue with a future."],
           ["02", "Listen closely", "The song leads; production, image, and strategy follow with restraint."],
-          ["03", "Protect the world", "Every artist arrives with a language. Our job is to sharpen it, not flatten it."],
+          ["03", "Outlast the moment", "We're not here for the cycle. We're here for the catalogue that survives it."],
         ].map(([number, title, text]) => (
           <div key={number} className="py-10 md:p-10 md:border-l first:border-l-0 border-border">
             <p className="text-gold font-serif text-3xl mb-8">{number}</p>
