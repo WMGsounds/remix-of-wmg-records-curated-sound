@@ -69,8 +69,8 @@ const About = () => (
             <div className="space-y-4 text-sm md:text-base leading-relaxed font-light text-ivory/88">
               <p>
                 We don't sit inside a single genre. Our roster spans soul and gospel, country and
-                americana, reggae and contemporary classical — but every record shares a sensibility:
-                warmth, restraint, and a respect for the song.
+                americana, reggae and contemporary classical, crooner and jazz, and more. Every single 
+                record shares a sensibility: warmth, restraint, and a respect for the song.
               </p>
               <p>
                 We look for music with atmosphere and intention: voices that feel lived-in, arrangements
@@ -83,13 +83,13 @@ const About = () => (
             <div className="gold-rule mb-6" />
             <div className="space-y-4 text-sm md:text-base leading-relaxed font-light text-ivory/88">
               <p>
-                We sign artists, not songs. Each WMG signing is a long-form commitment — to a body of
+                We sign artists, not songs. Each WMG signing is a long-form commitment - to a body of
                 work, to a visual language, to the world an artist is trying to build. We are
                 collaborators, not gatekeepers.
               </p>
               <p>
                 The aim is not to force an artist into shape, but to protect what already makes them
-                distinct — then give that world the space, care, and context it deserves.
+                distinct, then give that world the space, care, and context it deserves.
               </p>
             </div>
           </div>
