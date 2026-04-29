@@ -52,21 +52,24 @@ const Index = () => {
 
       {/* FEATURED RELEASE */}
       {featured && (
-        <section className="container-editorial py-28 md:py-40">
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-20 items-center">
+        <section className="relative overflow-hidden bg-ink py-28 md:py-40 text-ivory">
+          <div className="absolute inset-0 bg-[radial-gradient(circle_at_74%_38%,hsl(var(--golden-brown)/0.38),transparent_34%),radial-gradient(circle_at_18%_78%,hsl(var(--gold)/0.16),transparent_28%)]" aria-hidden="true" />
+          <div className="absolute inset-0 opacity-[0.08] [background-image:linear-gradient(90deg,hsl(var(--ivory)/0.8)_1px,transparent_1px),linear-gradient(0deg,hsl(var(--ivory)/0.8)_1px,transparent_1px)] [background-size:3px_3px]" aria-hidden="true" />
+          <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,transparent_42%,hsl(var(--ink)/0.72)_100%)]" aria-hidden="true" />
+          <div className="relative container-editorial grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-20 items-center">
             <div className="lg:col-span-7 order-2 lg:order-1">
-              <p className="eyebrow mb-4">Featured Release</p>
+              <p className="eyebrow text-gold-soft mb-4">Featured Release</p>
               <div className="gold-rule mb-8" />
               <h2 className="display-serif text-5xl md:text-7xl mb-6">{featured.title}</h2>
-              <p className="font-serif italic text-2xl text-muted-foreground mb-8">
+              <p className="font-serif italic text-2xl text-ivory/68 mb-8">
                 {featured.artistName}
               </p>
-              <p className="text-lg leading-relaxed max-w-xl mb-10 text-foreground/85">
+              <p className="text-lg leading-relaxed max-w-xl mb-10 text-ivory/82">
                 {featured.fullDescription || featured.shortDescription}
               </p>
               <Link
                 to={`/releases/${encodeURIComponent(featured.slug)}`}
-                className="inline-flex items-center gap-3 border-b border-foreground pb-2 text-[12px] uppercase tracking-[0.24em] font-medium hover:text-accent hover:border-accent transition-colors duration-500"
+                className="inline-flex items-center gap-3 border-b border-ivory/70 pb-2 text-[12px] uppercase tracking-[0.24em] font-medium hover:text-gold hover:border-gold transition-colors duration-500"
               >
                 Explore Release <ArrowRight className="h-4 w-4" />
               </Link>
