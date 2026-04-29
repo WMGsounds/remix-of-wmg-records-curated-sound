@@ -6,13 +6,13 @@ import { InlineSkeleton, PageError } from "@/components/UIStates";
 const Artists = () => {
   const { data: artists = [], isLoading, isError } = useArtists();
   const genres = useMemo(() => {
-    const set = new Set(artists.map((a) => a.genre).filter(Boolean));
+    const set = new Set(artists.flatMap((a) => a.genre.split(",").map((g) => g.trim()).filter(Boolean)));
     return ["All", ...Array.from(set)];
   }, [artists]);
   const [filter, setFilter] = useState<string>("All");
 
   const visible = useMemo(
-    () => (filter === "All" ? artists : artists.filter((a) => a.genre === filter)),
+    () => (filter === "All" ? artists : artists.filter((a) => a.genre.split(",").map((g) => g.trim()).includes(filter))),
     [filter, artists],
   );
 
