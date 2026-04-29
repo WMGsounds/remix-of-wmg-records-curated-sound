@@ -87,19 +87,22 @@ const About = () => (
       </div>
     </section>
 
-    <section className="bg-golden-brown/95 py-20 md:py-28 text-ivory">
-      <div className="container-editorial grid grid-cols-1 md:grid-cols-3 border-y border-ivory/25 reveal-on-scroll">
+    <section className="bg-golden-brown/78 py-18 md:py-24 text-ivory">
+      <div className="container-editorial reveal-on-scroll">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-y-12 md:gap-x-14 lg:gap-x-20">
         {[
           ["01", "Build slowly", "No trend-chasing, no disposable campaigns. Only catalogue with a lasting future."],
           ["02", "Listen closely", "The song leads; production, image, and strategy follow with restraint."],
           ["03", "Outlast the moment", "We're not here for the cycle. We're here for the catalogue that survives it."],
         ].map(([number, title, text]) => (
-          <div key={number} className="py-10 md:p-10 md:border-l first:border-l-0 border-ivory/25">
-            <p className="text-gold-soft font-serif text-3xl mb-8">{number}</p>
-            <h2 className="font-serif text-3xl md:text-4xl mb-4">{title}</h2>
-            <p className="text-ivory/82 leading-relaxed max-w-sm">{text}</p>
+          <div key={number} className="relative md:pt-6">
+            <p className="text-gold-soft/75 font-serif text-2xl mb-5">{number}</p>
+            <div className="h-px w-16 bg-ivory/25 mb-8" />
+            <h2 className="font-serif text-3xl md:text-4xl mb-5">{title}</h2>
+            <p className="text-ivory/84 leading-relaxed max-w-sm">{text}</p>
           </div>
         ))}
+        </div>
       </div>
     </section>
 
