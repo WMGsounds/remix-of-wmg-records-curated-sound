@@ -15,6 +15,7 @@ import type {
   ArtistPageData,
   ReleasePageData,
 } from "./types";
+import { getMockDataForPath } from "./mockData";
 
 const API_BASE = import.meta.env.VITE_API_BASE_URL ?? "";
 
@@ -25,7 +26,17 @@ async function fetchJson<T>(path: string): Promise<T> {
   if (!res.ok) {
     throw new Error(`Request failed (${res.status}): ${path}`);
   }
-  return (await res.json()) as T;
+  const text = await res.text();
+  try {
+    return JSON.parse(text) as T;
+  } catch (error) {
+    const mock = getMockDataForPath(path);
+    if (mock !== null && text.trim().startsWith("import ")) {
+      console.warn(`[cms-api] Non-JSON preview response for ${path}; using MOCK DATA.`, error);
+      return mock as T;
+    }
+    throw error;
+  }
 }
 
 // ----------------------------------------------------------------------------
