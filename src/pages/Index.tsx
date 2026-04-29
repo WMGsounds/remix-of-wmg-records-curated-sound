@@ -140,10 +140,14 @@ const Index = () => {
       </section>
 
       {/* LATEST RELEASES */}
-      <section className="container-editorial py-28 md:py-40">
+      <section className="relative overflow-hidden bg-ink py-28 md:py-40 text-ivory">
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_74%_38%,hsl(var(--golden-brown)/0.38),transparent_34%),radial-gradient(circle_at_18%_78%,hsl(var(--gold)/0.16),transparent_28%)]" aria-hidden="true" />
+        <div className="absolute inset-0 opacity-[0.08] [background-image:linear-gradient(90deg,hsl(var(--ivory)/0.8)_1px,transparent_1px),linear-gradient(0deg,hsl(var(--ivory)/0.8)_1px,transparent_1px)] [background-size:3px_3px]" aria-hidden="true" />
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,transparent_42%,hsl(var(--ink)/0.72)_100%)]" aria-hidden="true" />
+        <div className="relative container-editorial">
         <div className="flex items-end justify-between mb-16">
           <div>
-            <p className="eyebrow mb-4">New & Recent</p>
+            <p className="eyebrow text-gold-soft mb-4">New & Recent</p>
             <h2 className="display-serif text-5xl md:text-7xl">Latest Releases</h2>
           </div>
           <Link to="/releases" className="hidden md:inline-flex items-center gap-2 text-[12px] uppercase tracking-[0.24em] link-underline">
@@ -161,6 +165,7 @@ const Index = () => {
             {latestReleases.map((r) => <ReleaseCard key={r.slug} release={r} />)}
           </div>
         )}
+        </div>
       </section>
 
       {/* LABEL STATEMENT */}
