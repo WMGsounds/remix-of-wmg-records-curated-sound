@@ -1,9 +1,11 @@
-import { notion, DBS, CACHE_HEADERS } from "../_client.js";
+import { notion, DBS, CACHE_HEADERS, logApiError, validateNotionEnv } from "../_client.js";
 import { loadAll, normalizeArtist, normalizeRelease } from "../_normalize.js";
 
 export default async function handler(req: any, res: any) {
+  const route = "/api/notion/artist/[slug]";
   const { slug } = req.query;
   try {
+    validateNotionEnv(route);
     const [artistPages, releasePages] = await Promise.all([
       loadAll(notion, DBS.artists),
       loadAll(notion, DBS.releases),
@@ -20,6 +22,7 @@ export default async function handler(req: any, res: any) {
 
     res.writeHead(200, CACHE_HEADERS).end(JSON.stringify({ artist, discography }));
   } catch (e: any) {
+    logApiError(route, e, { slug });
     res.status(500).json({ error: e.message });
   }
 }
