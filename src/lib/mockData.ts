@@ -1,7 +1,9 @@
+import type { Artist, HomepageData, Release, ReleasePageData, ArtistPageData, Track } from "./types";
+
 const image = (name: string) => `/mock/${name}`;
 
-// MOCK DATA — returned with HTTP 200 when Notion env vars are missing or Notion calls fail.
-export const fallbackArtists = [
+// MOCK DATA — used only when Notion API JSON cannot be loaded in preview.
+export const mockArtists: Artist[] = [
   {
     id: "mock-artist-aurora-vale",
     slug: "aurora-vale",
@@ -24,9 +26,7 @@ export const fallbackArtists = [
     name: "Milo Saint",
     genre: "Indie R&B, Electronic",
     shortDescription: "Minimalist rhythm sketches, warm low-end and refrains built for headphones after midnight.",
-    fullBio: [
-      "Milo Saint makes understated records with emotional weight, drawing from club rhythm, diaristic R&B and spacious electronic production.",
-    ],
+    fullBio: ["Milo Saint makes understated records with emotional weight, drawing from club rhythm, diaristic R&B and spacious electronic production."],
     heroImage: image("artist-2.jpg"),
     gallery: [image("artist-2.jpg"), image("artist-3.jpg")],
     featured: true,
@@ -39,9 +39,7 @@ export const fallbackArtists = [
     name: "The North Room",
     genre: "Dream Pop, Guitar",
     shortDescription: "A guitar-led project shaped by analogue haze, spacious drums and restrained hooks.",
-    fullBio: [
-      "The North Room turns small observations into textured guitar music, leaving space for atmosphere, repetition and slowly unfolding melodies.",
-    ],
+    fullBio: ["The North Room turns small observations into textured guitar music, leaving space for atmosphere, repetition and slowly unfolding melodies."],
     heroImage: image("artist-3.jpg"),
     gallery: [image("artist-3.jpg"), image("artist-1.jpg")],
     featured: true,
@@ -50,7 +48,7 @@ export const fallbackArtists = [
   },
 ];
 
-export const fallbackReleases = [
+export const mockReleases: Release[] = [
   {
     id: "mock-release-glass-hours",
     slug: "glass-hours",
@@ -107,38 +105,44 @@ export const fallbackReleases = [
   },
 ];
 
-export const fallbackTracks = [
+export const mockTracks: Track[] = [
   { id: "mock-track-glass-hours-1", trackTitle: "Glass Hours", releaseId: "mock-release-glass-hours", releaseSlug: "glass-hours", trackNumber: 1, duration: "3:42", lyrics: null },
   { id: "mock-track-night-geometry-1", trackTitle: "Afterimage", releaseId: "mock-release-night-geometry", releaseSlug: "night-geometry", trackNumber: 1, duration: "2:58", lyrics: null },
   { id: "mock-track-night-geometry-2", trackTitle: "Low Signal", releaseId: "mock-release-night-geometry", releaseSlug: "night-geometry", trackNumber: 2, duration: "3:21", lyrics: null },
   { id: "mock-track-static-bloom-1", trackTitle: "First Light Static", releaseId: "mock-release-static-bloom", releaseSlug: "static-bloom", trackNumber: 1, duration: "4:06", lyrics: null },
 ];
 
-export const FALLBACK_HEADERS = {
-  "Cache-Control": "no-store",
-  "Content-Type": "application/json",
-  "X-Data-Source": "mock-fallback",
-};
+export const mockHomepage = (): HomepageData => ({
+  featuredArtists: mockArtists.filter((a) => a.featured).slice(0, 6),
+  latestReleases: mockReleases.filter((r) => r.showOnHomepage).slice(0, 6),
+  featuredRelease: mockReleases.find((r) => r.featured) ?? mockReleases[0] ?? null,
+});
 
-export const fallbackHomepage = () => {
-  const featuredArtists = fallbackArtists.filter((a) => a.featured).slice(0, 6);
-  const latestReleases = fallbackReleases.filter((r) => r.showOnHomepage).slice(0, 6);
-  const featuredRelease = fallbackReleases.find((r) => r.featured) ?? latestReleases[0] ?? null;
-  return { featuredArtists, latestReleases, featuredRelease };
-};
-
-export const fallbackArtistPage = (slug: string) => {
-  const artist = fallbackArtists.find((a) => a.slug === slug) ?? fallbackArtists[0];
+export const mockArtistPage = (slug: string): ArtistPageData | null => {
+  const artist = mockArtists.find((a) => a.slug === slug);
   if (!artist) return null;
-  const discography = fallbackReleases.filter((r) => r.artistSlug === artist.slug);
-  return { artist, discography };
+  return { artist, discography: mockReleases.filter((r) => r.artistSlug === slug) };
 };
 
-export const fallbackReleasePage = (slug: string) => {
-  const release = fallbackReleases.find((r) => r.slug === slug) ?? fallbackReleases[0];
+export const mockReleasePage = (slug: string): ReleasePageData | null => {
+  const release = mockReleases.find((r) => r.slug === slug);
   if (!release) return null;
-  const artist = fallbackArtists.find((a) => a.id === release.artistId) ?? null;
-  const tracks = fallbackTracks.filter((t) => t.releaseSlug === slug).sort((a, b) => a.trackNumber - b.trackNumber);
-  const related = fallbackReleases.filter((r) => r.artistSlug === release.artistSlug && r.slug !== slug).slice(0, 3);
-  return { release, artist, tracks, related };
+  return {
+    release,
+    artist: mockArtists.find((a) => a.id === release.artistId) ?? null,
+    tracks: mockTracks.filter((t) => t.releaseSlug === slug).sort((a, b) => a.trackNumber - b.trackNumber),
+    related: mockReleases.filter((r) => r.artistSlug === release.artistSlug && r.slug !== slug).slice(0, 3),
+  };
 };
+
+export function getMockDataForPath(path: string): unknown {
+  if (path === "/api/notion/artists") return mockArtists;
+  if (path === "/api/notion/releases") return mockReleases;
+  if (path === "/api/notion/tracks") return mockTracks;
+  if (path === "/api/notion/homepage") return mockHomepage();
+  const artistSlug = path.match(/^\/api\/notion\/artist\/([^/]+)$/)?.[1];
+  if (artistSlug) return mockArtistPage(decodeURIComponent(artistSlug));
+  const releaseSlug = path.match(/^\/api\/notion\/release\/([^/]+)$/)?.[1];
+  if (releaseSlug) return mockReleasePage(decodeURIComponent(releaseSlug));
+  return null;
+}
