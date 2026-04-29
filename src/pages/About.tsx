@@ -87,7 +87,7 @@ const About = () => (
       </div>
     </section>
 
-    <section className="relative overflow-hidden bg-ink py-20 md:py-28 text-ivory">
+    <section className="relative overflow-hidden bg-ink py-14 md:py-18 text-ivory">
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_74%_38%,hsl(var(--golden-brown)/0.38),transparent_34%),radial-gradient(circle_at_18%_78%,hsl(var(--gold)/0.16),transparent_28%)]" aria-hidden="true" />
       <div className="absolute inset-0 opacity-[0.08] [background-image:linear-gradient(90deg,hsl(var(--ivory)/0.8)_1px,transparent_1px),linear-gradient(0deg,hsl(var(--ivory)/0.8)_1px,transparent_1px)] [background-size:3px_3px]" aria-hidden="true" />
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,transparent_42%,hsl(var(--ink)/0.72)_100%)]" aria-hidden="true" />
@@ -98,19 +98,19 @@ const About = () => (
             Three things we hold to.
           </p>
         </div>
-        <div className="mt-14 md:mt-20 grid grid-cols-1 md:grid-cols-12 gap-y-16 md:gap-y-20">
+        <div className="mt-10 md:mt-12 grid grid-cols-1 md:grid-cols-12 gap-y-10 md:gap-y-12">
           {[
             ["01", "Build", "slowly", "No trend-chasing, no disposable campaigns. Only catalogue with a lasting future.", "md:col-span-5 md:col-start-1", "0ms"],
-            ["02", "Listen", "closely", "The song leads; production, image, and strategy follow with restraint.", "md:col-span-5 md:col-start-5 md:translate-y-8", "140ms"],
+            ["02", "Listen", "closely", "The song leads; production, image, and strategy follow with restraint.", "md:col-span-5 md:col-start-4 md:translate-y-5", "140ms"],
             ["03", "Outlast the", "moment", "We're not here for the cycle. We're here for the catalogue that survives it.", "md:col-span-5 md:col-start-8", "280ms"],
           ].map(([number, title, accent, text, placement, delay]) => (
             <div key={number} className={`relative reveal-on-scroll ${placement}`} style={{ animationDelay: delay }}>
-              <p className="pointer-events-none absolute -left-3 -top-14 font-serif text-[8rem] leading-none text-gold-soft/10 md:-left-10 md:-top-20 md:text-[12rem]">
+              <p className="pointer-events-none absolute -left-3 -top-10 font-serif text-[7rem] leading-none text-gold-soft/10 md:-left-8 md:-top-14 md:text-[10rem]">
                 {number}
               </p>
-              <div className="relative border-t border-ivory/18 pt-8">
-                <p className="mb-8 font-serif text-4xl text-gold-soft/80 md:text-5xl">{number}</p>
-                <h2 className="font-serif text-4xl md:text-5xl mb-6">
+              <div className="relative border-t border-ivory/18 pt-6">
+                <p className="mb-5 font-serif text-4xl text-gold-soft/80 md:text-5xl">{number}</p>
+                <h2 className="font-serif text-4xl md:text-5xl mb-4">
                   {title} <span className="italic text-gold-soft">{accent}</span>
                 </h2>
                 <p className="text-base md:text-lg leading-relaxed text-ivory/82 max-w-md">{text}</p>
