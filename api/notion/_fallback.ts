@@ -130,7 +130,7 @@ export const fallbackHomepage = () => {
 export const fallbackArtistPage = (slug: string) => {
   const artist = fallbackArtists.find((a) => a.slug === slug) ?? fallbackArtists[0];
   if (!artist) return null;
-  const discography = fallbackReleases.filter((r) => r.artistSlug === slug);
+  const discography = fallbackReleases.filter((r) => r.artistSlug === artist.slug);
   return { artist, discography };
 };
 
