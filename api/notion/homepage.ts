@@ -1,4 +1,4 @@
-import { notion, DBS, CACHE_HEADERS, logApiError, validateNotionEnv, type ApiResponse } from "./_client.js";
+import { notion, DBS, CACHE_HEADERS, logApiError, logApiFallback, logApiSuccess, validateNotionEnv, type ApiResponse } from "./_client.js";
 import { FALLBACK_HEADERS, fallbackHomepage } from "./_fallback.js";
 import { loadAll, normalizeArtist, normalizeRelease } from "./_normalize.js";
 
@@ -56,11 +56,22 @@ export default async function handler(_req: unknown, res: ApiResponse) {
 
     const featuredRelease = releases.find((r) => r.featured) ?? latestReleases[0] ?? null;
 
+    logApiSuccess(route, {
+      artistPageCount: artistPages.length,
+      releasePageCount: releasePages.length,
+      artistCount: artists.length,
+      releaseCount: releases.length,
+      featuredArtistCount: featuredArtists.length,
+      latestReleaseCount: latestReleases.length,
+      featuredReleaseTitle: featuredRelease?.title ?? null,
+    });
+
     res.writeHead(200, CACHE_HEADERS).end(
       JSON.stringify({ featuredArtists, latestReleases, featuredRelease }),
     );
   } catch (e: unknown) {
     logApiError(route, e);
+    logApiFallback(route, e, { fallback: "homepage" });
     res.writeHead(200, FALLBACK_HEADERS).end(JSON.stringify(fallbackHomepage()));
   }
 }
