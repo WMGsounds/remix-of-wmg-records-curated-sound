@@ -5,8 +5,8 @@ import { PageTitle } from "@/components/PageTitle";
 const channels = [
   { label: "General Enquiries", email: "info@wmgsounds.com" },
   { label: "Press", email: "press@wmgsounds.com" },
-  { label: "Licensing / Sync", email: "sync@wmg.com" },
-  { label: "Artist & Demo Submissions", email: "demos@wmgrecords.com" },
+  { label: "Licensing / Sync", email: "sync@wmgsounds.com" },
+  { label: "Artist & Demo Submissions", email: "demos@wmgsounds.com" },
 ];
 
 const Contact = () => {
