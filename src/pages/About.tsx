@@ -56,15 +56,15 @@ const About = () => (
       </div>
     </section>
 
-    <section className="bg-golden-brown/95 py-24 md:py-36">
-      <div className="container-editorial grid grid-cols-1 lg:grid-cols-12 gap-10 md:gap-16 items-stretch">
+    <section className="bg-golden-brown/95 py-16 md:py-24">
+      <div className="container-editorial grid grid-cols-1 lg:grid-cols-12 gap-10 md:gap-14 items-center">
         <div className="lg:col-span-5 order-2 lg:order-1 reveal-on-scroll">
-          <div className="h-full min-h-[520px] overflow-hidden bg-muted">
-            <img src={studioSingingJoy} alt="Singer recording in a warm studio" className="h-full w-full object-cover" />
+          <div className="aspect-[4/3] lg:aspect-[5/4] overflow-hidden bg-muted">
+            <img src={studioSingingJoy} alt="Singer recording in a warm studio" className="h-full w-full object-cover object-top" />
           </div>
         </div>
-        <div className="lg:col-span-6 lg:col-start-7 order-1 lg:order-2 reveal-on-scroll grid grid-rows-1 lg:grid-rows-2 gap-12 text-ivory">
-          <div className="border-b border-ivory/25 pb-12 lg:pb-14">
+        <div className="lg:col-span-6 lg:col-start-7 order-1 lg:order-2 reveal-on-scroll grid grid-rows-1 lg:grid-rows-2 gap-9 text-ivory">
+          <div className="border-b border-ivory/25 pb-9 lg:pb-10">
             <p className="eyebrow text-gold-soft mb-5">Our Sound</p>
             <div className="gold-rule mb-10" />
             <p className="display-serif text-4xl md:text-6xl leading-[1.03] mb-8">
