@@ -1,7 +1,7 @@
-import { notion, DBS, CACHE_HEADERS, logApiError, validateNotionEnv } from "./_client.js";
+import { notion, DBS, CACHE_HEADERS, logApiError, validateNotionEnv, type ApiResponse } from "./_client.js";
 import { loadAll, normalizeArtist } from "./_normalize.js";
 
-export default async function handler(_req: any, res: any) {
+export default async function handler(_req: unknown, res: ApiResponse) {
   const route = "/api/notion/artists";
   try {
     validateNotionEnv(route);
