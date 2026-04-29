@@ -80,21 +80,31 @@ export const SiteHeader = () => {
       </div>
 
       {open && (
-        <div className="md:hidden border-t border-border bg-background">
-          <nav className="container-editorial flex flex-col py-6 gap-5">
-            {nav.map((item) => (
+        <div className="relative z-10 md:hidden border-t border-gold/30 bg-ink text-ivory shadow-soft">
+          <nav className="container-editorial flex flex-col py-8 gap-3" aria-label="Mobile navigation">
+            {[...nav, { to: "/store", label: "Store" }].map((item) => (
               <NavLink
                 key={item.to}
                 to={item.to}
                 end={item.to === "/"}
-                className="font-serif text-2xl"
+                className={({ isActive }) =>
+                  `group flex min-h-12 items-center justify-between font-serif text-3xl leading-none transition-colors duration-300 ${
+                    isActive ? "text-gold" : "text-ivory hover:text-gold"
+                  }`
+                }
               >
-                {item.label}
+                {({ isActive }) => (
+                  <>
+                    <span>{item.label}</span>
+                    <span
+                      className={`h-px w-12 origin-right transition-transform duration-500 ${
+                        isActive ? "scale-x-100 bg-gold" : "scale-x-0 bg-ivory group-hover:scale-x-100 group-hover:bg-gold"
+                      }`}
+                    />
+                  </>
+                )}
               </NavLink>
             ))}
-            <Link to="/store" className="font-serif text-2xl text-accent">
-              Store
-            </Link>
           </nav>
         </div>
       )}
