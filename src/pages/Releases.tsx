@@ -3,6 +3,7 @@ import { ReleaseCard } from "@/components/Cards";
 import { PageTitle } from "@/components/PageTitle";
 import { useReleases } from "@/lib/queries";
 import { InlineSkeleton, PageError } from "@/components/UIStates";
+import artistsHeroStudio from "@/assets/artists-hero-microphone-vinyl.png";
 
 const filters = ["All", "Single", "Album", "EP"] as const;
 const sortOptions = ["Release Date", "Artist Name", "Release Name"] as const;
@@ -30,18 +31,40 @@ const Releases = () => {
   if (isError) return <PageError message="Couldn't load the catalogue." />;
 
   return (
-    <div className="relative overflow-hidden bg-ink text-ivory pt-40 pb-32">
-      <div className="absolute inset-0 bg-[radial-gradient(circle_at_74%_38%,hsl(var(--golden-brown)/0.38),transparent_34%),radial-gradient(circle_at_18%_78%,hsl(var(--gold)/0.16),transparent_28%)]" aria-hidden="true" />
-      <div className="absolute inset-0 opacity-[0.08] [background-image:linear-gradient(90deg,hsl(var(--ivory)/0.8)_1px,transparent_1px),linear-gradient(0deg,hsl(var(--ivory)/0.8)_1px,transparent_1px)] [background-size:3px_3px]" aria-hidden="true" />
-      <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,transparent_42%,hsl(var(--ink)/0.72)_100%)]" aria-hidden="true" />
+    <div className="bg-ink text-ivory pb-32">
       <PageTitle title="Releases" />
-      <div className="relative container-editorial">
-        <p className="eyebrow text-gold-soft mb-6">The Catalogue</p>
-        <h1 className="display-serif text-6xl md:text-8xl lg:text-9xl mb-10">Releases</h1>
-        <p className="max-w-2xl text-lg text-ivory/70 mb-16">
-          Every WMG release is built to last — from the songwriting to the sleeve. Browse the full
-          catalogue below.
-        </p>
+      <section className="relative overflow-hidden bg-ink pt-40 pb-24 md:pb-28">
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_78%_22%,hsl(var(--golden-brown)/0.24),transparent_28%),radial-gradient(circle_at_30%_36%,hsl(var(--gold)/0.10),transparent_30%)]" aria-hidden="true" />
+        <div className="absolute inset-0 opacity-[0.07] [background-image:linear-gradient(90deg,hsl(var(--ivory)/0.72)_1px,transparent_1px),linear-gradient(0deg,hsl(var(--ivory)/0.72)_1px,transparent_1px)] [background-size:3px_3px]" aria-hidden="true" />
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,transparent_38%,hsl(var(--ink)/0.72)_100%)]" aria-hidden="true" />
+        <div className="relative container-editorial grid items-center gap-14 lg:grid-cols-[0.9fr_1.1fr]">
+          <div>
+            <p className="eyebrow text-ivory/60 mb-6">The Catalogue</p>
+            <h1 className="display-serif text-6xl md:text-8xl lg:text-9xl mb-10">Releases</h1>
+            <p className="max-w-2xl text-lg text-ivory/65">
+              Every WMG release is built to last — from the songwriting to the sleeve. Browse the full
+              catalogue below.
+            </p>
+          </div>
+          <div className="relative hidden min-h-[360px] lg:block">
+            <div className="absolute right-0 top-1/2 h-[560px] w-full -translate-y-1/2 overflow-hidden [-webkit-mask-image:linear-gradient(90deg,transparent_0%,rgba(0,0,0,0.08)_14%,rgba(0,0,0,0.42)_26%,black_44%,black_56%,rgba(0,0,0,0.42)_74%,rgba(0,0,0,0.08)_86%,transparent_100%)] [mask-image:linear-gradient(90deg,transparent_0%,rgba(0,0,0,0.08)_14%,rgba(0,0,0,0.42)_26%,black_44%,black_56%,rgba(0,0,0,0.42)_74%,rgba(0,0,0,0.08)_86%,transparent_100%)] [mask-repeat:no-repeat] [mask-size:100%_100%]">
+              <div className="h-full w-full [-webkit-mask-image:radial-gradient(ellipse_at_center,black_18%,rgba(0,0,0,0.68)_38%,rgba(0,0,0,0.28)_58%,transparent_78%)] [mask-image:radial-gradient(ellipse_at_center,black_18%,rgba(0,0,0,0.68)_38%,rgba(0,0,0,0.28)_58%,transparent_78%)] [mask-repeat:no-repeat] [mask-size:100%_100%]">
+                <img
+                  src={artistsHeroStudio}
+                  alt="Monochrome studio detail with microphone and vinyl"
+                  width={1280}
+                  height={960}
+                  className="h-full w-full object-cover"
+                />
+              </div>
+            </div>
+          </div>
+        </div>
+        <div className="absolute inset-x-0 bottom-0 h-20 bg-gradient-to-b from-transparent to-ink" aria-hidden="true" />
+        <div className="absolute inset-x-0 bottom-0 h-px bg-gold/35" aria-hidden="true" />
+      </section>
+
+      <div className="container-editorial pt-16">
 
         <div className="flex flex-wrap items-center justify-between gap-4 mb-16 border-y border-ivory/18 py-5">
           <div className="flex flex-wrap gap-2">
