@@ -99,7 +99,7 @@ const About = () => (
     <section className="bg-golden-brown/95 py-20 md:py-28 text-ivory">
       <div className="container-editorial grid grid-cols-1 md:grid-cols-3 border-y border-ivory/25 reveal-on-scroll">
         {[
-          ["01", "Build slowly", "No trend-chasing, no disposable campaigns — only catalogue with a future."],
+          ["01", "Build slowly", "No trend-chasing, no disposable campaigns. Only catalogue with a lasting future."],
           ["02", "Listen closely", "The song leads; production, image, and strategy follow with restraint."],
           ["03", "Outlast the moment", "We're not here for the cycle. We're here for the catalogue that survives it."],
         ].map(([number, title, text]) => (
