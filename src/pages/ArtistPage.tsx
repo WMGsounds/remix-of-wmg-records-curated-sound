@@ -14,13 +14,17 @@ const ArtistPage = () => {
 
   const { artist, discography } = data;
   const featured = discography[0];
-  const gallery = artist.gallery.length > 0 ? artist.gallery : [artist.heroImage];
+  const gallery = artist.gallery.filter(Boolean);
 
   return (
     <div>
       {/* Hero */}
       <section className="relative h-[85vh] min-h-[600px] bg-ink text-ivory overflow-hidden">
-        <img src={artist.heroImage} alt={artist.name} className="absolute inset-0 h-full w-full object-cover opacity-80" />
+        {artist.heroImage ? (
+          <img src={artist.heroImage} alt={artist.name} className="absolute inset-0 h-full w-full object-cover opacity-80" />
+        ) : (
+          <div className="absolute inset-0 bg-secondary" />
+        )}
         <div className="absolute inset-0 bg-gradient-to-t from-ink via-ink/40 to-ink/30" />
         <div className="relative z-10 h-full container-editorial flex flex-col justify-end pb-20">
           <p className="eyebrow text-ivory/70 mb-4">{artist.genre}</p>
@@ -40,9 +44,13 @@ const ArtistPage = () => {
           <div className="gold-rule" />
         </div>
         <div className="lg:col-span-8 space-y-6">
-          {artist.fullBio.map((p, i) => (
-            <p key={i} className="text-lg md:text-xl leading-relaxed font-light">{p}</p>
-          ))}
+          {artist.fullBio.length === 0 ? (
+            <p className="text-lg md:text-xl leading-relaxed font-light text-muted-foreground">Artist bio coming soon.</p>
+          ) : (
+            artist.fullBio.map((p, i) => (
+              <p key={i} className="text-lg md:text-xl leading-relaxed font-light">{p}</p>
+            ))
+          )}
         </div>
       </section>
 
@@ -79,11 +87,13 @@ const ArtistPage = () => {
       )}
 
       {/* Discography */}
-      {discography.length > 0 && (
-        <section className="bg-ink text-ivory py-28 md:py-36">
+      <section className="bg-ink text-ivory py-28 md:py-36">
           <div className="container-editorial">
             <p className="eyebrow text-ivory/60 mb-4">Discography</p>
             <h2 className="display-serif text-5xl md:text-7xl mb-16">Selected Works</h2>
+            {discography.length === 0 ? (
+              <p className="text-ivory/60">No releases yet.</p>
+            ) : (
             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
               {discography.map((r) => (
                 <Link key={r.slug} to={`/releases/${r.slug}`} className="group block hover-zoom">
@@ -97,33 +107,25 @@ const ArtistPage = () => {
                 </Link>
               ))}
             </div>
+            )}
           </div>
         </section>
-      )}
 
       {/* Listen */}
-      <section className="container-editorial py-28">
-        <p className="eyebrow mb-4">Listen</p>
-        <h2 className="display-serif text-4xl md:text-6xl mb-10">Wherever you listen.</h2>
-        <div className="flex flex-wrap gap-4">
-          {["Spotify", "Apple Music", "Bandcamp", "Tidal", "YouTube"].map((p) => (
-            <a key={p} href="#" className="border border-foreground px-6 py-3 text-[12px] uppercase tracking-[0.24em] hover:bg-foreground hover:text-background transition-colors duration-500">
-              {p}
-            </a>
-          ))}
-        </div>
-      </section>
-
       {/* Gallery */}
-      <section className="container-editorial pb-28">
+      <section className="container-editorial py-28">
         <p className="eyebrow mb-4">Gallery</p>
-        <div className="grid grid-cols-2 md:grid-cols-3 gap-4 mt-8">
+        {gallery.length === 0 ? (
+          <p className="text-muted-foreground mt-8">Gallery coming soon.</p>
+        ) : (
+          <div className="grid grid-cols-2 md:grid-cols-3 gap-4 mt-8">
           {gallery.map((img, i) => (
             <div key={i} className="hover-zoom overflow-hidden aspect-[3/4]">
               <img src={img} alt={`${artist.name} ${i+1}`} loading="lazy" className="h-full w-full object-cover" />
             </div>
           ))}
-        </div>
+          </div>
+        )}
       </section>
 
       {/* Newsletter */}
