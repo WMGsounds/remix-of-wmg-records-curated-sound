@@ -130,7 +130,9 @@ export const fallbackHomepage = () => {
 export const fallbackArtistPage = (slug: string) => {
   const artist = fallbackArtists.find((a) => a.slug === slug) ?? fallbackArtists[0];
   if (!artist) return null;
-  const discography = fallbackReleases.filter((r) => r.artistSlug === artist.slug);
+  const discography = fallbackReleases
+    .filter((r) => r.artistSlug === artist.slug)
+    .sort((a, b) => +new Date(b.releaseDate) - +new Date(a.releaseDate));
   return { artist, discography };
 };
 
@@ -138,7 +140,7 @@ export const fallbackReleasePage = (slug: string) => {
   const release = fallbackReleases.find((r) => r.slug === slug) ?? fallbackReleases[0];
   if (!release) return null;
   const artist = fallbackArtists.find((a) => a.id === release.artistId) ?? null;
-  const tracks = fallbackTracks.filter((t) => t.releaseSlug === slug).sort((a, b) => a.trackNumber - b.trackNumber);
+  const tracks = fallbackTracks.filter((t) => t.releaseSlug === release.slug).sort((a, b) => a.trackNumber - b.trackNumber);
   const related = fallbackReleases.filter((r) => r.artistSlug === release.artistSlug && r.slug !== slug).slice(0, 3);
   return { release, artist, tracks, related };
 };
