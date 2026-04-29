@@ -56,21 +56,21 @@ const About = () => (
       </div>
     </section>
 
-    <section className="bg-golden-brown/95 py-16 md:py-24">
-      <div className="container-editorial grid grid-cols-1 lg:grid-cols-12 gap-10 md:gap-14 items-center">
+    <section className="bg-golden-brown/95 py-12 md:py-16">
+      <div className="container-editorial max-w-[1180px] grid grid-cols-1 lg:grid-cols-12 gap-9 md:gap-12 items-center">
         <div className="lg:col-span-5 order-2 lg:order-1 reveal-on-scroll">
           <div className="aspect-[4/3] lg:aspect-[5/4] overflow-hidden bg-muted">
             <img src={studioSingingJoy} alt="Singer recording in a warm studio" className="h-full w-full object-cover object-top" />
           </div>
         </div>
-        <div className="lg:col-span-6 lg:col-start-7 order-1 lg:order-2 reveal-on-scroll grid grid-rows-1 lg:grid-rows-2 gap-9 text-ivory">
-          <div className="border-b border-ivory/25 pb-9 lg:pb-10">
-            <p className="eyebrow text-gold-soft mb-5">Our Sound</p>
-            <div className="gold-rule mb-10" />
-            <p className="display-serif text-4xl md:text-6xl leading-[1.03] mb-8">
+        <div className="lg:col-span-6 lg:col-start-7 order-1 lg:order-2 reveal-on-scroll space-y-7 text-ivory">
+          <div className="border-b border-ivory/25 pb-7">
+            <p className="eyebrow text-gold-soft mb-3">Our Sound</p>
+            <div className="gold-rule mb-6" />
+            <p className="display-serif text-3xl md:text-5xl leading-[1.02] mb-5">
               Warmth, restraint, and respect for the song.
             </p>
-            <div className="space-y-6 text-lg md:text-xl leading-relaxed font-light text-ivory/88">
+            <div className="space-y-4 text-sm md:text-base leading-relaxed font-light text-ivory/88">
               <p>
                 We don't sit inside a single genre. Our roster spans soul and gospel, country and
                 americana, reggae and contemporary classical — but every record shares a sensibility:
@@ -83,9 +83,9 @@ const About = () => (
             </div>
           </div>
           <div>
-            <p className="eyebrow text-gold-soft mb-5">Our Artists</p>
-            <div className="gold-rule mb-10" />
-            <div className="space-y-6 text-lg md:text-xl leading-relaxed font-light text-ivory/88">
+            <p className="eyebrow text-gold-soft mb-3">Our Artists</p>
+            <div className="gold-rule mb-6" />
+            <div className="space-y-4 text-sm md:text-base leading-relaxed font-light text-ivory/88">
               <p>
                 We sign artists, not songs. Each WMG signing is a long-form commitment — to a body of
                 work, to a visual language, to the world an artist is trying to build. We are
