@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { ArrowRight, Play } from "lucide-react";
+import { ArrowRight } from "lucide-react";
 import hero from "@/assets/hero-cinematic.jpg";
 import { ArtistCard, ReleaseCard } from "@/components/Cards";
 import { NewsletterForm } from "@/components/NewsletterForm";
@@ -166,33 +166,6 @@ const Index = () => {
             reward attention, and in artists whose worlds are built to last. WMG is a home for music
             made with intent.
           </p>
-        </div>
-      </section>
-
-      {/* LISTENING / VIDEO */}
-      <section className="container-editorial py-28 md:py-40">
-        <p className="eyebrow mb-4">Watch & Listen</p>
-        <h2 className="display-serif text-5xl md:text-7xl mb-12">In Session</h2>
-        <div className="relative aspect-video bg-ink overflow-hidden group cursor-pointer">
-          <img
-            src={featured?.coverArt || latestReleases[0]?.coverArt || hero}
-            alt={featured?.title || latestReleases[0]?.title || "WMG Records"}
-            loading="lazy"
-            className="absolute inset-0 h-full w-full object-cover opacity-60 group-hover:opacity-50 transition-opacity duration-700"
-          />
-          <div className="absolute inset-0 flex items-center justify-center">
-            <div className="h-20 w-20 md:h-24 md:w-24 border border-ivory/80 rounded-full flex items-center justify-center text-ivory group-hover:bg-ivory group-hover:text-ink transition-colors duration-500">
-              <Play className="h-7 w-7 ml-1" fill="currentColor" />
-            </div>
-          </div>
-          <div className="absolute bottom-8 left-8 text-ivory">
-            <p className="font-serif text-2xl md:text-3xl">
-              {featured ? `${featured.artistName} — ${featured.title}` : latestReleases[0] ? `${latestReleases[0].artistName} — ${latestReleases[0].title}` : "WMG Records"}
-            </p>
-            <p className="text-sm text-ivory/70 mt-1">
-              {featured?.releaseType || latestReleases[0]?.releaseType || "Release"}
-            </p>
-          </div>
         </div>
       </section>
 
