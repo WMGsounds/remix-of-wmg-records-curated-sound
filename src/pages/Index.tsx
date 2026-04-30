@@ -54,7 +54,7 @@ const Index = () => {
 
       {/* FEATURED RELEASE */}
       {featured && (
-        <section className="relative overflow-hidden bg-ink py-28 md:py-40 text-ivory">
+        <section className="relative overflow-hidden bg-ink py-16 md:py-20 text-ivory">
           <div className="absolute inset-0 bg-[radial-gradient(circle_at_74%_38%,hsl(var(--golden-brown)/0.38),transparent_34%),radial-gradient(circle_at_18%_78%,hsl(var(--gold)/0.16),transparent_28%)]" aria-hidden="true" />
           <div className="absolute inset-0 opacity-[0.08] [background-image:linear-gradient(90deg,hsl(var(--ivory)/0.8)_1px,transparent_1px),linear-gradient(0deg,hsl(var(--ivory)/0.8)_1px,transparent_1px)] [background-size:3px_3px]" aria-hidden="true" />
           <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,transparent_42%,hsl(var(--ink)/0.72)_100%)]" aria-hidden="true" />
@@ -63,12 +63,14 @@ const Index = () => {
               <p className="eyebrow text-gold-soft mb-4">Featured Release</p>
               <div className="gold-rule mb-8" />
               <h2 className="display-serif text-5xl md:text-7xl mb-6">{featured.title}</h2>
-              <p className="font-serif italic text-2xl text-ivory/68 mb-8">
+              <p className="font-serif italic text-2xl text-ivory/68 mb-6">
                 {featured.artistName}
               </p>
-              <p className="text-lg leading-relaxed max-w-xl mb-10 text-ivory/82">
-                {featured.fullDescription || featured.shortDescription}
-              </p>
+              {featured.shortDescription && (
+                <p className="text-base font-light leading-relaxed max-w-xl mb-10 text-ivory/70">
+                  {featured.shortDescription}
+                </p>
+              )}
               <Link
                 to={`/releases/${encodeURIComponent(featured.slug)}`}
                 className="inline-flex items-center gap-3 border-b border-ivory/70 pb-2 text-[12px] uppercase tracking-[0.24em] font-medium hover:text-gold hover:border-gold transition-colors duration-500"
