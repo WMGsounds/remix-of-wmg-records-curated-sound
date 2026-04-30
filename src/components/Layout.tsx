@@ -37,10 +37,10 @@ export const SiteHeader = () => {
           loading="lazy"
           width={1920}
           height={1080}
-          className="pointer-events-none absolute inset-0 h-full w-full object-cover object-top opacity-70"
+          className="pointer-events-none absolute inset-0 h-full w-full object-cover object-top opacity-70 hidden md:block"
         />
       )}
-      <div className="pointer-events-none absolute inset-0 bg-ink/70" />
+      <div className="pointer-events-none absolute inset-0 bg-ink/85 md:bg-ink/70" />
 
       <div className="container-editorial relative z-10 flex items-center justify-between py-5">
         <Link to="/" className="flex items-center gap-3" aria-label="WMG Records home">
