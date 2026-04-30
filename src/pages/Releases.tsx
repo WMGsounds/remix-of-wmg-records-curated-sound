@@ -65,8 +65,23 @@ const Releases = () => {
 
       <div className="container-editorial pt-16">
 
-        <div className="flex flex-wrap items-center justify-between gap-4 mb-16 border-y border-ivory/18 py-5">
-          <div className="flex flex-wrap gap-2">
+        <div className="flex flex-row flex-wrap items-center justify-between gap-4 mb-16 border-y border-ivory/18 py-5">
+          {/* Mobile: filter as dropdown */}
+          <div className="md:hidden">
+            <select
+              value={filter}
+              onChange={(e) => setFilter(e.target.value as (typeof filters)[number])}
+              className="bg-transparent border border-ivory/24 text-[11px] uppercase tracking-[0.24em] px-3 py-2 text-ivory focus:outline-none focus:ring-1 focus:ring-ivory cursor-pointer"
+            >
+              {filters.map((f) => (
+                <option key={f} value={f} className="bg-ink text-ivory">
+                  {f}
+                </option>
+              ))}
+            </select>
+          </div>
+          {/* Desktop: filter as buttons */}
+          <div className="hidden md:flex flex-wrap gap-2">
             {filters.map((f) => (
               <button
                 key={f}
@@ -80,7 +95,7 @@ const Releases = () => {
             ))}
           </div>
           <div className="flex items-center gap-3">
-            <label className="text-[11px] uppercase tracking-[0.24em] text-ivory/60">Sort by</label>
+            <label className="hidden md:inline text-[11px] uppercase tracking-[0.24em] text-ivory/60">Sort by</label>
             <select
               value={sort}
               onChange={(e) => setSort(e.target.value as (typeof sortOptions)[number])}
