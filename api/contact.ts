@@ -119,7 +119,7 @@ function emailShell(innerHtml: string): string {
             <tr>
               <td align="center" style="background:${COLOR_BAND};padding:32px 24px;">
                 <a href="${SITE_URL}" style="text-decoration:none;border:0;outline:none;">
-                  <img src="${LOGO_URL}" width="170" alt="WMG — Wareham Music Group" style="display:block;border:0;outline:none;text-decoration:none;height:auto;max-width:170px;margin:0 auto;" />
+                  <img src="${LOGO_URL}" width="225" alt="WMG — Wareham Music Group" style="display:block;border:0;outline:none;text-decoration:none;height:auto;max-width:225px;margin:0 auto;" />
                 </a>
               </td>
             </tr>
