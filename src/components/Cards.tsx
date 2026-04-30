@@ -34,7 +34,9 @@ export const ArtistCard = ({ artist }: { artist: Artist }) => (
 
 export const ReleaseCard = ({ release }: { release: Release }) => {
   const date = release.releaseDate ? new Date(release.releaseDate) : null;
-  const year = date && !Number.isNaN(date.getTime()) ? date.getFullYear() : "TBC";
+  const monthYear = date && !Number.isNaN(date.getTime())
+    ? date.toLocaleDateString(undefined, { month: "long", year: "numeric" }).toUpperCase()
+    : "TBC";
   return (
     <Link
       to={`/releases/${encodeURIComponent(release.slug)}`}
@@ -62,7 +64,7 @@ export const ReleaseCard = ({ release }: { release: Release }) => {
         </div>
         <div className="text-right shrink-0">
           <p className="eyebrow text-current/60">{release.releaseType}</p>
-          <p className="text-xs text-current/60 mt-1">{year}</p>
+          <p className="text-xs text-current/60 mt-1">{monthYear}</p>
         </div>
       </div>
     </Link>
