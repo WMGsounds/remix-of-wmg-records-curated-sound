@@ -97,6 +97,7 @@ export function normalizeTrack(page: any, releaseLookup: Map<string, any>) {
     trackNumber: num(props["Track Number"]),
     duration: text(props["Duration"]) || "",
     lyrics: text(props["Lyrics"]) || null,
+    spotifyUrl: url(props["Spotify URL"]) || null,
   };
 }
 

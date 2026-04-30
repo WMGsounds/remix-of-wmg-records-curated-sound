@@ -57,6 +57,7 @@ export type Track = {
   trackNumber: number;
   duration: string; // mm:ss
   lyrics?: string | null;
+  spotifyUrl?: string | null;
   // future:
   isrc?: string | null;
   writers?: string[];
