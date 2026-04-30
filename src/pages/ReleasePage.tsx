@@ -93,6 +93,7 @@ const TrackRow = ({
 const ReleasePage = () => {
   const { slug } = useParams();
   const { data, isLoading, isError } = useReleaseBySlug(slug);
+  const [openPreviewTrackId, setOpenPreviewTrackId] = useState<string | null>(null);
 
   if (isLoading) return <PageLoading label="Opening release" />;
   if (isError) return <PageError />;
