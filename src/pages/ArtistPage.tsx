@@ -54,6 +54,7 @@ const ArtistPage = () => {
             ))
           )}
         </div>
+        </div>
       </section>
 
       {/* Featured (latest) Release */}
