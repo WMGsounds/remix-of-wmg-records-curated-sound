@@ -209,8 +209,10 @@ function autoResponseHtml(body: string, eyebrowLabel: string): string {
   return emailShell(inner);
 }
 
-function autoResponseText(body: string): string {
+function autoResponseText(body: string, eyebrowLabel: string): string {
   return [
+    eyebrowLabel.toUpperCase(),
+    "",
     body,
     "",
     "— WMG (Wareham Music Group)",
@@ -218,6 +220,7 @@ function autoResponseText(body: string): string {
     "---",
     "London · Music built to last.",
     SITE_URL,
+    "© 2025 Wareham Music Group. All rights reserved.",
   ].join("\n");
 }
 
