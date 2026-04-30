@@ -10,11 +10,14 @@ const SITE_URL = "https://wmgsounds.com";
 const LOGO_URL = `${SITE_URL}/wmg-logo-full.png`;
 
 // Brand palette (inline only — email clients ignore <style>)
-const COLOR_BG = "#0b0b0b"; // ink
-const COLOR_PANEL = "#f6f1e7"; // cream/ivory
-const COLOR_TEXT = "#1a1a1a";
+const COLOR_OUTER = "#0f0f0f"; // outer wrapper / dark canvas
+const COLOR_BAND = "#1a1a1a"; // header & footer bands
+const COLOR_PANEL = "#f5f0e8"; // warm cream content area
+const COLOR_TEXT = "#1a1a1a"; // dark ink on cream
 const COLOR_MUTED = "#6b6357";
-const COLOR_GOLD = "#b08a3e";
+const COLOR_FOOT_MUTED = "#7a7a7a";
+const COLOR_GOLD = "#c9a84c";
+const COLOR_CREAM_LINK = "#f5f0e8";
 const COLOR_BORDER = "#e6dcc7";
 
 type SubjectKey = "General" | "Press" | "Sync / Licensing" | "Demo Submission" | "Support";
