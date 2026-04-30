@@ -6,9 +6,33 @@ import { PageTitle } from "@/components/PageTitle";
 import { PageLoading, PageError } from "@/components/UIStates";
 import type { Track } from "@/lib/types";
 
-const TrackRow = ({ track }: { track: Track }) => {
-  const [open, setOpen] = useState(false);
+const getSpotifyTrackId = (rawUrl?: string | null): string | null => {
+  if (!rawUrl) return null;
+  try {
+    const u = new URL(rawUrl);
+    if (!u.hostname.includes("spotify.com")) return null;
+    const parts = u.pathname.split("/").filter(Boolean);
+    const idx = parts.findIndex((p) => p === "track");
+    if (idx >= 0 && parts[idx + 1]) return parts[idx + 1];
+    return null;
+  } catch {
+    return null;
+  }
+};
+
+const TrackRow = ({
+  track,
+  previewOpen,
+  onTogglePreview,
+}: {
+  track: Track;
+  previewOpen: boolean;
+  onTogglePreview: () => void;
+}) => {
+  const [lyricsOpen, setLyricsOpen] = useState(false);
   const hasLyrics = !!track.lyrics && track.lyrics.trim().length > 0;
+  const spotifyTrackId = getSpotifyTrackId(track.spotifyUrl);
+
   return (
     <li className="border-b border-ivory/15 last:border-b-0">
       <div className="flex items-baseline justify-between py-5 group hover:text-gold transition-colors duration-300">
@@ -20,19 +44,44 @@ const TrackRow = ({ track }: { track: Track }) => {
         </span>
         <span className="flex items-center gap-6 shrink-0">
           <span className="text-xs text-ivory/55 tabular-nums">{track.duration}</span>
+          {spotifyTrackId && (
+            <button
+              onClick={onTogglePreview}
+              className="text-[10px] uppercase tracking-[0.24em] text-ivory/55 hover:text-ivory inline-flex items-center gap-1.5"
+              aria-expanded={previewOpen}
+              aria-label={previewOpen ? "Close Spotify preview" : "Open Spotify preview"}
+            >
+              <Play className="h-3 w-3" />
+              Preview
+            </button>
+          )}
           {hasLyrics && (
             <button
-              onClick={() => setOpen((o) => !o)}
+              onClick={() => setLyricsOpen((o) => !o)}
               className="text-[10px] uppercase tracking-[0.24em] text-ivory/55 hover:text-ivory inline-flex items-center gap-1.5"
-              aria-expanded={open}
+              aria-expanded={lyricsOpen}
             >
               Lyrics
-              <ChevronDown className={`h-3 w-3 transition-transform ${open ? "rotate-180" : ""}`} />
+              <ChevronDown className={`h-3 w-3 transition-transform ${lyricsOpen ? "rotate-180" : ""}`} />
             </button>
           )}
         </span>
       </div>
-      {hasLyrics && open && (
+      {spotifyTrackId && previewOpen && (
+        <div className="pb-6 pl-12 pr-4">
+          <iframe
+            title={`Spotify preview – ${track.trackTitle}`}
+            src={`https://open.spotify.com/embed/track/${spotifyTrackId}?utm_source=generator`}
+            width="100%"
+            height="80"
+            frameBorder={0}
+            allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
+            loading="lazy"
+            className="rounded"
+          />
+        </div>
+      )}
+      {hasLyrics && lyricsOpen && (
         <div className="pb-8 pl-12 pr-4 text-ivory/80 whitespace-pre-line font-serif text-base leading-relaxed">
           {track.lyrics}
         </div>
