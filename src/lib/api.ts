@@ -36,9 +36,17 @@ async function fetchJson<T>(path: string): Promise<T> {
   try {
     return JSON.parse(text) as T;
   } catch (error) {
+    // In the Lovable preview environment the Vercel /api/* serverless routes
+    // are not running, so the SPA fallback returns index.html (or Vite returns
+    // a raw TS module). Either way the response is not JSON — fall back to
+    // mock data so the preview still renders the full layout.
     const mock = getMockDataForPath(path);
-    if (ALLOW_MOCK_DATA && mock !== null && text.trim().startsWith("import ")) {
-      console.warn(`[cms-api] Non-JSON preview response for ${path}; using MOCK DATA.`, error);
+    if (ALLOW_MOCK_DATA && mock !== null) {
+      const trimmed = text.trim().slice(0, 40);
+      console.warn(
+        `[cms-api] Non-JSON preview response for ${path} (starts with: ${trimmed}…); using MOCK DATA.`,
+        error,
+      );
       return mock as T;
     }
     throw error;
