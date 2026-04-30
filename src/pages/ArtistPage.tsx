@@ -39,7 +39,8 @@ const ArtistPage = () => {
       </section>
 
       {/* Bio */}
-      <section className="container-editorial py-20 md:py-28 grid grid-cols-1 lg:grid-cols-12 gap-10">
+      <section className="bg-gold/10 py-20 md:py-28">
+        <div className="container-editorial grid grid-cols-1 lg:grid-cols-12 gap-10">
         <div className="lg:col-span-4">
           <p className="eyebrow mb-4">About</p>
           <div className="gold-rule" />
@@ -52,6 +53,7 @@ const ArtistPage = () => {
               <p key={i} className="text-base md:text-lg leading-relaxed font-light">{p}</p>
             ))
           )}
+        </div>
         </div>
       </section>
 
