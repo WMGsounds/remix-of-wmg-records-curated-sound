@@ -11,13 +11,30 @@ const channels = [
 ];
 
 const Contact = () => {
-  const [form, setForm] = useState({ name: "", email: "", subject: "General", message: "" });
+  const [form, setForm] = useState({ name: "", email: "", subject: "General", message: "", website: "" });
   const [sent, setSent] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
+  const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
-  const onSubmit = (e: React.FormEvent) => {
+  const onSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setSent(true);
-    setForm({ name: "", email: "", subject: "General", message: "" });
+    if (submitting || sent) return;
+    setSubmitting(true);
+    setErrorMsg(null);
+    try {
+      const res = await fetch("/api/contact", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(form),
+      });
+      if (!res.ok) throw new Error("send_failed");
+      setSent(true);
+      setForm({ name: "", email: "", subject: "General", message: "", website: "" });
+    } catch {
+      setErrorMsg("Something went wrong. Please email us directly.");
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   return (
