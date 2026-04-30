@@ -119,7 +119,7 @@ function emailShell(innerHtml: string): string {
             <tr>
               <td align="center" style="background:${COLOR_BAND};padding:32px 24px;">
                 <a href="${SITE_URL}" style="text-decoration:none;border:0;outline:none;">
-                  <img src="${LOGO_URL}" width="140" alt="WMG — Wareham Music Group" style="display:block;border:0;outline:none;text-decoration:none;height:auto;max-width:140px;margin:0 auto;" />
+                  <img src="${LOGO_URL}" width="170" alt="WMG — Wareham Music Group" style="display:block;border:0;outline:none;text-decoration:none;height:auto;max-width:170px;margin:0 auto;" />
                 </a>
               </td>
             </tr>
@@ -151,7 +151,7 @@ function emailShell(innerHtml: string): string {
             </tr>
             <tr>
               <td align="center" style="background:${COLOR_BAND};padding:0 24px 24px;">
-                <div style="font-family:Georgia,'Times New Roman',serif;font-size:11px;color:${COLOR_FOOT_MUTED};line-height:1.6;">© 2025 Wareham Music Group. All rights reserved.</div>
+                <div style="font-family:Georgia,'Times New Roman',serif;font-size:11px;color:${COLOR_FOOT_MUTED};line-height:1.6;">© ${new Date().getFullYear()} Wareham Music Group. All rights reserved.</div>
               </td>
             </tr>
           </table>
@@ -197,7 +197,7 @@ function notificationText(name: string, email: string, subject: string, message:
     "WMG (Wareham Music Group)",
     "London · Music built to last.",
     SITE_URL,
-    "© 2025 Wareham Music Group. All rights reserved.",
+    `© ${new Date().getFullYear()} Wareham Music Group. All rights reserved.`,
   ].join("\n");
 }
 
@@ -220,7 +220,7 @@ function autoResponseText(body: string, eyebrowLabel: string): string {
     "---",
     "London · Music built to last.",
     SITE_URL,
-    "© 2025 Wareham Music Group. All rights reserved.",
+    `© ${new Date().getFullYear()} Wareham Music Group. All rights reserved.`,
   ].join("\n");
 }
 
