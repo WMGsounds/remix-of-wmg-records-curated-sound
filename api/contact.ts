@@ -30,26 +30,31 @@ const SUBJECT_TO_ENV: Record<string, string> = {
   Support: "CONTACT_EMAIL_GENERAL",
 };
 
-const AUTO_RESPONSES: Record<string, { subject: string; body: string }> = {
+const AUTO_RESPONSES: Record<string, { subject: string; body: string; eyebrow: string }> = {
   General: {
     subject: "We received your message",
     body: "Thanks for reaching out to WMG. We've received your message and someone from the team will be in touch soon.",
+    eyebrow: "General Enquiry Received",
   },
   Press: {
     subject: "Your press enquiry has reached us",
     body: "Thank you for getting in touch. Press and interview enquiries are reviewed by our communications team and we'll come back to you within a few working days. For embargoed or time-sensitive requests, please reply to this email and flag the deadline.",
+    eyebrow: "Press Enquiry Received",
   },
   "Sync / Licensing": {
     subject: "Your sync enquiry has reached us",
     body: "Thanks for reaching out about sync and licensing. Our licensing team handles enquiries case by case — we'll review your request and respond within a few working days. If your project has a tight deadline, please reply to this email with details.",
+    eyebrow: "Sync Enquiry Received",
   },
   "Demo Submission": {
     subject: "Your demo has reached us",
     body: "Thank you for sending your music to WMG. We listen to every submission, and although we can't reply individually to each one, please know that your work has reached us and will be heard. If we'd like to talk further, you'll hear back from us directly. We do not chase trends. We sign artists for the long-term, and we sign rarely.",
+    eyebrow: "Demo Submission Received",
   },
   Support: {
     subject: "We received your message",
     body: "Thanks for reaching out to WMG. We've received your message and someone from the team will be in touch soon.",
+    eyebrow: "General Enquiry Received",
   },
 };
 
