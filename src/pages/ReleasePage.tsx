@@ -162,7 +162,16 @@ const ReleasePage = () => {
               <p className="text-ivory/60">Tracklist coming soon.</p>
             ) : (
               <ol className="border-y border-ivory/15">
-                {tracks.map((t) => <TrackRow key={t.id} track={t} />)}
+                {tracks.map((t) => (
+                  <TrackRow
+                    key={t.id}
+                    track={t}
+                    previewOpen={openPreviewTrackId === t.id}
+                    onTogglePreview={() =>
+                      setOpenPreviewTrackId((curr) => (curr === t.id ? null : t.id))
+                    }
+                  />
+                ))}
               </ol>
             )}
           </div>
