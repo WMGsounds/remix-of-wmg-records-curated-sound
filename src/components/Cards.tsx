@@ -64,7 +64,7 @@ export const ReleaseCard = ({ release }: { release: Release }) => {
         </div>
         <div className="text-right shrink-0">
           <p className="eyebrow text-current/60">{release.releaseType}</p>
-          <p className="text-xs text-current/60 mt-1">{year}</p>
+          <p className="text-xs text-current/60 mt-1">{monthYear}</p>
         </div>
       </div>
     </Link>
