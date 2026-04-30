@@ -1,7 +1,7 @@
 import { Link, useParams, Navigate } from "react-router-dom";
 import { ArrowRight } from "lucide-react";
 import { useArtistBySlug } from "@/lib/queries";
-import { NewsletterForm } from "@/components/NewsletterForm";
+
 import { PageTitle } from "@/components/PageTitle";
 import { PageLoading, PageError } from "@/components/UIStates";
 
@@ -119,14 +119,6 @@ const ArtistPage = () => {
           </div>
         </section>
 
-      {/* Newsletter */}
-      <section className="border-t border-border py-24">
-        <div className="container-editorial max-w-2xl text-center">
-          <p className="eyebrow mb-4">Stay Close</p>
-          <h2 className="display-serif text-4xl md:text-5xl mb-8">First to know.</h2>
-          <div className="flex justify-center"><NewsletterForm compact /></div>
-        </div>
-      </section>
     </div>
   );
 };
