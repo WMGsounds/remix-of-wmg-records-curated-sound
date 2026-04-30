@@ -90,7 +90,7 @@ const ReleasePage = () => {
       </section>
 
       {/* Description */}
-      <section className="bg-secondary py-24">
+      <section className="bg-gold/10 py-24">
         <div className="container-editorial max-w-3xl">
           <p className="display-serif text-3xl md:text-4xl italic leading-[1.25]">
             {release.fullDescription || release.shortDescription}
