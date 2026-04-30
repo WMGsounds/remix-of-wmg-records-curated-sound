@@ -296,8 +296,8 @@ export default async function handler(req: any, res: any) {
       from: "WMG (Wareham Music Group) <noreply@wmgsounds.com>",
       to: [email],
       subject: auto.subject,
-      html: autoResponseHtml(auto.body),
-      text: autoResponseText(auto.body),
+      html: autoResponseHtml(auto.body, auto.eyebrow),
+      text: autoResponseText(auto.body, auto.eyebrow),
     });
 
     if ((autoResult as any)?.error) {
