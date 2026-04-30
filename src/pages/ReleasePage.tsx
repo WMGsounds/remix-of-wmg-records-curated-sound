@@ -52,7 +52,7 @@ const TrackRow = ({
               aria-label={previewOpen ? "Close Spotify preview" : "Open Spotify preview"}
             >
               <Play className="h-3 w-3" />
-              Preview
+              Listen
             </button>
           )}
           {hasLyrics && (
@@ -142,9 +142,9 @@ const ReleasePage = () => {
       </section>
 
       {/* Description */}
-      <section className="bg-gold/10 py-16 md:py-20">
-        <div className="container-editorial flex justify-center">
-          <p className="display-serif italic text-center text-balance leading-[1.4] text-xl md:text-2xl lg:text-[1.75rem] max-w-3xl">
+      <section className="bg-ink text-ivory py-16 md:py-20">
+        <div className="container-editorial">
+          <p className="text-left leading-relaxed text-base md:text-lg text-ivory/82 max-w-3xl">
             {release.fullDescription || release.shortDescription}
           </p>
         </div>
