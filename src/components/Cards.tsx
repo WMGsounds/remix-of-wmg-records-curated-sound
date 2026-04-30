@@ -34,7 +34,9 @@ export const ArtistCard = ({ artist }: { artist: Artist }) => (
 
 export const ReleaseCard = ({ release }: { release: Release }) => {
   const date = release.releaseDate ? new Date(release.releaseDate) : null;
-  const year = date && !Number.isNaN(date.getTime()) ? date.getFullYear() : "TBC";
+  const monthYear = date && !Number.isNaN(date.getTime())
+    ? date.toLocaleDateString(undefined, { month: "long", year: "numeric" }).toUpperCase()
+    : "TBC";
   return (
     <Link
       to={`/releases/${encodeURIComponent(release.slug)}`}
