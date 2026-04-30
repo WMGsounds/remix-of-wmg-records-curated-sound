@@ -76,7 +76,32 @@ const Contact = () => {
                 ))}
               </div>
 
-              <form onSubmit={onSubmit} className="xl:col-span-7 space-y-8">
+              {sent ? (
+                <div className="xl:col-span-7">
+                  <p className="font-serif text-2xl italic text-golden-brown md:text-3xl">
+                    Message sent. We'll be in touch.
+                  </p>
+                </div>
+              ) : (
+              <form onSubmit={onSubmit} className="xl:col-span-7 space-y-8" noValidate>
+                {/* Honeypot — hidden from real users */}
+                <div
+                  aria-hidden="true"
+                  style={{ position: "absolute", left: "-10000px", top: "auto", width: "1px", height: "1px", overflow: "hidden" }}
+                >
+                  <label>
+                    Website
+                    <input
+                      type="text"
+                      name="website"
+                      tabIndex={-1}
+                      autoComplete="off"
+                      value={form.website}
+                      onChange={(e) => setForm({ ...form, website: e.target.value })}
+                    />
+                  </label>
+                </div>
+
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                   <Field label="Name" value={form.name} onChange={(v) => setForm({ ...form, name: v })} />
                   <Field label="Email" type="email" value={form.email} onChange={(v) => setForm({ ...form, email: v })} />
@@ -109,13 +134,15 @@ const Contact = () => {
                 <div className="flex flex-wrap items-center gap-5">
                   <button
                     type="submit"
-                    className="inline-flex items-center gap-3 border border-foreground bg-foreground px-9 py-4 text-[12px] font-medium uppercase tracking-[0.24em] text-gold hover:border-gold hover:bg-transparent hover:text-foreground transition-colors duration-500"
+                    disabled={submitting}
+                    className="inline-flex items-center gap-3 border border-foreground bg-foreground px-9 py-4 text-[12px] font-medium uppercase tracking-[0.24em] text-gold hover:border-gold hover:bg-transparent hover:text-foreground transition-colors duration-500 disabled:opacity-60 disabled:cursor-not-allowed"
                   >
-                    Send Message <ArrowRight className="h-4 w-4" />
+                    {submitting ? "Sending…" : "Send Message"} <ArrowRight className="h-4 w-4" />
                   </button>
-                  {sent && <p className="font-serif text-xl italic text-golden-brown">Message sent. We'll be in touch.</p>}
+                  {errorMsg && <p className="font-serif text-lg italic text-golden-brown">{errorMsg}</p>}
                 </div>
               </form>
+              )}
             </div>
           </div>
         </div>
