@@ -94,7 +94,7 @@ const ReleasePage = () => {
       {/* Description — fixed section height, text box width adapts to content */}
       <section className="bg-gold/10 h-[260px] md:h-[280px] flex items-center">
         <div className="container-editorial flex justify-center">
-          <p className="display-serif italic leading-[1.25] text-center max-w-3xl text-balance text-2xl md:text-3xl lg:text-[2.25rem]">
+          <p className="display-serif italic leading-[1.3] text-center text-balance text-2xl md:text-3xl lg:text-[2.25rem] max-w-5xl">
             {release.fullDescription || release.shortDescription}
           </p>
         </div>
