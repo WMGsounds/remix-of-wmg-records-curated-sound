@@ -167,7 +167,7 @@ const Index = () => {
           <p className="text-muted-foreground">No releases on the homepage yet.</p>
         ) : (
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 md:gap-10">
-            {latestReleases.map((r) => <ReleaseCard key={r.slug} release={r} />)}
+            {latestReleases.map((r) => <ReleaseCard key={r.slug} release={r} hideMetaOnMobile />)}
           </div>
         )}
         </div>

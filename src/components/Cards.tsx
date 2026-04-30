@@ -32,7 +32,7 @@ export const ArtistCard = ({ artist }: { artist: Artist }) => (
   </Link>
 );
 
-export const ReleaseCard = ({ release }: { release: Release }) => {
+export const ReleaseCard = ({ release, hideMetaOnMobile = false }: { release: Release; hideMetaOnMobile?: boolean }) => {
   const date = release.releaseDate ? new Date(release.releaseDate) : null;
   const monthYear = date && !Number.isNaN(date.getTime())
     ? date.toLocaleDateString(undefined, { month: "long", year: "numeric" }).toUpperCase()
@@ -58,11 +58,11 @@ export const ReleaseCard = ({ release }: { release: Release }) => {
         )}
       </div>
       <div className="pt-5 flex items-start justify-between gap-4">
-        <div>
+        <div className="min-w-0 flex-1">
           <h3 className="font-serif text-xl md:text-2xl leading-tight">{release.title}</h3>
           <p className="text-sm text-current/60 mt-1">{release.artistName}</p>
         </div>
-        <div className="text-right shrink-0">
+        <div className={`text-right shrink-0 ${hideMetaOnMobile ? "hidden md:block" : ""}`}>
           <p className="eyebrow text-current/60">{release.releaseType}</p>
           <p className="text-xs text-current/60 mt-1">{monthYear}</p>
         </div>
