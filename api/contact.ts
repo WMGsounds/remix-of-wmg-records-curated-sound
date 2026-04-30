@@ -110,39 +110,48 @@ function emailShell(innerHtml: string): string {
     <meta name="supported-color-schemes" content="light only" />
     <title>WMG</title>
   </head>
-  <body style="margin:0;padding:0;background:${COLOR_BG};font-family:Georgia,'Times New Roman',serif;color:${COLOR_TEXT};">
-    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:${COLOR_BG};padding:32px 16px;">
+  <body style="margin:0;padding:0;background:${COLOR_OUTER};font-family:Georgia,'Times New Roman',serif;color:${COLOR_TEXT};">
+    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:${COLOR_OUTER};padding:40px 16px;">
       <tr>
         <td align="center">
-          <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width:560px;background:${COLOR_PANEL};border:1px solid ${COLOR_BORDER};">
+          <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width:600px;background:${COLOR_PANEL};color-scheme:light only;">
+            <!-- Header band -->
             <tr>
-              <td align="center" style="padding:32px 32px 8px;">
+              <td align="center" style="background:${COLOR_BAND};padding:32px 24px;">
                 <a href="${SITE_URL}" style="text-decoration:none;border:0;outline:none;">
-                  <img src="${LOGO_URL}" width="120" alt="WMG — Wareham Music Group" style="display:block;border:0;outline:none;text-decoration:none;height:auto;max-width:120px;" />
+                  <img src="${LOGO_URL}" width="140" alt="WMG — Wareham Music Group" style="display:block;border:0;outline:none;text-decoration:none;height:auto;max-width:140px;margin:0 auto;" />
                 </a>
               </td>
             </tr>
             <tr>
-              <td style="padding:16px 36px 32px;">
+              <td style="background:${COLOR_BAND};line-height:0;font-size:0;">
+                <div style="height:1px;background:${COLOR_GOLD};line-height:1px;font-size:1px;">&nbsp;</div>
+              </td>
+            </tr>
+            <!-- Body -->
+            <tr>
+              <td style="background:${COLOR_PANEL};padding:32px 40px;">
                 ${innerHtml}
               </td>
             </tr>
+            <!-- Gold rule -->
             <tr>
-              <td style="padding:0 36px 28px;">
-                <hr style="border:0;border-top:1px solid ${COLOR_BORDER};margin:0 0 16px;" />
-                <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
-                  <tr>
-                    <td align="center" style="font-family:Georgia,'Times New Roman',serif;font-size:12px;color:${COLOR_MUTED};line-height:1.6;">
-                      <a href="${SITE_URL}" style="text-decoration:none;border:0;">
-                        <img src="${LOGO_URL}" width="72" alt="WMG" style="display:block;border:0;outline:none;text-decoration:none;height:auto;max-width:72px;margin:0 auto 8px;" />
-                      </a>
-                      <div style="letter-spacing:0.08em;text-transform:uppercase;font-size:11px;color:${COLOR_GOLD};">London · Music built to last.</div>
-                      <div style="margin-top:6px;">
-                        <a href="${SITE_URL}" style="color:${COLOR_MUTED};text-decoration:underline;">wmgsounds.com</a>
-                      </div>
-                    </td>
-                  </tr>
-                </table>
+              <td style="background:${COLOR_PANEL};line-height:0;font-size:0;padding:0 40px;">
+                <div style="height:1px;background:${COLOR_GOLD};line-height:1px;font-size:1px;">&nbsp;</div>
+              </td>
+            </tr>
+            <!-- Footer band -->
+            <tr>
+              <td align="center" style="background:${COLOR_BAND};padding:28px 24px 12px;">
+                <div style="letter-spacing:0.18em;text-transform:uppercase;font-family:Georgia,'Times New Roman',serif;font-size:11px;color:${COLOR_GOLD};">London · Music built to last.</div>
+                <div style="margin-top:10px;font-family:Georgia,'Times New Roman',serif;font-size:13px;">
+                  <a href="${SITE_URL}" style="color:${COLOR_CREAM_LINK};text-decoration:none;">wmgsounds.com</a>
+                </div>
+              </td>
+            </tr>
+            <tr>
+              <td align="center" style="background:${COLOR_BAND};padding:0 24px 24px;">
+                <div style="font-family:Georgia,'Times New Roman',serif;font-size:11px;color:${COLOR_FOOT_MUTED};line-height:1.6;">© 2025 Wareham Music Group. All rights reserved.</div>
               </td>
             </tr>
           </table>
@@ -153,18 +162,22 @@ function emailShell(innerHtml: string): string {
 </html>`;
 }
 
+function eyebrow(label: string): string {
+  return `<div style="letter-spacing:0.2em;text-transform:uppercase;font-family:Georgia,'Times New Roman',serif;font-size:11px;color:${COLOR_GOLD};margin:0 0 22px;">${escapeHtml(label)}</div>`;
+}
+
 function notificationHtml(name: string, email: string, subject: string, message: string): string {
   const inner = `
-    <h1 style="font-family:Georgia,'Times New Roman',serif;font-size:22px;font-weight:normal;color:${COLOR_TEXT};margin:0 0 6px;">New enquiry via wmgsounds.com</h1>
-    <div style="letter-spacing:0.12em;text-transform:uppercase;font-size:11px;color:${COLOR_GOLD};margin-bottom:24px;">${escapeHtml(subject)}</div>
+    ${eyebrow(`${subject} · New Enquiry`)}
+    <h1 style="font-family:Georgia,'Times New Roman',serif;font-size:22px;font-weight:normal;color:${COLOR_TEXT};margin:0 0 22px;text-align:left;">New enquiry via wmgsounds.com</h1>
     <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="font-family:Georgia,'Times New Roman',serif;font-size:15px;color:${COLOR_TEXT};">
       <tr><td style="padding:8px 0;color:${COLOR_MUTED};width:90px;">Name</td><td style="padding:8px 0;">${escapeHtml(name)}</td></tr>
       <tr><td style="padding:8px 0;color:${COLOR_MUTED};">Email</td><td style="padding:8px 0;"><a href="mailto:${escapeHtml(email)}" style="color:${COLOR_TEXT};">${escapeHtml(email)}</a></td></tr>
       <tr><td style="padding:8px 0;color:${COLOR_MUTED};">Subject</td><td style="padding:8px 0;">${escapeHtml(subject)}</td></tr>
     </table>
     <div style="margin-top:24px;padding-top:20px;border-top:1px solid ${COLOR_BORDER};">
-      <div style="letter-spacing:0.1em;text-transform:uppercase;font-size:11px;color:${COLOR_MUTED};margin-bottom:10px;">Message</div>
-      <div style="font-family:Georgia,'Times New Roman',serif;font-size:15px;line-height:1.7;color:${COLOR_TEXT};white-space:pre-wrap;">${escapeHtml(message)}</div>
+      <div style="letter-spacing:0.18em;text-transform:uppercase;font-family:Georgia,'Times New Roman',serif;font-size:11px;color:${COLOR_MUTED};margin-bottom:12px;">Message</div>
+      <div style="font-family:Georgia,'Times New Roman',serif;font-size:15px;line-height:1.7;color:${COLOR_TEXT};white-space:pre-wrap;text-align:left;">${escapeHtml(message)}</div>
     </div>`;
   return emailShell(inner);
 }
@@ -184,13 +197,15 @@ function notificationText(name: string, email: string, subject: string, message:
     "WMG (Wareham Music Group)",
     "London · Music built to last.",
     SITE_URL,
+    "© 2025 Wareham Music Group. All rights reserved.",
   ].join("\n");
 }
 
-function autoResponseHtml(body: string): string {
+function autoResponseHtml(body: string, eyebrowLabel: string): string {
   const inner = `
-    <p style="font-family:Georgia,'Times New Roman',serif;font-size:16px;line-height:1.7;color:${COLOR_TEXT};margin:0 0 18px;">${escapeHtml(body)}</p>
-    <p style="font-family:Georgia,'Times New Roman',serif;font-size:14px;color:${COLOR_MUTED};margin:24px 0 0;">— WMG (Wareham Music Group)</p>`;
+    ${eyebrow(eyebrowLabel)}
+    <p style="font-family:Georgia,'Times New Roman',serif;font-size:16px;line-height:1.7;color:${COLOR_TEXT};margin:0 0 22px;text-align:left;">${escapeHtml(body)}</p>
+    <p style="font-family:Georgia,'Times New Roman',serif;font-style:italic;font-size:14px;color:${COLOR_MUTED};margin:28px 0 0;text-align:left;">— WMG (Wareham Music Group)</p>`;
   return emailShell(inner);
 }
 
