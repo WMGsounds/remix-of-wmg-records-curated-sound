@@ -138,12 +138,12 @@ const About = () => (
         <div className="lg:col-span-6 lg:col-start-7 reveal-on-scroll">
           <p className="eyebrow text-gold mb-5">The People</p>
           <div className="gold-rule mb-10" />
-          <h2 className="display-serif text-5xl md:text-7xl mb-8">A small team with a long view.</h2>
+          <h2 className="display-serif md:text-7xl mb-8 text-6xl">A small team with a long view.</h2>
           <div className="space-y-6 text-lg md:text-xl leading-relaxed font-light text-ivory/88">
-            <p>
+            <p className="text-base">
               WMG was founded in 2025 in London by a small group of producers, writers, and listeners who wanted to do this differently. We came together around a shared frustration with the speed of modern release cycles, and a quiet belief that the records worth keeping are still the ones made slowly, by people who care more about the work than the numbers.
             </p>
-            <p>
+            <p className="text-base">
               Today the team is small by design. Founders, A&R, production, design, and the people who make sure each release lands with the attention it deserves. Everyone here listens to everything. No track gets signed off in isolation, and no campaign goes out without someone who genuinely believes in it. We're not chasing trend or scale. We're building a catalogue we'll still be proud of in twenty years.
             </p>
           </div>
