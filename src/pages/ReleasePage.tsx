@@ -137,16 +137,12 @@ const ReleasePage = () => {
               </Link>
             )}
             <p className="text-sm text-ivory/60 mt-6">{dateLabel}</p>
+            {(release.fullDescription || release.shortDescription) && (
+              <p className="mt-8 text-base md:text-lg leading-relaxed text-ivory/75 max-w-2xl">
+                {release.fullDescription || release.shortDescription}
+              </p>
+            )}
           </div>
-        </div>
-      </section>
-
-      {/* Description */}
-      <section className="bg-ink text-ivory py-16 md:py-20">
-        <div className="container-editorial">
-          <p className="text-left leading-relaxed text-base md:text-lg text-ivory/82 max-w-3xl">
-            {release.fullDescription || release.shortDescription}
-          </p>
         </div>
       </section>
 
