@@ -59,10 +59,10 @@ const ReleasePage = () => {
   }) : "Release date TBC";
 
   return (
-    <div className="pt-32">
+    <div>
       <PageTitle title={release.title} />
       {/* Hero */}
-      <section className="relative overflow-hidden bg-ink text-ivory pt-20 md:pt-28 pb-20 md:pb-28">
+      <section className="relative overflow-hidden bg-ink text-ivory pt-52 md:pt-60 pb-20 md:pb-28">
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_74%_38%,hsl(var(--golden-brown)/0.38),transparent_34%),radial-gradient(circle_at_18%_78%,hsl(var(--gold)/0.16),transparent_28%)]" aria-hidden="true" />
         <div className="absolute inset-0 opacity-[0.08] [background-image:linear-gradient(90deg,hsl(var(--ivory)/0.8)_1px,transparent_1px),linear-gradient(0deg,hsl(var(--ivory)/0.8)_1px,transparent_1px)] [background-size:3px_3px]" aria-hidden="true" />
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,transparent_42%,hsl(var(--ink)/0.72)_100%)]" aria-hidden="true" />
