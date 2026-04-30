@@ -119,7 +119,7 @@ export const SiteFooter = () => (
   <footer className="relative bg-ink text-ivory">
     <div className="absolute inset-x-0 top-0 h-px bg-gold" aria-hidden="true" />
     <div className="container-editorial py-10 grid grid-cols-1 md:grid-cols-[2fr_1fr] gap-8 md:gap-10 items-start">
-      <div className="flex items-center self-stretch">
+      <div className="flex items-center justify-center md:justify-start self-stretch">
         <Link to="/" className="inline-block" aria-label="WMG Records — Wareham Music Group">
           <img
             src={footerLogo}
@@ -127,7 +127,7 @@ export const SiteFooter = () => (
             loading="lazy"
             width={640}
             height={220}
-            className="w-full max-w-[280px] h-auto"
+            className="w-full max-w-[280px] h-auto mx-auto md:mx-0"
           />
         </Link>
       </div>
