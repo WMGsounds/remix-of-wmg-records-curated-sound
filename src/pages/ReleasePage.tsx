@@ -190,17 +190,6 @@ const ReleasePage = () => {
               {artist && <li>{artist.name}</li>}
               <li className="text-ivory/60 italic text-sm pt-2">Additional credits coming soon.</li>
             </ul>
-            {release.streamingLinks?.spotify && (
-              <a
-                href={release.streamingLinks.spotify}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="mt-8 inline-flex items-center gap-2 border border-ivory/30 px-6 py-3 text-[11px] uppercase tracking-[0.28em] text-ivory hover:bg-ivory hover:text-ink transition-colors duration-300"
-              >
-                <Play className="h-3.5 w-3.5" />
-                Listen on Spotify
-              </a>
-            )}
           </div>
         </div>
       </section>
