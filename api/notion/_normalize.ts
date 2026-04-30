@@ -8,7 +8,13 @@ const paragraphs = (p: any): string[] =>
 
 const num = (p: any): number => p?.number ?? 0;
 const bool = (p: any): boolean => p?.type === "checkbox" && p.checkbox === true;
-const url = (p: any): string | undefined => p?.url ?? undefined;
+const url = (p: any): string | undefined => {
+  if (!p) return undefined;
+  if (typeof p === "string") return p.trim() || undefined;
+  if (typeof p.url === "string") return p.url.trim() || undefined;
+  if (typeof p[p.type] === "string") return p[p.type].trim() || undefined;
+  return undefined;
+};
 const select = (p: any): string => p?.select?.name ?? "";
 const multiSelect = (p: any): string => (p?.multi_select ?? []).map((o: any) => o.name).filter(Boolean).join(", ");
 const date = (p: any): string => p?.date?.start ?? "";
