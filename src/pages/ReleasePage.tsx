@@ -118,9 +118,9 @@ const ReleasePage = () => {
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_74%_38%,hsl(var(--golden-brown)/0.38),transparent_34%),radial-gradient(circle_at_18%_78%,hsl(var(--gold)/0.16),transparent_28%)]" aria-hidden="true" />
         <div className="absolute inset-0 opacity-[0.08] [background-image:linear-gradient(90deg,hsl(var(--ivory)/0.8)_1px,transparent_1px),linear-gradient(0deg,hsl(var(--ivory)/0.8)_1px,transparent_1px)] [background-size:3px_3px]" aria-hidden="true" />
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,transparent_42%,hsl(var(--ink)/0.72)_100%)]" aria-hidden="true" />
-        <div className="relative container-editorial grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-20 items-center">
-          <div className="lg:col-span-5">
-            <div className="overflow-hidden aspect-square shadow-[var(--shadow-soft)] max-w-[460px] mx-auto lg:mx-0">
+        <div className="relative container-editorial grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16 items-center">
+          <div className="lg:col-span-6">
+            <div className="overflow-hidden aspect-square shadow-[var(--shadow-soft)] w-full max-w-[620px] mx-auto lg:mx-0">
               {release.coverArt ? (
                 <img src={release.coverArt} alt={release.title} loading="eager" fetchPriority="high" width={1200} height={1200} className="h-full w-full object-cover" />
               ) : (
@@ -128,9 +128,9 @@ const ReleasePage = () => {
               )}
             </div>
           </div>
-          <div className="lg:col-span-7">
+          <div className="lg:col-span-6">
             <p className="eyebrow text-gold-soft mb-4">{release.releaseType} · {monthYear}</p>
-            <h1 className="display-serif text-6xl md:text-8xl mb-6">{release.title}</h1>
+            <h1 className="display-serif text-4xl md:text-5xl lg:text-6xl mb-6">{release.title}</h1>
             {artist && (
               <Link to={`/artists/${encodeURIComponent(artist.slug)}`} className="font-serif italic text-2xl md:text-3xl text-ivory/82 link-underline">
                 {artist.name}
@@ -138,7 +138,7 @@ const ReleasePage = () => {
             )}
             <p className="text-sm text-ivory/60 mt-6">{dateLabel}</p>
             {(release.fullDescription || release.shortDescription) && (
-              <p className="mt-8 text-base md:text-lg leading-relaxed text-ivory/75 max-w-2xl">
+              <p className="mt-8 text-sm md:text-base leading-relaxed text-ivory/75 max-w-2xl">
                 {release.fullDescription || release.shortDescription}
               </p>
             )}
