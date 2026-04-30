@@ -39,18 +39,18 @@ const ArtistPage = () => {
       </section>
 
       {/* Bio */}
-      <section className="bg-gold/10 py-20 md:py-28">
+      <section className="bg-ink text-ivory py-20 md:py-28">
         <div className="container-editorial grid grid-cols-1 lg:grid-cols-12 gap-10">
         <div className="lg:col-span-4">
-          <p className="eyebrow mb-4">About</p>
+          <p className="eyebrow text-ivory/60 mb-4">About</p>
           <div className="gold-rule" />
         </div>
         <div className="lg:col-span-8 space-y-5">
           {artist.fullBio.length === 0 ? (
-            <p className="text-base md:text-lg leading-relaxed font-light text-muted-foreground">Artist bio coming soon.</p>
+            <p className="text-base md:text-lg leading-relaxed font-light text-ivory/60">Artist bio coming soon.</p>
           ) : (
             artist.fullBio.map((p, i) => (
-              <p key={i} className="text-base md:text-lg leading-relaxed font-light">{p}</p>
+              <p key={i} className="text-base md:text-lg leading-relaxed font-light text-ivory/82">{p}</p>
             ))
           )}
         </div>
