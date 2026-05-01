@@ -54,8 +54,8 @@ export const SiteHeader = () => {
               to={item.to}
               end={item.to === "/"}
               className={({ isActive }) =>
-                `text-[12px] uppercase tracking-[0.24em] font-medium link-underline transition-colors ${
-                  isActive ? "text-gold" : "text-ivory/70 hover:text-ivory"
+                `text-[12px] uppercase tracking-[0.24em] link-underline transition-colors ${
+                  isActive ? "text-gold font-bold" : "text-ivory/70 font-medium hover:text-ivory"
                 }`
               }
             >
@@ -67,7 +67,7 @@ export const SiteHeader = () => {
         <div className="hidden md:flex items-center gap-6">
           <Link
             to="/store"
-            className="text-[12px] uppercase tracking-[0.24em] font-medium border border-ivory/60 px-5 py-2.5 transition-colors duration-500 bg-gold text-gold"
+            className="text-[12px] uppercase tracking-[0.24em] font-medium border border-ivory/60 px-5 py-2.5 transition-colors duration-500 text-gold"
           >
             Store
           </Link>
