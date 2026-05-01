@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Link, useParams, Navigate } from "react-router-dom";
 import { ChevronDown, Play } from "lucide-react";
 import { useReleaseBySlug } from "@/lib/queries";
+import { LazyImage } from "@/components/LazyImage";
 import { PageTitle } from "@/components/PageTitle";
 import { PageLoading, PageError } from "@/components/UIStates";
 import type { Track } from "@/lib/types";
@@ -122,7 +123,17 @@ const ReleasePage = () => {
           <div className="lg:col-span-6">
             <div className="overflow-hidden aspect-square shadow-[var(--shadow-soft)] w-full max-w-[620px] mx-auto lg:mx-0">
               {release.coverArt ? (
-                <img src={release.coverArt} alt={release.title} loading="eager" fetchPriority="high" width={1200} height={1200} className="h-full w-full object-cover" />
+                <LazyImage
+                  src={release.coverArt}
+                  alt={release.title}
+                  width={1200}
+                  height={1200}
+                  displayWidth={960}
+                  sizes="(min-width: 1024px) 50vw, 100vw"
+                  loading="eager"
+                  fetchPriority="high"
+                  className="object-cover"
+                />
               ) : (
                 <div className="h-full w-full bg-ivory/10 flex items-center justify-center text-ivory/60">Artwork coming soon.</div>
               )}
@@ -203,9 +214,17 @@ const ReleasePage = () => {
             <div className="grid grid-cols-2 md:grid-cols-3 gap-8">
               {related.map((r) => (
                 <Link key={r.slug} to={`/releases/${encodeURIComponent(r.slug)}`} className="group block hover-zoom cursor-pointer focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-ivory">
-                  <div className="overflow-hidden aspect-square">
+                  <div className="aspect-square">
                     {r.coverArt ? (
-                      <img src={r.coverArt} alt={r.title} loading="lazy" width={1200} height={1200} className="h-full w-full object-cover" />
+                      <LazyImage
+                        src={r.coverArt}
+                        alt={r.title}
+                        width={1200}
+                        height={1200}
+                        displayWidth={480}
+                        sizes="(min-width: 768px) 33vw, 50vw"
+                        className="object-cover"
+                      />
                     ) : (
                       <div className="h-full w-full bg-ivory/10 flex items-center justify-center p-4 text-center text-ivory/60">Artwork coming soon.</div>
                     )}
