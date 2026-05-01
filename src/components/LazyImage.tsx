@@ -37,6 +37,8 @@ type LazyImageProps = {
   displayWidth?: number;
   loading?: "lazy" | "eager";
   fetchPriority?: "high" | "low" | "auto";
+  /** When true, the image fills its parent (which must be positioned). No aspect-ratio wrapper is added. */
+  fill?: boolean;
 };
 
 export const LazyImage = ({
@@ -50,6 +52,7 @@ export const LazyImage = ({
   displayWidth,
   loading = "lazy",
   fetchPriority,
+  fill = false,
 }: LazyImageProps) => {
   const [loaded, setLoaded] = useState(false);
   const imgRef = useRef<HTMLImageElement>(null);
@@ -60,16 +63,12 @@ export const LazyImage = ({
   const srcSet = proxied ? buildSrcSet(src, targetWidth) : undefined;
   const blurUrl = proxied ? buildBlurUrl(src) : null;
 
-  // Sync loaded state with cached images that complete before mount.
   useEffect(() => {
     if (imgRef.current?.complete) setLoaded(true);
   }, [finalSrc]);
 
-  return (
-    <div
-      className={cn("relative overflow-hidden", wrapperClassName)}
-      style={{ aspectRatio: `${width} / ${height}` }}
-    >
+  const imgEl = (
+    <>
       {blurUrl && (
         <div
           aria-hidden="true"
@@ -99,6 +98,21 @@ export const LazyImage = ({
           className
         )}
       />
+    </>
+  );
+
+  if (fill) {
+    // Caller controls the wrapper sizing; we just render the layered children.
+    return <>{imgEl}</>;
+  }
+
+  return (
+    <div
+      className={cn("relative overflow-hidden", wrapperClassName)}
+      style={{ aspectRatio: `${width} / ${height}` }}
+    >
+      {imgEl}
     </div>
   );
 };
+
