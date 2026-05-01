@@ -1,6 +1,7 @@
 import { Link, useParams, Navigate } from "react-router-dom";
 import { ArrowRight } from "lucide-react";
 import { useArtistBySlug } from "@/lib/queries";
+import { LazyImage } from "@/components/LazyImage";
 
 import { PageTitle } from "@/components/PageTitle";
 import { PageLoading, PageError } from "@/components/UIStates";
@@ -22,7 +23,18 @@ const ArtistPage = () => {
       {/* Hero */}
       <section className="relative h-[85vh] min-h-[600px] bg-ink text-ivory overflow-hidden">
         {heroImage ? (
-          <img src={heroImage} alt={artist.name} loading="eager" fetchPriority="high" width={1920} height={1280} className="absolute inset-0 h-full w-full object-cover opacity-80" />
+          <LazyImage
+            src={heroImage}
+            alt={artist.name}
+            width={1920}
+            height={1280}
+            displayWidth={1920}
+            sizes="100vw"
+            loading="eager"
+            fetchPriority="high"
+            fill
+            className="object-cover opacity-80"
+          />
         ) : (
           <div className="absolute inset-0 bg-secondary" />
         )}
@@ -68,7 +80,15 @@ const ArtistPage = () => {
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center mt-8">
             <div className="lg:col-span-5 hover-zoom overflow-hidden">
               {featured.coverArt ? (
-                <img src={featured.coverArt} alt={featured.title} loading="lazy" width={1200} height={1200} className="w-full aspect-square object-cover" />
+                <LazyImage
+                  src={featured.coverArt}
+                  alt={featured.title}
+                  width={1200}
+                  height={1200}
+                  displayWidth={640}
+                  sizes="(min-width: 1024px) 40vw, 100vw"
+                  className="object-cover"
+                />
               ) : (
                 <div className="w-full aspect-square bg-ivory/10 flex items-center justify-center text-ivory/60">Artwork coming soon.</div>
               )}
@@ -101,9 +121,17 @@ const ArtistPage = () => {
             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
               {discography.map((r) => (
                 <Link key={r.slug} to={`/releases/${encodeURIComponent(r.slug)}`} className="group block hover-zoom cursor-pointer focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-ivory">
-                  <div className="overflow-hidden aspect-square">
+                  <div className="aspect-square">
                     {r.coverArt ? (
-                      <img src={r.coverArt} alt={r.title} loading="lazy" width={1200} height={1200} className="h-full w-full object-cover" />
+                      <LazyImage
+                        src={r.coverArt}
+                        alt={r.title}
+                        width={1200}
+                        height={1200}
+                        displayWidth={480}
+                        sizes="(min-width: 1024px) 25vw, (min-width: 768px) 33vw, 50vw"
+                        className="object-cover"
+                      />
                     ) : (
                       <div className="h-full w-full bg-ivory/10 flex items-center justify-center p-4 text-center text-ivory/60">Artwork coming soon.</div>
                     )}

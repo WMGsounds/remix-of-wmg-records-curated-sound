@@ -3,6 +3,7 @@ import { ArrowRight } from "lucide-react";
 import hero from "@/assets/hero-cinematic.jpg";
 import { ArtistCard, ReleaseCard } from "@/components/Cards";
 import { PageTitle } from "@/components/PageTitle";
+import { LazyImage } from "@/components/LazyImage";
 import { useHomepageData } from "@/lib/queries";
 import { InlineSkeleton } from "@/components/UIStates";
 
@@ -80,7 +81,15 @@ const Index = () => {
             </div>
             <div className="lg:col-span-5 order-1 lg:order-2 hover-zoom overflow-hidden">
               {featured.coverArt ? (
-                <img src={featured.coverArt} alt={featured.title} loading="lazy" width={1200} height={1200} className="w-full aspect-square object-cover" />
+                <LazyImage
+                  src={featured.coverArt}
+                  alt={featured.title}
+                  width={1200}
+                  height={1200}
+                  displayWidth={640}
+                  sizes="(min-width: 1024px) 40vw, 100vw"
+                  className="object-cover"
+                />
               ) : (
                 <div className="w-full aspect-square bg-muted flex items-center justify-center text-muted-foreground">Artwork coming soon.</div>
               )}
@@ -126,9 +135,17 @@ const Index = () => {
                   className="group block hover-zoom cursor-pointer focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-ivory"
                   aria-label={`View ${a.name}`}
                 >
-                  <div className="relative overflow-hidden bg-secondary aspect-[3/4]">
+                  <div className="relative bg-secondary aspect-[3/4]">
                     {a.heroImage ? (
-                      <img src={a.heroImage} alt={a.name} loading="lazy" width={900} height={1200} className="h-full w-full object-cover" />
+                      <LazyImage
+                        src={a.heroImage}
+                        alt={a.name}
+                        width={900}
+                        height={1200}
+                        displayWidth={480}
+                        sizes="(min-width: 1024px) 25vw, 50vw"
+                        className="object-cover"
+                      />
                     ) : (
                       <div className="h-full w-full flex items-center justify-center p-6 text-center text-ivory/60">Image coming soon.</div>
                     )}
