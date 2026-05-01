@@ -247,7 +247,7 @@ const ReleasePage = () => {
       {related.length > 0 && (
         <section className="bg-ink text-ivory py-28">
           <div className="container-editorial">
-            <p className="eyebrow text-ivory/60 mb-4">More from {artist?.name ?? "this artist"}</p>
+            <p className="eyebrow mb-4 text-gold-soft">More from {artist?.name ?? "this artist"}</p>
             <h2 className="display-serif text-5xl md:text-6xl mb-16">Related Releases</h2>
             <div className="grid grid-cols-2 md:grid-cols-3 gap-8">
               {related.map((r) => (
