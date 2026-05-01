@@ -16,6 +16,7 @@ const REQUIRED_ENV = [
   "NOTION_ARTISTS_DB_ID",
   "NOTION_RELEASES_DB_ID",
   "NOTION_TRACKS_DB_ID",
+  "NOTION_RELEASE_TRACKS_DB_ID",
 ] as const;
 
 export const getEnvStatus = () =>
@@ -79,6 +80,7 @@ export const DBS = {
   artists: process.env.NOTION_ARTISTS_DB_ID!,
   releases: process.env.NOTION_RELEASES_DB_ID!,
   tracks: process.env.NOTION_TRACKS_DB_ID!,
+  releaseTracks: process.env.NOTION_RELEASE_TRACKS_DB_ID!,
 };
 
 // Notion file URLs expire ~1h. Cache JSON 50 min on the CDN, allow the browser
