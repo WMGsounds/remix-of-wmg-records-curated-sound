@@ -103,8 +103,10 @@ export const SiteHeader = () => {
 export const SiteFooter = () => (
   <footer className="relative bg-ink text-ivory">
     <div className="absolute inset-x-0 top-0 h-px bg-gold" aria-hidden="true" />
-    <div className="container-editorial py-10 grid grid-cols-1 md:grid-cols-[2fr_1fr] gap-8 md:gap-10 items-start">
-      <div className="flex items-center justify-center md:justify-start self-stretch">
+    <div className="container-editorial py-10 grid grid-cols-1 md:grid-cols-3 gap-8 md:gap-10 items-center">
+      <div className="hidden md:block" />
+
+      <div className="flex items-center justify-center">
         <Link to="/" className="inline-block" aria-label="WMG Records — Wareham Music Group">
           <img
             src={footerLogo}
@@ -112,12 +114,12 @@ export const SiteFooter = () => (
             loading="lazy"
             width={640}
             height={220}
-            className="w-full max-w-[280px] h-auto mx-auto md:mx-0"
+            className="w-full max-w-[280px] h-auto"
           />
         </Link>
       </div>
 
-      <div className="md:pl-16 lg:pl-28">
+      <div className="md:text-right md:justify-self-end">
         <p className="eyebrow mb-3 text-gold">Explore</p>
         <ul className="space-y-1.5 text-sm">
           {nav.map((n) => (
