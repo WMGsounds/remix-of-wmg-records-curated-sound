@@ -56,9 +56,17 @@ const Index = () => {
       {/* FEATURED RELEASE */}
       {featured && (
         <section className="relative overflow-hidden bg-ink py-16 md:py-20 text-ivory">
-          <div className="absolute inset-0 bg-[radial-gradient(circle_at_74%_38%,hsl(var(--golden-brown)/0.38),transparent_34%),radial-gradient(circle_at_18%_78%,hsl(var(--gold)/0.16),transparent_28%)]" aria-hidden="true" />
-          <div className="absolute inset-0 opacity-[0.08] [background-image:linear-gradient(90deg,hsl(var(--ivory)/0.8)_1px,transparent_1px),linear-gradient(0deg,hsl(var(--ivory)/0.8)_1px,transparent_1px)] [background-size:3px_3px]" aria-hidden="true" />
-          <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,transparent_42%,hsl(var(--ink)/0.72)_100%)]" aria-hidden="true" />
+          {featured.coverArt && (
+            <div
+              className="absolute inset-0 scale-110 bg-cover bg-center"
+              style={{
+                backgroundImage: `url(${featured.coverArt}${featured.coverArt.includes("?") ? "&" : "?"}w=640)`,
+                filter: "blur(50px)",
+              }}
+              aria-hidden="true"
+            />
+          )}
+          <div className="absolute inset-0 bg-ink/75" aria-hidden="true" />
           <div className="relative container-editorial grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-20 items-center">
             <div className="lg:col-span-7 order-2 lg:order-1">
               <p className="eyebrow text-gold-soft mb-4">Featured Release</p>
