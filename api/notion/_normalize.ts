@@ -132,7 +132,9 @@ export function normalizeReleaseTrack(page: any, trackPageLookup: Map<string, an
     duration: relatedDuration,
     // Carry through useful per-track metadata so the Release page UI keeps working.
     lyrics: text(trackProps["Lyrics"]) || null,
-    spotifyUrl: url(props["Spotify URL (Release-Specific)"]) || url(trackProps["Spotify URL"]) || null,
+    // Per-release Spotify URL only — never fall back to the Tracks DB URL,
+    // so a track on multiple releases links to the correct version each time.
+    spotifyUrl: url(props["Spotify URL (Release-Specific)"]) || null,
   };
 }
 
