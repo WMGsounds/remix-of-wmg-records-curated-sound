@@ -45,17 +45,19 @@ const TrackRow = ({
         </span>
         <span className="flex items-center gap-6 shrink-0">
           <span className="text-xs text-ivory/55 tabular-nums">{track.duration}</span>
-          {spotifyTrackId && (
-            <button
-              onClick={onTogglePreview}
-              className="text-[10px] uppercase tracking-[0.24em] text-ivory/55 hover:text-ivory inline-flex items-center gap-1.5"
-              aria-expanded={previewOpen}
-              aria-label={previewOpen ? "Close Spotify preview" : "Open Spotify preview"}
-            >
-              <Play className="h-3 w-3" />
-              Listen
-            </button>
-          )}
+          <span className="w-16 shrink-0 flex justify-end">
+            {spotifyTrackId && (
+              <button
+                onClick={onTogglePreview}
+                className="text-[10px] uppercase tracking-[0.24em] text-ivory/55 hover:text-ivory inline-flex items-center gap-1.5"
+                aria-expanded={previewOpen}
+                aria-label={previewOpen ? "Close Spotify preview" : "Open Spotify preview"}
+              >
+                <Play className="h-3 w-3" />
+                Listen
+              </button>
+            )}
+          </span>
           <span className="w-16 shrink-0 flex justify-end">
             {hasLyrics && (
               <button
