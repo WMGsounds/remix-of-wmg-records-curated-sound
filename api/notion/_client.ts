@@ -81,10 +81,11 @@ export const DBS = {
   tracks: process.env.NOTION_TRACKS_DB_ID!,
 };
 
-// Notion file URLs expire ~1h. Cache responses 50 min so we always re-fetch
-// before the URL goes stale.
+// Notion file URLs expire ~1h. Cache JSON 50 min on the CDN, allow the browser
+// to reuse it for 5 min, and serve stale-while-revalidate for an extra 10 min
+// so navigations feel instant and Notion isn't re-hit on every request.
 export const CACHE_HEADERS = {
-  "Cache-Control": "public, s-maxage=3000, stale-while-revalidate=600",
+  "Cache-Control": "public, max-age=300, s-maxage=3000, stale-while-revalidate=600",
   "Content-Type": "application/json",
   "X-Data-Source": "notion",
 };
