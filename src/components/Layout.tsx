@@ -55,7 +55,7 @@ export const SiteHeader = () => {
               end={item.to === "/"}
               className={({ isActive }) =>
                 `text-[12px] uppercase tracking-[0.24em] font-medium link-underline transition-colors ${
-                  isActive ? "text-ivory" : "text-ivory/70 hover:text-ivory"
+                  isActive ? "text-gold" : "text-ivory/70 hover:text-ivory"
                 }`
               }
             >
@@ -67,7 +67,7 @@ export const SiteHeader = () => {
         <div className="hidden md:flex items-center gap-6">
           <Link
             to="/store"
-            className="text-[12px] uppercase tracking-[0.24em] font-medium border border-ivory/60 text-ivory px-5 py-2.5 hover:bg-ivory hover:text-ink transition-colors duration-500"
+            className="text-[12px] uppercase tracking-[0.24em] font-medium border border-ivory/60 px-5 py-2.5 transition-colors duration-500 bg-gold text-gold"
           >
             Store
           </Link>
