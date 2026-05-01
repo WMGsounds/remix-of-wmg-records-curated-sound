@@ -92,11 +92,11 @@ const Index = () => {
       {/* FEATURED RELEASE */}
       {featured && (
         <section className="relative overflow-hidden bg-ink py-16 md:py-20 text-ivory">
-          {featured.coverArt && (
+          {featuredBgUrl && (
             <div
-              className="absolute inset-0 scale-110 bg-cover bg-center"
+              className={`absolute inset-0 scale-110 bg-cover bg-center transition-opacity duration-300 ${bgReady ? "opacity-100" : "opacity-0"}`}
               style={{
-                backgroundImage: `url(${featured.coverArt}${featured.coverArt.includes("?") ? "&" : "?"}w=640)`,
+                backgroundImage: `url(${featuredBgUrl})`,
                 filter: "blur(50px)",
               }}
               aria-hidden="true"
