@@ -65,7 +65,7 @@ const Index = () => {
         />
         <div className="absolute inset-0 bg-gradient-to-b from-ink/40 via-ink/20 to-ink/80" />
         <div className="relative z-10 h-full container-editorial flex flex-col justify-end pb-20 md:pb-28">
-          <p className="eyebrow text-ivory/70 mb-6 animate-fade-in">Wareham Music Group · Est. London</p>
+          <p className="eyebrow mb-6 text-gold-soft animate-fade-in">Wareham Music Group · Est. London</p>
           <h1 className="display-serif text-[15vw] md:text-[10vw] lg:text-[9vw] leading-none animate-fade-up">
             WMG <span className="italic text-gold">Sounds</span>
           </h1>
@@ -150,7 +150,7 @@ const Index = () => {
         <div className="relative container-editorial">
           <div className="flex items-end justify-between mb-16">
             <div>
-              <p className="eyebrow text-ivory/60 mb-4">The Roster</p>
+              <p className="eyebrow mb-4 text-gold-soft">The Roster</p>
               <h2 className="display-serif text-5xl md:text-7xl">Featured Artists</h2>
             </div>
             <Link to="/artists" className="hidden md:inline-flex items-center gap-2 text-[12px] uppercase tracking-[0.24em] link-underline">

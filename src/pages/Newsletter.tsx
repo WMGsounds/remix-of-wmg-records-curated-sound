@@ -3,7 +3,7 @@ import { NewsletterForm } from "@/components/NewsletterForm";
 const Newsletter = () => (
   <div className="bg-ink text-ivory pt-32 pb-16">
     <div className="container-editorial max-w-3xl text-center">
-      <p className="eyebrow text-ivory/60 mb-8">The List</p>
+      <p className="eyebrow mb-8 text-gold-soft">The List</p>
       <h1 className="display-serif text-6xl md:text-8xl lg:text-9xl leading-[0.95]">
         Join the <span className="italic text-gold">List</span>.
       </h1>

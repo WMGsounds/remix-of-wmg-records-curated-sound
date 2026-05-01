@@ -40,7 +40,7 @@ const ArtistPage = () => {
         )}
         <div className="absolute inset-0 bg-gradient-to-t from-ink via-ink/40 to-ink/30" />
         <div className="relative z-10 h-full container-editorial flex flex-col justify-end pb-20">
-          <p className="eyebrow text-ivory/70 mb-4">{artist.genre}</p>
+          <p className="eyebrow mb-4 text-gold-soft">{artist.genre}</p>
           <h1 className="display-serif text-7xl md:text-9xl">{artist.name}</h1>
           {artist.shortDescription && (
             <p className="font-serif italic text-2xl md:text-3xl text-ivory/85 mt-6 max-w-2xl">
@@ -54,7 +54,7 @@ const ArtistPage = () => {
       <section className="bg-ink text-ivory py-20 md:py-28">
         <div className="container-editorial grid grid-cols-1 lg:grid-cols-12 gap-10">
         <div className="lg:col-span-4">
-          <p className="eyebrow text-ivory/60 mb-4">About</p>
+          <p className="eyebrow mb-4 text-gold-soft">About</p>
           <div className="gold-rule" />
         </div>
         <div className="lg:col-span-8 space-y-5">
@@ -113,7 +113,7 @@ const ArtistPage = () => {
       {/* Discography */}
       <section className="bg-ink text-ivory py-28 md:py-36">
           <div className="container-editorial">
-            <p className="eyebrow text-ivory/60 mb-4">Discography</p>
+            <p className="eyebrow mb-4 text-gold-soft">Discography</p>
             <h2 className="display-serif text-5xl md:text-7xl mb-16">Selected Works</h2>
             {discography.length === 0 ? (
               <p className="text-ivory/60">No releases yet.</p>

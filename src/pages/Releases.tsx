@@ -40,7 +40,7 @@ const Releases = () => {
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,transparent_42%,hsl(var(--ink)/0.72)_100%)]" aria-hidden="true" />
         <div className="relative container-editorial grid items-center gap-14 lg:grid-cols-[0.9fr_1.1fr]">
           <div>
-            <p className="eyebrow text-ivory/60 mb-6">The Catalogue</p>
+            <p className="eyebrow mb-6 text-gold-soft">The Catalogue</p>
             <h1 className="display-serif text-6xl md:text-8xl lg:text-9xl mb-10">Releases</h1>
             <p className="max-w-2xl text-lg text-ivory/65">
               Every WMG release is built to last — from the songwriting to the sleeve. Browse the full
