@@ -191,10 +191,14 @@ const Index = () => {
       </section>
 
       {/* LABEL STATEMENT */}
-      <section className="bg-secondary py-28 md:py-40">
-        <div className="container-editorial max-w-4xl">
-          <p className="eyebrow mb-6">Our Statement</p>
-          <p className="display-serif text-3xl md:text-5xl leading-[1.15]">
+      <section className="relative overflow-hidden bg-ink py-28 md:py-40 text-ivory">
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_22%_30%,hsl(var(--golden-brown)/0.32),transparent_32%),radial-gradient(circle_at_80%_70%,hsl(var(--gold)/0.14),transparent_30%)]" aria-hidden="true" />
+        <div className="absolute inset-0 opacity-[0.07] [background-image:linear-gradient(90deg,hsl(var(--ivory)/0.72)_1px,transparent_1px),linear-gradient(0deg,hsl(var(--ivory)/0.72)_1px,transparent_1px)] [background-size:3px_3px]" aria-hidden="true" />
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,transparent_40%,hsl(var(--ink)/0.72)_100%)]" aria-hidden="true" />
+        <div className="relative container-editorial max-w-4xl">
+          <p className="eyebrow text-gold-soft mb-4">Our Statement</p>
+          <div className="gold-rule mb-8" />
+          <p className="display-serif text-3xl md:text-5xl leading-[1.15] text-ivory">
             We believe in <span className="italic text-gold">craft</span> over noise — in records that
             reward attention, and in artists whose worlds are built to last. WMG is a home for music
             made with intent.
@@ -203,27 +207,30 @@ const Index = () => {
       </section>
 
       {/* JOURNAL */}
-      <section className="bg-gold/10 border-t border-border pt-24 pb-16 md:pt-32 md:pb-20">
-        <div className="container-editorial">
+      <section className="relative overflow-hidden bg-ink py-28 md:py-40 text-ivory">
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_74%_38%,hsl(var(--golden-brown)/0.38),transparent_34%),radial-gradient(circle_at_18%_78%,hsl(var(--gold)/0.16),transparent_28%)]" aria-hidden="true" />
+        <div className="absolute inset-0 opacity-[0.08] [background-image:linear-gradient(90deg,hsl(var(--ivory)/0.8)_1px,transparent_1px),linear-gradient(0deg,hsl(var(--ivory)/0.8)_1px,transparent_1px)] [background-size:3px_3px]" aria-hidden="true" />
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,transparent_42%,hsl(var(--ink)/0.72)_100%)]" aria-hidden="true" />
+        <div className="relative container-editorial">
           <div className="flex items-end justify-between mb-16">
             <div>
-              <p className="eyebrow mb-4">The Journal</p>
+              <p className="eyebrow text-gold-soft mb-4">The Journal</p>
               <h2 className="display-serif text-5xl md:text-7xl">Notes & Stories</h2>
             </div>
           </div>
           {isLoading ? (
             <InlineSkeleton count={3} />
           ) : latestReleases.length === 0 ? (
-            <p className="text-muted-foreground">No release stories yet.</p>
+            <p className="text-ivory/60">No release stories yet.</p>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-3 gap-12">
               {latestReleases.slice(0, 3).map((release) => (
                 <Link key={release.slug} to={`/releases/${encodeURIComponent(release.slug)}`} className="group cursor-pointer">
-                  <p className="eyebrow mb-4">{release.releaseType}</p>
-                  <h3 className="font-serif text-3xl leading-tight group-hover:text-accent transition-colors duration-500">
+                  <p className="eyebrow text-gold-soft mb-4">{release.releaseType}</p>
+                  <h3 className="font-serif text-3xl leading-tight text-ivory group-hover:text-gold transition-colors duration-500">
                     {release.title}
                   </h3>
-                  <p className="text-sm text-muted-foreground mt-6">
+                  <p className="text-sm text-ivory/60 mt-6">
                     {release.releaseDate ? new Date(release.releaseDate).toLocaleDateString(undefined, { month: "long", year: "numeric" }) : "Date TBC"}
                   </p>
                 </Link>
