@@ -40,7 +40,7 @@ const ArtistPage = () => {
         )}
         <div className="absolute inset-0 bg-gradient-to-t from-ink via-ink/40 to-ink/30" />
         <div className="relative z-10 h-full container-editorial flex flex-col justify-end pb-20">
-          <p className="eyebrow text-ivory/70 mb-4">{artist.genre}</p>
+          <p className="eyebrow mb-4 text-gold-soft">{artist.genre}</p>
           <h1 className="display-serif text-7xl md:text-9xl">{artist.name}</h1>
           {artist.shortDescription && (
             <p className="font-serif italic text-2xl md:text-3xl text-ivory/85 mt-6 max-w-2xl">
