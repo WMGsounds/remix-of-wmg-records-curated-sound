@@ -114,7 +114,7 @@ export const SiteFooter = () => (
             loading="lazy"
             width={640}
             height={220}
-            className="w-full max-w-[280px] h-auto"
+            className="w-full max-w-[440px] h-auto"
           />
         </Link>
       </div>
