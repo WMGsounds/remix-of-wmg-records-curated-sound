@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Link, useParams, Navigate } from "react-router-dom";
 import { ChevronDown, Play } from "lucide-react";
 import { useReleaseBySlug } from "@/lib/queries";
@@ -101,6 +101,40 @@ const ReleasePage = () => {
   if (!data) return <Navigate to="/releases" replace />;
 
   const { release, artist, tracks, related } = data;
+
+  // Reuse the same URL for the blurred background — the browser dedupes the request.
+  const featuredBgUrl = useMemo(() => {
+    if (!release?.coverArt) return null;
+    const sep = release.coverArt.includes("?") ? "&" : "?";
+    return `${release.coverArt}${sep}w=640`;
+  }, [release?.coverArt]);
+
+  const [bgReady, setBgReady] = useState(false);
+  useEffect(() => {
+    setBgReady(false);
+    if (!featuredBgUrl) return;
+
+    const link = document.createElement("link");
+    link.rel = "preload";
+    link.as = "image";
+    link.href = featuredBgUrl;
+    link.setAttribute("fetchpriority", "high");
+    document.head.appendChild(link);
+
+    const img = new Image();
+    img.decoding = "async";
+    img.src = featuredBgUrl;
+    const done = () => setBgReady(true);
+    img.addEventListener("load", done);
+    img.addEventListener("error", done);
+
+    return () => {
+      img.removeEventListener("load", done);
+      img.removeEventListener("error", done);
+      if (link.parentNode) link.parentNode.removeChild(link);
+    };
+  }, [featuredBgUrl]);
+
   const releaseDate = release.releaseDate ? new Date(release.releaseDate) : null;
   const monthYear = releaseDate && !Number.isNaN(releaseDate.getTime())
     ? releaseDate.toLocaleDateString(undefined, { month: "long", year: "numeric" }).toUpperCase()
@@ -114,11 +148,20 @@ const ReleasePage = () => {
   return (
     <div>
       <PageTitle title={release.title} />
-      {/* Hero */}
-      <section className="relative overflow-hidden bg-ink text-ivory pt-52 md:pt-60 pb-20 md:pb-28">
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_74%_38%,hsl(var(--golden-brown)/0.38),transparent_34%),radial-gradient(circle_at_18%_78%,hsl(var(--gold)/0.16),transparent_28%)]" aria-hidden="true" />
-        <div className="absolute inset-0 opacity-[0.08] [background-image:linear-gradient(90deg,hsl(var(--ivory)/0.8)_1px,transparent_1px),linear-gradient(0deg,hsl(var(--ivory)/0.8)_1px,transparent_1px)] [background-size:3px_3px]" aria-hidden="true" />
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,transparent_42%,hsl(var(--ink)/0.72)_100%)]" aria-hidden="true" />
+      {/* Hero + Tracklist (unified blurred-cover background) */}
+      <section className="relative overflow-hidden bg-ink text-ivory pt-52 md:pt-60 pb-28">
+        {featuredBgUrl && (
+          <div
+            className={`absolute inset-0 scale-110 bg-cover bg-center transition-opacity duration-300 ${bgReady ? "opacity-100" : "opacity-0"}`}
+            style={{
+              backgroundImage: `url(${featuredBgUrl})`,
+              filter: "blur(50px)",
+            }}
+            aria-hidden="true"
+          />
+        )}
+        <div className="absolute inset-0 bg-ink/75" aria-hidden="true" />
+
         <div className="relative container-editorial grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16 items-center">
           <div className="lg:col-span-6">
             <div className="overflow-hidden aspect-square shadow-[var(--shadow-soft)] w-full max-w-[620px] mx-auto lg:mx-0">
@@ -166,14 +209,8 @@ const ReleasePage = () => {
             )}
           </div>
         </div>
-      </section>
 
-      {/* Tracklist + Credits */}
-      <section className="relative overflow-hidden bg-ink text-ivory py-28">
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_74%_38%,hsl(var(--golden-brown)/0.38),transparent_34%),radial-gradient(circle_at_18%_78%,hsl(var(--gold)/0.16),transparent_28%)]" aria-hidden="true" />
-        <div className="absolute inset-0 opacity-[0.08] [background-image:linear-gradient(90deg,hsl(var(--ivory)/0.8)_1px,transparent_1px),linear-gradient(0deg,hsl(var(--ivory)/0.8)_1px,transparent_1px)] [background-size:3px_3px]" aria-hidden="true" />
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,transparent_42%,hsl(var(--ink)/0.72)_100%)]" aria-hidden="true" />
-        <div className="relative container-editorial grid grid-cols-1 lg:grid-cols-12 gap-16">
+        <div className="relative container-editorial grid grid-cols-1 lg:grid-cols-12 gap-16 mt-28">
           <div className="lg:col-span-7">
             <p className="eyebrow text-gold-soft mb-8">Tracklist</p>
             {tracks.length === 0 ? (
