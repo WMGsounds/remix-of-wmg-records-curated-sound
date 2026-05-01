@@ -1,6 +1,7 @@
 import { Link, useParams, Navigate } from "react-router-dom";
 import { ArrowRight } from "lucide-react";
 import { useArtistBySlug } from "@/lib/queries";
+import { LazyImage } from "@/components/LazyImage";
 
 import { PageTitle } from "@/components/PageTitle";
 import { PageLoading, PageError } from "@/components/UIStates";
