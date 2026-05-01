@@ -16,10 +16,6 @@ const nav = [
 export const SiteHeader = () => {
   const [open, setOpen] = useState(false);
   const location = useLocation();
-  const usesImageLedTopSection = location.pathname === "/"
-    || location.pathname === "/about"
-    || /^\/artists\/[^/]+/.test(location.pathname)
-    || /^\/releases\/[^/]+/.test(location.pathname);
 
   useEffect(() => {
     setOpen(false);
@@ -29,17 +25,6 @@ export const SiteHeader = () => {
     <header
       className="fixed top-0 left-0 right-0 z-50 overflow-hidden backdrop-blur-md border-b border-ivory/10 text-ivory shadow-sm"
     >
-      {!usesImageLedTopSection && (
-        <img
-          src={hero}
-          alt=""
-          aria-hidden="true"
-          loading="lazy"
-          width={1920}
-          height={1080}
-          className="pointer-events-none absolute inset-0 h-full w-full object-cover object-top opacity-70 hidden md:block"
-        />
-      )}
       <div className="pointer-events-none absolute inset-0 bg-ink/85 md:bg-ink/70" />
 
       <div className="container-editorial relative z-10 flex items-center justify-between py-5">
