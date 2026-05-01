@@ -23,7 +23,18 @@ const ArtistPage = () => {
       {/* Hero */}
       <section className="relative h-[85vh] min-h-[600px] bg-ink text-ivory overflow-hidden">
         {heroImage ? (
-          <img src={heroImage} alt={artist.name} loading="eager" fetchPriority="high" width={1920} height={1280} className="absolute inset-0 h-full w-full object-cover opacity-80" />
+          <LazyImage
+            src={heroImage}
+            alt={artist.name}
+            width={1920}
+            height={1280}
+            displayWidth={1920}
+            sizes="100vw"
+            loading="eager"
+            fetchPriority="high"
+            fill
+            className="object-cover opacity-80"
+          />
         ) : (
           <div className="absolute inset-0 bg-secondary" />
         )}
