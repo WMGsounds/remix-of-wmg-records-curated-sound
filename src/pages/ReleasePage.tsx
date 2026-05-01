@@ -56,16 +56,18 @@ const TrackRow = ({
               Listen
             </button>
           )}
-          {hasLyrics && (
-            <button
-              onClick={() => setLyricsOpen((o) => !o)}
-              className="text-[10px] uppercase tracking-[0.24em] text-ivory/55 hover:text-ivory inline-flex items-center gap-1.5"
-              aria-expanded={lyricsOpen}
-            >
-              Lyrics
-              <ChevronDown className={`h-3 w-3 transition-transform ${lyricsOpen ? "rotate-180" : ""}`} />
-            </button>
-          )}
+          <span className="w-16 shrink-0 flex justify-end">
+            {hasLyrics && (
+              <button
+                onClick={() => setLyricsOpen((o) => !o)}
+                className="text-[10px] uppercase tracking-[0.24em] text-ivory/55 hover:text-ivory inline-flex items-center gap-1.5"
+                aria-expanded={lyricsOpen}
+              >
+                Lyrics
+                <ChevronDown className={`h-3 w-3 transition-transform ${lyricsOpen ? "rotate-180" : ""}`} />
+              </button>
+            )}
+          </span>
         </span>
       </div>
       {spotifyTrackId && previewOpen && (
