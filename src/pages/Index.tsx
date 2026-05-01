@@ -1,3 +1,4 @@
+import { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import { ArrowRight } from "lucide-react";
 import hero from "@/assets/hero-cinematic.jpg";
@@ -12,6 +13,41 @@ const Index = () => {
   const featured = data?.featuredRelease ?? null;
   const featuredArtists = data?.featuredArtists ?? [];
   const latestReleases = data?.latestReleases ?? [];
+
+  // Reuse the same URL for the blurred background — the browser dedupes the request.
+  const featuredBgUrl = useMemo(() => {
+    if (!featured?.coverArt) return null;
+    const sep = featured.coverArt.includes("?") ? "&" : "?";
+    return `${featured.coverArt}${sep}w=640`;
+  }, [featured?.coverArt]);
+
+  // Preload at high priority the moment the URL is known, and only reveal
+  // the blurred layer once bytes are in cache so there's no half-paint flash.
+  const [bgReady, setBgReady] = useState(false);
+  useEffect(() => {
+    setBgReady(false);
+    if (!featuredBgUrl) return;
+
+    const link = document.createElement("link");
+    link.rel = "preload";
+    link.as = "image";
+    link.href = featuredBgUrl;
+    link.setAttribute("fetchpriority", "high");
+    document.head.appendChild(link);
+
+    const img = new Image();
+    img.decoding = "async";
+    img.src = featuredBgUrl;
+    const done = () => setBgReady(true);
+    img.addEventListener("load", done);
+    img.addEventListener("error", done);
+
+    return () => {
+      img.removeEventListener("load", done);
+      img.removeEventListener("error", done);
+      if (link.parentNode) link.parentNode.removeChild(link);
+    };
+  }, [featuredBgUrl]);
 
   return (
     <div className="pt-20">
@@ -56,11 +92,11 @@ const Index = () => {
       {/* FEATURED RELEASE */}
       {featured && (
         <section className="relative overflow-hidden bg-ink py-16 md:py-20 text-ivory">
-          {featured.coverArt && (
+          {featuredBgUrl && (
             <div
-              className="absolute inset-0 scale-110 bg-cover bg-center"
+              className={`absolute inset-0 scale-110 bg-cover bg-center transition-opacity duration-300 ${bgReady ? "opacity-100" : "opacity-0"}`}
               style={{
-                backgroundImage: `url(${featured.coverArt}${featured.coverArt.includes("?") ? "&" : "?"}w=640)`,
+                backgroundImage: `url(${featuredBgUrl})`,
                 filter: "blur(50px)",
               }}
               aria-hidden="true"
