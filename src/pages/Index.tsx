@@ -207,11 +207,8 @@ const Index = () => {
       </section>
 
       {/* JOURNAL */}
-      <section className="relative overflow-hidden bg-ink py-16 md:py-20 text-ivory">
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_74%_38%,hsl(var(--golden-brown)/0.38),transparent_34%),radial-gradient(circle_at_18%_78%,hsl(var(--gold)/0.16),transparent_28%)]" aria-hidden="true" />
-        <div className="absolute inset-0 opacity-[0.08] [background-image:linear-gradient(90deg,hsl(var(--ivory)/0.8)_1px,transparent_1px),linear-gradient(0deg,hsl(var(--ivory)/0.8)_1px,transparent_1px)] [background-size:3px_3px]" aria-hidden="true" />
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,transparent_42%,hsl(var(--ink)/0.72)_100%)]" aria-hidden="true" />
-        <div className="relative container-editorial">
+      <section className="bg-ink py-16 md:py-20 text-ivory">
+        <div className="container-editorial">
           <div className="flex items-end justify-between mb-10">
             <div>
               <p className="eyebrow text-gold-soft mb-3">The Journal</p>
