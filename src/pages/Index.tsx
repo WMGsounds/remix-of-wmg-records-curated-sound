@@ -3,6 +3,7 @@ import { ArrowRight } from "lucide-react";
 import hero from "@/assets/hero-cinematic.jpg";
 import { ArtistCard, ReleaseCard } from "@/components/Cards";
 import { PageTitle } from "@/components/PageTitle";
+import { LazyImage } from "@/components/LazyImage";
 import { useHomepageData } from "@/lib/queries";
 import { InlineSkeleton } from "@/components/UIStates";
 

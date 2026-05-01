@@ -1,4 +1,5 @@
 import { Link } from "react-router-dom";
+import { LazyImage } from "@/components/LazyImage";
 import type { Artist, Release } from "@/lib/types";
 
 export const ArtistCard = ({ artist }: { artist: Artist }) => (
@@ -7,20 +8,21 @@ export const ArtistCard = ({ artist }: { artist: Artist }) => (
     className="group block hover-zoom cursor-pointer focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-current"
     aria-label={`View ${artist.name}`}
   >
-    <div className="relative overflow-hidden bg-muted aspect-[3/4]">
+    <div className="relative bg-muted aspect-[3/4]">
       {artist.heroImage ? (
-        <img
+        <LazyImage
           src={artist.heroImage}
           alt={artist.name}
-          loading="lazy"
           width={900}
           height={1200}
-          className="h-full w-full object-cover"
+          displayWidth={640}
+          sizes="(min-width: 1024px) 25vw, (min-width: 768px) 33vw, 50vw"
+          className="object-cover"
         />
       ) : (
         <div className="h-full w-full flex items-center justify-center p-6 text-center text-muted-foreground">Image coming soon.</div>
       )}
-      <div className="absolute inset-0 bg-gradient-to-t from-ink/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-700" />
+      <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-ink/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-700" />
     </div>
     <div className="pt-5">
       <h3 className="font-serif text-2xl md:text-3xl">{artist.name}</h3>
@@ -43,15 +45,16 @@ export const ReleaseCard = ({ release, hideMetaOnMobile = false }: { release: Re
       className="group block hover-zoom cursor-pointer focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-current"
       aria-label={`View ${release.title}`}
     >
-      <div className="relative overflow-hidden bg-muted aspect-square">
+      <div className="relative bg-muted aspect-square">
         {release.coverArt ? (
-          <img
+          <LazyImage
             src={release.coverArt}
             alt={`${release.title} by ${release.artistName}`}
-            loading="lazy"
             width={1200}
             height={1200}
-            className="h-full w-full object-cover"
+            displayWidth={640}
+            sizes="(min-width: 1024px) 25vw, (min-width: 768px) 33vw, 50vw"
+            className="object-cover"
           />
         ) : (
           <div className="h-full w-full flex items-center justify-center p-6 text-center text-muted-foreground">Artwork coming soon.</div>
