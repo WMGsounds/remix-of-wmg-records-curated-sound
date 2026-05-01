@@ -67,7 +67,7 @@ export const SiteHeader = () => {
         <div className="hidden md:flex items-center gap-6">
           <Link
             to="/store"
-            className="text-[12px] uppercase tracking-[0.24em] font-medium border border-ivory/60 px-5 py-2.5 transition-colors duration-500 text-gold"
+            className="text-[12px] uppercase tracking-[0.24em] font-medium border border-gold px-5 py-2.5 transition-colors duration-500 text-gold"
           >
             Store
           </Link>
