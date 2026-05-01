@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import { Menu, X } from "lucide-react";
 import logo from "@/assets/wmg-logo-stacked.png";
 import footerLogo from "@/assets/wmg-logo-full.png";
-import hero from "@/assets/hero-cinematic.jpg";
+
 
 const nav = [
   { to: "/", label: "Home" },
