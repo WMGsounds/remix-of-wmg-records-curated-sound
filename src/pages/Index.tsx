@@ -150,7 +150,7 @@ const Index = () => {
         <div className="relative container-editorial">
           <div className="flex items-end justify-between mb-16">
             <div>
-              <p className="eyebrow text-ivory/60 mb-4">The Roster</p>
+              <p className="eyebrow mb-4 text-gold-soft">The Roster</p>
               <h2 className="display-serif text-5xl md:text-7xl">Featured Artists</h2>
             </div>
             <Link to="/artists" className="hidden md:inline-flex items-center gap-2 text-[12px] uppercase tracking-[0.24em] link-underline">
