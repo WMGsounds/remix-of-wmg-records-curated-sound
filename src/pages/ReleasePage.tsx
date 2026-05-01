@@ -95,21 +95,17 @@ const ReleasePage = () => {
   const { slug } = useParams();
   const { data, isLoading, isError } = useReleaseBySlug(slug);
   const [openPreviewTrackId, setOpenPreviewTrackId] = useState<string | null>(null);
+  const [bgReady, setBgReady] = useState(false);
 
-  if (isLoading) return <PageLoading label="Opening release" />;
-  if (isError) return <PageError />;
-  if (!data) return <Navigate to="/releases" replace />;
-
-  const { release, artist, tracks, related } = data;
+  const coverArt = data?.release?.coverArt ?? null;
 
   // Reuse the same URL for the blurred background — the browser dedupes the request.
   const featuredBgUrl = useMemo(() => {
-    if (!release?.coverArt) return null;
-    const sep = release.coverArt.includes("?") ? "&" : "?";
-    return `${release.coverArt}${sep}w=640`;
-  }, [release?.coverArt]);
+    if (!coverArt) return null;
+    const sep = coverArt.includes("?") ? "&" : "?";
+    return `${coverArt}${sep}w=640`;
+  }, [coverArt]);
 
-  const [bgReady, setBgReady] = useState(false);
   useEffect(() => {
     setBgReady(false);
     if (!featuredBgUrl) return;
@@ -135,6 +131,11 @@ const ReleasePage = () => {
     };
   }, [featuredBgUrl]);
 
+  if (isLoading) return <PageLoading label="Opening release" />;
+  if (isError) return <PageError />;
+  if (!data) return <Navigate to="/releases" replace />;
+
+  const { release, artist, tracks, related } = data;
   const releaseDate = release.releaseDate ? new Date(release.releaseDate) : null;
   const monthYear = releaseDate && !Number.isNaN(releaseDate.getTime())
     ? releaseDate.toLocaleDateString(undefined, { month: "long", year: "numeric" }).toUpperCase()
