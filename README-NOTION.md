@@ -50,6 +50,7 @@ Add these in the Vercel project dashboard → **Settings → Environment Variabl
 | `NOTION_ARTISTS_DB_ID`   | yes      | 32-char Artists database ID                            |
 | `NOTION_RELEASES_DB_ID`  | yes      | 32-char Releases database ID                           |
 | `NOTION_TRACKS_DB_ID`    | yes      | 32-char Tracks database ID                             |
+| `NOTION_RELEASE_TRACKS_DB_ID` | yes | 32-char Release Tracks (tracklist) database ID          |
 
 > Get database IDs from the Notion URL: `notion.so/.../<32-char-id>?v=...`
 > Make sure each database is **shared with your Notion integration**.
@@ -97,10 +98,24 @@ Add these in the Vercel project dashboard → **Settings → Environment Variabl
 | Property        | Type            |
 |-----------------|-----------------|
 | `Track Title`   | title           |
-| `Release`       | relation → Releases |
+| `Release`       | relation → Releases (legacy, optional) |
 | `Track Number`  | number          |
 | `Duration`      | rich_text (e.g. "3:42") |
 | `Lyrics`        | rich_text       |
+
+### Release Tracks DB (tracklist pivot)
+One row = one track appearing on one release. The Release page reads from this
+DB instead of the legacy `Tracklist` field.
+
+| Property         | Type                |
+|------------------|---------------------|
+| `Name`           | title               |
+| `Release`        | relation → Releases |
+| `Track`          | relation → Tracks   |
+| `Track Number`   | number              |
+| `Side`           | rich_text           |
+| `Version Label`  | rich_text           |
+| `Display Title`  | rich_text (overrides related Track title when set) |
 
 ---
 
@@ -139,6 +154,7 @@ export const DBS = {
   artists: process.env.NOTION_ARTISTS_DB_ID!,
   releases: process.env.NOTION_RELEASES_DB_ID!,
   tracks: process.env.NOTION_TRACKS_DB_ID!,
+  releaseTracks: process.env.NOTION_RELEASE_TRACKS_DB_ID!,
 };
 
 // Notion file URLs expire ~1h. Cache responses 50 min so we always re-fetch

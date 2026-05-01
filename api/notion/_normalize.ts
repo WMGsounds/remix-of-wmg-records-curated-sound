@@ -107,6 +107,35 @@ export function normalizeTrack(page: any, releaseLookup: Map<string, any>) {
   };
 }
 
+// Release Tracks DB: pivot rows that place one Track on one Release with
+// per-release metadata (track number, side, version label, display title).
+export function normalizeReleaseTrack(page: any, trackPageLookup: Map<string, any>) {
+  const props = page.properties;
+  const releaseRel = props["Release"]?.relation?.[0]?.id ?? "";
+  const trackRel = props["Track"]?.relation?.[0]?.id ?? "";
+  const trackPage = trackPageLookup.get(trackRel);
+  const trackProps = trackPage?.properties ?? {};
+
+  const displayTitle = text(props["Display Title"]);
+  const relatedTrackTitle = text(trackProps["Track Title"]) || text(titleProp(trackProps));
+  const relatedDuration = text(trackProps["Duration"]) || "";
+
+  return {
+    id: page.id,
+    releaseId: releaseRel,
+    trackId: trackRel,
+    trackNumber: num(props["Track Number"]),
+    side: text(props["Side"]) || null,
+    versionLabel: text(props["Version Label"]) || null,
+    displayTitle: displayTitle || null,
+    title: displayTitle || relatedTrackTitle,
+    duration: relatedDuration,
+    // Carry through useful per-track metadata so the Release page UI keeps working.
+    lyrics: text(trackProps["Lyrics"]) || null,
+    spotifyUrl: url(trackProps["Spotify URL"]) || null,
+  };
+}
+
 const dataSourceIdCache = new Map<string, Promise<string>>();
 
 type NotionApiError = { status?: number; code?: string };
