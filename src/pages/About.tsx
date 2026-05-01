@@ -21,7 +21,7 @@ const About = () => (
       </div>
     </section>
 
-    <section className="bg-gold/10 py-24 md:py-36">
+    <section className="bg-ink text-ivory py-24 md:py-36 border-t border-b border-gold/30">
       <div className="container-editorial grid grid-cols-1 lg:grid-cols-12 gap-12 md:gap-16 items-start">
         <div className="lg:col-span-5 reveal-on-scroll">
           <p className="eyebrow text-gold mb-5">Our Story</p>
@@ -30,7 +30,7 @@ const About = () => (
             Records still come from a careful ear.
           </p>
         </div>
-        <div className="lg:col-span-6 lg:col-start-7 space-y-7 text-lg md:text-xl leading-relaxed font-light reveal-on-scroll">
+        <div className="lg:col-span-6 lg:col-start-7 space-y-7 text-lg md:text-xl leading-relaxed font-light reveal-on-scroll text-ivory/88">
           <p>
             WMG (Wareham Music Group) was founded on a simple instinct: that the most enduring
             records still come from a small room, a careful ear, and an artist with something to say.
