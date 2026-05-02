@@ -167,7 +167,21 @@ function eyebrow(label: string): string {
   return `<div style="letter-spacing:0.2em;text-transform:uppercase;font-family:Georgia,'Times New Roman',serif;font-size:11px;color:${COLOR_GOLD};margin:0 0 22px;">${escapeHtml(label)}</div>`;
 }
 
-function notificationHtml(name: string, email: string, subject: string, message: string): string {
+function notificationHtml(
+  name: string,
+  email: string,
+  subject: string,
+  message: string,
+  demo?: { url: string; filename: string; size: number } | null,
+): string {
+  const demoBlock = demo
+    ? `
+    <div style="margin-top:24px;padding:18px 20px;border:1px solid ${COLOR_GOLD};background:#fffaf0;">
+      <div style="letter-spacing:0.18em;text-transform:uppercase;font-family:Georgia,'Times New Roman',serif;font-size:11px;color:${COLOR_GOLD};margin-bottom:10px;">Demo File Attached</div>
+      <p style="font-family:Georgia,'Times New Roman',serif;font-size:15px;color:${COLOR_TEXT};margin:0 0 6px;">${escapeHtml(demo.filename)}${demo.size > 0 ? ` <span style="color:${COLOR_MUTED};">· ${(demo.size / (1024 * 1024)).toFixed(2)} MB</span>` : ""}</p>
+      <p style="margin:10px 0 0;"><a href="${escapeHtml(demo.url)}" style="font-family:Georgia,'Times New Roman',serif;font-size:14px;color:${COLOR_TEXT};text-decoration:underline;" target="_blank" rel="noopener">Download demo file →</a></p>
+    </div>`
+    : "";
   const inner = `
     ${eyebrow(`${subject} · New Enquiry`)}
     <h1 style="font-family:Georgia,'Times New Roman',serif;font-size:22px;font-weight:normal;color:${COLOR_TEXT};margin:0 0 22px;text-align:left;">New enquiry via wmgsounds.com</h1>
@@ -179,12 +193,19 @@ function notificationHtml(name: string, email: string, subject: string, message:
     <div style="margin-top:24px;padding-top:20px;border-top:1px solid ${COLOR_BORDER};">
       <div style="letter-spacing:0.18em;text-transform:uppercase;font-family:Georgia,'Times New Roman',serif;font-size:11px;color:${COLOR_MUTED};margin-bottom:12px;">Message</div>
       <div style="font-family:Georgia,'Times New Roman',serif;font-size:15px;line-height:1.7;color:${COLOR_TEXT};white-space:pre-wrap;text-align:left;">${escapeHtml(message)}</div>
-    </div>`;
+    </div>
+    ${demoBlock}`;
   return emailShell(inner);
 }
 
-function notificationText(name: string, email: string, subject: string, message: string): string {
-  return [
+function notificationText(
+  name: string,
+  email: string,
+  subject: string,
+  message: string,
+  demo?: { url: string; filename: string; size: number } | null,
+): string {
+  const lines = [
     "New enquiry via wmgsounds.com",
     `Subject: ${subject}`,
     "",
@@ -193,13 +214,19 @@ function notificationText(name: string, email: string, subject: string, message:
     "",
     "Message:",
     message,
+  ];
+  if (demo) {
+    lines.push("", "Demo file attached:", demo.filename, demo.url);
+  }
+  lines.push(
     "",
     "---",
     "WMG (Wareham Music Group)",
     "London · Music built to last.",
     SITE_URL,
     `© ${new Date().getFullYear()} Wareham Music Group. All rights reserved.`,
-  ].join("\n");
+  );
+  return lines.join("\n");
 }
 
 function autoResponseHtml(body: string, eyebrowLabel: string): string {
