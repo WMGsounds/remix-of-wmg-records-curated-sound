@@ -303,8 +303,7 @@ export default async function handler(req: any, res: any) {
     let demo: { url: string; filename: string; size: number } | null = null;
     if (typeof body.demoUrl === "string" && body.demoUrl.length > 0) {
       const url = body.demoUrl.trim();
-      const isUploadcare = /^https:\/\/(ucarecdn\.com|[a-z0-9-]+\.ucr\.io)\//i.test(url);
-      if (!isUploadcare) {
+      if (!/^https:\/\//i.test(url)) {
         return res.status(400).json({ error: "Invalid demo file URL" });
       }
       const filename =
