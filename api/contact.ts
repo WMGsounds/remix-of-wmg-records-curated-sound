@@ -292,12 +292,55 @@ export default async function handler(req: any, res: any) {
   }
 
   try {
-    const body = typeof req.body === "string" ? JSON.parse(req.body || "{}") : req.body ?? {};
-    const name = typeof body.name === "string" ? body.name.trim() : "";
-    const email = typeof body.email === "string" ? body.email.trim() : "";
-    const subject = typeof body.subject === "string" ? body.subject.trim() : "";
-    const message = typeof body.message === "string" ? body.message.trim() : "";
-    const honeypot = typeof body.website === "string" ? body.website.trim() : "";
+    const contentType = String(req.headers?.["content-type"] || "");
+    const isMultipart = contentType.toLowerCase().startsWith("multipart/form-data");
+
+    let name = "";
+    let email = "";
+    let subject = "";
+    let message = "";
+    let honeypot = "";
+    let demoFile: { filename: string; mimeType: string; content: Buffer } | null = null;
+
+    if (isMultipart) {
+      let parsed: ParsedMultipart;
+      try {
+        parsed = await parseMultipart(req);
+      } catch (err) {
+        console.error("[contact] Multipart parse failed:", err);
+        return res.status(400).json({ error: "Invalid form submission" });
+      }
+      if (parsed.tooLarge) {
+        return res.status(413).json({ error: "Demo file exceeds 25MB limit" });
+      }
+      const f = parsed.fields;
+      name = (f.name ?? "").trim();
+      email = (f.email ?? "").trim();
+      subject = (f.subject ?? "").trim();
+      message = (f.message ?? "").trim();
+      honeypot = (f.website ?? "").trim();
+
+      if (parsed.file) {
+        const ext = "." + (parsed.file.filename.split(".").pop() ?? "").toLowerCase();
+        const typeOk =
+          ACCEPTED_DEMO_MIMES.has(parsed.file.mimeType.toLowerCase()) ||
+          ACCEPTED_DEMO_EXTS.includes(ext);
+        if (!typeOk) {
+          return res.status(400).json({ error: "Unsupported demo file format" });
+        }
+        if (parsed.file.content.length > MAX_DEMO_BYTES) {
+          return res.status(413).json({ error: "Demo file exceeds 25MB limit" });
+        }
+        demoFile = parsed.file;
+      }
+    } else {
+      const body = typeof req.body === "string" ? JSON.parse(req.body || "{}") : req.body ?? {};
+      name = typeof body.name === "string" ? body.name.trim() : "";
+      email = typeof body.email === "string" ? body.email.trim() : "";
+      subject = typeof body.subject === "string" ? body.subject.trim() : "";
+      message = typeof body.message === "string" ? body.message.trim() : "";
+      honeypot = typeof body.website === "string" ? body.website.trim() : "";
+    }
 
     // Honeypot — silently succeed
     if (honeypot.length > 0) {
@@ -336,6 +379,16 @@ export default async function handler(req: any, res: any) {
 
     const resend = new Resend(apiKey);
 
+    const attachments = demoFile
+      ? [
+          {
+            filename: demoFile.filename,
+            content: demoFile.content,
+            contentType: demoFile.mimeType,
+          },
+        ]
+      : undefined;
+
     // Notification (to label)
     const notifyResult = await resend.emails.send({
       from: "WMG Website <noreply@wmgsounds.com>",
@@ -344,6 +397,7 @@ export default async function handler(req: any, res: any) {
       subject: `WMG: ${subject} — from ${name}`,
       html: notificationHtml(name, email, subject, message),
       text: notificationText(name, email, subject, message),
+      ...(attachments ? { attachments } : {}),
     });
 
     if ((notifyResult as any)?.error) {
