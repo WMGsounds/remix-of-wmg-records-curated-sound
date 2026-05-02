@@ -259,54 +259,27 @@ export default async function handler(req: any, res: any) {
   }
 
   try {
-    const contentType = String(req.headers?.["content-type"] || "");
-    const isMultipart = contentType.toLowerCase().startsWith("multipart/form-data");
+    const body = typeof req.body === "string" ? JSON.parse(req.body || "{}") : req.body ?? {};
+    const name = typeof body.name === "string" ? body.name.trim() : "";
+    const email = typeof body.email === "string" ? body.email.trim() : "";
+    const subject = typeof body.subject === "string" ? body.subject.trim() : "";
+    const message = typeof body.message === "string" ? body.message.trim() : "";
+    const honeypot = typeof body.website === "string" ? body.website.trim() : "";
 
-    let name = "";
-    let email = "";
-    let subject = "";
-    let message = "";
-    let honeypot = "";
-    let demoFile: { filename: string; mimeType: string; content: Buffer } | null = null;
-
-    if (isMultipart) {
-      let parsed: ParsedMultipart;
-      try {
-        parsed = await parseMultipart(req);
-      } catch (err) {
-        console.error("[contact] Multipart parse failed:", err);
-        return res.status(400).json({ error: "Invalid form submission" });
+    // Demo upload (Uploadcare URL — uploaded directly from the browser)
+    let demo: { url: string; filename: string; size: number } | null = null;
+    if (typeof body.demoUrl === "string" && body.demoUrl.length > 0) {
+      const url = body.demoUrl.trim();
+      const isUploadcare = /^https:\/\/(ucarecdn\.com|[a-z0-9-]+\.ucr\.io)\//i.test(url);
+      if (!isUploadcare) {
+        return res.status(400).json({ error: "Invalid demo file URL" });
       }
-      if (parsed.tooLarge) {
-        return res.status(413).json({ error: "Demo file exceeds 25MB limit" });
-      }
-      const f = parsed.fields;
-      name = (f.name ?? "").trim();
-      email = (f.email ?? "").trim();
-      subject = (f.subject ?? "").trim();
-      message = (f.message ?? "").trim();
-      honeypot = (f.website ?? "").trim();
-
-      if (parsed.file) {
-        const ext = "." + (parsed.file.filename.split(".").pop() ?? "").toLowerCase();
-        const typeOk =
-          ACCEPTED_DEMO_MIMES.has(parsed.file.mimeType.toLowerCase()) ||
-          ACCEPTED_DEMO_EXTS.includes(ext);
-        if (!typeOk) {
-          return res.status(400).json({ error: "Unsupported demo file format" });
-        }
-        if (parsed.file.content.length > MAX_DEMO_BYTES) {
-          return res.status(413).json({ error: "Demo file exceeds 25MB limit" });
-        }
-        demoFile = parsed.file;
-      }
-    } else {
-      const body = typeof req.body === "string" ? JSON.parse(req.body || "{}") : req.body ?? {};
-      name = typeof body.name === "string" ? body.name.trim() : "";
-      email = typeof body.email === "string" ? body.email.trim() : "";
-      subject = typeof body.subject === "string" ? body.subject.trim() : "";
-      message = typeof body.message === "string" ? body.message.trim() : "";
-      honeypot = typeof body.website === "string" ? body.website.trim() : "";
+      const filename =
+        typeof body.demoFilename === "string" && body.demoFilename.length > 0
+          ? body.demoFilename.slice(0, 200)
+          : "demo";
+      const size = typeof body.demoSize === "number" && isFinite(body.demoSize) ? body.demoSize : 0;
+      demo = { url, filename, size };
     }
 
     // Honeypot — silently succeed
@@ -346,25 +319,14 @@ export default async function handler(req: any, res: any) {
 
     const resend = new Resend(apiKey);
 
-    const attachments = demoFile
-      ? [
-          {
-            filename: demoFile.filename,
-            content: demoFile.content,
-            contentType: demoFile.mimeType,
-          },
-        ]
-      : undefined;
-
     // Notification (to label)
     const notifyResult = await resend.emails.send({
       from: "WMG Website <noreply@wmgsounds.com>",
       to: [recipient],
       replyTo: email,
       subject: `WMG: ${subject} — from ${name}`,
-      html: notificationHtml(name, email, subject, message),
-      text: notificationText(name, email, subject, message),
-      ...(attachments ? { attachments } : {}),
+      html: notificationHtml(name, email, subject, message, demo),
+      text: notificationText(name, email, subject, message, demo),
     });
 
     if ((notifyResult as any)?.error) {
