@@ -84,12 +84,13 @@ const Contact = () => {
           <img
             src={contactImage}
             alt="Moody analog mixing console glowing in a darkened studio"
-            className="absolute inset-0 h-full w-full object-cover opacity-90"
+            className="absolute inset-0 h-full w-full object-cover opacity-80 blur-[5px] scale-105"
             loading="eager"
             width={1024}
             height={1536}
           />
-          <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_60%,transparent_0,hsl(var(--ink)/0.25)_45%,hsl(var(--ink)/0.95)_100%)]" aria-hidden="true" />
+          <div className="absolute inset-0 bg-ink/40" aria-hidden="true" />
+          <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_60%,transparent_0,hsl(var(--ink)/0.35)_45%,hsl(var(--ink)/0.95)_100%)]" aria-hidden="true" />
           <div className="absolute inset-y-0 right-0 w-24 bg-gradient-to-r from-transparent to-ink hidden lg:block" aria-hidden="true" />
         </div>
 
@@ -102,12 +103,12 @@ const Contact = () => {
               Send us a note. Whether it's press, sync, or new music, we read every message.
             </p>
 
-            <div className="grid grid-cols-1 gap-14 xl:grid-cols-12 xl:gap-16">
+            <div className="grid grid-cols-1 gap-20 xl:grid-cols-12 xl:gap-24">
               <div className="xl:col-span-5">
                 {channels.map((c) => (
-                  <div key={c.label} className="border-t border-gold/30 py-5 last:border-b">
-                    <p className="eyebrow mb-2 text-gold">{c.label}</p>
-                    <a href={`mailto:${c.email}`} className="font-serif text-2xl leading-tight link-underline md:text-3xl text-ivory">
+                  <div key={c.label} className="border-t border-gold/20 py-3 last:border-b">
+                    <p className="text-[10px] uppercase tracking-[0.2em] mb-1 text-gold/80">{c.label}</p>
+                    <a href={`mailto:${c.email}`} className="text-sm leading-tight link-underline text-ivory/75 hover:text-ivory">
                       {c.email}
                     </a>
                   </div>
@@ -218,9 +219,9 @@ const Contact = () => {
                   <button
                     type="submit"
                     disabled={submitting}
-                    className="inline-flex items-center gap-3 border border-gold bg-gold px-9 py-4 text-[12px] font-medium uppercase tracking-[0.24em] text-ink hover:bg-transparent hover:text-gold transition-colors duration-500 disabled:opacity-60 disabled:cursor-not-allowed"
+                    className="inline-flex items-center gap-2 border border-gold/60 bg-transparent px-5 py-2 text-[11px] font-normal uppercase tracking-[0.22em] text-gold hover:border-gold hover:bg-gold/10 transition-colors duration-300 disabled:opacity-60 disabled:cursor-not-allowed"
                   >
-                    {submitting ? "Sending…" : "Send Message"} <ArrowRight className="h-4 w-4" />
+                    {submitting ? "Sending…" : "Send Message"} <ArrowRight className="h-3.5 w-3.5" />
                   </button>
                   {errorMsg && <p className="font-serif text-lg italic text-gold">{errorMsg}</p>}
                 </div>
