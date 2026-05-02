@@ -138,7 +138,7 @@ const ArtistPage = () => {
                   </div>
                   <h3 className="font-serif text-xl mt-4">{r.title}</h3>
                   <p className="text-xs text-ivory/60 mt-1">
-                    {r.releaseType} · {new Date(r.releaseDate).toLocaleDateString(undefined, { month: "long", year: "numeric" }).toUpperCase()}
+                    {r.releaseType} · {new Date(r.releaseDate).toLocaleDateString(undefined, { month: "long", year: "numeric" })}
                   </p>
                 </Link>
               ))}
