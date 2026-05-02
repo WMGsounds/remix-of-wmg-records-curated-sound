@@ -1,7 +1,11 @@
-import { useRef, useState } from "react";
-import { ArrowRight, Upload, X } from "lucide-react";
+import { useState } from "react";
+import { ArrowRight, X, CheckCircle2 } from "lucide-react";
 import contactImage from "@/assets/contact-editorial.jpg";
 import { PageTitle } from "@/components/PageTitle";
+import { FileUploaderRegular } from "@uploadcare/react-uploader";
+import "@uploadcare/react-uploader/core.css";
+
+const UPLOADCARE_PUBLIC_KEY = import.meta.env.VITE_UPLOADCARE_PUBLIC_KEY as string | undefined;
 
 const channels = [
   { label: "General Enquiries", email: "info@wmgsounds.com" },
@@ -10,77 +14,48 @@ const channels = [
   { label: "Artist & Demo Submissions", email: "demos@wmgsounds.com" },
 ];
 
-const ACCEPTED_DEMO_TYPES = [
-  "audio/mpeg", // mp3
-  "audio/mp3",
-  "audio/wav",
-  "audio/wave",
-  "audio/x-wav",
-  "audio/aiff",
-  "audio/x-aiff",
-  "audio/mp4", // m4a
-  "audio/x-m4a",
-];
-const ACCEPTED_DEMO_EXTS = [".mp3", ".wav", ".aiff", ".aif", ".m4a"];
 const MAX_DEMO_BYTES = 25 * 1024 * 1024;
+
+type DemoUpload = {
+  url: string;
+  name: string;
+  size: number;
+};
 
 const Contact = () => {
   const [form, setForm] = useState({ name: "", email: "", subject: "General", message: "", website: "" });
-  const [demoFile, setDemoFile] = useState<File | null>(null);
+  const [demoUpload, setDemoUpload] = useState<DemoUpload | null>(null);
   const [demoError, setDemoError] = useState<string | null>(null);
+  const [uploading, setUploading] = useState(false);
+  const [uploadProgress, setUploadProgress] = useState(0);
   const [sent, setSent] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
-  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const isDemo = form.subject === "Demo Submission";
 
-  const handleFile = (file: File | null) => {
-    setDemoError(null);
-    if (!file) {
-      setDemoFile(null);
-      return;
-    }
-    const ext = "." + (file.name.split(".").pop() ?? "").toLowerCase();
-    const typeOk = ACCEPTED_DEMO_TYPES.includes(file.type) || ACCEPTED_DEMO_EXTS.includes(ext);
-    if (!typeOk) {
-      setDemoError("Unsupported file format. Please upload MP3, WAV, AIFF or M4A.");
-      return;
-    }
-    if (file.size > MAX_DEMO_BYTES) {
-      setDemoError("File exceeds 25MB. Please upload a smaller file.");
-      return;
-    }
-    setDemoFile(file);
-  };
-
   const onSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (submitting || sent) return;
+    if (submitting || sent || uploading) return;
     setSubmitting(true);
     setErrorMsg(null);
     try {
-      let res: Response;
-      if (isDemo && demoFile) {
-        const fd = new FormData();
-        fd.append("name", form.name);
-        fd.append("email", form.email);
-        fd.append("subject", form.subject);
-        fd.append("message", form.message);
-        fd.append("website", form.website);
-        fd.append("demo", demoFile, demoFile.name);
-        res = await fetch("/api/contact", { method: "POST", body: fd });
-      } else {
-        res = await fetch("/api/contact", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(form),
-        });
-      }
+      const payload = {
+        ...form,
+        demoUrl: demoUpload?.url ?? null,
+        demoFilename: demoUpload?.name ?? null,
+        demoSize: demoUpload?.size ?? null,
+      };
+      const res = await fetch("/api/contact", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
       if (!res.ok) throw new Error("send_failed");
       setSent(true);
       setForm({ name: "", email: "", subject: "General", message: "", website: "" });
-      setDemoFile(null);
+      setDemoUpload(null);
+      setUploadProgress(0);
     } catch {
       setErrorMsg("Something went wrong. Please email us directly.");
     } finally {
