@@ -1,6 +1,6 @@
 import { Link, NavLink, useLocation } from "react-router-dom";
 import { useEffect, useState } from "react";
-import { Menu, X } from "lucide-react";
+import { Menu, X, ArrowRight } from "lucide-react";
 import logo from "@/assets/wmg-logo-stacked.png";
 import footerLogo from "@/assets/wmg-logo-full.png";
 
@@ -52,9 +52,9 @@ export const SiteHeader = () => {
         <div className="hidden md:flex items-center gap-6">
           <Link
             to="/store"
-            className="text-[12px] uppercase tracking-[0.24em] font-medium border border-gold px-5 py-2.5 transition-colors duration-500 text-gold"
+            className="inline-flex items-center gap-3 border border-gold bg-gold px-6 py-2.5 text-[12px] font-medium uppercase tracking-[0.24em] text-ink hover:bg-transparent hover:text-gold transition-colors duration-500"
           >
-            Store
+            Store <ArrowRight className="h-4 w-4" />
           </Link>
         </div>
 
