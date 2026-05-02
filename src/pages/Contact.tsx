@@ -81,7 +81,7 @@ const Contact = () => {
           <img
             src={contactImage}
             alt="Moody analog mixing console glowing in a darkened studio"
-            className="absolute inset-0 h-full w-full object-cover opacity-80 blur-[5px] scale-105"
+            className="absolute inset-0 h-full w-full object-cover object-left opacity-80 blur-[5px] scale-105"
             loading="eager"
             width={1024}
             height={1536}
