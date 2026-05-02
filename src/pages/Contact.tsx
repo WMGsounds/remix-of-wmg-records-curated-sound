@@ -160,33 +160,83 @@ const Contact = () => {
                 {isDemo && (
                   <div>
                     <label className="eyebrow mb-3 block text-gold">Demo Submission (optional)</label>
-                    <input
-                      ref={fileInputRef}
-                      type="file"
-                      accept=".mp3,.wav,.aiff,.aif,.m4a,audio/mpeg,audio/wav,audio/x-wav,audio/aiff,audio/x-aiff,audio/mp4,audio/x-m4a"
-                      onChange={(e) => handleFile(e.target.files?.[0] ?? null)}
-                      className="sr-only"
-                      id="demo-upload"
-                    />
-                    {!demoFile ? (
-                      <button
-                        type="button"
-                        onClick={() => fileInputRef.current?.click()}
-                        className="inline-flex items-center gap-3 border border-ivory/40 bg-transparent px-6 py-4 text-[12px] font-medium uppercase tracking-[0.24em] text-ivory hover:border-gold hover:text-gold transition-colors duration-300"
-                      >
-                        <Upload className="h-4 w-4" /> Choose Audio File
-                      </button>
+
+                    {!UPLOADCARE_PUBLIC_KEY ? (
+                      <p className="text-xs text-gold">
+                        File uploads are not configured. Please set VITE_UPLOADCARE_PUBLIC_KEY.
+                      </p>
+                    ) : !demoUpload ? (
+                      <div className="uploadcare-wrapper">
+                        <FileUploaderRegular
+                          pubkey={UPLOADCARE_PUBLIC_KEY}
+                          multiple={false}
+                          imgOnly={false}
+                          accept="audio/mpeg,audio/mp3,audio/wav,audio/wave,audio/x-wav,audio/aiff,audio/x-aiff,audio/mp4,audio/x-m4a,.mp3,.wav,.aiff,.aif,.m4a"
+                          maxLocalFileSizeBytes={MAX_DEMO_BYTES}
+                          sourceList="local, dropbox, gdrive"
+                          confirmUpload={false}
+                          removeCopyright
+                          onFileUploadStart={() => {
+                            setUploading(true);
+                            setUploadProgress(0);
+                            setDemoError(null);
+                          }}
+                          onFileUploadProgress={(e: any) => {
+                            const p = e?.progress ?? e?.detail?.progress ?? 0;
+                            setUploadProgress(Math.round(p));
+                          }}
+                          onFileUploadFailed={(e: any) => {
+                            setUploading(false);
+                            setUploadProgress(0);
+                            setDemoError(e?.errors?.[0]?.message ?? "Upload failed. Please try again.");
+                          }}
+                          onFileUploadSuccess={(e: any) => {
+                            const url = e?.cdnUrl ?? e?.fileInfo?.cdnUrl;
+                            const name = e?.fileInfo?.name ?? e?.name ?? "demo";
+                            const size = e?.fileInfo?.size ?? e?.size ?? 0;
+                            if (url) {
+                              setDemoUpload({ url, name, size });
+                            }
+                            setUploading(false);
+                            setUploadProgress(100);
+                          }}
+                          onCommonUploadFailed={(e: any) => {
+                            setUploading(false);
+                            setDemoError(e?.errors?.[0]?.message ?? "Upload failed. Please try again.");
+                          }}
+                        />
+                        {uploading && (
+                          <div className="mt-4">
+                            <div className="flex justify-between text-[10px] uppercase tracking-[0.2em] text-ivory/60 mb-2">
+                              <span>Uploading…</span>
+                              <span>{uploadProgress}%</span>
+                            </div>
+                            <div className="h-[2px] w-full bg-ivory/15 overflow-hidden">
+                              <div
+                                className="h-full bg-gold transition-all duration-200"
+                                style={{ width: `${uploadProgress}%` }}
+                              />
+                            </div>
+                          </div>
+                        )}
+                      </div>
                     ) : (
                       <div className="flex items-center justify-between gap-4 border border-gold/40 bg-ivory/5 px-5 py-4">
-                        <div className="min-w-0">
-                          <p className="font-serif text-base text-ivory truncate">{demoFile.name}</p>
-                          <p className="text-xs text-ivory/55 mt-1">{(demoFile.size / (1024 * 1024)).toFixed(2)} MB</p>
+                        <div className="min-w-0 flex items-center gap-3">
+                          <CheckCircle2 className="h-5 w-5 text-gold shrink-0" />
+                          <div className="min-w-0">
+                            <p className="font-serif text-base text-ivory truncate">{demoUpload.name}</p>
+                            <p className="text-xs text-ivory/55 mt-1">
+                              {demoUpload.size > 0 ? `${(demoUpload.size / (1024 * 1024)).toFixed(2)} MB · ` : ""}
+                              Uploaded
+                            </p>
+                          </div>
                         </div>
                         <button
                           type="button"
                           onClick={() => {
-                            setDemoFile(null);
-                            if (fileInputRef.current) fileInputRef.current.value = "";
+                            setDemoUpload(null);
+                            setUploadProgress(0);
                           }}
                           className="text-ivory/60 hover:text-gold transition-colors"
                           aria-label="Remove file"
@@ -195,6 +245,7 @@ const Contact = () => {
                         </button>
                       </div>
                     )}
+
                     <p className="text-xs text-ivory/55 mt-3">
                       Maximum file size 25MB. Recommended format: MP3.
                     </p>
