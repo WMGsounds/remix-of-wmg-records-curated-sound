@@ -209,7 +209,7 @@ const Contact = () => {
                       </div>
                     )}
                     <p className="text-xs text-ivory/55 mt-3">
-                      Maximum file size 25MB. Accepted formats: MP3, WAV, AIFF, M4A.
+                      Maximum file size 25MB. Recommended format: MP3.
                     </p>
                     {demoError && <p className="text-xs text-gold mt-2">{demoError}</p>}
                   </div>
