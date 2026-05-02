@@ -77,7 +77,7 @@ const ArtistPage = () => {
           <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,transparent_42%,hsl(var(--ink)/0.72)_100%)]" aria-hidden="true" />
           <div className="relative container-editorial">
           <p className="eyebrow text-gold-soft mb-4">Latest Release</p>
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center mt-8">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-24 items-center mt-8">
             <div className="lg:col-span-5 hover-zoom overflow-hidden">
               {featured.coverArt ? (
                 <LazyImage
