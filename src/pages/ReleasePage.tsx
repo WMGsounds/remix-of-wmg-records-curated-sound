@@ -89,6 +89,14 @@ const TrackRow = ({
           />
         </div>
       )}
+      {hasLyrics && lyricsOpen && (
+        <div className="lg:hidden pb-6 pl-12 pr-4">
+          <p className="eyebrow text-gold-soft mb-3">Lyrics</p>
+          <div className="text-ivory/80 whitespace-pre-line font-serif text-base leading-relaxed">
+            {track.lyrics}
+          </div>
+        </div>
+      )}
     </li>
   );
 };
