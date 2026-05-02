@@ -352,39 +352,49 @@ export default async function handler(req: any, res: any) {
 
     const resend = new Resend(apiKey);
 
-    // Notification (to label)
-    const notifyResult = await resend.emails.send({
-      from: "WMG Website <noreply@wmgsounds.com>",
-      to: [recipient],
-      replyTo: email,
-      subject: `WMG: ${subject} — from ${name}`,
-      html: notificationHtml(name, email, subject, message, demo),
-      text: notificationText(name, email, subject, message, demo),
-    });
-
-    if ((notifyResult as any)?.error) {
-      console.error("[contact] Notification send failed:", (notifyResult as any).error);
-      return res.status(502).json({ error: "Failed to send message" });
+    let notifyResult: any;
+    try {
+      notifyResult = await resend.emails.send({
+        from: "WMG Website <noreply@wmgsounds.com>",
+        to: [recipient],
+        replyTo: email,
+        subject: `WMG: ${subject} — from ${name}`,
+        html: notificationHtml(name, email, subject, message, demo),
+        text: notificationText(name, email, subject, message, demo),
+      });
+    } catch (sendErr: any) {
+      console.error("[contact] Notification threw:", sendErr?.message || sendErr, sendErr?.stack);
+      return res.status(502).json({ error: "Failed to send message", detail: sendErr?.message ?? String(sendErr) });
     }
+
+    if (notifyResult?.error) {
+      console.error("[contact] Notification send failed:", JSON.stringify(notifyResult.error));
+      return res.status(502).json({ error: "Failed to send message", detail: notifyResult.error?.message ?? "resend_error" });
+    }
+    console.log("[contact] Notification sent", { id: notifyResult?.data?.id });
 
     // Auto-response (to submitter)
     const auto = AUTO_RESPONSES[subject] ?? AUTO_RESPONSES.Support;
-    const autoResult = await resend.emails.send({
-      from: "WMG (Wareham Music Group) <noreply@wmgsounds.com>",
-      to: [email],
-      subject: auto.subject,
-      html: autoResponseHtml(auto.body, auto.eyebrow),
-      text: autoResponseText(auto.body, auto.eyebrow),
-    });
-
-    if ((autoResult as any)?.error) {
-      // Notification already sent; log but don't fail the user request
-      console.error("[contact] Auto-response send failed:", (autoResult as any).error);
+    try {
+      const autoResult = await resend.emails.send({
+        from: "WMG (Wareham Music Group) <noreply@wmgsounds.com>",
+        to: [email],
+        subject: auto.subject,
+        html: autoResponseHtml(auto.body, auto.eyebrow),
+        text: autoResponseText(auto.body, auto.eyebrow),
+      });
+      if (autoResult?.error) {
+        console.error("[contact] Auto-response send failed:", JSON.stringify(autoResult.error));
+      } else {
+        console.log("[contact] Auto-response sent", { id: autoResult?.data?.id });
+      }
+    } catch (autoErr: any) {
+      console.error("[contact] Auto-response threw:", autoErr?.message || autoErr, autoErr?.stack);
     }
 
     return res.status(200).json({ ok: true });
-  } catch (err) {
-    console.error("[contact] Unexpected error:", err);
-    return res.status(500).json({ error: "Unexpected server error" });
+  } catch (err: any) {
+    console.error("[contact] Unexpected error:", err?.message || err, err?.stack);
+    return res.status(500).json({ error: "Unexpected server error", detail: err?.message ?? String(err) });
   }
 }
