@@ -94,7 +94,7 @@ const Contact = () => {
           <div className="absolute inset-y-0 right-0 w-24 bg-gradient-to-r from-transparent to-ink hidden lg:block" aria-hidden="true" />
         </div>
 
-        <div className="relative overflow-hidden bg-ink px-4 pb-24 pt-28 md:px-6 md:pb-32 md:pt-36 lg:pl-6 lg:pr-16 xl:pl-8 xl:pr-24">
+        <div className="relative overflow-hidden bg-ink px-4 pb-24 pt-40 md:px-6 md:pb-32 md:pt-52 lg:pl-6 lg:pr-16 lg:pt-56 xl:pl-8 xl:pr-24">
           <div className="pointer-events-none absolute inset-0 opacity-[0.06] [background-image:linear-gradient(90deg,hsl(var(--ivory)/0.5)_1px,transparent_1px),linear-gradient(0deg,hsl(var(--ivory)/0.4)_1px,transparent_1px)] [background-size:4px_4px]" aria-hidden="true" />
           <div className="relative">
             <p className="eyebrow mb-5 text-gold">Contact</p>
