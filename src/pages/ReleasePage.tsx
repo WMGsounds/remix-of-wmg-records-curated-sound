@@ -37,9 +37,10 @@ const TrackRow = ({
   const hasLyrics = !!track.lyrics && track.lyrics.trim().length > 0;
   const spotifyTrackId = getSpotifyTrackId(track.spotifyUrl);
 
+  const isActive = previewOpen || lyricsOpen;
   return (
     <li className="border-b border-ivory/15 last:border-b-0">
-      <div className="flex items-baseline justify-between py-5 group hover:text-gold transition-colors duration-300">
+      <div className={`flex items-baseline justify-between py-5 group transition-colors duration-300 hover:text-gold ${isActive ? "text-gold" : ""}`}>
         <span className="flex items-baseline gap-6 min-w-0">
           <span className="text-xs text-ivory/55 tabular-nums w-6 shrink-0">
             {String(track.trackNumber).padStart(2, "0")}
@@ -52,7 +53,7 @@ const TrackRow = ({
             {spotifyTrackId && (
               <button
                 onClick={onTogglePreview}
-                className="text-[10px] uppercase tracking-[0.24em] text-ivory/55 hover:text-ivory inline-flex items-center gap-1.5"
+                className={`text-[10px] uppercase tracking-[0.24em] hover:text-ivory inline-flex items-center gap-1.5 ${previewOpen ? "text-ivory" : "text-ivory/55"}`}
                 aria-expanded={previewOpen}
                 aria-label={previewOpen ? "Close Spotify preview" : "Open Spotify preview"}
               >
@@ -65,7 +66,7 @@ const TrackRow = ({
             {hasLyrics && (
               <button
                 onClick={onToggleLyrics}
-                className="text-[10px] uppercase tracking-[0.24em] text-ivory/55 hover:text-ivory inline-flex items-center gap-1.5"
+                className={`text-[10px] uppercase tracking-[0.24em] hover:text-ivory inline-flex items-center gap-1.5 ${lyricsOpen ? "text-ivory" : "text-ivory/55"}`}
                 aria-expanded={lyricsOpen}
               >
                 Lyrics
