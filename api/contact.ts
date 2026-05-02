@@ -252,6 +252,17 @@ function autoResponseText(body: string, eyebrowLabel: string): string {
   ].join("\n");
 }
 
+async function readRawBody(req: any): Promise<string> {
+  return await new Promise((resolve, reject) => {
+    let data = "";
+    req.on("data", (chunk: any) => {
+      data += typeof chunk === "string" ? chunk : chunk.toString("utf8");
+    });
+    req.on("end", () => resolve(data));
+    req.on("error", reject);
+  });
+}
+
 export default async function handler(req: any, res: any) {
   if (req.method !== "POST") {
     res.setHeader("Allow", "POST");
@@ -259,7 +270,29 @@ export default async function handler(req: any, res: any) {
   }
 
   try {
-    const body = typeof req.body === "string" ? JSON.parse(req.body || "{}") : req.body ?? {};
+    let body: any = {};
+    try {
+      if (req.body && typeof req.body === "object") {
+        body = req.body;
+      } else if (typeof req.body === "string" && req.body.length > 0) {
+        body = JSON.parse(req.body);
+      } else {
+        const raw = await readRawBody(req);
+        body = raw ? JSON.parse(raw) : {};
+      }
+    } catch (parseErr) {
+      console.error("[contact] Body parse failed:", parseErr);
+      return res.status(400).json({ error: "Invalid JSON body" });
+    }
+    console.log("[contact] Received submission", {
+      hasName: !!body?.name,
+      hasEmail: !!body?.email,
+      subject: body?.subject,
+      hasMessage: !!body?.message,
+      hasDemoUrl: !!body?.demoUrl,
+      demoFilename: body?.demoFilename,
+      demoSize: body?.demoSize,
+    });
     const name = typeof body.name === "string" ? body.name.trim() : "";
     const email = typeof body.email === "string" ? body.email.trim() : "";
     const subject = typeof body.subject === "string" ? body.subject.trim() : "";
