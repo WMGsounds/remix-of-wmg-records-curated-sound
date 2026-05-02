@@ -246,7 +246,7 @@ const ReleasePage = () => {
               </ol>
             )}
           </div>
-          <div className="lg:col-span-5">
+          <div className="hidden lg:block lg:col-span-5">
             {(() => {
               const activeTrack = tracks.find((t) => t.id === openLyricsTrackId);
               if (!activeTrack || !activeTrack.lyrics) {
