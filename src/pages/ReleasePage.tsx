@@ -141,7 +141,7 @@ const ReleasePage = () => {
   const { release, artist, tracks, related } = data;
   const releaseDate = release.releaseDate ? new Date(release.releaseDate) : null;
   const monthYear = releaseDate && !Number.isNaN(releaseDate.getTime())
-    ? releaseDate.toLocaleDateString(undefined, { month: "long", year: "numeric" }).toUpperCase()
+    ? releaseDate.toLocaleDateString(undefined, { month: "long", year: "numeric" })
     : "TBC";
   const dateLabel = releaseDate && !Number.isNaN(releaseDate.getTime()) ? releaseDate.toLocaleDateString(undefined, {
     year: "numeric",
@@ -187,7 +187,7 @@ const ReleasePage = () => {
             </div>
           </div>
           <div className="lg:col-span-6">
-            <p className="eyebrow text-gold-soft mb-4">{release.releaseType} · {monthYear}</p>
+            <p className="eyebrow text-gold-soft mb-4">{release.releaseType} · <span className="normal-case tracking-normal">{monthYear}</span></p>
             <h1 className="display-serif text-4xl md:text-5xl lg:text-6xl mb-6">{release.title}</h1>
             {artist && (
               <Link to={`/artists/${encodeURIComponent(artist.slug)}`} className="font-serif italic text-2xl md:text-3xl text-ivory/82 link-underline">
