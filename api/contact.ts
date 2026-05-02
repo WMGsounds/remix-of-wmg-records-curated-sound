@@ -1,4 +1,65 @@
 import { Resend } from "resend";
+import Busboy from "busboy";
+
+// Disable Vercel's automatic body parsing so multipart streams reach us intact.
+export const config = { api: { bodyParser: false } };
+
+const MAX_DEMO_BYTES = 25 * 1024 * 1024; // 25MB
+const ACCEPTED_DEMO_EXTS = [".mp3", ".wav", ".aiff", ".aif", ".m4a"];
+const ACCEPTED_DEMO_MIMES = new Set([
+  "audio/mpeg",
+  "audio/mp3",
+  "audio/wav",
+  "audio/wave",
+  "audio/x-wav",
+  "audio/aiff",
+  "audio/x-aiff",
+  "audio/mp4",
+  "audio/x-m4a",
+]);
+
+type ParsedMultipart = {
+  fields: Record<string, string>;
+  file: { filename: string; mimeType: string; content: Buffer } | null;
+  tooLarge: boolean;
+};
+
+function parseMultipart(req: any): Promise<ParsedMultipart> {
+  return new Promise((resolve, reject) => {
+    const headers = req.headers || {};
+    const bb = Busboy({ headers, limits: { files: 1, fileSize: MAX_DEMO_BYTES, fields: 20 } });
+    const fields: Record<string, string> = {};
+    let file: ParsedMultipart["file"] = null;
+    let tooLarge = false;
+
+    bb.on("field", (name: string, val: string) => {
+      fields[name] = val;
+    });
+
+    bb.on("file", (_name: string, stream: any, info: any) => {
+      const chunks: Buffer[] = [];
+      stream.on("data", (chunk: Buffer) => chunks.push(chunk));
+      stream.on("limit", () => {
+        tooLarge = true;
+        stream.resume();
+      });
+      stream.on("end", () => {
+        if (!tooLarge && chunks.length > 0) {
+          file = {
+            filename: info.filename || "demo",
+            mimeType: info.mimeType || "application/octet-stream",
+            content: Buffer.concat(chunks),
+          };
+        }
+      });
+    });
+
+    bb.on("error", (err: Error) => reject(err));
+    bb.on("close", () => resolve({ fields, file, tooLarge }));
+
+    req.pipe(bb);
+  });
+}
 
 // In-memory rate limit store (per serverless instance).
 // Best-effort: works for typical traffic on Vercel; not strictly shared across cold starts/regions.
@@ -231,12 +292,55 @@ export default async function handler(req: any, res: any) {
   }
 
   try {
-    const body = typeof req.body === "string" ? JSON.parse(req.body || "{}") : req.body ?? {};
-    const name = typeof body.name === "string" ? body.name.trim() : "";
-    const email = typeof body.email === "string" ? body.email.trim() : "";
-    const subject = typeof body.subject === "string" ? body.subject.trim() : "";
-    const message = typeof body.message === "string" ? body.message.trim() : "";
-    const honeypot = typeof body.website === "string" ? body.website.trim() : "";
+    const contentType = String(req.headers?.["content-type"] || "");
+    const isMultipart = contentType.toLowerCase().startsWith("multipart/form-data");
+
+    let name = "";
+    let email = "";
+    let subject = "";
+    let message = "";
+    let honeypot = "";
+    let demoFile: { filename: string; mimeType: string; content: Buffer } | null = null;
+
+    if (isMultipart) {
+      let parsed: ParsedMultipart;
+      try {
+        parsed = await parseMultipart(req);
+      } catch (err) {
+        console.error("[contact] Multipart parse failed:", err);
+        return res.status(400).json({ error: "Invalid form submission" });
+      }
+      if (parsed.tooLarge) {
+        return res.status(413).json({ error: "Demo file exceeds 25MB limit" });
+      }
+      const f = parsed.fields;
+      name = (f.name ?? "").trim();
+      email = (f.email ?? "").trim();
+      subject = (f.subject ?? "").trim();
+      message = (f.message ?? "").trim();
+      honeypot = (f.website ?? "").trim();
+
+      if (parsed.file) {
+        const ext = "." + (parsed.file.filename.split(".").pop() ?? "").toLowerCase();
+        const typeOk =
+          ACCEPTED_DEMO_MIMES.has(parsed.file.mimeType.toLowerCase()) ||
+          ACCEPTED_DEMO_EXTS.includes(ext);
+        if (!typeOk) {
+          return res.status(400).json({ error: "Unsupported demo file format" });
+        }
+        if (parsed.file.content.length > MAX_DEMO_BYTES) {
+          return res.status(413).json({ error: "Demo file exceeds 25MB limit" });
+        }
+        demoFile = parsed.file;
+      }
+    } else {
+      const body = typeof req.body === "string" ? JSON.parse(req.body || "{}") : req.body ?? {};
+      name = typeof body.name === "string" ? body.name.trim() : "";
+      email = typeof body.email === "string" ? body.email.trim() : "";
+      subject = typeof body.subject === "string" ? body.subject.trim() : "";
+      message = typeof body.message === "string" ? body.message.trim() : "";
+      honeypot = typeof body.website === "string" ? body.website.trim() : "";
+    }
 
     // Honeypot — silently succeed
     if (honeypot.length > 0) {
@@ -275,6 +379,16 @@ export default async function handler(req: any, res: any) {
 
     const resend = new Resend(apiKey);
 
+    const attachments = demoFile
+      ? [
+          {
+            filename: demoFile.filename,
+            content: demoFile.content,
+            contentType: demoFile.mimeType,
+          },
+        ]
+      : undefined;
+
     // Notification (to label)
     const notifyResult = await resend.emails.send({
       from: "WMG Website <noreply@wmgsounds.com>",
@@ -283,6 +397,7 @@ export default async function handler(req: any, res: any) {
       subject: `WMG: ${subject} — from ${name}`,
       html: notificationHtml(name, email, subject, message),
       text: notificationText(name, email, subject, message),
+      ...(attachments ? { attachments } : {}),
     });
 
     if ((notifyResult as any)?.error) {

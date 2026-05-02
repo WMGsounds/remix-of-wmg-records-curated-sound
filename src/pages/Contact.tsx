@@ -60,11 +60,23 @@ const Contact = () => {
     setSubmitting(true);
     setErrorMsg(null);
     try {
-      const res = await fetch("/api/contact", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(form),
-      });
+      let res: Response;
+      if (isDemo && demoFile) {
+        const fd = new FormData();
+        fd.append("name", form.name);
+        fd.append("email", form.email);
+        fd.append("subject", form.subject);
+        fd.append("message", form.message);
+        fd.append("website", form.website);
+        fd.append("demo", demoFile, demoFile.name);
+        res = await fetch("/api/contact", { method: "POST", body: fd });
+      } else {
+        res = await fetch("/api/contact", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(form),
+        });
+      }
       if (!res.ok) throw new Error("send_failed");
       setSent(true);
       setForm({ name: "", email: "", subject: "General", message: "", website: "" });
