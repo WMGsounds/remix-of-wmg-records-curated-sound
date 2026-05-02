@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { Link, useParams, Navigate } from "react-router-dom";
-import { ChevronLeft, ChevronRight, Play } from "lucide-react";
+import { ChevronDown, ChevronLeft, ChevronRight, ChevronUp, Play } from "lucide-react";
 import { useReleaseBySlug } from "@/lib/queries";
 import { LazyImage } from "@/components/LazyImage";
 import { PageTitle } from "@/components/PageTitle";
@@ -38,43 +38,61 @@ const TrackRow = ({
   const spotifyTrackId = getSpotifyTrackId(track.spotifyUrl);
 
   const isActive = previewOpen || lyricsOpen;
+  const listenButton = spotifyTrackId && (
+    <button
+      onClick={onTogglePreview}
+      className={`text-[10px] uppercase tracking-[0.24em] hover:text-ivory inline-flex items-center gap-1.5 ${previewOpen ? "text-ivory" : "text-ivory/55"}`}
+      aria-expanded={previewOpen}
+      aria-label={previewOpen ? "Close Spotify preview" : "Open Spotify preview"}
+    >
+      <Play className="h-3 w-3" />
+      Listen
+    </button>
+  );
+  const lyricsButton = hasLyrics && (
+    <button
+      onClick={onToggleLyrics}
+      className={`text-[10px] uppercase tracking-[0.24em] hover:text-ivory inline-flex items-center gap-1.5 ${lyricsOpen ? "text-ivory" : "text-ivory/55"}`}
+      aria-expanded={lyricsOpen}
+    >
+      Lyrics
+      <span className="md:hidden">
+        {lyricsOpen ? <ChevronUp className="h-3 w-3" /> : <ChevronDown className="h-3 w-3" />}
+      </span>
+      <span className="hidden md:inline">
+        {lyricsOpen ? <ChevronLeft className="h-3 w-3" /> : <ChevronRight className="h-3 w-3" />}
+      </span>
+    </button>
+  );
   return (
     <li className="border-b border-ivory/15 last:border-b-0">
-      <div className={`flex items-baseline justify-between py-5 group transition-colors duration-300 hover:text-gold ${isActive ? "text-gold" : ""}`}>
-        <span className="flex items-baseline gap-6 min-w-0">
-          <span className="text-xs text-ivory/55 tabular-nums w-6 shrink-0">
-            {String(track.trackNumber).padStart(2, "0")}
+      <div className={`py-5 group transition-colors duration-300 hover:text-gold ${isActive ? "text-gold" : ""}`}>
+        {/* Title row */}
+        <div className="flex items-baseline justify-between gap-4">
+          <span className="flex items-baseline gap-4 md:gap-6 min-w-0">
+            <span className="text-xs text-ivory/55 tabular-nums w-6 shrink-0">
+              {String(track.trackNumber).padStart(2, "0")}
+            </span>
+            <span className="font-serif text-xl md:text-2xl truncate md:whitespace-normal">{track.trackTitle}</span>
           </span>
-          <span className="font-serif text-xl md:text-2xl truncate">{track.trackTitle}</span>
-        </span>
-        <span className="flex items-center gap-6 shrink-0">
-          <span className="text-xs text-ivory/55 tabular-nums">{track.duration}</span>
-          <span className="w-16 shrink-0 flex justify-end">
-            {spotifyTrackId && (
-              <button
-                onClick={onTogglePreview}
-                className={`text-[10px] uppercase tracking-[0.24em] hover:text-ivory inline-flex items-center gap-1.5 ${previewOpen ? "text-ivory" : "text-ivory/55"}`}
-                aria-expanded={previewOpen}
-                aria-label={previewOpen ? "Close Spotify preview" : "Open Spotify preview"}
-              >
-                <Play className="h-3 w-3" />
-                Listen
-              </button>
-            )}
+          <span className="flex items-center gap-6 shrink-0">
+            {/* Desktop: buttons inline with title */}
+            <span className="hidden md:flex items-center gap-6">
+              <span className="text-xs text-ivory/55 tabular-nums">{track.duration}</span>
+              <span className="w-16 shrink-0 flex justify-end">{listenButton}</span>
+              <span className="w-20 shrink-0 flex justify-end">{lyricsButton}</span>
+            </span>
+            {/* Mobile: only duration on this row, anchored right */}
+            <span className="md:hidden text-xs text-ivory/55 tabular-nums">{track.duration}</span>
           </span>
-          <span className="w-20 shrink-0 flex justify-end">
-            {hasLyrics && (
-              <button
-                onClick={onToggleLyrics}
-                className={`text-[10px] uppercase tracking-[0.24em] hover:text-ivory inline-flex items-center gap-1.5 ${lyricsOpen ? "text-ivory" : "text-ivory/55"}`}
-                aria-expanded={lyricsOpen}
-              >
-                Lyrics
-                {lyricsOpen ? <ChevronLeft className="h-3 w-3" /> : <ChevronRight className="h-3 w-3" />}
-              </button>
-            )}
-          </span>
-        </span>
+        </div>
+        {/* Mobile: buttons under title */}
+        {(listenButton || lyricsButton) && (
+          <div className="md:hidden flex items-center gap-6 mt-3 pl-10">
+            {listenButton}
+            {lyricsButton}
+          </div>
+        )}
       </div>
       {spotifyTrackId && previewOpen && (
         <div className="pb-6 pl-12 pr-4">
