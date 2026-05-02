@@ -96,7 +96,7 @@ const ArtistPage = () => {
             <div className="lg:col-span-7">
               <h2 className="display-serif text-5xl md:text-6xl mb-4">{featured.title}</h2>
               <p className="text-ivory/64 mb-6">
-                {featured.releaseType} · {new Date(featured.releaseDate).toLocaleDateString(undefined, { month: "long", year: "numeric" }).toUpperCase()}
+                {featured.releaseType} · {new Date(featured.releaseDate).toLocaleDateString(undefined, { month: "long", year: "numeric" })}
               </p>
               <p className="text-lg leading-relaxed mb-8 max-w-xl text-ivory/82">
                 {featured.fullDescription || featured.shortDescription}
