@@ -51,13 +51,23 @@ const Contact = () => {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
       });
-      if (!res.ok) throw new Error("send_failed");
+      if (!res.ok) {
+        let detail = "";
+        try {
+          const data = await res.json();
+          detail = data?.detail || data?.error || "";
+        } catch {
+          /* ignore */
+        }
+        console.error("[contact] Submit failed", res.status, detail);
+        throw new Error(detail || "send_failed");
+      }
       setSent(true);
       setForm({ name: "", email: "", subject: "General", message: "", website: "" });
       setDemoUpload(null);
       setUploadProgress(0);
-    } catch {
-      setErrorMsg("Something went wrong. Please email us directly.");
+    } catch (err: any) {
+      setErrorMsg(err?.message ? `Something went wrong: ${err.message}` : "Something went wrong. Please email us directly.");
     } finally {
       setSubmitting(false);
     }
