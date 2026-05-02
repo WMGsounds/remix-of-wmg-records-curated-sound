@@ -141,7 +141,7 @@ const ReleasePage = () => {
   const { release, artist, tracks, related } = data;
   const releaseDate = release.releaseDate ? new Date(release.releaseDate) : null;
   const monthYear = releaseDate && !Number.isNaN(releaseDate.getTime())
-    ? releaseDate.toLocaleDateString(undefined, { month: "long", year: "numeric" }).toUpperCase()
+    ? releaseDate.toLocaleDateString(undefined, { month: "long", year: "numeric" })
     : "TBC";
   const dateLabel = releaseDate && !Number.isNaN(releaseDate.getTime()) ? releaseDate.toLocaleDateString(undefined, {
     year: "numeric",
