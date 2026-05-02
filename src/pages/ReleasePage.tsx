@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { Link, useParams, Navigate } from "react-router-dom";
-import { ChevronDown, Play } from "lucide-react";
+import { ChevronLeft, ChevronRight, Play } from "lucide-react";
 import { useReleaseBySlug } from "@/lib/queries";
 import { LazyImage } from "@/components/LazyImage";
 import { PageTitle } from "@/components/PageTitle";
@@ -25,12 +25,15 @@ const TrackRow = ({
   track,
   previewOpen,
   onTogglePreview,
+  lyricsOpen,
+  onToggleLyrics,
 }: {
   track: Track;
   previewOpen: boolean;
   onTogglePreview: () => void;
+  lyricsOpen: boolean;
+  onToggleLyrics: () => void;
 }) => {
-  const [lyricsOpen, setLyricsOpen] = useState(false);
   const hasLyrics = !!track.lyrics && track.lyrics.trim().length > 0;
   const spotifyTrackId = getSpotifyTrackId(track.spotifyUrl);
 
@@ -58,15 +61,15 @@ const TrackRow = ({
               </button>
             )}
           </span>
-          <span className="w-16 shrink-0 flex justify-end">
+          <span className="w-20 shrink-0 flex justify-end">
             {hasLyrics && (
               <button
-                onClick={() => setLyricsOpen((o) => !o)}
+                onClick={onToggleLyrics}
                 className="text-[10px] uppercase tracking-[0.24em] text-ivory/55 hover:text-ivory inline-flex items-center gap-1.5"
                 aria-expanded={lyricsOpen}
               >
                 Lyrics
-                <ChevronDown className={`h-3 w-3 transition-transform ${lyricsOpen ? "rotate-180" : ""}`} />
+                {lyricsOpen ? <ChevronLeft className="h-3 w-3" /> : <ChevronRight className="h-3 w-3" />}
               </button>
             )}
           </span>
@@ -86,11 +89,6 @@ const TrackRow = ({
           />
         </div>
       )}
-      {hasLyrics && lyricsOpen && (
-        <div className="pb-8 pl-12 pr-4 text-ivory/80 whitespace-pre-line font-serif text-base leading-relaxed">
-          {track.lyrics}
-        </div>
-      )}
     </li>
   );
 };
@@ -99,6 +97,7 @@ const ReleasePage = () => {
   const { slug } = useParams();
   const { data, isLoading, isError } = useReleaseBySlug(slug);
   const [openPreviewTrackId, setOpenPreviewTrackId] = useState<string | null>(null);
+  const [openLyricsTrackId, setOpenLyricsTrackId] = useState<string | null>(null);
   const [bgReady, setBgReady] = useState(false);
 
   const coverArt = data?.release?.coverArt ?? null;
@@ -215,7 +214,7 @@ const ReleasePage = () => {
           </div>
         </div>
 
-        <div className="relative container-editorial grid grid-cols-1 lg:grid-cols-12 gap-16 mt-28">
+        <div className="relative container-editorial grid grid-cols-1 lg:grid-cols-12 gap-16 lg:gap-28 mt-28">
           <div className="lg:col-span-7">
             <p className="eyebrow text-gold-soft mb-8">Tracklist</p>
             {tracks.length === 0 ? (
@@ -230,19 +229,37 @@ const ReleasePage = () => {
                     onTogglePreview={() =>
                       setOpenPreviewTrackId((curr) => (curr === t.id ? null : t.id))
                     }
+                    lyricsOpen={openLyricsTrackId === t.id}
+                    onToggleLyrics={() =>
+                      setOpenLyricsTrackId((curr) => (curr === t.id ? null : t.id))
+                    }
                   />
                 ))}
               </ol>
             )}
           </div>
           <div className="lg:col-span-5">
-            <p className="eyebrow text-gold-soft mb-8">Credits</p>
-            <ul className="space-y-3 text-ivory/82">
-              {release.catalogueId && <li>Catalogue: {release.catalogueId}</li>}
-              <li>Released {dateLabel}</li>
-              {artist && <li>{artist.name}</li>}
-              <li className="text-ivory/60 italic text-sm pt-2">Additional credits coming soon.</li>
-            </ul>
+            {(() => {
+              const activeTrack = tracks.find((t) => t.id === openLyricsTrackId);
+              if (!activeTrack || !activeTrack.lyrics) {
+                return (
+                  <p className="text-ivory/55 italic text-sm">
+                    Select “Lyrics” on a track to view them here.
+                  </p>
+                );
+              }
+              return (
+                <div>
+                  <p className="eyebrow text-gold-soft mb-4">Lyrics</p>
+                  <h3 className="font-serif text-2xl md:text-3xl mb-6 text-ivory">
+                    {activeTrack.trackTitle}
+                  </h3>
+                  <div className="text-ivory/80 whitespace-pre-line font-serif text-base leading-relaxed">
+                    {activeTrack.lyrics}
+                  </div>
+                </div>
+              );
+            })()}
           </div>
         </div>
       </section>
