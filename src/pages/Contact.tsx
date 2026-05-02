@@ -256,10 +256,10 @@ const Contact = () => {
                 <div className="flex flex-wrap items-center gap-5">
                   <button
                     type="submit"
-                    disabled={submitting}
+                    disabled={submitting || uploading}
                     className="inline-flex items-center gap-2 border border-gold/60 bg-transparent px-5 py-2 text-[11px] font-normal uppercase tracking-[0.22em] text-gold hover:border-gold hover:bg-gold/10 transition-colors duration-300 disabled:opacity-60 disabled:cursor-not-allowed"
                   >
-                    {submitting ? "Sending…" : "Send Message"} <ArrowRight className="h-3.5 w-3.5" />
+                    {submitting ? "Sending…" : uploading ? "Uploading…" : "Send Message"} <ArrowRight className="h-3.5 w-3.5" />
                   </button>
                   {errorMsg && <p className="font-serif text-lg italic text-gold">{errorMsg}</p>}
                 </div>
