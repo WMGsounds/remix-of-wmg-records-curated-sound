@@ -5,14 +5,17 @@ import hero from "@/assets/hero-cinematic.jpg";
 import { ArtistCard, ReleaseCard } from "@/components/Cards";
 import { PageTitle } from "@/components/PageTitle";
 import { LazyImage } from "@/components/LazyImage";
-import { useHomepageData } from "@/lib/queries";
+import { useHomepageData, useJournal } from "@/lib/queries";
 import { InlineSkeleton } from "@/components/UIStates";
+import { formatJournalDate } from "@/components/JournalArticle";
 
 const Index = () => {
   const { data, isLoading, isError } = useHomepageData();
+  const { data: journalArticles = [], isLoading: journalLoading } = useJournal();
   const featured = data?.featuredRelease ?? null;
   const featuredArtists = data?.featuredArtists ?? [];
   const latestReleases = data?.latestReleases ?? [];
+  const latestArticles = journalArticles.slice(0, 3);
 
   // Reuse the same URL for the blurred background — the browser dedupes the request.
   const featuredBgUrl = useMemo(() => {
@@ -258,22 +261,25 @@ const Index = () => {
               <p className="eyebrow text-gold-soft mb-3">The Journal</p>
               <h2 className="display-serif text-4xl md:text-5xl">Notes & Stories</h2>
             </div>
+            <Link to="/journal" className="hidden md:inline-flex items-center gap-2 text-[12px] uppercase tracking-[0.24em] link-underline">
+              All Articles <ArrowRight className="h-4 w-4" />
+            </Link>
           </div>
-          {isLoading ? (
+          {journalLoading ? (
             <InlineSkeleton count={3} />
-          ) : latestReleases.length === 0 ? (
-            <p className="text-ivory/60">No release stories yet.</p>
+          ) : latestArticles.length === 0 ? (
+            <p className="text-ivory/60">No articles yet.</p>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-              {latestReleases.slice(0, 3).map((release) => (
-                <Link key={release.slug} to={`/releases/${encodeURIComponent(release.slug)}`} className="group cursor-pointer">
-                  <p className="eyebrow text-gold-soft mb-3">{release.releaseType}</p>
+              {latestArticles.map((a) => (
+                <Link key={a.slug} to={`/journal/${encodeURIComponent(a.slug)}`} className="group cursor-pointer">
+                  {a.category && <p className="eyebrow text-gold-soft mb-3">{a.category}</p>}
                   <h3 className="font-serif text-2xl leading-tight text-ivory group-hover:text-gold transition-colors duration-500">
-                    {release.title}
+                    {a.title}
                   </h3>
-                  <p className="text-sm text-ivory/60 mt-4">
-                    {release.releaseDate ? new Date(release.releaseDate).toLocaleDateString(undefined, { month: "long", year: "numeric" }) : "Date TBC"}
-                  </p>
+                  {a.publishedDate && (
+                    <p className="text-sm text-ivory/60 mt-4">{formatJournalDate(a.publishedDate)}</p>
+                  )}
                 </Link>
               ))}
             </div>
