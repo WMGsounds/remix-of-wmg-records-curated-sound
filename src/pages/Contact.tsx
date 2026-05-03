@@ -73,8 +73,8 @@ const Contact = () => {
       }
       setSent(true);
       setForm({ name: "", email: "", subject: "General", message: "", website: "" });
-      setDemoUpload(null);
-      setUploadProgress(0);
+      setDemoUploads({ 0: null, 1: null, 2: null });
+      setUploadProgressMap({ 0: 0, 1: 0, 2: 0 });
     } catch (err: any) {
       setErrorMsg(err?.message ? `Something went wrong: ${err.message}` : "Something went wrong. Please email us directly.");
     } finally {
