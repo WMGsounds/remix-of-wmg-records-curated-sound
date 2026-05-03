@@ -22,17 +22,21 @@ type DemoUpload = {
   size: number;
 };
 
+const DEMO_SLOTS = [0, 1, 2] as const;
+type DemoSlot = typeof DEMO_SLOTS[number];
+
 const Contact = () => {
   const [form, setForm] = useState({ name: "", email: "", subject: "General", message: "", website: "" });
-  const [demoUpload, setDemoUpload] = useState<DemoUpload | null>(null);
-  const [demoError, setDemoError] = useState<string | null>(null);
-  const [uploading, setUploading] = useState(false);
-  const [uploadProgress, setUploadProgress] = useState(0);
+  const [demoUploads, setDemoUploads] = useState<Record<DemoSlot, DemoUpload | null>>({ 0: null, 1: null, 2: null });
+  const [demoErrors, setDemoErrors] = useState<Record<DemoSlot, string | null>>({ 0: null, 1: null, 2: null });
+  const [uploadingMap, setUploadingMap] = useState<Record<DemoSlot, boolean>>({ 0: false, 1: false, 2: false });
+  const [uploadProgressMap, setUploadProgressMap] = useState<Record<DemoSlot, number>>({ 0: 0, 1: 0, 2: 0 });
   const [sent, setSent] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
   const isDemo = form.subject === "Demo Submission";
+  const uploading = uploadingMap[0] || uploadingMap[1] || uploadingMap[2];
 
   const onSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -40,11 +44,16 @@ const Contact = () => {
     setSubmitting(true);
     setErrorMsg(null);
     try {
+      const demos = DEMO_SLOTS
+        .map((i) => {
+          const u = demoUploads[i];
+          if (!u) return null;
+          return { label: `Demo ${i + 1}`, url: u.url, filename: u.name, size: u.size };
+        })
+        .filter(Boolean);
       const payload = {
         ...form,
-        demoUrl: demoUpload?.url ?? null,
-        demoFilename: demoUpload?.name ?? null,
-        demoSize: demoUpload?.size ?? null,
+        demos,
       };
       const res = await fetch("/api/contact", {
         method: "POST",
