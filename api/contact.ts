@@ -377,8 +377,8 @@ export default async function handler(req: any, res: any) {
         to: [recipient],
         replyTo: email,
         subject: `WMG: ${subject} — from ${name}`,
-        html: notificationHtml(name, email, subject, message, demo),
-        text: notificationText(name, email, subject, message, demo),
+        html: notificationHtml(name, email, subject, message, demos),
+        text: notificationText(name, email, subject, message, demos),
       });
     } catch (sendErr: any) {
       console.error("[contact] Notification threw:", sendErr?.message || sendErr, sendErr?.stack);
