@@ -81,7 +81,16 @@ export const DBS = {
   releases: process.env.NOTION_RELEASES_DB_ID!,
   tracks: process.env.NOTION_TRACKS_DB_ID!,
   releaseTracks: process.env.NOTION_RELEASE_TRACKS_DB_ID!,
+  journal: process.env.NOTION_JOURNAL_DB_ID!,
 };
+
+export function requireEnv(route: string, names: string[]) {
+  const missing = names.filter((n) => !process.env[n]);
+  if (missing.length > 0) {
+    console.error("[notion-api] Missing required env", { route, missing });
+    throw new Error(`Missing required environment variables: ${missing.join(", ")}`);
+  }
+}
 
 // Notion file URLs expire ~1h. Cache JSON 50 min on the CDN, allow the browser
 // to reuse it for 5 min, and serve stale-while-revalidate for an extra 10 min
