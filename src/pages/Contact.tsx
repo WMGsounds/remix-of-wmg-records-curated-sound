@@ -172,6 +172,7 @@ const Contact = () => {
                     rows={6}
                     value={form.message}
                     onChange={(e) => setForm({ ...form, message: e.target.value })}
+                    placeholder="Share a bit about yourself and your music. If you have links to your tracks on SoundCloud, Spotify or anywhere else, feel free to drop them here."
                     className="w-full bg-transparent border-b border-ivory/40 py-3 text-base text-ivory placeholder:text-ivory/40 focus:border-gold focus:outline-none resize-none transition-colors duration-300"
                   />
                 </div>
