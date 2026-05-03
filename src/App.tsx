@@ -17,6 +17,8 @@ import NotFound from "./pages/NotFound.tsx";
 
 const Artists = lazy(() => import("./pages/Artists.tsx"));
 const Releases = lazy(() => import("./pages/Releases.tsx"));
+const Journal = lazy(() => import("./pages/Journal.tsx"));
+const JournalArticlePage = lazy(() => import("./pages/JournalArticlePage.tsx"));
 
 const queryClient = new QueryClient();
 
@@ -35,6 +37,8 @@ const App = () => (
             <Route path="/artists/:slug" element={<ArtistPage />} />
             <Route path="/releases" element={<Suspense fallback={null}><Releases /></Suspense>} />
             <Route path="/releases/:slug" element={<ReleasePage />} />
+            <Route path="/journal" element={<Suspense fallback={null}><Journal /></Suspense>} />
+            <Route path="/journal/:slug" element={<Suspense fallback={null}><JournalArticlePage /></Suspense>} />
             <Route path="/about" element={<About />} />
             <Route path="/contact" element={<Contact />} />
             <Route path="/newsletter" element={<Newsletter />} />
