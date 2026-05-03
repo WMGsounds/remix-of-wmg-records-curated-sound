@@ -13,9 +13,9 @@ const SORT_OPTIONS = ["Newest", "Oldest", "Title"] as const;
 
 const Card = ({ a }: { a: JournalArticleSummary }) => (
   <Link to={`/journal/${encodeURIComponent(a.slug)}`} className="group block hover-zoom focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-gold">
-    <div className="relative aspect-[4/3] bg-ivory/5 overflow-hidden">
+    <div className="relative aspect-[4/3] bg-ink overflow-hidden">
       {a.coverImage ? (
-        <LazyImage src={a.coverImage} alt={a.imageAlt || `${a.title} cover image`} width={1200} height={900} displayWidth={640} sizes="(min-width:1024px) 33vw, (min-width:768px) 50vw, 100vw" className="object-cover" />
+        <LazyImage src={a.coverImage} alt={a.imageAlt || `${a.title} cover image`} width={1200} height={900} displayWidth={640} sizes="(min-width:1024px) 33vw, (min-width:768px) 50vw, 100vw" className="object-contain" />
       ) : (
         <div className="h-full w-full bg-gradient-to-br from-ink to-ivory/10" />
       )}
