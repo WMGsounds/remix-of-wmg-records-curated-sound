@@ -104,8 +104,8 @@ export const SiteHeader = () => {
 export const SiteFooter = () => (
   <footer className="relative bg-ink text-ivory">
     <div className="absolute inset-x-0 top-0 h-px bg-gold" aria-hidden="true" />
-    <div className="container-editorial py-12 grid grid-cols-1 md:grid-cols-3 gap-10 items-start">
-      <div>
+    <div className="container-editorial py-12 grid grid-cols-1 md:grid-cols-3 gap-10 items-end">
+      <div className="self-start">
         <Link to="/" className="inline-block mb-5" aria-label="WMG Records — Wareham Music Group">
           <img
             src={footerLogo}
@@ -133,11 +133,10 @@ export const SiteFooter = () => (
           <li><a href="mailto:press@wmgsounds.com" className="link-underline hover:text-ivory">press@wmgsounds.com</a> <span className="text-ivory/40">— Press</span></li>
           <li><a href="mailto:sync@wmgsounds.com" className="link-underline hover:text-ivory">sync@wmgsounds.com</a> <span className="text-ivory/40">— Licensing</span></li>
           <li><a href="mailto:demos@wmgsounds.com" className="link-underline hover:text-ivory">demos@wmgsounds.com</a> <span className="text-ivory/40">— Submissions</span></li>
-          <li><a href="mailto:copyright@wmgsounds.com" className="link-underline hover:text-ivory">copyright@wmgsounds.com</a> <span className="text-ivory/40">— Copyright</span></li>
         </ul>
       </div>
 
-      <div className="md:text-right md:justify-self-end">
+      <div className="md:text-right md:justify-self-end self-start">
         <p className="eyebrow mb-3 text-gold">Explore</p>
         <ul className="space-y-1.5 text-sm">
           {nav.map((n) => (
