@@ -120,6 +120,9 @@ export type JournalArticleSummary = {
   featured: boolean;
   seoTitle: string;
   seoDescription: string;
+  canonicalUrl: string;
+  noindex: boolean;
+  socialCaption: string;
   imageAlt: string;
   createdTime: string;
   lastEditedTime: string;
