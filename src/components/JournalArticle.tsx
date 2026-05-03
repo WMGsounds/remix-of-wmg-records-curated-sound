@@ -63,10 +63,14 @@ export const ArticleBody = ({ blocks }: { blocks: JournalBlock[] }) => (
           );
         case "image":
           return (
-            <figure key={i} className="my-10 -mx-2 md:-mx-12">
-              <div className="overflow-hidden bg-ivory/5">
-                <LazyImage src={b.url} alt={b.alt} width={1600} height={1066} displayWidth={960} sizes="(min-width:768px) 720px, 100vw" className="object-cover" />
-              </div>
+            <figure key={i} className="my-10">
+              <img
+                src={b.url}
+                alt={b.alt}
+                loading="lazy"
+                decoding="async"
+                className="w-full h-auto block bg-ivory/5"
+              />
               {b.caption && (
                 <figcaption className="mt-3 text-sm text-ivory/55 italic text-center">{b.caption}</figcaption>
               )}
