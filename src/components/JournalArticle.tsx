@@ -61,11 +61,18 @@ export const ArticleBody = ({ blocks }: { blocks: JournalBlock[] }) => (
               {b.items.map((it, j) => <li key={j}>{renderRich(it)}</li>)}
             </ol>
           );
-        case "image":
+        case "image": {
+          const isProxied = b.url.startsWith("/api/image-proxy?");
+          const widthFor = (w: number) => (isProxied ? `${b.url}&w=${w}` : b.url);
+          const srcSet = isProxied
+            ? [480, 720, 960, 1280, 1600].map((w) => `${widthFor(w)} ${w}w`).join(", ")
+            : undefined;
           return (
             <figure key={i} className="my-10">
               <img
-                src={b.url}
+                src={widthFor(960)}
+                srcSet={srcSet}
+                sizes="(min-width:768px) 720px, 100vw"
                 alt={b.alt}
                 loading="lazy"
                 decoding="async"
@@ -76,6 +83,8 @@ export const ArticleBody = ({ blocks }: { blocks: JournalBlock[] }) => (
               )}
             </figure>
           );
+        }
+
         default:
           return null;
       }
