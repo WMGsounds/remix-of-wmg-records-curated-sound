@@ -88,24 +88,7 @@ const JournalArticlePage = () => {
         )}
       </header>
 
-      {/* Hero image */}
-      {a.coverImage && (
-        <div className="container-editorial mb-16 md:mb-20">
-          <div className="relative aspect-[16/9] bg-ivory/5 overflow-hidden">
-            <LazyImage
-              src={a.coverImage}
-              alt={a.imageAlt || `${a.title} cover image`}
-              width={1920}
-              height={1080}
-              displayWidth={1600}
-              sizes="100vw"
-              loading="eager"
-              fetchPriority="high"
-              className="object-cover"
-            />
-          </div>
-        </div>
-      )}
+      {/* Hero image intentionally omitted from article body — cover art is used only on listing/cards. */}
 
       {/* Body */}
       <div className="container-editorial">
