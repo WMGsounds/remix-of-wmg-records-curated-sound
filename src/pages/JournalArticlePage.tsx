@@ -65,7 +65,7 @@ const JournalArticlePage = () => {
           {a.title}
         </h1>
 
-        <div className="flex flex-wrap items-center gap-x-6 gap-y-2 text-[12px] uppercase tracking-[0.24em] text-ivory/60 mb-8">
+        <div className="flex flex-wrap items-center gap-x-6 gap-y-2 text-[12px] uppercase tracking-[0.24em] text-ivory/60 mb-6">
           {heroArtist && (
             <Link to={`/artists/${heroArtist.slug}`} className="hover:text-gold transition-colors">
               {heroArtist.name}
@@ -80,6 +80,17 @@ const JournalArticlePage = () => {
           {a.publishedDate && <span>{formatJournalDate(a.publishedDate)}</span>}
           {a.readingTime > 0 && <span>{a.readingTime} min read</span>}
         </div>
+
+        {a.category === "Release Story" && heroRelease && (
+          <div className="mb-8">
+            <Link
+              to={`/releases/${heroRelease.slug}`}
+              className="inline-flex items-center gap-2 text-[11px] uppercase tracking-[0.24em] text-gold hover:text-ivory transition-colors border-b border-gold/40 hover:border-ivory pb-1"
+            >
+              View the release: {heroRelease.title} <ArrowRight className="h-3.5 w-3.5" />
+            </Link>
+          </div>
+        )}
 
         {a.excerpt && (
           <p className="font-serif italic text-2xl md:text-3xl text-ivory/85 leading-snug max-w-3xl">
@@ -112,7 +123,7 @@ const JournalArticlePage = () => {
             <p className="eyebrow text-gold-soft mb-8">Related</p>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
               {relatedArtists.map((art) => (
-                <Link key={art.id} to={`/artists/${art.slug}`} className="group flex gap-5 items-center border border-ivory/12 hover:border-gold/40 transition-colors p-4">
+                <Link key={art.id} to={`/artists/${art.slug}`} className="group flex gap-5 items-center p-4 -mx-4 hover:bg-ivory/[0.03] transition-colors">
                   <div className="relative h-24 w-24 shrink-0 bg-ivory/5 overflow-hidden">
                     {art.heroImage && <LazyImage src={art.heroImage} alt={art.name} width={300} height={300} displayWidth={200} className="object-cover" />}
                   </div>
@@ -124,7 +135,7 @@ const JournalArticlePage = () => {
                 </Link>
               ))}
               {relatedReleases.map((rel) => (
-                <Link key={rel.id} to={`/releases/${rel.slug}`} className="group flex gap-5 items-center border border-ivory/12 hover:border-gold/40 transition-colors p-4">
+                <Link key={rel.id} to={`/releases/${rel.slug}`} className="group flex gap-5 items-center p-4 -mx-4 hover:bg-ivory/[0.03] transition-colors">
                   <div className="relative h-24 w-24 shrink-0 bg-ivory/5 overflow-hidden">
                     {rel.coverArt && <LazyImage src={rel.coverArt} alt={rel.title} width={300} height={300} displayWidth={200} className="object-cover" />}
                   </div>
