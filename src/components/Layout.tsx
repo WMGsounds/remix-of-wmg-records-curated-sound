@@ -129,10 +129,10 @@ export const SiteFooter = () => (
       <div className="md:text-center">
         <p className="eyebrow mb-3 text-gold">Contact</p>
         <ul className="space-y-1.5 text-sm text-ivory/70">
-          <li><a href="mailto:info@wmgsounds.com" className="link-underline hover:text-ivory">info@wmgsounds.com</a></li>
-          <li><a href="mailto:press@wmgsounds.com" className="link-underline hover:text-ivory">press@wmgsounds.com</a> <span className="text-ivory/40">— Press</span></li>
-          <li><a href="mailto:sync@wmgsounds.com" className="link-underline hover:text-ivory">sync@wmgsounds.com</a> <span className="text-ivory/40">— Licensing</span></li>
-          <li><a href="mailto:demos@wmgsounds.com" className="link-underline hover:text-ivory">demos@wmgsounds.com</a> <span className="text-ivory/40">— Submissions</span></li>
+          <li><a href="mailto:info@wmgsounds.com" className="link-underline hover:text-ivory">info@wmgsounds.com</a> <span className="text-ivory/40">(General)</span></li>
+          <li><a href="mailto:press@wmgsounds.com" className="link-underline hover:text-ivory">press@wmgsounds.com</a> <span className="text-ivory/40">(Press)</span></li>
+          <li><a href="mailto:sync@wmgsounds.com" className="link-underline hover:text-ivory">sync@wmgsounds.com</a> <span className="text-ivory/40">(Licensing)</span></li>
+          <li><a href="mailto:demos@wmgsounds.com" className="link-underline hover:text-ivory">demos@wmgsounds.com</a> <span className="text-ivory/40">(Submissions)</span></li>
         </ul>
       </div>
 
