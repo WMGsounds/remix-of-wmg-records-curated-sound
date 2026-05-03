@@ -22,17 +22,21 @@ type DemoUpload = {
   size: number;
 };
 
+const DEMO_SLOTS = [0, 1, 2] as const;
+type DemoSlot = typeof DEMO_SLOTS[number];
+
 const Contact = () => {
   const [form, setForm] = useState({ name: "", email: "", subject: "General", message: "", website: "" });
-  const [demoUpload, setDemoUpload] = useState<DemoUpload | null>(null);
-  const [demoError, setDemoError] = useState<string | null>(null);
-  const [uploading, setUploading] = useState(false);
-  const [uploadProgress, setUploadProgress] = useState(0);
+  const [demoUploads, setDemoUploads] = useState<Record<DemoSlot, DemoUpload | null>>({ 0: null, 1: null, 2: null });
+  const [demoErrors, setDemoErrors] = useState<Record<DemoSlot, string | null>>({ 0: null, 1: null, 2: null });
+  const [uploadingMap, setUploadingMap] = useState<Record<DemoSlot, boolean>>({ 0: false, 1: false, 2: false });
+  const [uploadProgressMap, setUploadProgressMap] = useState<Record<DemoSlot, number>>({ 0: 0, 1: 0, 2: 0 });
   const [sent, setSent] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
   const isDemo = form.subject === "Demo Submission";
+  const uploading = uploadingMap[0] || uploadingMap[1] || uploadingMap[2];
 
   const onSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -40,11 +44,16 @@ const Contact = () => {
     setSubmitting(true);
     setErrorMsg(null);
     try {
+      const demos = DEMO_SLOTS
+        .map((i) => {
+          const u = demoUploads[i];
+          if (!u) return null;
+          return { label: `Demo ${i + 1}`, url: u.url, filename: u.name, size: u.size };
+        })
+        .filter(Boolean);
       const payload = {
         ...form,
-        demoUrl: demoUpload?.url ?? null,
-        demoFilename: demoUpload?.name ?? null,
-        demoSize: demoUpload?.size ?? null,
+        demos,
       };
       const res = await fetch("/api/contact", {
         method: "POST",
@@ -64,8 +73,8 @@ const Contact = () => {
       }
       setSent(true);
       setForm({ name: "", email: "", subject: "General", message: "", website: "" });
-      setDemoUpload(null);
-      setUploadProgress(0);
+      setDemoUploads({ 0: null, 1: null, 2: null });
+      setUploadProgressMap({ 0: 0, 1: 0, 2: 0 });
     } catch (err: any) {
       setErrorMsg(err?.message ? `Something went wrong: ${err.message}` : "Something went wrong. Please email us directly.");
     } finally {
@@ -175,91 +184,107 @@ const Contact = () => {
                       <p className="text-xs text-gold">
                         File uploads are not configured. Please set VITE_UPLOADCARE_PUBLIC_KEY.
                       </p>
-                    ) : !demoUpload ? (
-                      <div className="uploadcare-wrapper">
-                        <FileUploaderRegular
-                          pubkey={UPLOADCARE_PUBLIC_KEY}
-                          multiple={false}
-                          imgOnly={false}
-                          accept="audio/mpeg,audio/mp3,audio/wav,audio/wave,audio/x-wav,audio/aiff,audio/x-aiff,audio/mp4,audio/x-m4a,.mp3,.wav,.aiff,.aif,.m4a"
-                          maxLocalFileSizeBytes={MAX_DEMO_BYTES}
-                          sourceList="local, dropbox, gdrive"
-                          confirmUpload={false}
-                          removeCopyright
-                          onFileUploadStart={() => {
-                            setUploading(true);
-                            setUploadProgress(0);
-                            setDemoError(null);
-                          }}
-                          onFileUploadProgress={(e: any) => {
-                            const p = e?.progress ?? e?.detail?.progress ?? 0;
-                            setUploadProgress(Math.round(p));
-                          }}
-                          onFileUploadFailed={(e: any) => {
-                            setUploading(false);
-                            setUploadProgress(0);
-                            setDemoError(e?.errors?.[0]?.message ?? "Upload failed. Please try again.");
-                          }}
-                          onFileUploadSuccess={(e: any) => {
-                            const url = e?.cdnUrl ?? e?.fileInfo?.cdnUrl;
-                            const name = e?.fileInfo?.name ?? e?.name ?? "demo";
-                            const size = e?.fileInfo?.size ?? e?.size ?? 0;
-                            if (url) {
-                              setDemoUpload({ url, name, size });
-                            }
-                            setUploading(false);
-                            setUploadProgress(100);
-                          }}
-                          onCommonUploadFailed={(e: any) => {
-                            setUploading(false);
-                            setDemoError(e?.errors?.[0]?.message ?? "Upload failed. Please try again.");
-                          }}
-                        />
-                        {uploading && (
-                          <div className="mt-4">
-                            <div className="flex justify-between text-[10px] uppercase tracking-[0.2em] text-ivory/60 mb-2">
-                              <span>Uploading…</span>
-                              <span>{uploadProgress}%</span>
-                            </div>
-                            <div className="h-[2px] w-full bg-ivory/15 overflow-hidden">
-                              <div
-                                className="h-full bg-gold transition-all duration-200"
-                                style={{ width: `${uploadProgress}%` }}
-                              />
-                            </div>
-                          </div>
-                        )}
-                      </div>
                     ) : (
-                      <div className="flex items-center justify-between gap-4 border border-gold/40 bg-ivory/5 px-5 py-4">
-                        <div className="min-w-0 flex items-center gap-3">
-                          <CheckCircle2 className="h-5 w-5 text-gold shrink-0" />
-                          <div className="min-w-0">
-                            <p className="font-serif text-base text-ivory truncate">{demoUpload.name}</p>
-                            <p className="text-xs text-ivory/55 mt-1">
-                              {demoUpload.size > 0 ? `${(demoUpload.size / (1024 * 1024)).toFixed(2)} MB · ` : ""}
-                              Uploaded
-                            </p>
-                          </div>
-                        </div>
-                        <button
-                          type="button"
-                          onClick={() => {
-                            setDemoUpload(null);
-                            setUploadProgress(0);
-                          }}
-                          className="text-ivory/60 hover:text-gold transition-colors"
-                          aria-label="Remove file"
-                        >
-                          <X className="h-5 w-5" />
-                        </button>
+                      <div className="space-y-6">
+                        {DEMO_SLOTS.map((slot) => {
+                          const upload = demoUploads[slot];
+                          const isUploading = uploadingMap[slot];
+                          const progress = uploadProgressMap[slot];
+                          const error = demoErrors[slot];
+                          const slotLabel = `Demo ${slot + 1}`;
+                          return (
+                            <div key={slot}>
+                              <p className="text-[10px] uppercase tracking-[0.2em] text-ivory/60 mb-2">{slotLabel}</p>
+                              {!upload ? (
+                                <div className="uploadcare-wrapper">
+                                  <FileUploaderRegular
+                                    pubkey={UPLOADCARE_PUBLIC_KEY}
+                                    multiple={false}
+                                    imgOnly={false}
+                                    accept="audio/mpeg,audio/mp3,audio/wav,audio/wave,audio/x-wav,audio/aiff,audio/x-aiff,audio/mp4,audio/x-m4a,.mp3,.wav,.aiff,.aif,.m4a"
+                                    maxLocalFileSizeBytes={MAX_DEMO_BYTES}
+                                    sourceList="local, dropbox, gdrive"
+                                    confirmUpload={false}
+                                    removeCopyright
+                                    onFileUploadStart={() => {
+                                      setUploadingMap((m) => ({ ...m, [slot]: true }));
+                                      setUploadProgressMap((m) => ({ ...m, [slot]: 0 }));
+                                      setDemoErrors((m) => ({ ...m, [slot]: null }));
+                                    }}
+                                    onFileUploadProgress={(e: any) => {
+                                      const p = e?.progress ?? e?.detail?.progress ?? 0;
+                                      setUploadProgressMap((m) => ({ ...m, [slot]: Math.round(p) }));
+                                    }}
+                                    onFileUploadFailed={(e: any) => {
+                                      setUploadingMap((m) => ({ ...m, [slot]: false }));
+                                      setUploadProgressMap((m) => ({ ...m, [slot]: 0 }));
+                                      setDemoErrors((m) => ({ ...m, [slot]: e?.errors?.[0]?.message ?? "Upload failed. Please try again." }));
+                                    }}
+                                    onFileUploadSuccess={(e: any) => {
+                                      const url = e?.cdnUrl ?? e?.fileInfo?.cdnUrl;
+                                      const name = e?.fileInfo?.name ?? e?.name ?? "demo";
+                                      const size = e?.fileInfo?.size ?? e?.size ?? 0;
+                                      if (url) {
+                                        setDemoUploads((m) => ({ ...m, [slot]: { url, name, size } }));
+                                      }
+                                      setUploadingMap((m) => ({ ...m, [slot]: false }));
+                                      setUploadProgressMap((m) => ({ ...m, [slot]: 100 }));
+                                    }}
+                                    onCommonUploadFailed={(e: any) => {
+                                      setUploadingMap((m) => ({ ...m, [slot]: false }));
+                                      setDemoErrors((m) => ({ ...m, [slot]: e?.errors?.[0]?.message ?? "Upload failed. Please try again." }));
+                                    }}
+                                  />
+                                  {isUploading && (
+                                    <div className="mt-4">
+                                      <div className="flex justify-between text-[10px] uppercase tracking-[0.2em] text-ivory/60 mb-2">
+                                        <span>Uploading…</span>
+                                        <span>{progress}%</span>
+                                      </div>
+                                      <div className="h-[2px] w-full bg-ivory/15 overflow-hidden">
+                                        <div
+                                          className="h-full bg-gold transition-all duration-200"
+                                          style={{ width: `${progress}%` }}
+                                        />
+                                      </div>
+                                    </div>
+                                  )}
+                                </div>
+                              ) : (
+                                <div className="flex items-center justify-between gap-4 border border-gold/40 bg-ivory/5 px-5 py-4">
+                                  <div className="min-w-0 flex items-center gap-3">
+                                    <CheckCircle2 className="h-5 w-5 text-gold shrink-0" />
+                                    <div className="min-w-0">
+                                      <p className="font-serif text-base text-ivory truncate">{upload.name}</p>
+                                      <p className="text-xs text-ivory/55 mt-1">
+                                        {upload.size > 0 ? `${(upload.size / (1024 * 1024)).toFixed(2)} MB · ` : ""}
+                                        Uploaded
+                                      </p>
+                                    </div>
+                                  </div>
+                                  <button
+                                    type="button"
+                                    onClick={() => {
+                                      setDemoUploads((m) => ({ ...m, [slot]: null }));
+                                      setUploadProgressMap((m) => ({ ...m, [slot]: 0 }));
+                                    }}
+                                    className="text-ivory/60 hover:text-gold transition-colors"
+                                    aria-label={`Remove ${slotLabel}`}
+                                  >
+                                    <X className="h-5 w-5" />
+                                  </button>
+                                </div>
+                              )}
+                              {error && <p className="text-xs text-gold mt-2">{error}</p>}
+                            </div>
+                          );
+                        })}
                       </div>
                     )}
 
                     <p className="text-xs text-ivory/55 mt-3">
-                      Maximum file size 25MB. Recommended format: MP3.
+                      Up to 3 files. Maximum 25MB each. Recommended format: MP3.
                     </p>
-                    {demoError && <p className="text-xs text-gold mt-2">{demoError}</p>}
                   </div>
                 )}
 
