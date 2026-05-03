@@ -5,9 +5,11 @@ import { useJournal } from "@/lib/queries";
 import { InlineSkeleton, PageError, PageEmpty } from "@/components/UIStates";
 import { LazyImage } from "@/components/LazyImage";
 import { formatJournalDate } from "@/components/JournalArticle";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import type { JournalArticleSummary } from "@/lib/types";
 
 const CATEGORIES = ["All", "Release Story", "Artist Spotlight", "Label News", "Behind The Scenes", "Interview", "Track Story", "Album Story"] as const;
+const SORT_OPTIONS = ["Newest", "Oldest", "Title"] as const;
 
 const Card = ({ a }: { a: JournalArticleSummary }) => (
   <Link to={`/journal/${encodeURIComponent(a.slug)}`} className="group block hover-zoom focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-gold">
@@ -58,13 +60,26 @@ const Hero = ({ a }: { a: JournalArticleSummary }) => (
 const Journal = () => {
   const { data: articles = [], isLoading, isError } = useJournal();
   const [cat, setCat] = useState<string>("All");
+  const [sort, setSort] = useState<(typeof SORT_OPTIONS)[number]>("Newest");
 
   const { hero, rest } = useMemo(() => {
-    const filtered = cat === "All" ? articles : articles.filter((a) => a.category === cat);
+    const filtered = cat === "All" ? [...articles] : articles.filter((a) => a.category === cat);
+    const dateOf = (a: JournalArticleSummary) => +new Date(a.publishedDate || a.lastEditedTime || a.createdTime);
+    switch (sort) {
+      case "Oldest":
+        filtered.sort((a, b) => dateOf(a) - dateOf(b));
+        break;
+      case "Title":
+        filtered.sort((a, b) => a.title.localeCompare(b.title));
+        break;
+      case "Newest":
+      default:
+        filtered.sort((a, b) => dateOf(b) - dateOf(a));
+    }
     const hero = filtered.find((a) => a.featured) ?? filtered[0] ?? null;
     const rest = filtered.filter((a) => a !== hero);
     return { hero, rest };
-  }, [articles, cat]);
+  }, [articles, cat, sort]);
 
   if (isError) return <PageError message="Couldn't load the Journal." />;
 
@@ -80,16 +95,37 @@ const Journal = () => {
       </section>
 
       <div className="container-editorial">
-        <div className="flex flex-wrap gap-x-6 gap-y-3 border-y border-ivory/15 py-5 mb-16">
-          {CATEGORIES.map((c) => (
-            <button
-              key={c}
-              onClick={() => setCat(c)}
-              className={`text-[11px] uppercase tracking-[0.24em] transition-colors ${cat === c ? "text-gold" : "text-ivory/55 hover:text-ivory"}`}
-            >
-              {c}
-            </button>
-          ))}
+        <div className="flex flex-row flex-wrap items-center justify-between gap-4 mb-16 border-y border-ivory/18 py-5">
+          <div className="flex items-center gap-3">
+            <label className="hidden md:inline text-[11px] uppercase tracking-[0.24em] text-ivory/60">Category</label>
+            <Select value={cat} onValueChange={setCat}>
+              <SelectTrigger className="w-[200px] bg-transparent border-ivory/24 text-[11px] uppercase tracking-[0.24em] text-ivory rounded-none focus:ring-ivory">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent className="bg-ink text-ivory border-ivory/24">
+                {CATEGORIES.map((c) => (
+                  <SelectItem key={c} value={c} className="text-[11px] uppercase tracking-[0.24em] focus:bg-ivory/10 focus:text-ivory">
+                    {c}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+          <div className="flex items-center gap-3">
+            <label className="hidden md:inline text-[11px] uppercase tracking-[0.24em] text-ivory/60">Sort by</label>
+            <Select value={sort} onValueChange={(v) => setSort(v as (typeof SORT_OPTIONS)[number])}>
+              <SelectTrigger className="w-[160px] bg-transparent border-ivory/24 text-[11px] uppercase tracking-[0.24em] text-ivory rounded-none focus:ring-ivory">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent className="bg-ink text-ivory border-ivory/24">
+                {SORT_OPTIONS.map((o) => (
+                  <SelectItem key={o} value={o} className="text-[11px] uppercase tracking-[0.24em] focus:bg-ivory/10 focus:text-ivory">
+                    {o}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
         </div>
 
         {isLoading ? (
