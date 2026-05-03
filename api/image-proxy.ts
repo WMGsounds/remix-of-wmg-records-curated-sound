@@ -71,6 +71,8 @@ export default async function handler(req: ApiRequest, res: ImageProxyResponse) 
       res.writeHead(200, {
         "Cache-Control": CACHE_CONTROL,
         "Content-Type": sourceContentType,
+        "Content-Disposition": "inline",
+        "X-Content-Type-Options": "nosniff",
         "Content-Length": String(sourceBuffer.length),
       }).end(sourceBuffer as unknown as string);
       return;
@@ -94,6 +96,8 @@ export default async function handler(req: ApiRequest, res: ImageProxyResponse) 
     res.writeHead(200, {
       "Cache-Control": CACHE_CONTROL,
       "Content-Type": "image/webp",
+      "Content-Disposition": "inline",
+      "X-Content-Type-Options": "nosniff",
       "Content-Length": String(output.length),
     }).end(output as unknown as string);
   } catch (error) {
