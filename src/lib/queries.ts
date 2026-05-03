@@ -37,3 +37,16 @@ export const useReleaseBySlug = (slug: string | undefined) =>
     enabled: !!slug,
     staleTime: STALE,
   });
+
+import { fetchJournal, fetchJournalBySlug } from "./api";
+
+export const useJournal = () =>
+  useQuery({ queryKey: ["journal"], queryFn: fetchJournal, staleTime: STALE });
+
+export const useJournalArticle = (slug: string | undefined) =>
+  useQuery({
+    queryKey: ["journal", slug],
+    queryFn: () => fetchJournalBySlug(slug as string),
+    enabled: !!slug,
+    staleTime: STALE,
+  });

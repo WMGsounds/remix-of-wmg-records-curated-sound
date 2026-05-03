@@ -86,3 +86,13 @@ export async function fetchReleaseBySlug(slug: string): Promise<ReleasePageData 
     `/api/notion/release/${encodeURIComponent(slug)}`,
   );
 }
+
+export async function fetchJournal(): Promise<JournalArticleSummary[]> {
+  return fetchJson<JournalArticleSummary[]>("/api/notion/journal");
+}
+
+export async function fetchJournalBySlug(slug: string): Promise<JournalArticleData | null> {
+  return fetchJson<JournalArticleData | null>(
+    `/api/notion/journal/${encodeURIComponent(slug)}`,
+  );
+}
