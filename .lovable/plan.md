@@ -1,49 +1,19 @@
-I’ll add the Vercel serverless Notion CMS routes exactly as documented, without changing the frontend design or using Lovable Cloud.
+## Restore your original WMG favicon
 
-Implementation plan:
+**What went wrong:** In the previous step I added a new `/favicon.svg` (a generated WMG-style mark) and linked it in `<head>`. Modern browsers prefer SVG over `.ico`, so that generated SVG started overriding the original WMG favicon you uploaded. Your uploaded `.ico`/PNG files were never touched — only the new SVG was winning.
 
-1. Create the root `api/notion` route tree
-   - Add `api/notion/_client.ts`
-   - Add `api/notion/_normalize.ts`
-   - Add `api/notion/artists.ts`
-   - Add `api/notion/releases.ts`
-   - Add `api/notion/tracks.ts`
-   - Add `api/notion/homepage.ts`
-   - Add `api/notion/artist/[slug].ts`
-   - Add `api/notion/release/[slug].ts`
+**Fix:**
 
-2. Use the exact code from `README-NOTION.md`
-   - `_client.ts` will instantiate the Notion SDK with `process.env.NOTION_TOKEN`
-   - Routes will read `NOTION_ARTISTS_DB_ID`, `NOTION_RELEASES_DB_ID`, and `NOTION_TRACKS_DB_ID`
-   - Routes will normalize Notion pages into the existing `src/lib/types.ts` response shape
-   - Routes will respond under Vercel’s `/api/notion/*` convention
+1. Delete `public/favicon.svg` (the generated one).
+2. In `index.html`, remove this line:
+   ```html
+   <link rel="icon" href="/favicon.svg?v=wmg-2" type="image/svg+xml">
+   ```
+3. Leave everything else from the previous change intact:
+   - `/favicon.ico`, `/favicon-16x16.png`, `/favicon-32x32.png`, `/apple-touch-icon.png`, `/icon-192.png`, `/icon-512.png`, `/safari-pinned-tab.svg`, `/site.webmanifest` — all still pointing at your original WMG assets.
+   - Lovable preview script + Lovable preview OG images already removed.
+   - `/api/image-proxy` already returns image-only responses with `Content-Disposition: inline`.
 
-3. Add the Notion SDK dependency
-   - Add `@notionhq/client` to `package.json` dependencies
-   - Update the package lockfile so Vercel installs it reliably
+After this, browsers will fall back to your original `/favicon.ico` (the file you uploaded). You may need a hard refresh / clear of the favicon cache to see it update on already-open tabs.
 
-4. Keep the frontend behavior unchanged
-   - Leave `src/lib/api.ts` as-is
-   - When `VITE_USE_MOCKS=false`, it already calls:
-     - `/api/notion/artists`
-     - `/api/notion/releases`
-     - `/api/notion/tracks`
-     - `/api/notion/homepage`
-     - `/api/notion/artist/[slug]`
-     - `/api/notion/release/[slug]`
-
-5. Validate locally as far as possible
-   - Confirm the new files are present in the expected root `api/` structure
-   - Confirm imports and dependency entries are consistent
-   - I won’t change styles, pages, layout, or mock data
-
-Important note about GitHub/Vercel:
-- I can make the code changes in the project once you approve this plan.
-- I cannot directly commit or push to GitHub from here because git state is managed outside this environment. After the changes are applied, use Lovable’s GitHub sync/export flow or your normal GitHub workflow to push them so Vercel redeploys.
-
-Vercel still needs these Production environment variables set:
-- `NOTION_TOKEN`
-- `NOTION_ARTISTS_DB_ID`
-- `NOTION_RELEASES_DB_ID`
-- `NOTION_TRACKS_DB_ID`
-- `VITE_USE_MOCKS=false`
+**No visual/layout changes.**
