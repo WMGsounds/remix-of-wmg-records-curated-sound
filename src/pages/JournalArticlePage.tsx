@@ -81,7 +81,7 @@ const JournalArticlePage = () => {
           {a.readingTime > 0 && <span>{a.readingTime} min read</span>}
         </div>
 
-        {a.category === "Release Story" && heroRelease && (
+        {a.category?.toLowerCase().includes("release") && heroRelease?.slug && (
           <div className="mb-8">
             <Link
               to={`/releases/${heroRelease.slug}`}
