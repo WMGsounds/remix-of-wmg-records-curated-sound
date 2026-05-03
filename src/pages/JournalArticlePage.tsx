@@ -49,15 +49,17 @@ const JournalArticlePage = () => {
 
       {/* Header */}
       <header className="container-editorial pt-36 md:pt-44 pb-12 max-w-[960px]">
-        <Link to="/journal" className="inline-flex items-center gap-2 text-[11px] uppercase tracking-[0.24em] text-ivory/55 hover:text-gold transition-colors mb-10">
-          <ArrowLeft className="h-3.5 w-3.5" /> Back to Journal
-        </Link>
-
-        {a.category && (
-          <span className="inline-block border border-gold/50 text-gold text-[10px] uppercase tracking-[0.28em] px-3 py-1.5 mb-8">
-            {a.category}
-          </span>
-        )}
+        <div className="flex items-center justify-between gap-4 mb-10">
+          <Link to="/journal" className="inline-flex items-center gap-2 text-[11px] uppercase tracking-[0.24em] text-ivory/55 hover:text-gold transition-colors">
+            <ArrowLeft className="h-3.5 w-3.5" /> Back to Journal
+          </Link>
+          {a.category && (
+            <span className="inline-block border border-gold/50 text-gold text-[10px] uppercase tracking-[0.28em] px-3 py-1.5">
+              {a.category}
+            </span>
+          )}
+        </div>
+        <div className="mb-8" />
 
         <h1 className="display-serif text-5xl md:text-7xl lg:text-8xl leading-[1.02] mb-8 text-ivory">
           {a.title}
