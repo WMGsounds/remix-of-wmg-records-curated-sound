@@ -302,9 +302,7 @@ export default async function handler(req: any, res: any) {
       hasEmail: !!body?.email,
       subject: body?.subject,
       hasMessage: !!body?.message,
-      hasDemoUrl: !!body?.demoUrl,
-      demoFilename: body?.demoFilename,
-      demoSize: body?.demoSize,
+      demoCount: Array.isArray(body?.demos) ? body.demos.length : (body?.demoUrl ? 1 : 0),
     });
     const name = typeof body.name === "string" ? body.name.trim() : "";
     const email = typeof body.email === "string" ? body.email.trim() : "";
@@ -312,19 +310,27 @@ export default async function handler(req: any, res: any) {
     const message = typeof body.message === "string" ? body.message.trim() : "";
     const honeypot = typeof body.website === "string" ? body.website.trim() : "";
 
-    // Demo upload (Uploadcare URL — uploaded directly from the browser)
-    let demo: { url: string; filename: string; size: number } | null = null;
-    if (typeof body.demoUrl === "string" && body.demoUrl.length > 0) {
-      const url = body.demoUrl.trim();
+    // Demo uploads (Uploadcare URLs — uploaded directly from the browser)
+    const demos: DemoFile[] = [];
+    const rawDemos: any[] = Array.isArray(body.demos)
+      ? body.demos
+      : (typeof body.demoUrl === "string" && body.demoUrl.length > 0
+          ? [{ label: "Demo", url: body.demoUrl, filename: body.demoFilename, size: body.demoSize }]
+          : []);
+    for (let i = 0; i < rawDemos.length && demos.length < 3; i++) {
+      const d = rawDemos[i];
+      if (!d || typeof d.url !== "string" || d.url.length === 0) continue;
+      const url = d.url.trim();
       if (!/^https:\/\//i.test(url)) {
         return res.status(400).json({ error: "Invalid demo file URL" });
       }
       const filename =
-        typeof body.demoFilename === "string" && body.demoFilename.length > 0
-          ? body.demoFilename.slice(0, 200)
+        typeof d.filename === "string" && d.filename.length > 0
+          ? d.filename.slice(0, 200)
           : "demo";
-      const size = typeof body.demoSize === "number" && isFinite(body.demoSize) ? body.demoSize : 0;
-      demo = { url, filename, size };
+      const size = typeof d.size === "number" && isFinite(d.size) ? d.size : 0;
+      const label = typeof d.label === "string" && d.label.length > 0 ? d.label.slice(0, 40) : `Demo ${demos.length + 1}`;
+      demos.push({ label, url, filename, size });
     }
 
     // Honeypot — silently succeed
