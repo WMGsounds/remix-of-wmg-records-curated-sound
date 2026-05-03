@@ -167,19 +167,29 @@ function eyebrow(label: string): string {
   return `<div style="letter-spacing:0.2em;text-transform:uppercase;font-family:Georgia,'Times New Roman',serif;font-size:11px;color:${COLOR_GOLD};margin:0 0 22px;">${escapeHtml(label)}</div>`;
 }
 
+type DemoFile = { label: string; url: string; filename: string; size: number };
+
 function notificationHtml(
   name: string,
   email: string,
   subject: string,
   message: string,
-  demo?: { url: string; filename: string; size: number } | null,
+  demos?: DemoFile[] | null,
 ): string {
-  const demoBlock = demo
+  const demoBlock = demos && demos.length > 0
     ? `
     <div style="margin-top:24px;padding:18px 20px;border:1px solid ${COLOR_GOLD};background:#fffaf0;">
-      <div style="letter-spacing:0.18em;text-transform:uppercase;font-family:Georgia,'Times New Roman',serif;font-size:11px;color:${COLOR_GOLD};margin-bottom:10px;">Demo File Attached</div>
-      <p style="font-family:Georgia,'Times New Roman',serif;font-size:15px;color:${COLOR_TEXT};margin:0 0 6px;">${escapeHtml(demo.filename)}${demo.size > 0 ? ` <span style="color:${COLOR_MUTED};">· ${(demo.size / (1024 * 1024)).toFixed(2)} MB</span>` : ""}</p>
-      <p style="margin:10px 0 0;"><a href="${escapeHtml(demo.url)}" style="font-family:Georgia,'Times New Roman',serif;font-size:14px;color:${COLOR_TEXT};text-decoration:underline;" target="_blank" rel="noopener">Download demo file →</a></p>
+      <div style="letter-spacing:0.18em;text-transform:uppercase;font-family:Georgia,'Times New Roman',serif;font-size:11px;color:${COLOR_GOLD};margin-bottom:10px;">Demo File${demos.length > 1 ? "s" : ""} Attached</div>
+      ${demos
+        .map(
+          (d) => `
+      <div style="margin-bottom:14px;">
+        <div style="letter-spacing:0.18em;text-transform:uppercase;font-family:Georgia,'Times New Roman',serif;font-size:10px;color:${COLOR_MUTED};margin-bottom:4px;">${escapeHtml(d.label)}</div>
+        <p style="font-family:Georgia,'Times New Roman',serif;font-size:15px;color:${COLOR_TEXT};margin:0 0 6px;">${escapeHtml(d.filename)}${d.size > 0 ? ` <span style="color:${COLOR_MUTED};">· ${(d.size / (1024 * 1024)).toFixed(2)} MB</span>` : ""}</p>
+        <p style="margin:6px 0 0;"><a href="${escapeHtml(d.url)}" style="font-family:Georgia,'Times New Roman',serif;font-size:14px;color:${COLOR_TEXT};text-decoration:underline;" target="_blank" rel="noopener">Download ${escapeHtml(d.label)} →</a></p>
+      </div>`,
+        )
+        .join("")}
     </div>`
     : "";
   const inner = `
@@ -203,7 +213,7 @@ function notificationText(
   email: string,
   subject: string,
   message: string,
-  demo?: { url: string; filename: string; size: number } | null,
+  demos?: DemoFile[] | null,
 ): string {
   const lines = [
     "New enquiry via wmgsounds.com",
@@ -215,8 +225,11 @@ function notificationText(
     "Message:",
     message,
   ];
-  if (demo) {
-    lines.push("", "Demo file attached:", demo.filename, demo.url);
+  if (demos && demos.length > 0) {
+    lines.push("", "Demo files attached:");
+    for (const d of demos) {
+      lines.push("", `${d.label}: ${d.filename}`, d.url);
+    }
   }
   lines.push(
     "",
