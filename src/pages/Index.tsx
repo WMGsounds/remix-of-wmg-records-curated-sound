@@ -274,7 +274,7 @@ const Index = () => {
               {latestArticles.map((a) => (
                 <Link key={a.slug} to={`/journal/${encodeURIComponent(a.slug)}`} className="group cursor-pointer">
                   {a.category && <p className="eyebrow text-gold-soft mb-3">{a.category}</p>}
-                  <h3 className="font-serif text-2xl leading-tight text-ivory group-hover:text-gold transition-colors duration-500 line-clamp-2 h-[3.5rem] overflow-hidden">
+                  <h3 className="font-serif text-2xl leading-tight text-ivory group-hover:text-gold transition-colors duration-500 line-clamp-2 h-[3rem] overflow-hidden">
                     {a.title}
                   </h3>
                   {a.publishedDate && (
