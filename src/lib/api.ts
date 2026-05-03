@@ -14,6 +14,8 @@ import type {
   HomepageData,
   ArtistPageData,
   ReleasePageData,
+  JournalArticleSummary,
+  JournalArticleData,
 } from "./types";
 import { getMockDataForPath } from "./mockData";
 
