@@ -1,4 +1,3 @@
-import { Link } from "react-router-dom";
 import type { JournalBlock, JournalRichText } from "@/lib/types";
 import { LazyImage } from "@/components/LazyImage";
 
