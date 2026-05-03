@@ -106,7 +106,7 @@ export const SiteFooter = () => (
     <div className="absolute inset-x-0 top-0 h-px bg-gold" aria-hidden="true" />
     <div className="container-editorial py-12 grid grid-cols-1 md:grid-cols-3 gap-10 items-end">
       <div className="self-start">
-        <Link to="/" className="inline-block mb-5 -ml-2 md:-ml-4" aria-label="WMG Records — Wareham Music Group">
+        <Link to="/" className="inline-block mb-5 -ml-12 md:-ml-14" aria-label="WMG Records — Wareham Music Group">
           <img
             src={footerLogo}
             alt="WMG Records — Wareham Music Group"
