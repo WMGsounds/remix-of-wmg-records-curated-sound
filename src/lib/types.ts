@@ -83,3 +83,56 @@ export type ReleasePageData = {
   tracks: Track[]; // sorted by trackNumber asc
   related: Release[]; // same artist, excluding current
 };
+
+// ---------- Journal ----------
+
+export type JournalRichText = {
+  text: string;
+  bold?: boolean;
+  italic?: boolean;
+  underline?: boolean;
+  code?: boolean;
+  href?: string | null;
+};
+
+export type JournalBlock =
+  | { type: "paragraph"; rich: JournalRichText[] }
+  | { type: "heading_2"; rich: JournalRichText[] }
+  | { type: "heading_3"; rich: JournalRichText[] }
+  | { type: "quote"; rich: JournalRichText[] }
+  | { type: "divider" }
+  | { type: "bulleted_list"; items: JournalRichText[][] }
+  | { type: "numbered_list"; items: JournalRichText[][] }
+  | { type: "image"; url: string; caption: string; alt: string };
+
+export type JournalArticleSummary = {
+  id: string;
+  slug: string;
+  title: string;
+  category: string;
+  album: string;
+  publishedDate: string;
+  coverImage: string;
+  excerpt: string;
+  summary: string;
+  readingTime: number;
+  published: boolean;
+  featured: boolean;
+  seoTitle: string;
+  seoDescription: string;
+  imageAlt: string;
+  createdTime: string;
+  lastEditedTime: string;
+  artistIds: string[];
+  releaseIds: string[];
+  trackIds: string[];
+  artists: { id: string; slug: string; name: string }[];
+  releases: { id: string; slug: string; title: string; coverArt: string }[];
+};
+
+export type JournalArticleData = {
+  article: JournalArticleSummary;
+  blocks: JournalBlock[];
+  relatedArtists: Artist[];
+  relatedReleases: Release[];
+};

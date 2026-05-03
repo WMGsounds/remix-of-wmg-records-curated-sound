@@ -14,6 +14,8 @@ import type {
   HomepageData,
   ArtistPageData,
   ReleasePageData,
+  JournalArticleSummary,
+  JournalArticleData,
 } from "./types";
 import { getMockDataForPath } from "./mockData";
 
@@ -82,5 +84,15 @@ export async function fetchArtistBySlug(slug: string): Promise<ArtistPageData | 
 export async function fetchReleaseBySlug(slug: string): Promise<ReleasePageData | null> {
   return fetchJson<ReleasePageData | null>(
     `/api/notion/release/${encodeURIComponent(slug)}`,
+  );
+}
+
+export async function fetchJournal(): Promise<JournalArticleSummary[]> {
+  return fetchJson<JournalArticleSummary[]>("/api/notion/journal");
+}
+
+export async function fetchJournalBySlug(slug: string): Promise<JournalArticleData | null> {
+  return fetchJson<JournalArticleData | null>(
+    `/api/notion/journal/${encodeURIComponent(slug)}`,
   );
 }
