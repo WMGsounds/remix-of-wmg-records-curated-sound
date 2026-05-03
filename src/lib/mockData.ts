@@ -148,9 +148,11 @@ export function getMockDataForPath(path: string): unknown {
   if (path === "/api/notion/releases") return mockReleases;
   if (path === "/api/notion/tracks") return mockTracks;
   if (path === "/api/notion/homepage") return mockHomepage();
+  if (path === "/api/notion/journal") return [];
   const artistSlug = path.match(/^\/api\/notion\/artist\/([^/]+)$/)?.[1];
   if (artistSlug) return mockArtistPage(decodeURIComponent(artistSlug));
   const releaseSlug = path.match(/^\/api\/notion\/release\/([^/]+)$/)?.[1];
   if (releaseSlug) return mockReleasePage(decodeURIComponent(releaseSlug));
+  if (/^\/api\/notion\/journal\/[^/]+$/.test(path)) return null;
   return null;
 }
