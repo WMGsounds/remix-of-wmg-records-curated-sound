@@ -106,8 +106,8 @@ const Index = () => {
             />
           )}
           <div className="absolute inset-0 bg-ink/75" aria-hidden="true" />
-          <div className="relative container-editorial grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-20 items-center">
-            <div className="lg:col-span-7 order-2 lg:order-1">
+          <div className="relative container-editorial grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-12 items-center">
+            <div className="lg:col-span-5 order-2 lg:order-1">
               <p className="eyebrow text-gold-soft mb-4">Featured Release</p>
               <div className="gold-rule mb-8" />
               <h2 className="display-serif text-5xl md:text-7xl mb-6">{featured.title}</h2>
@@ -126,7 +126,7 @@ const Index = () => {
                 Explore Release <ArrowRight className="h-4 w-4" />
               </Link>
             </div>
-            <div className="lg:col-span-5 order-1 lg:order-2 hover-zoom overflow-hidden">
+            <div className="lg:col-span-7 order-1 lg:order-2 hover-zoom overflow-hidden">
               {featured.coverArt ? (
                 <LazyImage
                   src={featured.coverArt}
