@@ -3,7 +3,8 @@ import { Link, useParams, Navigate } from "react-router-dom";
 import { ChevronDown, ChevronLeft, ChevronRight, ChevronUp, Play } from "lucide-react";
 import { useReleaseBySlug } from "@/lib/queries";
 import { LazyImage } from "@/components/LazyImage";
-import { PageTitle } from "@/components/PageTitle";
+import { Seo } from "@/components/Seo";
+import { breadcrumbSchema, absoluteUrl, truncate } from "@/lib/seo";
 import { PageLoading, PageError } from "@/components/UIStates";
 import type { Track } from "@/lib/types";
 
@@ -178,7 +179,46 @@ const ReleasePage = () => {
 
   return (
     <div>
-      <PageTitle title={release.title} />
+      <Seo
+        title={`${release.title} by ${release.artistName || artist?.name || "WMG Artist"}`}
+        description={truncate(
+          (release.shortDescription || release.fullDescription)
+            ? `${release.shortDescription || release.fullDescription}`
+            : `Listen to ${release.title} by ${release.artistName || artist?.name || ""}, a ${release.releaseType} release from WMG Records.`,
+        )}
+        canonicalPath={`/releases/${release.slug}`}
+        image={release.coverArt}
+        type="music.album"
+        jsonLd={[
+          breadcrumbSchema([
+            { name: "Home", path: "/" },
+            { name: "Releases", path: "/releases" },
+            { name: release.title, path: `/releases/${release.slug}` },
+          ]),
+          {
+            "@context": "https://schema.org",
+            "@type": release.releaseType === "Single" ? "MusicRecording" : "MusicAlbum",
+            name: release.title,
+            url: absoluteUrl(`/releases/${release.slug}`),
+            image: release.coverArt || undefined,
+            datePublished: release.releaseDate || undefined,
+            description: release.shortDescription || release.fullDescription || undefined,
+            byArtist: artist
+              ? {
+                  "@type": "MusicGroup",
+                  name: artist.name,
+                  url: absoluteUrl(`/artists/${artist.slug}`),
+                }
+              : undefined,
+            track: tracks.map((t, i) => ({
+              "@type": "MusicRecording",
+              name: t.trackTitle,
+              position: t.trackNumber || i + 1,
+              duration: t.duration ? `PT${t.duration.split(":")[0]}M${t.duration.split(":")[1] || "0"}S` : undefined,
+            })),
+          },
+        ]}
+      />
       {/* Hero + Tracklist (unified blurred-cover background) */}
       <section className="relative overflow-hidden bg-ink text-ivory pt-52 md:pt-60 pb-28">
         {featuredBgUrl && (
