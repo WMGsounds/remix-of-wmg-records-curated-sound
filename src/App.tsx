@@ -20,6 +20,7 @@ const Releases = lazy(() => import("./pages/Releases.tsx"));
 const Journal = lazy(() => import("./pages/Journal.tsx"));
 const JournalArticlePage = lazy(() => import("./pages/JournalArticlePage.tsx"));
 const JournalCategory = lazy(() => import("./pages/JournalCategory.tsx"));
+const SeoDiagnostics = lazy(() => import("./pages/SeoDiagnostics.tsx"));
 
 const queryClient = new QueryClient();
 
@@ -45,6 +46,7 @@ const App = () => (
             <Route path="/contact" element={<Contact />} />
             <Route path="/newsletter" element={<Newsletter />} />
             <Route path="/legal/:doc" element={<Legal />} />
+            <Route path="/seo-diagnostics" element={<Suspense fallback={null}><SeoDiagnostics /></Suspense>} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </main>
