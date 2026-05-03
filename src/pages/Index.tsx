@@ -3,7 +3,8 @@ import { Link } from "react-router-dom";
 import { ArrowRight } from "lucide-react";
 import hero from "@/assets/hero-cinematic.jpg";
 import { ArtistCard, ReleaseCard } from "@/components/Cards";
-import { PageTitle } from "@/components/PageTitle";
+import { Seo } from "@/components/Seo";
+import { organizationSchema, websiteSchema } from "@/lib/seo";
 import { LazyImage } from "@/components/LazyImage";
 import { useHomepageData, useJournal } from "@/lib/queries";
 import { InlineSkeleton } from "@/components/UIStates";
@@ -54,7 +55,7 @@ const Index = () => {
 
   return (
     <div className="pt-20">
-      <PageTitle />
+      <Seo canonicalPath="/" jsonLd={[organizationSchema(), websiteSchema()]} />
       {/* HERO */}
       <section className="relative h-[92vh] min-h-[640px] w-full overflow-hidden -mt-20 bg-ink text-ivory">
         <img

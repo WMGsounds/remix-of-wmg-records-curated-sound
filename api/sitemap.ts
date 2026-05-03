@@ -15,12 +15,8 @@ const STATIC_PATHS = [
   { path: "/legal/cookies", priority: "0.3", changefreq: "yearly" },
 ];
 
-function getBaseUrl(req: any): string {
-  const envUrl = process.env.SITE_URL || process.env.PUBLIC_SITE_URL;
-  if (envUrl) return envUrl.replace(/\/$/, "");
-  const host = req?.headers?.host || "wmgr-soundscapes.lovable.app";
-  const proto = req?.headers?.["x-forwarded-proto"] || "https";
-  return `${proto}://${host}`;
+function getBaseUrl(_req: any): string {
+  return "https://www.wmgsounds.com";
 }
 
 function escapeXml(s: string): string {
@@ -54,7 +50,17 @@ export default async function handler(req: any, res: any) {
     const artists = artistPages.map(normalizeArtist);
     const artistMap = new Map(artists.map((a) => [a.id, a]));
     const releases = releasePages.map((p) => normalizeRelease(p, artistMap));
-    const journal = journalPages.map(normalizeJournal).filter((a: any) => a.published);
+    const journal = journalPages.map(normalizeJournal).filter((a: any) => a.published && !a.noindex);
+
+    // Journal categories
+    const cats = new Set<string>();
+    for (const j of journal as any[]) {
+      if (j.category) cats.add(j.category);
+    }
+    for (const cat of cats) {
+      const slug = cat.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
+      if (slug) urls.push(urlEntry(`${base}/journal/category/${slug}`, undefined, "weekly", "0.6"));
+    }
 
     for (const a of artists) {
       if (a.slug) urls.push(urlEntry(`${base}/artists/${a.slug}`, undefined, "monthly", "0.7"));

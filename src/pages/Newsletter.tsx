@@ -1,7 +1,18 @@
+import { Seo } from "@/components/Seo";
+import { breadcrumbSchema } from "@/lib/seo";
 import { NewsletterForm } from "@/components/NewsletterForm";
 
 const Newsletter = () => (
   <div className="bg-ink text-ivory pt-32 pb-16">
+    <Seo
+      title="Newsletter"
+      description="Join the WMG Records list for new releases, limited editions and first access — sent rarely, only when there's something worth saying."
+      canonicalPath="/newsletter"
+      jsonLd={breadcrumbSchema([
+        { name: "Home", path: "/" },
+        { name: "Newsletter", path: "/newsletter" },
+      ])}
+    />
     <div className="container-editorial max-w-3xl text-center">
       <p className="eyebrow mb-8 text-gold-soft">The List</p>
       <h1 className="display-serif text-6xl md:text-8xl lg:text-9xl leading-[0.95]">

@@ -1,6 +1,7 @@
 import { useMemo, useState } from "react";
 import { Link } from "react-router-dom";
-import { PageTitle } from "@/components/PageTitle";
+import { Seo } from "@/components/Seo";
+import { breadcrumbSchema } from "@/lib/seo";
 import { useJournal } from "@/lib/queries";
 import { InlineSkeleton, PageError, PageEmpty } from "@/components/UIStates";
 import { LazyImage } from "@/components/LazyImage";
@@ -85,7 +86,15 @@ const Journal = () => {
 
   return (
     <div className="bg-ink text-ivory pb-32 min-h-screen">
-      <PageTitle title="Journal" />
+      <Seo
+        title="Journal | Stories From WMG Records"
+        description="Read WMG Journal stories, including release stories, artist spotlights, album features and behind-the-scenes editorial from Wareham Music Group."
+        canonicalPath="/journal"
+        jsonLd={breadcrumbSchema([
+          { name: "Home", path: "/" },
+          { name: "Journal", path: "/journal" },
+        ])}
+      />
       <section className="container-editorial pt-40 pb-16">
         <p className="eyebrow text-gold-soft mb-6">The Journal</p>
         <h1 className="display-serif text-6xl md:text-8xl lg:text-9xl mb-8">Journal</h1>

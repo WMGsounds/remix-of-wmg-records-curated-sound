@@ -3,7 +3,8 @@ import { ArrowRight } from "lucide-react";
 import { useArtistBySlug } from "@/lib/queries";
 import { LazyImage } from "@/components/LazyImage";
 
-import { PageTitle } from "@/components/PageTitle";
+import { Seo } from "@/components/Seo";
+import { breadcrumbSchema, absoluteUrl, truncate } from "@/lib/seo";
 import { PageLoading, PageError } from "@/components/UIStates";
 
 const ArtistPage = () => {
@@ -17,9 +18,45 @@ const ArtistPage = () => {
   const { artist, discography } = data;
   const heroImage = artist.heroImage2 || artist.heroImage;
   const featured = discography[0];
+  const path = `/artists/${artist.slug}`;
+  const seoTitle = `${artist.name}${artist.genre ? ` | ${artist.genre}` : ""} | WMG Records`;
+  const seoDesc = truncate(
+    artist.shortDescription
+      ? `${artist.name} — ${artist.shortDescription} Explore releases, stories and music from ${artist.name} on WMG Records.`
+      : `${artist.name} on WMG Records. Explore releases, stories and music from ${artist.name}.`,
+  );
+  const musicGroup = {
+    "@context": "https://schema.org",
+    "@type": "MusicGroup",
+    name: artist.name,
+    url: absoluteUrl(path),
+    image: artist.heroImage || undefined,
+    genre: artist.genre || undefined,
+    description: artist.shortDescription || undefined,
+    album: discography.map((r) => ({
+      "@type": "MusicAlbum",
+      name: r.title,
+      url: absoluteUrl(`/releases/${r.slug}`),
+      image: r.coverArt || undefined,
+      datePublished: r.releaseDate || undefined,
+    })),
+  };
   return (
     <div>
-      <PageTitle title={artist.name} />
+      <Seo
+        title={seoTitle.replace(" | WMG Records", "")}
+        description={seoDesc}
+        canonicalPath={path}
+        image={artist.heroImage}
+        jsonLd={[
+          breadcrumbSchema([
+            { name: "Home", path: "/" },
+            { name: "Artists", path: "/artists" },
+            { name: artist.name, path },
+          ]),
+          musicGroup,
+        ]}
+      />
       {/* Hero */}
       <section className="relative h-[85vh] min-h-[600px] bg-ink text-ivory overflow-hidden">
         {heroImage ? (

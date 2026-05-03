@@ -14,9 +14,9 @@ export default async function handler(req: ApiRequest, res: ApiResponse) {
       loadAll(notion, DBS.releases),
     ]);
 
-    const articles = journalPages.map(normalizeJournal).filter((a) => a.published);
+    const articles = journalPages.map(normalizeJournal);
     const article = articles.find((a) => a.slug === slug);
-    if (!article) return res.status(404).json(null);
+    if (!article || !article.published) return res.status(404).json(null);
 
     const blocks = await fetchPageBlocks(notion, article.id);
 

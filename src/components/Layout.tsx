@@ -104,20 +104,37 @@ export const SiteHeader = () => {
 export const SiteFooter = () => (
   <footer className="relative bg-ink text-ivory">
     <div className="absolute inset-x-0 top-0 h-px bg-gold" aria-hidden="true" />
-    <div className="container-editorial py-10 grid grid-cols-1 md:grid-cols-3 gap-8 md:gap-10 items-center">
-      <div className="hidden md:block" />
-
-      <div className="flex items-center justify-center">
-        <Link to="/" className="inline-block" aria-label="WMG Records — Wareham Music Group">
+    <div className="container-editorial py-12 grid grid-cols-1 md:grid-cols-3 gap-10 items-start">
+      <div>
+        <Link to="/" className="inline-block mb-5" aria-label="WMG Records — Wareham Music Group">
           <img
             src={footerLogo}
             alt="WMG Records — Wareham Music Group"
             loading="lazy"
             width={640}
             height={220}
-            className="w-full max-w-[440px] h-auto"
+            className="w-full max-w-[280px] h-auto"
           />
         </Link>
+        <address className="not-italic text-sm text-ivory/65 leading-relaxed">
+          <p className="font-medium text-ivory">WMG Records</p>
+          <p>Wareham Music Group</p>
+          <p>London, United Kingdom</p>
+          <p>
+            <a href="https://www.wmgsounds.com" className="link-underline hover:text-ivory">www.wmgsounds.com</a>
+          </p>
+        </address>
+      </div>
+
+      <div className="md:text-center">
+        <p className="eyebrow mb-3 text-gold">Contact</p>
+        <ul className="space-y-1.5 text-sm text-ivory/70">
+          <li><a href="mailto:info@wmgsounds.com" className="link-underline hover:text-ivory">info@wmgsounds.com</a></li>
+          <li><a href="mailto:press@wmgsounds.com" className="link-underline hover:text-ivory">press@wmgsounds.com</a> <span className="text-ivory/40">— Press</span></li>
+          <li><a href="mailto:sync@wmgsounds.com" className="link-underline hover:text-ivory">sync@wmgsounds.com</a> <span className="text-ivory/40">— Licensing</span></li>
+          <li><a href="mailto:demos@wmgsounds.com" className="link-underline hover:text-ivory">demos@wmgsounds.com</a> <span className="text-ivory/40">— Submissions</span></li>
+          <li><a href="mailto:copyright@wmgsounds.com" className="link-underline hover:text-ivory">copyright@wmgsounds.com</a> <span className="text-ivory/40">— Copyright</span></li>
+        </ul>
       </div>
 
       <div className="md:text-right md:justify-self-end">
@@ -130,6 +147,11 @@ export const SiteFooter = () => (
               </Link>
             </li>
           ))}
+          <li>
+            <Link to="/newsletter" className="link-underline text-ivory/70 hover:text-ivory transition-colors">
+              Newsletter
+            </Link>
+          </li>
           <li>
             <Link to="/store" className="link-underline text-ivory/70 hover:text-ivory transition-colors">
               Store

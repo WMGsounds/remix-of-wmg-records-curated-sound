@@ -25,7 +25,7 @@ export default async function handler(_req: unknown, res: ApiResponse) {
 
     const articles: JournalListItem[] = journalPages
       .map(normalizeJournal)
-      .filter((a) => a.published)
+      .filter((a) => a.published && !a.noindex)
       .map((a) => ({
         ...a,
         artists: a.artistIds.map((id) => artistMap.get(id)).filter(Boolean).map((x: any) => ({ id: x.id, slug: x.slug, name: x.name })),

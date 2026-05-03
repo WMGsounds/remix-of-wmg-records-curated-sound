@@ -1,6 +1,7 @@
 import { useMemo, useState } from "react";
 import { ArtistCard } from "@/components/Cards";
-import { PageTitle } from "@/components/PageTitle";
+import { Seo } from "@/components/Seo";
+import { breadcrumbSchema } from "@/lib/seo";
 import { useArtists } from "@/lib/queries";
 import { InlineSkeleton, PageError } from "@/components/UIStates";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -35,7 +36,15 @@ const Artists = () => {
 
   return (
     <div className="bg-ink text-ivory pb-32">
-      <PageTitle title="Artists" />
+      <Seo
+        title="Artists"
+        description="Explore the WMG Records artist roster, from classic soul and blues-soul to crooner, country-soul, Americana and cinematic music worlds."
+        canonicalPath="/artists"
+        jsonLd={breadcrumbSchema([
+          { name: "Home", path: "/" },
+          { name: "Artists", path: "/artists" },
+        ])}
+      />
       <section className="relative overflow-hidden bg-ink pt-40 pb-24 md:pb-28">
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_78%_22%,hsl(var(--golden-brown)/0.24),transparent_28%),radial-gradient(circle_at_30%_36%,hsl(var(--gold)/0.10),transparent_30%)]" aria-hidden="true" />
         <div className="absolute inset-0 opacity-[0.07] [background-image:linear-gradient(90deg,hsl(var(--ivory)/0.72)_1px,transparent_1px),linear-gradient(0deg,hsl(var(--ivory)/0.72)_1px,transparent_1px)] [background-size:3px_3px]" aria-hidden="true" />

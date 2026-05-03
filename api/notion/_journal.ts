@@ -35,6 +35,9 @@ export type JournalArticle = {
   featured: boolean;
   seoTitle: string;
   seoDescription: string;
+  canonicalUrl: string;
+  noindex: boolean;
+  socialCaption: string;
   imageAlt: string;
   createdTime: string;
   lastEditedTime: string;
@@ -61,6 +64,9 @@ export function normalizeJournal(page: any): JournalArticle {
     featured: bool(props["Featured"]),
     seoTitle: text(props["SEO Title"]),
     seoDescription: text(props["SEO Description"]),
+    canonicalUrl: (props["Canonical URL"]?.url ?? "").toString().trim(),
+    noindex: bool(props["Noindex"]),
+    socialCaption: text(props["Social Caption"]),
     imageAlt: text(props["Image Alt Text"]),
     createdTime: page.created_time ?? "",
     lastEditedTime: page.last_edited_time ?? "",
