@@ -82,7 +82,7 @@ const JournalArticlePage = () => {
         </div>
         <div className="mb-8" />
 
-        <h1 className="display-serif text-5xl md:text-7xl lg:text-8xl leading-[1.02] mb-8 text-ivory">
+        <h1 className="display-serif text-5xl md:text-7xl lg:text-8xl leading-[1.08] mb-8 text-ivory">
           {a.title}
         </h1>
 
