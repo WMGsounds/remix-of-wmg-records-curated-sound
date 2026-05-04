@@ -46,7 +46,7 @@ const Hero = ({ a }: { a: JournalArticleSummary }) => (
     </div>
     <div className="lg:col-span-5">
       <p className="eyebrow text-gold mb-5">{a.featured ? "Featured" : "Latest"} {a.category && `— ${a.category}`}</p>
-      <h2 className="display-serif text-4xl md:text-6xl text-ivory leading-[1.04] mb-6">{a.title}</h2>
+      <h2 className="display-serif text-4xl md:text-6xl text-ivory leading-[1.1] mb-6">{a.title}</h2>
       {a.excerpt && <p className="text-ivory/75 text-lg leading-relaxed mb-6">{a.excerpt}</p>}
       <div className="flex flex-wrap items-center gap-x-5 gap-y-1 text-[11px] uppercase tracking-[0.24em] text-ivory/55">
         {a.artists[0] && <span>{a.artists[0].name}</span>}
