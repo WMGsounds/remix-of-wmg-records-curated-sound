@@ -119,8 +119,15 @@
   .display-serif {
     font-family: 'Cormorant Garamond', serif;
     font-weight: 300;
-    line-height: 0.95;
+    line-height: 1.05;
     letter-spacing: -0.02em;
+    /* Protect descenders (g, p, y, j) from clipping by tight ancestors */
+    padding-bottom: 0.12em;
+  }
+
+  /* Generic descender protection for serif headings used in cards/lists */
+  .font-serif {
+    padding-bottom: 0.06em;
   }
 
   .hover-zoom img {
