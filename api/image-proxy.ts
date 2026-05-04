@@ -4,6 +4,7 @@ import type { ApiRequest, ApiResponse } from "./notion/_client.js";
 // Browsers cache the resized result for a year (URL is unique per width).
 // CDN keeps it hot, with stale-while-revalidate as a safety net.
 const CACHE_CONTROL = "public, max-age=31536000, s-maxage=31536000, stale-while-revalidate=86400, immutable";
+const WMG_FAVICON_LINK = '</favicon.ico?v=wmg-3>; rel="icon"; type="image/x-icon"';
 const ALLOWED_HOSTS = new Set([
   "prod-files-secure.s3.us-west-2.amazonaws.com",
   "s3.us-west-2.amazonaws.com",
@@ -19,6 +20,7 @@ type ImageProxyResponse = ApiResponse & {
 
 const sendError = (res: ImageProxyResponse, status: number, message: string) => {
   if (res.setHeader) res.setHeader("Cache-Control", "no-store");
+  if (res.setHeader) res.setHeader("Link", WMG_FAVICON_LINK);
   return res.status?.(status).json({ error: message });
 };
 
@@ -72,6 +74,7 @@ export default async function handler(req: ApiRequest, res: ImageProxyResponse) 
         "Cache-Control": CACHE_CONTROL,
         "Content-Type": sourceContentType,
         "Content-Disposition": "inline",
+        "Link": WMG_FAVICON_LINK,
         "X-Content-Type-Options": "nosniff",
         "Content-Length": String(sourceBuffer.length),
       }).end(sourceBuffer as unknown as string);
@@ -97,6 +100,7 @@ export default async function handler(req: ApiRequest, res: ImageProxyResponse) 
       "Cache-Control": CACHE_CONTROL,
       "Content-Type": "image/webp",
       "Content-Disposition": "inline",
+      "Link": WMG_FAVICON_LINK,
       "X-Content-Type-Options": "nosniff",
       "Content-Length": String(output.length),
     }).end(output as unknown as string);
