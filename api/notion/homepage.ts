@@ -45,7 +45,10 @@ export default async function handler(_req: unknown, res: ApiResponse) {
       .slice(0, 6);
 
     const latestReleases = releases
-      .filter((r) => r.showOnHomepage === true)
+      .filter((r) => {
+        const t = r.releaseDate ? +new Date(r.releaseDate) : NaN;
+        return !Number.isNaN(t);
+      })
       .sort((a, b) => +new Date(b.releaseDate) - +new Date(a.releaseDate))
       .slice(0, 6);
 
