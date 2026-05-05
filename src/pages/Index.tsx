@@ -275,17 +275,18 @@ const Index = () => {
               {latestArticles.map((a) => (
                 <Link key={a.slug} to={`/journal/${encodeURIComponent(a.slug)}`} className="group cursor-pointer block">
                   {a.category && <p className="eyebrow text-gold-soft mb-3">{a.category}</p>}
-                  <div className="relative bg-muted aspect-[4/3] mb-5 overflow-hidden flex items-center justify-center">
+                  <div className="relative bg-ink aspect-[4/3] mb-5 overflow-hidden flex items-center justify-center">
                     {a.coverImage ? (
                       <>
                         <div
                           aria-hidden="true"
-                          className="absolute inset-0 bg-cover bg-center scale-110"
+                          className="absolute inset-0 scale-110 bg-cover bg-center"
                           style={{
-                            backgroundImage: `url(${a.coverImage}${a.coverImage.includes("?") ? "&" : "?"}w=320)`,
-                            filter: "blur(40px)",
+                            backgroundImage: `url(${a.coverImage}${a.coverImage.includes("?") ? "&" : "?"}w=640)`,
+                            filter: "blur(50px)",
                           }}
                         />
+                        <div className="absolute inset-0 bg-ink/75" aria-hidden="true" />
                         <img
                           src={`${a.coverImage}${a.coverImage.includes("?") ? "&" : "?"}w=960`}
                           alt={a.title}
