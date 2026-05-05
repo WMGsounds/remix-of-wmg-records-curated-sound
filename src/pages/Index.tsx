@@ -275,17 +275,25 @@ const Index = () => {
               {latestArticles.map((a) => (
                 <Link key={a.slug} to={`/journal/${encodeURIComponent(a.slug)}`} className="group cursor-pointer block">
                   {a.category && <p className="eyebrow text-gold-soft mb-3">{a.category}</p>}
-                  <div className="relative bg-muted aspect-[4/3] mb-5 overflow-hidden">
+                  <div className="relative bg-muted aspect-[4/3] mb-5 overflow-hidden flex items-center justify-center">
                     {a.coverImage ? (
-                      <LazyImage
-                        src={a.coverImage}
-                        alt={a.title}
-                        width={900}
-                        height={675}
-                        displayWidth={640}
-                        sizes="(min-width: 768px) 33vw, 100vw"
-                        className="object-cover transition-transform duration-700 group-hover:scale-105"
-                      />
+                      <>
+                        <div
+                          aria-hidden="true"
+                          className="absolute inset-0 bg-cover bg-center scale-110"
+                          style={{
+                            backgroundImage: `url(${a.coverImage}${a.coverImage.includes("?") ? "&" : "?"}w=320)`,
+                            filter: "blur(40px)",
+                          }}
+                        />
+                        <img
+                          src={`${a.coverImage}${a.coverImage.includes("?") ? "&" : "?"}w=960`}
+                          alt={a.title}
+                          loading="lazy"
+                          decoding="async"
+                          className="relative z-10 max-w-full max-h-full w-auto h-auto object-contain transition-transform duration-700 group-hover:scale-105"
+                        />
+                      </>
                     ) : (
                       <div className="h-full w-full flex items-center justify-center text-ivory/40 text-sm">No image</div>
                     )}
