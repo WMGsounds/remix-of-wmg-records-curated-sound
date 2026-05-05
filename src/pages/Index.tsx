@@ -273,9 +273,24 @@ const Index = () => {
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
               {latestArticles.map((a) => (
-                <Link key={a.slug} to={`/journal/${encodeURIComponent(a.slug)}`} className="group cursor-pointer">
+                <Link key={a.slug} to={`/journal/${encodeURIComponent(a.slug)}`} className="group cursor-pointer block">
                   {a.category && <p className="eyebrow text-gold-soft mb-3">{a.category}</p>}
-                  <h3 className="font-serif text-2xl leading-tight text-ivory group-hover:text-gold transition-colors duration-500 line-clamp-2 h-[3.5rem] overflow-hidden max-w-[85%]">
+                  <div className="relative bg-muted aspect-[4/3] mb-5 overflow-hidden">
+                    {a.coverImage ? (
+                      <LazyImage
+                        src={a.coverImage}
+                        alt={a.title}
+                        width={900}
+                        height={675}
+                        displayWidth={640}
+                        sizes="(min-width: 768px) 33vw, 100vw"
+                        className="object-cover transition-transform duration-700 group-hover:scale-105"
+                      />
+                    ) : (
+                      <div className="h-full w-full flex items-center justify-center text-ivory/40 text-sm">No image</div>
+                    )}
+                  </div>
+                  <h3 className="font-serif text-2xl leading-tight text-ivory group-hover:text-gold transition-colors duration-500 line-clamp-2 max-w-[85%]">
                     {a.title}
                   </h3>
                   {a.publishedDate && (
