@@ -50,7 +50,7 @@ export default async function handler(_req: unknown, res: ApiResponse) {
         return !Number.isNaN(t);
       })
       .sort((a, b) => +new Date(b.releaseDate) - +new Date(a.releaseDate))
-      .slice(0, 6);
+      .slice(0, 8);
 
     console.log("[notion-homepage] homepage filter results", {
       featuredArtists: featuredArtists.map((artist) => ({ id: artist.id, name: artist.name, featured: artist.featured })),
