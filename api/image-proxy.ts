@@ -18,6 +18,10 @@ type ImageProxyResponse = ApiResponse & {
   end?: (body?: Buffer | string) => void;
 };
 
+type ImageProxyRequest = ApiRequest & {
+  headers?: Record<string, string | string[] | undefined>;
+};
+
 const sendError = (res: ImageProxyResponse, status: number, message: string) => {
   if (res.setHeader) res.setHeader("Cache-Control", "no-store");
   if (res.setHeader) res.setHeader("Link", WMG_FAVICON_LINK);
@@ -46,13 +50,49 @@ const pickWidth = (raw: string | undefined): number | null => {
   );
 };
 
-export default async function handler(req: ApiRequest, res: ImageProxyResponse) {
+const escapeHtml = (value: string) =>
+  value
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/\"/g, "&quot;");
+
+const headerValue = (req: ImageProxyRequest, name: string) => {
+  const value = req.headers?.[name] ?? req.headers?.[name.toLowerCase()];
+  return Array.isArray(value) ? value.join(",") : value ?? "";
+};
+
+const wantsHtmlViewer = (req: ImageProxyRequest) => {
+  if (getQueryValue(req.query.raw) === "1") return false;
+  const accept = headerValue(req, "accept");
+  const fetchDest = headerValue(req, "sec-fetch-dest");
+  return accept.includes("text/html") && fetchDest !== "image";
+};
+
+const sendHtmlViewer = (req: ImageProxyRequest, res: ImageProxyResponse, rawUrl: string) => {
+  const params = new URLSearchParams({ url: rawUrl, raw: "1" });
+  const requestedWidth = getQueryValue(req.query.w);
+  const requestedBlur = getQueryValue(req.query.blur);
+  if (requestedWidth) params.set("w", requestedWidth);
+  if (requestedBlur) params.set("blur", requestedBlur);
+  const imageSrc = `/api/image-proxy?${params.toString()}`;
+
+  res.writeHead(200, {
+    "Cache-Control": "no-store",
+    "Content-Type": "text/html; charset=utf-8",
+    "Link": WMG_FAVICON_LINK,
+    "X-Content-Type-Options": "nosniff",
+  }).end(`<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>WMG image</title><link rel="icon" href="/favicon.ico?v=wmg-3" sizes="any"><link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png?v=wmg-3"><style>html,body{margin:0;min-height:100%;background:#050505}body{display:grid;place-items:center;padding:48px;box-sizing:border-box}img{display:block;max-width:100%;height:auto}</style></head><body><img src="${escapeHtml(imageSrc)}" alt=""></body></html>`);
+};
+
+export default async function handler(req: ImageProxyRequest, res: ImageProxyResponse) {
   const rawUrl = getQueryValue(req.query.url);
   const width = pickWidth(getQueryValue(req.query.w));
   const wantBlur = getQueryValue(req.query.blur) === "1";
 
   if (!rawUrl) return sendError(res, 400, "Missing image URL.");
   if (!isAllowedImageUrl(rawUrl)) return sendError(res, 400, "Unsupported image URL.");
+  if (wantsHtmlViewer(req)) return sendHtmlViewer(req, res, rawUrl);
 
   try {
     const source = await fetch(rawUrl, {
