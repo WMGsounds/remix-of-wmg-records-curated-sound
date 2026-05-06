@@ -50,15 +50,6 @@ export const SiteHeader = () => {
           ))}
         </nav>
 
-        <div className="hidden md:flex items-center gap-6">
-          <Link
-            to="/store"
-            className="inline-flex items-center gap-3 border border-gold bg-gold px-6 py-2.5 text-[12px] font-medium uppercase tracking-[0.24em] text-ink hover:bg-transparent hover:text-gold transition-colors duration-500"
-          >
-            Store <ArrowRight className="h-4 w-4" />
-          </Link>
-        </div>
-
         <button
           aria-label="Toggle menu"
           className="md:hidden p-2 -mr-2"
@@ -71,7 +62,7 @@ export const SiteHeader = () => {
       {open && (
         <div className="relative z-10 md:hidden border-t border-gold/30 bg-ink text-ivory shadow-soft">
           <nav className="container-editorial flex flex-col py-8 gap-3" aria-label="Mobile navigation">
-            {[...nav, { to: "/store", label: "Store" }].map((item) => (
+            {nav.map((item) => (
               <NavLink
                 key={item.to}
                 to={item.to}
