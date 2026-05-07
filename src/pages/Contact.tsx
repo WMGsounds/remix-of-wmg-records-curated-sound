@@ -109,16 +109,16 @@ const Contact = () => {
           <div className="absolute inset-y-0 right-0 w-24 bg-gradient-to-r from-transparent to-ink hidden lg:block" aria-hidden="true" />
         </div>
 
-        <div className="relative overflow-hidden bg-ink px-4 pb-24 pt-16 md:px-6 md:pb-32 md:pt-52 lg:pl-6 lg:pr-16 lg:pt-56 xl:pl-8 xl:pr-24">
+        <div className="relative overflow-hidden bg-ink px-4 pb-24 pt-16 md:px-6 md:pb-32 md:pt-40 lg:pl-6 lg:pr-12 lg:pt-44 xl:pl-8 xl:pr-16 2xl:pt-56">
           <div className="pointer-events-none absolute inset-0 opacity-[0.06] [background-image:linear-gradient(90deg,hsl(var(--ivory)/0.5)_1px,transparent_1px),linear-gradient(0deg,hsl(var(--ivory)/0.4)_1px,transparent_1px)] [background-size:4px_4px]" aria-hidden="true" />
           <div className="relative">
             <p className="eyebrow mb-5 text-gold">Contact</p>
-            <h1 className="display-serif text-6xl md:text-8xl lg:text-9xl mb-6 text-ivory">Get in touch.</h1>
-            <p className="font-serif text-2xl md:text-3xl leading-tight max-w-2xl mb-14 text-ivory/80">
+            <h1 className="display-serif text-6xl md:text-7xl lg:text-7xl xl:text-8xl 2xl:text-9xl mb-6 text-ivory">Get in touch.</h1>
+            <p className="font-serif text-xl md:text-2xl xl:text-3xl leading-tight max-w-2xl mb-14 text-ivory/80">
               Send us a note. Whether it's press, sync, or new music, we read every message.
             </p>
 
-            <div className="grid grid-cols-1 gap-20 xl:grid-cols-12 xl:gap-32">
+            <div className="grid grid-cols-1 gap-12 xl:grid-cols-12 xl:gap-16 2xl:gap-24">
               <div className="xl:col-span-5 xl:pt-[88px]">
                 {channels.map((c) => (
                   <div key={c.label} className="border-t border-gold/20 py-3 last:border-b">
