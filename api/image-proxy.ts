@@ -4,7 +4,7 @@ import type { ApiRequest, ApiResponse } from "./notion/_client.js";
 // Browsers cache the resized result for a year (URL is unique per width).
 // CDN keeps it hot, with stale-while-revalidate as a safety net.
 const CACHE_CONTROL = "public, max-age=31536000, s-maxage=31536000, stale-while-revalidate=86400, immutable";
-const WMG_FAVICON_LINK = '</favicon.ico?v=wmg-3>; rel="icon"; type="image/x-icon"';
+const WMG_FAVICON_LINK = '</favicon.ico>; rel="icon"; type="image/x-icon"';
 const ALLOWED_HOSTS = new Set([
   "prod-files-secure.s3.us-west-2.amazonaws.com",
   "s3.us-west-2.amazonaws.com",
@@ -82,7 +82,7 @@ const sendHtmlViewer = (req: ImageProxyRequest, res: ImageProxyResponse, rawUrl:
     "Content-Type": "text/html; charset=utf-8",
     "Link": WMG_FAVICON_LINK,
     "X-Content-Type-Options": "nosniff",
-  }).end(`<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>WMG image</title><link rel="icon" href="/favicon.ico?v=wmg-3" sizes="any"><link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png?v=wmg-3"><style>html,body{margin:0;min-height:100%;background:#050505}body{display:grid;place-items:center;padding:48px;box-sizing:border-box}img{display:block;max-width:100%;height:auto}</style></head><body><img src="${escapeHtml(imageSrc)}" alt=""></body></html>`);
+  }).end(`<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>WMG image</title><link rel="icon" href="/favicon.ico" sizes="any"><link rel="icon" type="image/png" sizes="48x48" href="/favicon-48x48.png"><style>html,body{margin:0;min-height:100%;background:#050505}body{display:grid;place-items:center;padding:48px;box-sizing:border-box}img{display:block;max-width:100%;height:auto}</style></head><body><img src="${escapeHtml(imageSrc)}" alt=""></body></html>`);
 };
 
 export default async function handler(req: ImageProxyRequest, res: ImageProxyResponse) {
