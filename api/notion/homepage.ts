@@ -24,9 +24,12 @@ export default async function handler(_req: unknown, res: ApiResponse) {
     console.log("[notion-homepage] raw artist Featured values", artistPages.map((page) => summarizeCheckbox(page, "Featured")));
     console.log("[notion-homepage] raw release Show on Homepage values", releasePages.map((page) => summarizeCheckbox(page, "Show on Homepage")));
 
-    const artists = artistPages.map(normalizeArtist);
+    const allArtists = artistPages.map(normalizeArtist);
+    const artists = allArtists.filter((a) => a.showOnWebsite !== false);
     const artistLookup = new Map(artists.map((a) => [a.id, a]));
-    const releases = releasePages.map((p) => normalizeRelease(p, artistLookup));
+    const releases = releasePages
+      .map((p) => normalizeRelease(p, artistLookup))
+      .filter((r) => artistLookup.has(r.artistId));
 
     console.log("[notion-homepage] normalized artist Featured values", artists.map((artist) => ({
       id: artist.id,
