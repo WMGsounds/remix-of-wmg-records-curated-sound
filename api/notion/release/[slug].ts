@@ -18,6 +18,8 @@ export default async function handler(req: ApiRequest, res: ApiResponse) {
     const releases = releasePages.map((p) => normalizeRelease(p, artistLookup));
     const release = releases.find((r) => r.slug === slug);
     if (!release) return res.status(404).json(null);
+    const releaseArtist = artists.find((a) => a.id === release.artistId) ?? null;
+    if (releaseArtist && releaseArtist.showOnWebsite === false) return res.status(404).json(null);
 
     // Build a lookup of raw Track pages so we can read related Track title + duration.
     const trackPageLookup = new Map(trackPages.map((p: any) => [p.id, p]));
