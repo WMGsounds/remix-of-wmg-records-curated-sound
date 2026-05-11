@@ -9,6 +9,7 @@ export default async function handler(_req: unknown, res: ApiResponse) {
     const pages = await loadAll(notion, DBS.artists);
     const artists = pages
       .map(normalizeArtist)
+      .filter((a) => a.showOnWebsite !== false)
       .sort((a, b) => (a.displayOrder - b.displayOrder) || a.name.localeCompare(b.name));
     logApiSuccess(route, { pageCount: pages.length, artistCount: artists.length });
     res.writeHead(200, CACHE_HEADERS).end(JSON.stringify(artists));
