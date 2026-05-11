@@ -24,6 +24,7 @@ export type Artist = {
   heroImage2?: string;
   gallery: string[];
   featured: boolean;
+  showOnWebsite?: boolean;
   displayOrder: number;
   accentColour?: string | null;
   // future:
