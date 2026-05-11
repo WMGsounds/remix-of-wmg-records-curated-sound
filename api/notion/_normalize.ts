@@ -43,6 +43,10 @@ const titleProp = (props: Record<string, any>): any =>
 
 export function normalizeArtist(page: any) {
   const props = page.properties;
+  // Default to true if the property is missing entirely (e.g. older rows
+  // before the column existed) so we don't hide artists unintentionally.
+  const showOnWebsiteProp = props["Show On Website"];
+  const showOnWebsite = showOnWebsiteProp === undefined ? true : bool(showOnWebsiteProp);
   return {
     id: page.id,
     slug: text(props["Slug"]),
@@ -54,6 +58,7 @@ export function normalizeArtist(page: any) {
     heroImage2: firstFile(props["Hero Image 2"]),
     gallery: files(props["Gallery"]),
     featured: bool(props["Featured"]),
+    showOnWebsite,
     displayOrder: num(props["Display Order"]),
     accentColour: text(props["Accent Colour"]) || null,
   };
