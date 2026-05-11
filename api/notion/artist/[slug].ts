@@ -13,7 +13,7 @@ export default async function handler(req: ApiRequest, res: ApiResponse) {
     ]);
     const artists = artistPages.map(normalizeArtist);
     const artist = artists.find((a) => a.slug === slug);
-    if (!artist) return res.status(404).json(null);
+    if (!artist || artist.showOnWebsite === false) return res.status(404).json(null);
 
     const artistLookup = new Map(artists.map((a) => [a.id, a]));
     const discography = releasePages
