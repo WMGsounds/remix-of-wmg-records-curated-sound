@@ -63,7 +63,7 @@ export const ReleaseCard = ({ release, hideMetaOnMobile = false }: { release: Re
       <div className="pt-5 flex items-start justify-between gap-4">
         <div className="min-w-0 flex-1">
           <h3 className="font-serif text-xl md:text-2xl leading-tight">{release.title}</h3>
-          <p className="text-sm text-current/60 mt-1">{release.artistName}</p>
+          <p className="text-sm text-gold mt-1">{release.artistName}</p>
         </div>
         <div className={`text-right shrink-0 ${hideMetaOnMobile ? "hidden md:block" : ""}`}>
           <p className="eyebrow text-current/60">{release.releaseType}</p>
