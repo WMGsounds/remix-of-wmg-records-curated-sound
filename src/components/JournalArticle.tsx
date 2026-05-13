@@ -79,7 +79,7 @@ export const ArticleBody = ({ blocks }: { blocks: JournalBlock[] }) => (
                 className="w-full h-auto block bg-ivory/5"
               />
               {b.caption && (
-                <figcaption className="mt-3 text-sm text-ivory/55 italic text-center">{b.caption}</figcaption>
+                <figcaption className="mt-3 text-sm text-ivory/75 italic text-center">{b.caption}</figcaption>
               )}
             </figure>
           );

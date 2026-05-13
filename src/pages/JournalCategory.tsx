@@ -33,7 +33,7 @@ const Card = ({ a }: { a: JournalArticleSummary }) => (
       {a.category && <p className="eyebrow text-gold mb-3">{a.category}</p>}
       <h2 className="font-serif text-2xl md:text-3xl leading-tight text-ivory">{a.title}</h2>
       {a.excerpt && <p className="text-sm text-ivory/65 mt-3 line-clamp-3 leading-relaxed">{a.excerpt}</p>}
-      <div className="mt-4 flex flex-wrap items-center gap-x-4 gap-y-1 text-[11px] uppercase tracking-[0.22em] text-ivory/50">
+      <div className="mt-4 flex flex-wrap items-center gap-x-4 gap-y-1 text-[11px] uppercase tracking-[0.22em] text-ivory/70">
         {a.publishedDate && <span>{formatJournalDate(a.publishedDate)}</span>}
         {a.readingTime > 0 && <span>{a.readingTime} min read</span>}
       </div>

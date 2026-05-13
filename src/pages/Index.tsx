@@ -300,7 +300,7 @@ const Index = () => {
                         />
                       </>
                     ) : (
-                      <div className="h-full w-full flex items-center justify-center text-ivory/40 text-sm">No image</div>
+                      <div className="h-full w-full flex items-center justify-center text-ivory/70 text-sm">No image</div>
                     )}
                   </div>
                   <h3 className="font-serif text-2xl leading-tight text-ivory group-hover:text-gold transition-colors duration-500 line-clamp-2 max-w-[85%]">

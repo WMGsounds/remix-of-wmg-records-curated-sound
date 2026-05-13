@@ -68,7 +68,7 @@ const JournalArticlePage = () => {
       {/* Header */}
       <header className="container-editorial pt-36 md:pt-44 pb-12 max-w-[960px]">
         <div className="flex items-center justify-between gap-4 mb-10">
-          <Link to="/journal" className="inline-flex items-center gap-2 text-[11px] uppercase tracking-[0.24em] text-ivory/55 hover:text-gold transition-colors">
+          <Link to="/journal" className="inline-flex items-center gap-2 text-[11px] uppercase tracking-[0.24em] text-ivory/75 hover:text-gold transition-colors">
             <ArrowLeft className="h-3.5 w-3.5" /> Back to Journal
           </Link>
           {a.category && (
@@ -147,10 +147,10 @@ const JournalArticlePage = () => {
                     {art.heroImage && <LazyImage src={art.heroImage} alt={`${art.name} portrait`} width={300} height={300} displayWidth={200} className="object-cover" />}
                   </div>
                   <div className="flex-1 min-w-0">
-                    <p className="eyebrow text-ivory/50 mb-2">Artist</p>
+                    <p className="eyebrow text-ivory/70 mb-2">Artist</p>
                     <h3 className="font-serif text-2xl text-ivory group-hover:text-gold transition-colors">{art.name}</h3>
                   </div>
-                  <ArrowRight className="h-4 w-4 text-ivory/40 group-hover:text-gold transition-colors" />
+                  <ArrowRight className="h-4 w-4 text-ivory/70 group-hover:text-gold transition-colors" />
                 </Link>
               ))}
               {relatedReleases.map((rel) => (
@@ -159,11 +159,11 @@ const JournalArticlePage = () => {
                     {rel.coverArt && <LazyImage src={rel.coverArt} alt={`Cover artwork for ${rel.title}`} width={300} height={300} displayWidth={200} className="object-cover" />}
                   </div>
                   <div className="flex-1 min-w-0">
-                    <p className="eyebrow text-ivory/50 mb-2">{rel.releaseType}</p>
+                    <p className="eyebrow text-ivory/70 mb-2">{rel.releaseType}</p>
                     <h3 className="font-serif text-2xl text-ivory group-hover:text-gold transition-colors truncate">{rel.title}</h3>
-                    <p className="text-sm text-ivory/55 mt-1">{rel.artistName}</p>
+                    <p className="text-sm text-ivory/75 mt-1">{rel.artistName}</p>
                   </div>
-                  <ArrowRight className="h-4 w-4 text-ivory/40 group-hover:text-gold transition-colors" />
+                  <ArrowRight className="h-4 w-4 text-ivory/70 group-hover:text-gold transition-colors" />
                 </Link>
               ))}
             </div>
