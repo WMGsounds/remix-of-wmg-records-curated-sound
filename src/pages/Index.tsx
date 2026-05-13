@@ -72,7 +72,11 @@ const Index = () => {
           <p className="eyebrow mb-6 text-gold-soft animate-fade-in">Wareham Music Group · Est. London</p>
           <h1 className="display-serif text-[15vw] md:text-[10vw] lg:text-[9vw] leading-none animate-fade-up">
             WMG <span className="italic text-gold">Sounds</span>
+            <span className="sr-only"> — Independent Record Label</span>
           </h1>
+          <p className="mt-4 text-sm md:text-base uppercase tracking-[0.28em] text-ivory/75 animate-fade-up">
+            Independent Record Label
+          </p>
           <p className="mt-8 max-w-xl text-lg md:text-xl font-light text-ivory/85 animate-fade-up">
             A modern independent label curating artist worlds and timeless sound.
           </p>
