@@ -182,7 +182,7 @@ const Contact = () => {
                     value={form.message}
                     onChange={(e) => setForm({ ...form, message: e.target.value })}
                     placeholder={isDemo ? "Share a bit about yourself and your music. If you have links to your tracks on SoundCloud, Spotify or anywhere else, feel free to drop them here." : ""}
-                    className="w-full bg-transparent border-b border-ivory/40 py-3 text-base text-ivory placeholder:text-ivory/40 focus:border-gold focus:outline-none resize-none transition-colors duration-300"
+                    className="w-full bg-transparent border-b border-ivory/40 py-3 text-base text-ivory placeholder:text-ivory/70 focus:border-gold focus:outline-none resize-none transition-colors duration-300"
                   />
                 </div>
 
@@ -266,7 +266,7 @@ const Contact = () => {
                                     <CheckCircle2 className="h-5 w-5 text-gold shrink-0" />
                                     <div className="min-w-0">
                                       <p className="font-serif text-base text-ivory truncate">{upload.name}</p>
-                                      <p className="text-xs text-ivory/55 mt-1">
+                                      <p className="text-xs text-ivory/75 mt-1">
                                         {upload.size > 0 ? `${(upload.size / (1024 * 1024)).toFixed(2)} MB · ` : ""}
                                         Uploaded
                                       </p>
@@ -292,7 +292,7 @@ const Contact = () => {
                       </div>
                     )}
 
-                    <p className="text-xs text-ivory/55 mt-3">
+                    <p className="text-xs text-ivory/75 mt-3">
                       Up to 3 files. Maximum 25MB each. Recommended format: MP3.
                     </p>
                   </div>
@@ -332,7 +332,7 @@ const Field = ({
       required
       value={value}
       onChange={(e) => onChange(e.target.value)}
-      className="w-full bg-transparent border-b border-ivory/40 py-3 text-base text-ivory placeholder:text-ivory/40 focus:border-gold focus:outline-none transition-colors duration-300"
+      className="w-full bg-transparent border-b border-ivory/40 py-3 text-base text-ivory placeholder:text-ivory/70 focus:border-gold focus:outline-none transition-colors duration-300"
     />
   </div>
 );

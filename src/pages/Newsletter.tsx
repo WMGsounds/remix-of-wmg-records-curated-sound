@@ -25,7 +25,7 @@ const Newsletter = () => (
       <div className="mt-14 flex justify-center">
         <NewsletterForm />
       </div>
-      <p className="mt-12 text-xs uppercase tracking-[0.24em] text-ivory/50">
+      <p className="mt-12 text-xs uppercase tracking-[0.24em] text-ivory/70">
         No spam · Unsubscribe at any time
       </p>
     </div>

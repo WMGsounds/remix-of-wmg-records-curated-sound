@@ -42,7 +42,7 @@ const TrackRow = ({
   const listenButton = spotifyTrackId && (
     <button
       onClick={onTogglePreview}
-      className={`text-[10px] uppercase tracking-[0.24em] hover:text-ivory inline-flex items-center gap-1.5 ${previewOpen ? "text-ivory" : "text-ivory/55"}`}
+      className={`text-[10px] uppercase tracking-[0.24em] hover:text-ivory inline-flex items-center gap-1.5 ${previewOpen ? "text-ivory" : "text-ivory/75"}`}
       aria-expanded={previewOpen}
       aria-label={previewOpen ? "Close Spotify preview" : "Open Spotify preview"}
     >
@@ -53,7 +53,7 @@ const TrackRow = ({
   const lyricsButton = hasLyrics && (
     <button
       onClick={onToggleLyrics}
-      className={`text-[10px] uppercase tracking-[0.24em] hover:text-ivory inline-flex items-center gap-1.5 ${lyricsOpen ? "text-ivory" : "text-ivory/55"}`}
+      className={`text-[10px] uppercase tracking-[0.24em] hover:text-ivory inline-flex items-center gap-1.5 ${lyricsOpen ? "text-ivory" : "text-ivory/75"}`}
       aria-expanded={lyricsOpen}
     >
       Lyrics
@@ -71,7 +71,7 @@ const TrackRow = ({
         {/* Title row */}
         <div className="flex items-baseline justify-between gap-4">
           <span className="flex items-baseline gap-4 md:gap-6 min-w-0">
-            <span className="text-xs text-ivory/55 tabular-nums w-6 shrink-0">
+            <span className="text-xs text-ivory/75 tabular-nums w-6 shrink-0">
               {String(track.trackNumber).padStart(2, "0")}
             </span>
             <span className="font-serif text-xl md:text-2xl truncate md:whitespace-normal">{track.trackTitle}</span>
@@ -79,12 +79,12 @@ const TrackRow = ({
           <span className="flex items-center gap-6 shrink-0">
             {/* Desktop: buttons inline with title */}
             <span className="hidden md:flex items-center gap-6">
-              <span className="text-xs text-ivory/55 tabular-nums">{track.duration}</span>
+              <span className="text-xs text-ivory/75 tabular-nums">{track.duration}</span>
               <span className="w-16 shrink-0 flex justify-end">{listenButton}</span>
               <span className="w-20 shrink-0 flex justify-end">{lyricsButton}</span>
             </span>
             {/* Mobile: only duration on this row, anchored right */}
-            <span className="md:hidden text-xs text-ivory/55 tabular-nums">{track.duration}</span>
+            <span className="md:hidden text-xs text-ivory/75 tabular-nums">{track.duration}</span>
           </span>
         </div>
         {/* Mobile: buttons under title */}
@@ -310,7 +310,7 @@ const ReleasePage = () => {
               const activeTrack = tracks.find((t) => t.id === openLyricsTrackId);
               if (!activeTrack || !activeTrack.lyrics) {
                 return (
-                  <p className="text-ivory/55 italic text-sm">
+                  <p className="text-ivory/75 italic text-sm">
                     Select “Lyrics” on a track to view them here.
                   </p>
                 );

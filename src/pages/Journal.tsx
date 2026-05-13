@@ -25,7 +25,7 @@ const Card = ({ a }: { a: JournalArticleSummary }) => (
       {a.category && <p className="eyebrow text-gold mb-3">{a.category}</p>}
       <h3 className="font-serif text-2xl md:text-3xl leading-tight text-ivory">{a.title}</h3>
       {a.excerpt && <p className="text-sm text-ivory/65 mt-3 line-clamp-3 leading-relaxed">{a.excerpt}</p>}
-      <div className="mt-4 flex flex-wrap items-center gap-x-4 gap-y-1 text-[11px] uppercase tracking-[0.22em] text-ivory/50">
+      <div className="mt-4 flex flex-wrap items-center gap-x-4 gap-y-1 text-[11px] uppercase tracking-[0.22em] text-ivory/70">
         {a.artists[0] && <span>{a.artists[0].name}</span>}
         {a.releases[0] && <span>{a.releases[0].title}</span>}
         {a.publishedDate && <span>{formatJournalDate(a.publishedDate)}</span>}
@@ -48,7 +48,7 @@ const Hero = ({ a }: { a: JournalArticleSummary }) => (
       <p className="eyebrow text-gold mb-5">{a.featured ? "Featured" : "Latest"} {a.category && `— ${a.category}`}</p>
       <h2 className="display-serif text-4xl md:text-6xl text-ivory leading-[1.1] mb-6">{a.title}</h2>
       {a.excerpt && <p className="text-ivory/75 text-lg leading-relaxed mb-6">{a.excerpt}</p>}
-      <div className="flex flex-wrap items-center gap-x-5 gap-y-1 text-[11px] uppercase tracking-[0.24em] text-ivory/55">
+      <div className="flex flex-wrap items-center gap-x-5 gap-y-1 text-[11px] uppercase tracking-[0.24em] text-ivory/75">
         {a.artists[0] && <span>{a.artists[0].name}</span>}
         {a.releases[0] && <span>{a.releases[0].title}</span>}
         {a.publishedDate && <span>{formatJournalDate(a.publishedDate)}</span>}
