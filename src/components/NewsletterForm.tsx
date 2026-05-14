@@ -17,9 +17,12 @@ export const NewsletterForm = ({ compact = false }: { compact?: boolean }) => {
       onSubmit={onSubmit}
       className={`flex items-center border-b border-foreground ${compact ? "max-w-md" : "max-w-xl"} w-full`}
     >
+      <label htmlFor="newsletter-email" className="sr-only">Email address</label>
       <input
+        id="newsletter-email"
         type="email"
         required
+        aria-label="Email address"
         value={email}
         onChange={(e) => setEmail(e.target.value)}
         placeholder="your@email.com"
