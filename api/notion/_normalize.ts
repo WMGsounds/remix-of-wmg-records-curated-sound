@@ -68,6 +68,10 @@ export function normalizeRelease(page: any, artistLookup: Map<string, any>) {
   const props = page.properties;
   const artistRel = props["Artist"]?.relation?.[0]?.id ?? "";
   const artist = artistLookup.get(artistRel);
+  // Default to true if the property is missing entirely (e.g. older rows
+  // before the column existed) so we don't hide releases unintentionally.
+  const showOnWebsiteProp = props["Show on Website"] ?? props["Show On Website"];
+  const showOnWebsite = showOnWebsiteProp === undefined ? true : bool(showOnWebsiteProp);
   return {
     id: page.id,
     slug: text(props["Slug"]),
@@ -82,6 +86,7 @@ export function normalizeRelease(page: any, artistLookup: Map<string, any>) {
     fullDescription: text(props["Full Description"]),
     featured: bool(props["Featured"]),
     showOnHomepage: bool(props["Show on Homepage"]),
+    showOnWebsite,
     streamingLinks: {
       spotify: url(props["Spotify URL"]),
       appleMusic: url(props["Apple Music URL"]),
