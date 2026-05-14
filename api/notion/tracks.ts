@@ -17,6 +17,10 @@ export default async function handler(_req: unknown, res: ApiResponse) {
     );
     const tracks = trackPages
       .map((p) => normalizeTrack(p, releaseLookup))
+      .filter((t) => {
+        const rel = releaseLookup.get(t.releaseId);
+        return !rel || rel.showOnWebsite !== false;
+      })
       .sort((a, b) => a.trackNumber - b.trackNumber);
     logApiSuccess(route, { artistPageCount: artistPages.length, releasePageCount: releasePages.length, trackPageCount: trackPages.length, trackCount: tracks.length });
     res.writeHead(200, CACHE_HEADERS).end(JSON.stringify(tracks));

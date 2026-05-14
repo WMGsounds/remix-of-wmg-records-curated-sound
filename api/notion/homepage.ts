@@ -29,7 +29,7 @@ export default async function handler(_req: unknown, res: ApiResponse) {
     const artistLookup = new Map(artists.map((a) => [a.id, a]));
     const releases = releasePages
       .map((p) => normalizeRelease(p, artistLookup))
-      .filter((r) => artistLookup.has(r.artistId));
+      .filter((r) => artistLookup.has(r.artistId) && r.showOnWebsite !== false);
 
     console.log("[notion-homepage] normalized artist Featured values", artists.map((artist) => ({
       id: artist.id,

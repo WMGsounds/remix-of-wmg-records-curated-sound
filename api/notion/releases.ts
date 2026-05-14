@@ -18,7 +18,7 @@ export default async function handler(_req: unknown, res: ApiResponse) {
     );
     const releases = releasePages
       .map((p) => normalizeRelease(p, artistLookup))
-      .filter((r) => artistLookup.has(r.artistId))
+      .filter((r) => artistLookup.has(r.artistId) && r.showOnWebsite !== false)
       .sort((a, b) => +new Date(b.releaseDate) - +new Date(a.releaseDate));
     logApiSuccess(route, { artistPageCount: artistPages.length, releasePageCount: releasePages.length, releaseCount: releases.length });
     res.writeHead(200, CACHE_HEADERS).end(JSON.stringify(releases));

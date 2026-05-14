@@ -63,10 +63,10 @@ export default async function handler(req: any, res: any) {
     }
 
     for (const a of artists) {
-      if (a.slug) urls.push(urlEntry(`${base}/artists/${a.slug}`, undefined, "monthly", "0.7"));
+      if (a.slug && a.showOnWebsite !== false) urls.push(urlEntry(`${base}/artists/${a.slug}`, undefined, "monthly", "0.7"));
     }
     for (const r of releases as any[]) {
-      if (r.slug) urls.push(urlEntry(`${base}/releases/${r.slug}`, r.releaseDate, "monthly", "0.8"));
+      if (r.slug && r.showOnWebsite !== false) urls.push(urlEntry(`${base}/releases/${r.slug}`, r.releaseDate, "monthly", "0.8"));
     }
     for (const j of journal as any[]) {
       if (j.slug) {

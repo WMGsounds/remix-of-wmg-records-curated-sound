@@ -45,6 +45,7 @@ export type Release = {
   fullDescription: string;
   featured: boolean;
   showOnHomepage: boolean;
+  showOnWebsite?: boolean;
   streamingLinks: StreamingLinks;
   catalogueId?: string | null;
   displayOrder: number;

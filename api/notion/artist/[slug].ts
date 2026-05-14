@@ -18,7 +18,7 @@ export default async function handler(req: ApiRequest, res: ApiResponse) {
     const artistLookup = new Map(artists.map((a) => [a.id, a]));
     const discography = releasePages
       .map((p) => normalizeRelease(p, artistLookup))
-      .filter((r) => r.artistSlug === slug)
+      .filter((r) => r.artistSlug === slug && r.showOnWebsite !== false)
       .sort((a, b) => +new Date(b.releaseDate) - +new Date(a.releaseDate));
 
     res.writeHead(200, CACHE_HEADERS).end(JSON.stringify({ artist, discography }));

@@ -17,7 +17,7 @@ export default async function handler(req: ApiRequest, res: ApiResponse) {
     const artistLookup = new Map(artists.map((a) => [a.id, a]));
     const releases = releasePages.map((p) => normalizeRelease(p, artistLookup));
     const release = releases.find((r) => r.slug === slug);
-    if (!release) return res.status(404).json(null);
+    if (!release || release.showOnWebsite === false) return res.status(404).json(null);
     const releaseArtist = artists.find((a) => a.id === release.artistId) ?? null;
     if (releaseArtist && releaseArtist.showOnWebsite === false) return res.status(404).json(null);
 
@@ -44,7 +44,7 @@ export default async function handler(req: ApiRequest, res: ApiResponse) {
 
     const artist = artists.find((a) => a.id === release.artistId) ?? null;
     const related = releases
-      .filter((r) => r.artistSlug === release.artistSlug && r.slug !== slug)
+      .filter((r) => r.artistSlug === release.artistSlug && r.slug !== slug && r.showOnWebsite !== false)
       .sort((a, b) => +new Date(b.releaseDate) - +new Date(a.releaseDate))
       .slice(0, 3);
 
