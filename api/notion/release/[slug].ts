@@ -44,7 +44,7 @@ export default async function handler(req: ApiRequest, res: ApiResponse) {
 
     const artist = artists.find((a) => a.id === release.artistId) ?? null;
     const related = releases
-      .filter((r) => r.artistSlug === release.artistSlug && r.slug !== slug)
+      .filter((r) => r.artistSlug === release.artistSlug && r.slug !== slug && r.showOnWebsite !== false)
       .sort((a, b) => +new Date(b.releaseDate) - +new Date(a.releaseDate))
       .slice(0, 3);
 
