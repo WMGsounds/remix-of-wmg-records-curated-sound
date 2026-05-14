@@ -326,17 +326,21 @@ const Contact = () => {
 
 const Field = ({
   label, value, onChange, type = "text",
-}: { label: string; value: string; onChange: (v: string) => void; type?: string }) => (
-  <div>
-    <label className="eyebrow mb-3 block text-gold">{label}</label>
-    <input
-      type={type}
-      required
-      value={value}
-      onChange={(e) => onChange(e.target.value)}
-      className="w-full bg-transparent border-b border-ivory/40 py-3 text-base text-ivory placeholder:text-ivory/70 focus:border-gold focus:outline-none transition-colors duration-300"
-    />
-  </div>
-);
+}: { label: string; value: string; onChange: (v: string) => void; type?: string }) => {
+  const id = `contact-${label.toLowerCase().replace(/\s+/g, "-")}`;
+  return (
+    <div>
+      <label htmlFor={id} className="eyebrow mb-3 block text-gold">{label}</label>
+      <input
+        id={id}
+        type={type}
+        required
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+        className="w-full bg-transparent border-b border-ivory/40 py-3 text-base text-ivory placeholder:text-ivory/70 focus:border-gold focus:outline-none transition-colors duration-300"
+      />
+    </div>
+  );
+};
 
 export default Contact;
