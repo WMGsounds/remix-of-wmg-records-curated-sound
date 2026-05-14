@@ -162,8 +162,9 @@ const Contact = () => {
                 </div>
 
                 <div>
-                  <label className="eyebrow mb-3 block text-gold">Subject</label>
+                  <label htmlFor="contact-subject" className="eyebrow mb-3 block text-gold">Subject</label>
                   <select
+                    id="contact-subject"
                     value={form.subject}
                     onChange={(e) => setForm({ ...form, subject: e.target.value })}
                     className="w-full bg-transparent border-b border-ivory/40 py-3 text-base text-ivory focus:border-gold focus:outline-none transition-colors duration-300 [&>option]:text-ink"
@@ -175,8 +176,9 @@ const Contact = () => {
                 </div>
 
                 <div>
-                  <label className="eyebrow mb-3 block text-gold">Message</label>
+                  <label htmlFor="contact-message" className="eyebrow mb-3 block text-gold">Message</label>
                   <textarea
+                    id="contact-message"
                     required
                     rows={6}
                     value={form.message}
