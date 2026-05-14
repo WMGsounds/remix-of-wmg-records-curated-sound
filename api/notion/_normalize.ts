@@ -98,6 +98,9 @@ export function normalizeRelease(page: any, artistLookup: Map<string, any>) {
     },
     catalogueId: text(props["Catalogue ID"]) || null,
     displayOrder: num(props["Display Order"]),
+    pLine: text(props["℗"]) || text(props["P Line"]) || text(props["PLine"]) || null,
+    cLine: text(props["©"]) || text(props["C Line"]) || text(props["CLine"]) || null,
+    upc: text(props["UPC"]) || null,
   };
 }
 

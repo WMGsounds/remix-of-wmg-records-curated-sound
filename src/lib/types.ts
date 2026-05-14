@@ -49,6 +49,9 @@ export type Release = {
   streamingLinks: StreamingLinks;
   catalogueId?: string | null;
   displayOrder: number;
+  pLine?: string | null;
+  cLine?: string | null;
+  upc?: string | null;
 };
 
 export type Track = {
