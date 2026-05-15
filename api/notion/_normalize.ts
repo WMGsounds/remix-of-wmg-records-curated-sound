@@ -1,7 +1,33 @@
 // Convert Notion property objects into the clean shape src/lib/types.ts expects.
 
-const text = (p: any): string =>
-  (p?.rich_text ?? p?.title ?? []).map((t: any) => t.plain_text).join("").trim();
+const text = (p: any): string => {
+  if (!p) return "";
+  if (Array.isArray(p?.rich_text)) return p.rich_text.map((t: any) => t.plain_text).join("").trim();
+  if (Array.isArray(p?.title)) return p.title.map((t: any) => t.plain_text).join("").trim();
+  if (typeof p?.formula?.string === "string") return p.formula.string.trim();
+  if (typeof p?.formula?.number === "number") return String(p.formula.number);
+  if (typeof p?.rollup?.string === "string") return p.rollup.string.trim();
+  if (typeof p?.rollup?.number === "number") return String(p.rollup.number);
+  if (typeof p?.number === "number") return String(p.number);
+  if (typeof p?.email === "string") return p.email.trim();
+  if (typeof p?.phone_number === "string") return p.phone_number.trim();
+  if (typeof p?.url === "string") return p.url.trim();
+  if (p?.select?.name) return String(p.select.name).trim();
+  return "";
+};
+
+// Look up a Notion property by name, tolerant to unicode variants/whitespace.
+const findProp = (props: Record<string, any>, ...names: string[]): any => {
+  for (const n of names) {
+    if (props[n] !== undefined) return props[n];
+  }
+  const norm = (s: string) => s.normalize("NFKC").replace(/\s+/g, "").toLowerCase();
+  const targets = names.map(norm);
+  for (const key of Object.keys(props)) {
+    if (targets.includes(norm(key))) return props[key];
+  }
+  return undefined;
+};
 
 const paragraphs = (p: any): string[] =>
   text(p).split(/\n\s*\n/).map((s) => s.trim()).filter(Boolean);
@@ -104,9 +130,9 @@ export function normalizeRelease(page: any, artistLookup: Map<string, any>) {
     },
     catalogueId: text(props["Catalogue ID"]) || null,
     displayOrder: num(props["Display Order"]),
-    pLine: text(props["℗"]) || text(props["P Line"]) || text(props["PLine"]) || null,
-    cLine: text(props["©"]) || text(props["C Line"]) || text(props["CLine"]) || null,
-    upc: text(props["UPC"]) || null,
+    pLine: text(findProp(props, "℗", "P Line", "PLine", "P-Line", "Phonographic")) || null,
+    cLine: text(findProp(props, "©", "C Line", "CLine", "C-Line", "Copyright")) || null,
+    upc: text(findProp(props, "UPC", "Upc", "upc")) || null,
     parentAlbumId: parentAlbumRel,
   };
 }
