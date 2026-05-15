@@ -253,10 +253,47 @@ const ReleasePage = () => {
                 <div className="h-full w-full bg-ivory/10 flex items-center justify-center text-ivory/60">Artwork coming soon.</div>
               )}
             </div>
+            {(release.pLine || release.cLine || release.upc) && (
+              <div className="w-full max-w-[620px] mx-auto lg:mx-0 mt-4">
+                <button
+                  type="button"
+                  onClick={() => setInfoOpen((o) => !o)}
+                  aria-expanded={infoOpen}
+                  className="inline-flex items-center gap-1.5 text-[10px] uppercase tracking-[0.28em] text-ivory/70 hover:text-ivory transition-colors"
+                >
+                  Info
+                  {infoOpen ? <ChevronUp className="h-3 w-3" /> : <ChevronDown className="h-3 w-3" />}
+                </button>
+                {infoOpen && (
+                  <div className="mt-3 text-xs text-ivory/70 leading-relaxed space-y-1">
+                    {release.pLine && <p>℗ {release.pLine}</p>}
+                    {release.cLine && <p>© {release.cLine}</p>}
+                    {release.upc && <p>UPC: {release.upc}</p>}
+                    <p className="pt-1 text-ivory/55">All rights reserved.</p>
+                  </div>
+                )}
+              </div>
+            )}
           </div>
           <div className="lg:col-span-6">
             <p className="eyebrow text-gold-soft mb-4">{release.releaseType} · <span className="normal-case tracking-normal">{monthYear}</span></p>
             <h1 className="display-serif text-4xl md:text-5xl lg:text-6xl mb-6">{release.title}</h1>
+            {release.releaseType === "Single" && release.parentAlbum && (
+              <p className="-mt-4 mb-6 text-sm text-ivory/70 italic">
+                From the “
+                {release.parentAlbum.slug ? (
+                  <Link
+                    to={`/releases/${encodeURIComponent(release.parentAlbum.slug)}`}
+                    className="link-underline not-italic font-serif"
+                  >
+                    {release.parentAlbum.title}
+                  </Link>
+                ) : (
+                  <span className="not-italic font-serif">{release.parentAlbum.title}</span>
+                )}
+                ” album
+              </p>
+            )}
             {artist && (
               <Link to={`/artists/${encodeURIComponent(artist.slug)}`} className="font-serif italic text-2xl md:text-3xl text-ivory/82 link-underline">
                 {artist.name}
