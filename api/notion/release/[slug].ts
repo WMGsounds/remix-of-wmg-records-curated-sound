@@ -21,6 +21,20 @@ export default async function handler(req: ApiRequest, res: ApiResponse) {
     const releaseArtist = artists.find((a) => a.id === release.artistId) ?? null;
     if (releaseArtist && releaseArtist.showOnWebsite === false) return res.status(404).json(null);
 
+    // Resolve parent album relation (only meaningful for Singles, but attach if present).
+    if (release.parentAlbumId) {
+      const parent = releases.find((r) => r.id === release.parentAlbumId);
+      if (parent && parent.showOnWebsite !== false) {
+        release.parentAlbum = { id: parent.id, title: parent.title, slug: parent.slug || null };
+      } else if (parent) {
+        release.parentAlbum = { id: parent.id, title: parent.title, slug: null };
+      } else {
+        release.parentAlbum = null;
+      }
+    } else {
+      release.parentAlbum = null;
+    }
+
     // Build a lookup of raw Track pages so we can read related Track title + duration.
     const trackPageLookup = new Map(trackPages.map((p: any) => [p.id, p]));
 
