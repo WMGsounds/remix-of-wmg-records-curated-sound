@@ -130,9 +130,9 @@ export function normalizeRelease(page: any, artistLookup: Map<string, any>) {
     },
     catalogueId: text(props["Catalogue ID"]) || null,
     displayOrder: num(props["Display Order"]),
-    pLine: text(props["℗"]) || text(props["P Line"]) || text(props["PLine"]) || null,
-    cLine: text(props["©"]) || text(props["C Line"]) || text(props["CLine"]) || null,
-    upc: text(props["UPC"]) || null,
+    pLine: text(findProp(props, "℗", "P Line", "PLine", "P-Line", "Phonographic")) || null,
+    cLine: text(findProp(props, "©", "C Line", "CLine", "C-Line", "Copyright")) || null,
+    upc: text(findProp(props, "UPC", "Upc", "upc")) || null,
     parentAlbumId: parentAlbumRel,
   };
 }
