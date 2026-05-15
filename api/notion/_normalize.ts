@@ -107,6 +107,7 @@ export function normalizeRelease(page: any, artistLookup: Map<string, any>) {
     pLine: text(props["℗"]) || text(props["P Line"]) || text(props["PLine"]) || null,
     cLine: text(props["©"]) || text(props["C Line"]) || text(props["CLine"]) || null,
     upc: text(props["UPC"]) || null,
+    parentAlbumId: parentAlbumRel,
   };
 }
 
