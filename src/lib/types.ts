@@ -52,6 +52,8 @@ export type Release = {
   pLine?: string | null;
   cLine?: string | null;
   upc?: string | null;
+  parentAlbumId?: string | null;
+  parentAlbum?: { id: string; title: string; slug: string | null } | null;
 };
 
 export type Track = {

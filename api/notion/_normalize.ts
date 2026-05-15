@@ -72,6 +72,12 @@ export function normalizeRelease(page: any, artistLookup: Map<string, any>) {
   // before the column existed) so we don't hide releases unintentionally.
   const showOnWebsiteProp = props["Show on Website"] ?? props["Show On Website"];
   const showOnWebsite = showOnWebsiteProp === undefined ? true : bool(showOnWebsiteProp);
+  const parentAlbumRel =
+    props["Album"]?.relation?.[0]?.id ??
+    props["Parent Album"]?.relation?.[0]?.id ??
+    props["Related Album"]?.relation?.[0]?.id ??
+    props["From Album"]?.relation?.[0]?.id ??
+    null;
   return {
     id: page.id,
     slug: text(props["Slug"]),
@@ -101,6 +107,7 @@ export function normalizeRelease(page: any, artistLookup: Map<string, any>) {
     pLine: text(props["℗"]) || text(props["P Line"]) || text(props["PLine"]) || null,
     cLine: text(props["©"]) || text(props["C Line"]) || text(props["CLine"]) || null,
     upc: text(props["UPC"]) || null,
+    parentAlbumId: parentAlbumRel,
   };
 }
 
