@@ -126,6 +126,7 @@ const ReleasePage = () => {
   const { data, isLoading, isError } = useReleaseBySlug(slug);
   const [openPreviewTrackId, setOpenPreviewTrackId] = useState<string | null>(null);
   const [openLyricsTrackId, setOpenLyricsTrackId] = useState<string | null>(null);
+  const [infoOpen, setInfoOpen] = useState(false);
   const [bgReady, setBgReady] = useState(false);
 
   const coverArt = data?.release?.coverArt ?? null;
