@@ -137,16 +137,6 @@ export const SiteFooter = () => (
               </Link>
             </li>
           ))}
-          <li>
-            <Link to="/newsletter" className="link-underline text-ivory/70 hover:text-ivory transition-colors">
-              Newsletter
-            </Link>
-          </li>
-          <li>
-            <Link to="/store" className="link-underline text-ivory/70 hover:text-ivory transition-colors">
-              Store
-            </Link>
-          </li>
         </ul>
       </div>
     </div>
