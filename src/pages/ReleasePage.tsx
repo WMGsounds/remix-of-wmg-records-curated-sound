@@ -266,8 +266,8 @@ const ReleasePage = () => {
                 </button>
                 {infoOpen && (
                   <div className="mt-3 text-xs text-ivory/70 leading-relaxed space-y-1">
-                    {release.pLine && <p>℗ {release.pLine}</p>}
-                    {release.cLine && <p>© {release.cLine}</p>}
+                    {release.pLine && <p>{"\u2117\uFE0E"} {release.pLine}</p>}
+                    {release.cLine && <p>{"\u00A9\uFE0E"} {release.cLine}</p>}
                     {release.upc && <p>UPC: {release.upc}</p>}
                     <p className="pt-1 text-ivory/55">All rights reserved.</p>
                   </div>
