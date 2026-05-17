@@ -53,7 +53,7 @@ const Releases = () => {
             <p className="eyebrow mb-6 text-gold-soft">The Catalogue</p>
             <h1 className="display-serif text-6xl md:text-8xl lg:text-9xl mb-10">Releases</h1>
             <p className="max-w-2xl text-lg text-ivory/65">
-              Every WMG release is built to last — from the songwriting to the sleeve. Browse the full
+              Every WMG release is built to last, from the songwriting to the sleeve. Browse the full
               catalogue below.
             </p>
           </div>
