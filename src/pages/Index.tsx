@@ -251,7 +251,7 @@ const Index = () => {
           <p className="eyebrow text-gold-soft mb-4">Our Statement</p>
           <div className="gold-rule mb-8" />
           <p className="display-serif text-2xl md:text-3xl leading-[1.2] text-ivory">
-            We believe in <span className="italic text-gold">craft</span> over noise — in records that
+            We believe in <span className="italic text-gold">craft</span> over noise in records that
             reward attention, and in artists whose worlds are built to last. WMG is a home for music
             made with intent.
           </p>
