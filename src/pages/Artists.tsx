@@ -55,7 +55,7 @@ const Artists = () => {
             <h1 className="display-serif text-6xl md:text-8xl lg:text-9xl mb-10">Artists</h1>
             <p className="max-w-2xl text-lg text-ivory/65">
               Singular voices, carefully chosen. Each artist on WMG is given the space and time to build
-              a body of work — without compromise.
+              a body of work, without compromise.
             </p>
           </div>
           <div className="relative hidden min-h-[360px] lg:block">
