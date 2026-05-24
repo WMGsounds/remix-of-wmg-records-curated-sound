@@ -60,7 +60,7 @@ const Index = () => {
       <section className="relative h-[92vh] min-h-[640px] w-full overflow-hidden -mt-20 bg-ink text-ivory">
         <img
           src={hero}
-          alt="WMG Records"
+          alt="WMG"
           loading="eager"
           fetchPriority="high"
           className="absolute inset-0 h-full w-full object-cover opacity-70"

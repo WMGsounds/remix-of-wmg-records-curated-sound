@@ -29,8 +29,8 @@ export const SiteHeader = () => {
       <div className="pointer-events-none absolute inset-0 bg-ink/85 md:bg-ink/70" />
 
       <div className="container-editorial relative z-10 flex items-center justify-between py-5">
-        <Link to="/" className="flex items-center gap-3" aria-label="WMG Records home">
-          <img src={logo} alt="WMG Records" loading="eager" width={240} height={320} className="h-16 md:h-20 w-auto" />
+        <Link to="/" className="flex items-center gap-3" aria-label="WMG home">
+          <img src={logo} alt="WMG" loading="eager" width={240} height={320} className="h-16 md:h-20 w-auto" />
         </Link>
 
         <nav className="hidden md:flex items-center gap-10">
@@ -97,10 +97,10 @@ export const SiteFooter = () => (
     <div className="absolute inset-x-0 top-0 h-px bg-gold" aria-hidden="true" />
     <div className="container-editorial py-12 grid grid-cols-1 md:grid-cols-3 gap-10 items-end">
       <div className="self-start">
-        <Link to="/" className="inline-block mb-5 -ml-12 md:-ml-14" aria-label="WMG Records — Wareham Music Group">
+        <Link to="/" className="inline-block mb-5 -ml-12 md:-ml-14" aria-label="WMG — Wareham Music Group">
           <img
             src={footerLogo}
-            alt="WMG Records — Wareham Music Group"
+            alt="WMG — Wareham Music Group"
             loading="lazy"
             width={640}
             height={220}
@@ -108,7 +108,7 @@ export const SiteFooter = () => (
           />
         </Link>
         <address className="not-italic text-sm text-ivory/65 leading-relaxed">
-          <p className="font-medium text-ivory">WMG Records</p>
+          <p className="font-medium text-ivory">WMG</p>
           <p>Wareham Music Group</p>
           <p>London, United Kingdom</p>
           <p>

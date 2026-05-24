@@ -87,7 +87,7 @@ const Contact = () => {
     <main className="bg-ink text-ivory">
       <Seo
         title="Contact"
-        description="Get in touch with WMG Records — for press, sync and licensing, artist demos, or general enquiries."
+        description="Get in touch with WMG — for press, sync and licensing, artist demos, or general enquiries."
         canonicalPath="/contact"
         jsonLd={breadcrumbSchema([
           { name: "Home", path: "/" },
