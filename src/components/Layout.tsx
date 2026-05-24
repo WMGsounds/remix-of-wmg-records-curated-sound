@@ -127,7 +127,7 @@ export const SiteFooter = () => (
         </ul>
       </div>
 
-      <div className="md:text-right md:justify-self-end self-start">
+      <div className="md:text-right md:justify-self-end">
         <p className="eyebrow mb-3 text-gold">Explore</p>
         <ul className="space-y-1.5 text-sm">
           {nav.map((n) => (
