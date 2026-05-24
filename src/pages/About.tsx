@@ -9,7 +9,7 @@ const About = () => (
   <div>
     <Seo
       title="About"
-      description="WMG Records (Wareham Music Group) is a London-based independent label building catalogue with patience, restraint and respect for the song."
+      description="WMG (Wareham Music Group) is a London-based independent label building catalogue with patience, restraint and respect for the song."
       canonicalPath="/about"
       jsonLd={breadcrumbSchema([
         { name: "Home", path: "/" },

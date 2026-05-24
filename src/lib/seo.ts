@@ -1,10 +1,10 @@
 // Central SEO constants and helpers for WMG Records.
 export const SITE_URL = "https://www.wmgsounds.com";
-export const SITE_NAME = "WMG Records";
+export const SITE_NAME = "WMG";
 export const SITE_LEGAL_NAME = "Wareham Music Group";
-export const DEFAULT_TITLE = "WMG Records | Wareham Music Group";
+export const DEFAULT_TITLE = "WMG | Wareham Music Group";
 export const DEFAULT_DESCRIPTION =
-  "WMG Records is an independent label curating artist worlds and story-led releases across soul, blues, country, crooner and cinematic music.";
+  "WMG is an independent label curating artist worlds and story-led releases across soul, blues, country, crooner and cinematic music.";
 export const DEFAULT_OG_IMAGE = `${SITE_URL}/og-default.jpg`;
 export const LOGO_URL = `${SITE_URL}/wmg-logo.png`;
 
