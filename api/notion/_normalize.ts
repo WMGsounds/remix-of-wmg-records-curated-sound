@@ -134,6 +134,7 @@ export function normalizeRelease(page: any, artistLookup: Map<string, any>) {
     cLine: text(findProp(props, "©", "C Line", "CLine", "C-Line", "Copyright")) || null,
     upc: text(findProp(props, "UPC", "Upc", "upc")) || null,
     parentAlbumId: parentAlbumRel,
+    parentAlbum: null as null | { id: string; title: string; slug: string | null },
   };
 }
 
