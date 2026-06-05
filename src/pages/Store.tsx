@@ -48,7 +48,7 @@ const Store = () => {
         <div className="absolute inset-x-0 bottom-0 h-px bg-gold/35" aria-hidden="true" />
       </section>
 
-      <div className="container-editorial pt-16">
+      <div className="container-editorial pt-24 md:pt-28">
         {isLoading ? (
           <InlineSkeleton count={6} />
         ) : visible.length === 0 ? (
