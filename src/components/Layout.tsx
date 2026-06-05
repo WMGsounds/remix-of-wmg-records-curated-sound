@@ -31,11 +31,11 @@ export const SiteHeader = () => {
       <div className="pointer-events-none absolute inset-0 bg-ink/85 md:bg-ink/70" />
 
       <div className="container-editorial relative z-10 flex items-center justify-between py-5">
-        <Link to="/" className="flex items-center gap-3" aria-label="WMG home">
+        <Link to="/" className="flex items-center gap-3 md:flex-1" aria-label="WMG home">
           <img src={logo} alt="WMG" loading="eager" width={240} height={320} className="h-16 md:h-20 w-auto" />
         </Link>
 
-        <nav className="hidden md:flex items-center gap-10">
+        <nav className="hidden md:flex items-center justify-center gap-10">
           {nav.map((item) => (
             <NavLink
               key={item.to}
@@ -50,6 +50,9 @@ export const SiteHeader = () => {
               {item.label}
             </NavLink>
           ))}
+        </nav>
+
+        <div className="hidden md:flex flex-1 justify-end">
           <NavLink
             to={storeNav.to}
             className={({ isActive }) =>
@@ -62,7 +65,7 @@ export const SiteHeader = () => {
           >
             {storeNav.label}
           </NavLink>
-        </nav>
+        </div>
 
         <button
           aria-label="Toggle menu"
