@@ -76,7 +76,7 @@ export const StoreCard = ({ item }: { item: StoreItem }) => {
         </span>
       </div>
 
-      <div className="flex flex-1 flex-col gap-5 p-6 md:p-7">
+      <div className="flex flex-1 flex-col gap-6 p-8 md:p-10">
         <header className="space-y-2">
           {item.artist && (
             <p className="eyebrow text-gold">{item.artist.name}</p>
@@ -87,13 +87,13 @@ export const StoreCard = ({ item }: { item: StoreItem }) => {
         </header>
 
         {item.description && (
-          <p className="text-sm leading-relaxed text-ivory/65">{item.description}</p>
+          <p className="text-[15px] leading-relaxed text-ivory/70">{item.description}</p>
         )}
 
         {orderedFormats.length > 0 && (
-          <p className="text-[11px] uppercase tracking-[0.24em] text-ivory/55">
-            <span className="text-ivory/40">Available in: </span>
-            <span className="text-ivory/75">{formatLine}</span>
+          <p className="text-xs uppercase tracking-[0.2em] text-ivory/65">
+            <span className="text-ivory/45">Available in: </span>
+            <span className="text-ivory/85">{formatLine}</span>
           </p>
         )}
 
@@ -102,13 +102,13 @@ export const StoreCard = ({ item }: { item: StoreItem }) => {
         )}
 
         {orderedFormats.length > 0 && (
-          <dl className="grid grid-cols-1 gap-1.5 text-sm">
+          <dl className="grid grid-cols-1 gap-2 text-[15px]">
             {orderedFormats.map((f) => {
               const raw = item.prices[f]?.trim();
               return (
-                <div key={f} className="flex items-baseline justify-between gap-4 border-b border-ivory/8 pb-1.5">
-                  <dt className="text-ivory/55">{f}</dt>
-                  <dd className={raw ? "text-ivory" : "text-ivory/45 italic"}>
+                <div key={f} className="flex items-baseline justify-between gap-4 border-b border-ivory/10 pb-2">
+                  <dt className="text-ivory/65">{f}</dt>
+                  <dd className={raw ? "text-ivory" : "text-ivory/50 italic"}>
                     {raw || "See purchase page"}
                   </dd>
                 </div>
