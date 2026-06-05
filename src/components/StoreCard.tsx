@@ -52,7 +52,7 @@ export const StoreCard = ({ item }: { item: StoreItem }) => {
   const ariaLabel = `View purchase options for ${item.title} by ${artistName}`;
 
   return (
-    <article className="group flex h-full flex-col border border-ivory/12 bg-ink/60 backdrop-blur-sm transition-colors hover:border-gold/40">
+    <article className="group flex h-full flex-col border border-gold/15 bg-ink/60 backdrop-blur-sm transition-all duration-500 hover:border-gold/45 hover:shadow-[0_30px_60px_-30px_hsl(var(--gold)/0.35)]">
       <div className="relative aspect-square overflow-hidden bg-muted">
         {item.productImage ? (
           <LazyImage
