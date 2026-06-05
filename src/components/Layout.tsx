@@ -10,10 +10,11 @@ const nav = [
   { to: "/artists", label: "Artists" },
   { to: "/releases", label: "Releases" },
   { to: "/journal", label: "Journal" },
-  { to: "/store", label: "Store" },
   { to: "/about", label: "About" },
   { to: "/contact", label: "Contact" },
 ];
+
+const storeNav = { to: "/store", label: "Store" };
 
 export const SiteHeader = () => {
   const [open, setOpen] = useState(false);
@@ -49,6 +50,18 @@ export const SiteHeader = () => {
               {item.label}
             </NavLink>
           ))}
+          <NavLink
+            to={storeNav.to}
+            className={({ isActive }) =>
+              `inline-flex items-center border border-gold px-4 py-2 text-[12px] uppercase tracking-[0.24em] transition-colors duration-300 ${
+                isActive
+                  ? "bg-gold text-ink font-bold"
+                  : "text-gold font-medium hover:bg-gold hover:text-ink"
+              }`
+            }
+          >
+            {storeNav.label}
+          </NavLink>
         </nav>
 
         <button
@@ -86,6 +99,25 @@ export const SiteHeader = () => {
                 )}
               </NavLink>
             ))}
+            <NavLink
+              to={storeNav.to}
+              className={({ isActive }) =>
+                `group flex min-h-12 items-center justify-between font-serif text-3xl leading-none border-t border-gold/30 pt-3 mt-1 transition-colors duration-300 ${
+                  isActive ? "text-gold" : "text-gold hover:text-ivory"
+                }`
+              }
+            >
+              {({ isActive }) => (
+                <>
+                  <span>{storeNav.label}</span>
+                  <span
+                    className={`h-px w-12 origin-right transition-transform duration-500 ${
+                      isActive ? "scale-x-100 bg-gold" : "scale-x-0 bg-gold group-hover:scale-x-100 group-hover:bg-ivory"
+                    }`}
+                  />
+                </>
+              )}
+            </NavLink>
           </nav>
         </div>
       )}
@@ -138,6 +170,11 @@ export const SiteFooter = () => (
               </Link>
             </li>
           ))}
+          <li>
+            <Link to={storeNav.to} className="link-underline text-ivory/70 hover:text-ivory transition-colors">
+              {storeNav.label}
+            </Link>
+          </li>
         </ul>
       </div>
     </div>
