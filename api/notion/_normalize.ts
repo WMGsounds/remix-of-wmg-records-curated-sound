@@ -276,3 +276,124 @@ export async function loadAll(notion: any, dbId: string) {
   } while (cursor);
   return results;
 }
+
+// ---------- Store ----------
+
+const STORE_FORMATS = ["Vinyl", "CD", "iTunes", "Digital", "Merch", "Other"] as const;
+type StoreFormatLocal = (typeof STORE_FORMATS)[number];
+const STORE_AVAILABILITIES = ["Available Now", "Coming Soon", "Sold Out", "Hidden"] as const;
+
+const FORMAT_TO_PRICE_PROP: Record<StoreFormatLocal, string> = {
+  Vinyl: "Price - Vinyl",
+  CD: "Price - CD",
+  iTunes: "Price - iTunes",
+  Digital: "Price - Digital",
+  Merch: "Price - Other",
+  Other: "Price - Other",
+};
+
+function parsePriceNumeric(raw: string): number | null {
+  const m = raw.match(/-?\d+(?:[.,]\d+)?/);
+  if (!m) return null;
+  const n = parseFloat(m[0].replace(",", "."));
+  return Number.isFinite(n) ? n : null;
+}
+
+function buildPriceSummary(formats: StoreFormatLocal[], prices: Partial<Record<StoreFormatLocal, string>>): string | null {
+  const entries: { raw: string; numeric: number }[] = [];
+  for (const f of formats) {
+    const raw = prices[f];
+    if (!raw) continue;
+    const numeric = parsePriceNumeric(raw);
+    if (numeric === null) continue;
+    entries.push({ raw: raw.trim(), numeric });
+  }
+  if (entries.length === 0) return null;
+  entries.sort((a, b) => a.numeric - b.numeric);
+  const cheapest = entries[0].raw;
+  if (/^from\b/i.test(cheapest)) return cheapest;
+  if (/[£$€¥]/.test(cheapest)) return `From ${cheapest}`;
+  return `From £${cheapest}`;
+}
+
+export function normalizeStoreItem(
+  page: any,
+  lookups: {
+    artistLookup: Map<string, any>;
+    releaseLookup: Map<string, any>;
+    trackLookup: Map<string, { id: string; title: string }>;
+  },
+) {
+  const props = page.properties;
+  const { artistLookup, releaseLookup, trackLookup } = lookups;
+
+  const title = text(titleProp(props));
+  const slugText = text(findProp(props, "Store Slug", "Slug"));
+  const slug = slugText || null;
+
+  const artistRelId = props["Artist"]?.relation?.[0]?.id ?? "";
+  const artistRaw = artistRelId ? artistLookup.get(artistRelId) : null;
+  const artist = artistRaw
+    ? { id: artistRaw.id, slug: artistRaw.slug, name: artistRaw.name }
+    : null;
+
+  const releaseRelId = props["Release"]?.relation?.[0]?.id ?? "";
+  const releaseRaw = releaseRelId ? releaseLookup.get(releaseRelId) : null;
+  const release = releaseRaw
+    ? { id: releaseRaw.id, slug: releaseRaw.slug, title: releaseRaw.title }
+    : null;
+
+  const relatedTrackRelIds: string[] = (props["Related Tracks"]?.relation ?? []).map((r: any) => r.id);
+  const relatedTracks = relatedTrackRelIds
+    .map((id) => trackLookup.get(id))
+    .filter((t): t is { id: string; title: string } => Boolean(t));
+
+  const formatNames: string[] = (props["Format"]?.multi_select ?? []).map((o: any) => o.name);
+  const formats = formatNames.filter((n): n is StoreFormatLocal =>
+    (STORE_FORMATS as readonly string[]).includes(n),
+  );
+
+  const prices: Partial<Record<StoreFormatLocal, string>> = {};
+  for (const f of STORE_FORMATS) {
+    const raw = text(props[FORMAT_TO_PRICE_PROP[f]]);
+    if (raw) prices[f] = raw;
+  }
+
+  const displayPriceSummary = bool(props["Display Price Summary"]);
+  const priceSummary = displayPriceSummary ? buildPriceSummary(formats, prices) : null;
+
+  const productImage =
+    firstFile(props["Product Image"]) ||
+    (releaseRaw?.coverArt ?? "") ||
+    "";
+
+  const availRaw = select(props["Availability"]);
+  const availability = (STORE_AVAILABILITIES as readonly string[]).includes(availRaw)
+    ? (availRaw as (typeof STORE_AVAILABILITIES)[number])
+    : "Coming Soon";
+
+  const purchaseLinkRaw = url(props["Purchase Link"]);
+  const buttonTextRaw = text(props["Button Text"]);
+
+  return {
+    id: page.id,
+    slug,
+    title,
+    artist,
+    release,
+    relatedTracks,
+    formats,
+    prices,
+    displayPriceSummary,
+    priceSummary,
+    purchaseLink: purchaseLinkRaw ?? null,
+    productImage,
+    description: text(props["Store Description"]),
+    availability,
+    published: bool(props["Published"]),
+    featured: bool(props["Featured"]),
+    sortOrder: num(props["Store Sort Order"]),
+    buttonText: buttonTextRaw || null,
+  };
+}
+
