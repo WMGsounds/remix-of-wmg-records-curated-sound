@@ -228,6 +228,11 @@ const ReleasePage = () => {
     day: "numeric",
   }) : "Release date TBC";
 
+  const matchedStoreItem = pickStoreItemForRelease(storeItems, release.id, release.slug);
+  const storeCta = matchedStoreItem ? resolveStoreCta(matchedStoreItem) : null;
+
+
+
   return (
     <div>
       <Seo
