@@ -200,18 +200,17 @@ const Store = () => {
         ) : (
           <>
             {featured.length > 0 && (
-              <section className="mb-20">
-                <div className="mb-8 flex items-baseline justify-between gap-4">
-                  <div>
-                    <p className="eyebrow mb-2 text-gold-soft">Featured</p>
-                    <h2 className="display-serif text-3xl md:text-4xl">Featured in the Store</h2>
-                  </div>
+              <section className="mb-16">
+                <div className="mb-6">
+                  <p className="eyebrow mb-2 text-gold-soft">Featured</p>
+                  <h2 className="display-serif text-3xl md:text-4xl">Featured in the Store</h2>
                 </div>
-                <div className="grid grid-cols-1 gap-8 md:gap-10 lg:grid-cols-2">
+                <div className="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-3 md:gap-10">
                   {featured.map((item) => (
                     <StoreCard key={item.id} item={item} />
                   ))}
                 </div>
+                <div className="mt-10 h-px w-full bg-gradient-to-r from-transparent via-gold/30 to-transparent" aria-hidden="true" />
               </section>
             )}
 
