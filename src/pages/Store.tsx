@@ -41,7 +41,7 @@ const Store = () => {
           <h1 className="display-serif text-6xl md:text-8xl mb-10">Store</h1>
           <p className="text-lg text-ivory/65">
             Records, bundles and limited editions from the WMG roster. Each item links directly to its
-            dedicated purchase page — no cart, no checkout, just the music.
+            dedicated purchase page. No cart, no checkout, just the music.
           </p>
         </div>
         <div className="absolute inset-x-0 bottom-0 h-20 bg-gradient-to-b from-transparent to-ink" aria-hidden="true" />
