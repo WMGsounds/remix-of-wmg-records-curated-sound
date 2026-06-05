@@ -172,10 +172,12 @@ const TrackRow = ({
 const ReleasePage = () => {
   const { slug } = useParams();
   const { data, isLoading, isError } = useReleaseBySlug(slug);
+  const { data: storeItems = [] } = useStoreItems();
   const [openPreviewTrackId, setOpenPreviewTrackId] = useState<string | null>(null);
   const [openLyricsTrackId, setOpenLyricsTrackId] = useState<string | null>(null);
   const [infoOpen, setInfoOpen] = useState(false);
   const [bgReady, setBgReady] = useState(false);
+
 
   const coverArt = data?.release?.coverArt ?? null;
 
