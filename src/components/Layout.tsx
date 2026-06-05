@@ -10,10 +10,11 @@ const nav = [
   { to: "/artists", label: "Artists" },
   { to: "/releases", label: "Releases" },
   { to: "/journal", label: "Journal" },
-  { to: "/store", label: "Store" },
   { to: "/about", label: "About" },
   { to: "/contact", label: "Contact" },
 ];
+
+const storeNav = { to: "/store", label: "Store" };
 
 export const SiteHeader = () => {
   const [open, setOpen] = useState(false);
