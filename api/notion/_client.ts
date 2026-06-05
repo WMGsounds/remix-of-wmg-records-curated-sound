@@ -17,7 +17,6 @@ const REQUIRED_ENV = [
   "NOTION_RELEASES_DB_ID",
   "NOTION_TRACKS_DB_ID",
   "NOTION_RELEASE_TRACKS_DB_ID",
-  "NOTION_STORE_DB_ID",
 ] as const;
 
 export const getEnvStatus = () =>
