@@ -1,12 +1,60 @@
 import { useEffect, useMemo, useState } from "react";
 import { Link, useParams, Navigate } from "react-router-dom";
-import { ChevronDown, ChevronLeft, ChevronRight, ChevronUp, Play } from "lucide-react";
-import { useReleaseBySlug } from "@/lib/queries";
+import { ChevronDown, ChevronLeft, ChevronRight, ChevronUp, Play, ShoppingBag } from "lucide-react";
+import { useReleaseBySlug, useStoreItems } from "@/lib/queries";
 import { LazyImage } from "@/components/LazyImage";
 import { Seo } from "@/components/Seo";
 import { breadcrumbSchema, absoluteUrl, truncate } from "@/lib/seo";
 import { PageLoading, PageError } from "@/components/UIStates";
-import type { Track } from "@/lib/types";
+import type { Track, StoreItem } from "@/lib/types";
+
+type StoreCta = {
+  disabled: boolean;
+  label: string;
+  href?: string;
+};
+
+function pickStoreItemForRelease(items: StoreItem[], releaseId: string, releaseSlug: string): StoreItem | null {
+  const matches = items.filter(
+    (s) =>
+      s.availability !== "Hidden" &&
+      s.release &&
+      (s.release.id === releaseId || (releaseSlug && s.release.slug === releaseSlug)),
+  );
+  if (matches.length === 0) return null;
+  const availableWithLink = matches.find((s) => s.availability === "Available Now" && s.purchaseLink);
+  if (availableWithLink) return availableWithLink;
+  const available = matches.find((s) => s.availability === "Available Now");
+  if (available) return available;
+  const coming = matches.find((s) => s.availability === "Coming Soon");
+  if (coming) return coming;
+  const sold = matches.find((s) => s.availability === "Sold Out");
+  if (sold) return sold;
+  return matches[0];
+}
+
+function resolveStoreCta(item: StoreItem): StoreCta {
+  switch (item.availability) {
+    case "Available Now":
+      if (item.purchaseLink) {
+        const override = item.buttonText?.trim();
+        return {
+          disabled: false,
+          label: override && override.toLowerCase() !== "view purchase options" ? override : "Buy this release",
+          href: item.purchaseLink,
+        };
+      }
+      return { disabled: true, label: "Link Coming Soon" };
+    case "Coming Soon":
+      return { disabled: true, label: "Coming Soon" };
+    case "Sold Out":
+      return { disabled: true, label: "Sold Out" };
+    default:
+      return { disabled: true, label: "Unavailable" };
+  }
+}
+
+
 
 const getSpotifyTrackId = (rawUrl?: string | null): string | null => {
   if (!rawUrl) return null;
@@ -124,10 +172,12 @@ const TrackRow = ({
 const ReleasePage = () => {
   const { slug } = useParams();
   const { data, isLoading, isError } = useReleaseBySlug(slug);
+  const { data: storeItems = [] } = useStoreItems();
   const [openPreviewTrackId, setOpenPreviewTrackId] = useState<string | null>(null);
   const [openLyricsTrackId, setOpenLyricsTrackId] = useState<string | null>(null);
   const [infoOpen, setInfoOpen] = useState(false);
   const [bgReady, setBgReady] = useState(false);
+
 
   const coverArt = data?.release?.coverArt ?? null;
 
@@ -177,6 +227,11 @@ const ReleasePage = () => {
     month: "long",
     day: "numeric",
   }) : "Release date TBC";
+
+  const matchedStoreItem = pickStoreItemForRelease(storeItems, release.id, release.slug);
+  const storeCta = matchedStoreItem ? resolveStoreCta(matchedStoreItem) : null;
+
+
 
   return (
     <div>
@@ -305,17 +360,50 @@ const ReleasePage = () => {
                 {release.fullDescription || release.shortDescription}
               </p>
             )}
-            {release.streamingLinks?.spotify && (
-              <a
-                href={release.streamingLinks.spotify}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="mt-8 inline-flex items-center gap-2 border border-ivory/30 px-6 py-3 text-[11px] uppercase tracking-[0.28em] text-ivory hover:bg-ivory hover:text-ink transition-colors duration-300"
-              >
-                <Play className="h-3.5 w-3.5" />
-                Listen on Spotify
-              </a>
+            {(release.streamingLinks?.spotify || storeCta) && (
+              <div className="mt-8 flex flex-wrap items-center gap-3">
+                {release.streamingLinks?.spotify && (
+                  <a
+                    href={release.streamingLinks.spotify}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-2 border border-ivory/30 px-6 py-3 text-[11px] uppercase tracking-[0.28em] text-ivory hover:bg-ivory hover:text-ink transition-colors duration-300"
+                  >
+                    <Play className="h-3.5 w-3.5" />
+                    Listen on Spotify
+                  </a>
+                )}
+                {storeCta && (
+                  storeCta.disabled ? (
+                    <button
+                      type="button"
+                      disabled
+                      className="inline-flex cursor-not-allowed items-center gap-2 border border-ivory/15 px-6 py-3 text-[11px] uppercase tracking-[0.28em] text-ivory/45"
+                    >
+                      <ShoppingBag className="h-3.5 w-3.5" />
+                      {storeCta.label}
+                    </button>
+                  ) : (
+                    <a
+                      href={storeCta.href}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      aria-label={`Buy ${release.title}`}
+                      className="inline-flex items-center gap-2 border border-gold bg-gold/10 px-6 py-3 text-[11px] uppercase tracking-[0.28em] text-gold transition-colors hover:bg-gold hover:text-ink"
+                    >
+                      <ShoppingBag className="h-3.5 w-3.5" />
+                      {storeCta.label}
+                    </a>
+                  )
+                )}
+              </div>
             )}
+            {storeCta && !storeCta.disabled && (
+              <p className="mt-2 text-[10px] uppercase tracking-[0.24em] text-ivory/40">
+                Opens external purchase page
+              </p>
+            )}
+
           </div>
         </div>
 
