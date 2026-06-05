@@ -51,3 +51,6 @@ export const useJournalArticle = (slug: string | undefined) =>
     enabled: !!slug,
     staleTime: STALE,
   });
+
+export const useStoreItems = () =>
+  useQuery({ queryKey: ["storeItems"], queryFn: fetchStoreItems, staleTime: STALE });
