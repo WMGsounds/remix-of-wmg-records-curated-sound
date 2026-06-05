@@ -99,6 +99,25 @@ export const SiteHeader = () => {
                 )}
               </NavLink>
             ))}
+            <NavLink
+              to={storeNav.to}
+              className={({ isActive }) =>
+                `group flex min-h-12 items-center justify-between font-serif text-3xl leading-none border-t border-gold/30 pt-3 mt-1 transition-colors duration-300 ${
+                  isActive ? "text-gold" : "text-gold hover:text-ivory"
+                }`
+              }
+            >
+              {({ isActive }) => (
+                <>
+                  <span>{storeNav.label}</span>
+                  <span
+                    className={`h-px w-12 origin-right transition-transform duration-500 ${
+                      isActive ? "scale-x-100 bg-gold" : "scale-x-0 bg-gold group-hover:scale-x-100 group-hover:bg-ivory"
+                    }`}
+                  />
+                </>
+              )}
+            </NavLink>
           </nav>
         </div>
       )}
