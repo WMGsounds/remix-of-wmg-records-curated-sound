@@ -1,12 +1,60 @@
 import { useEffect, useMemo, useState } from "react";
 import { Link, useParams, Navigate } from "react-router-dom";
-import { ChevronDown, ChevronLeft, ChevronRight, ChevronUp, Play } from "lucide-react";
-import { useReleaseBySlug } from "@/lib/queries";
+import { ChevronDown, ChevronLeft, ChevronRight, ChevronUp, Play, ShoppingBag } from "lucide-react";
+import { useReleaseBySlug, useStoreItems } from "@/lib/queries";
 import { LazyImage } from "@/components/LazyImage";
 import { Seo } from "@/components/Seo";
 import { breadcrumbSchema, absoluteUrl, truncate } from "@/lib/seo";
 import { PageLoading, PageError } from "@/components/UIStates";
-import type { Track } from "@/lib/types";
+import type { Track, StoreItem } from "@/lib/types";
+
+type StoreCta = {
+  disabled: boolean;
+  label: string;
+  href?: string;
+};
+
+function pickStoreItemForRelease(items: StoreItem[], releaseId: string, releaseSlug: string): StoreItem | null {
+  const matches = items.filter(
+    (s) =>
+      s.availability !== "Hidden" &&
+      s.release &&
+      (s.release.id === releaseId || (releaseSlug && s.release.slug === releaseSlug)),
+  );
+  if (matches.length === 0) return null;
+  const availableWithLink = matches.find((s) => s.availability === "Available Now" && s.purchaseLink);
+  if (availableWithLink) return availableWithLink;
+  const available = matches.find((s) => s.availability === "Available Now");
+  if (available) return available;
+  const coming = matches.find((s) => s.availability === "Coming Soon");
+  if (coming) return coming;
+  const sold = matches.find((s) => s.availability === "Sold Out");
+  if (sold) return sold;
+  return matches[0];
+}
+
+function resolveStoreCta(item: StoreItem): StoreCta {
+  switch (item.availability) {
+    case "Available Now":
+      if (item.purchaseLink) {
+        const override = item.buttonText?.trim();
+        return {
+          disabled: false,
+          label: override && override.toLowerCase() !== "view purchase options" ? override : "Buy this release",
+          href: item.purchaseLink,
+        };
+      }
+      return { disabled: true, label: "Link Coming Soon" };
+    case "Coming Soon":
+      return { disabled: true, label: "Coming Soon" };
+    case "Sold Out":
+      return { disabled: true, label: "Sold Out" };
+    default:
+      return { disabled: true, label: "Unavailable" };
+  }
+}
+
+
 
 const getSpotifyTrackId = (rawUrl?: string | null): string | null => {
   if (!rawUrl) return null;
