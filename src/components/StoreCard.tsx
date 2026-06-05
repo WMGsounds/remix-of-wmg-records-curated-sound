@@ -69,14 +69,25 @@ export const StoreCard = ({ item }: { item: StoreItem }) => {
             Artwork coming soon.
           </div>
         )}
-        <span
-          className={`absolute left-4 top-4 inline-flex items-center border bg-ink/80 px-3 py-1 text-[10px] uppercase tracking-[0.24em] ${statusLabelClass(item.availability)}`}
-        >
-          {item.availability}
-        </span>
       </div>
 
       <div className="flex flex-1 flex-col gap-6 p-8 md:p-10">
+        <div className="flex flex-wrap items-center gap-2 border-b border-ivory/10 pb-4">
+          <span
+            className={`inline-flex items-center border px-3 py-1 text-[10px] uppercase tracking-[0.24em] ${statusLabelClass(item.availability)}`}
+          >
+            {item.availability}
+          </span>
+          {item.featured && (
+            <span className="inline-flex items-center border border-gold/40 px-3 py-1 text-[10px] uppercase tracking-[0.24em] text-gold">
+              Featured
+            </span>
+          )}
+          {item.displayPriceSummary && item.priceSummary && (
+            <span className="ml-auto font-serif text-lg text-gold">{item.priceSummary}</span>
+          )}
+        </div>
+
         <header className="space-y-2">
           {item.artist && (
             <p className="eyebrow text-gold">{item.artist.name}</p>
@@ -97,9 +108,6 @@ export const StoreCard = ({ item }: { item: StoreItem }) => {
           </p>
         )}
 
-        {item.displayPriceSummary && item.priceSummary && (
-          <p className="font-serif text-2xl text-gold md:text-3xl">{item.priceSummary}</p>
-        )}
 
         {orderedFormats.length > 0 && (
           <dl className="grid grid-cols-1 gap-2 text-[15px]">
