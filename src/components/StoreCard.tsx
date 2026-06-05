@@ -42,7 +42,12 @@ function statusLabelClass(availability: StoreItem["availability"]): string {
   }
 }
 
-export const StoreCard = ({ item }: { item: StoreItem }) => {
+type StoreCardProps = {
+  item: StoreItem;
+  variant?: "grid" | "featured";
+};
+
+export const StoreCard = ({ item, variant = "grid" }: StoreCardProps) => {
   if (item.availability === "Hidden") return null;
 
   const button = resolveButton(item);
@@ -50,6 +55,137 @@ export const StoreCard = ({ item }: { item: StoreItem }) => {
   const formatLine = orderedFormats.join(" · ");
   const artistName = item.artist?.name ?? "WMG";
   const ariaLabel = `View purchase options for ${item.title} by ${artistName}`;
+
+  const MetaRow = (
+    <div className="flex flex-wrap items-center gap-2 border-b border-ivory/10 pb-4">
+      {variant === "featured" && (
+        <span className="inline-flex items-center border border-gold/50 bg-gold/5 px-3 py-1 text-[10px] uppercase tracking-[0.24em] text-gold">
+          Featured
+        </span>
+      )}
+      <span
+        className={`inline-flex items-center border px-3 py-1 text-[10px] uppercase tracking-[0.24em] ${statusLabelClass(item.availability)}`}
+      >
+        {item.availability}
+      </span>
+      {variant !== "featured" && item.featured && (
+        <span className="inline-flex items-center border border-gold/40 px-3 py-1 text-[10px] uppercase tracking-[0.24em] text-gold">
+          Featured
+        </span>
+      )}
+      {item.displayPriceSummary && item.priceSummary && (
+        <span className="ml-auto font-serif text-lg text-gold">{item.priceSummary}</span>
+      )}
+    </div>
+  );
+
+  const Details = (
+    <div className="flex flex-1 flex-col gap-6 p-8 md:p-10">
+      {MetaRow}
+
+      <header className="space-y-2">
+        {item.artist && <p className="eyebrow text-gold">{item.artist.name}</p>}
+        <h3 className="font-serif text-2xl leading-tight text-ivory md:text-3xl">{item.title}</h3>
+      </header>
+
+      {item.description && (
+        <p className="text-[15px] leading-relaxed text-ivory/70">{item.description}</p>
+      )}
+
+      {orderedFormats.length > 0 && (
+        <p className="text-xs uppercase tracking-[0.2em] text-ivory/65">
+          <span className="text-ivory/45">Available in: </span>
+          <span className="text-ivory/85">{formatLine}</span>
+        </p>
+      )}
+
+      {orderedFormats.length > 0 && (
+        <dl className="grid grid-cols-1 gap-2 text-[15px]">
+          {orderedFormats.map((f) => {
+            const raw = item.prices[f]?.trim();
+            return (
+              <div key={f} className="flex items-baseline justify-between gap-4 border-b border-ivory/10 pb-2">
+                <dt className="text-ivory/65">{f}</dt>
+                <dd className={raw ? "text-ivory" : "text-ivory/50 italic"}>
+                  {raw || "See purchase page"}
+                </dd>
+              </div>
+            );
+          })}
+        </dl>
+      )}
+
+      {item.relatedTracks.length > 0 && (
+        <details className="group/inc text-sm">
+          <summary className="cursor-pointer list-none text-[11px] uppercase tracking-[0.24em] text-ivory/55 hover:text-ivory">
+            Includes ({item.relatedTracks.length})
+            <span className="ml-2 text-ivory/40 group-open/inc:hidden">+</span>
+            <span className="ml-2 hidden text-ivory/40 group-open/inc:inline">−</span>
+          </summary>
+          <ul className="mt-3 space-y-1 text-ivory/70">
+            {item.relatedTracks.map((t) => (
+              <li key={t.id} className="text-sm">
+                {t.title}
+              </li>
+            ))}
+          </ul>
+        </details>
+      )}
+
+      <div className="mt-auto pt-4">
+        {button.disabled ? (
+          <button
+            type="button"
+            disabled
+            aria-label={ariaLabel}
+            className="block w-full cursor-not-allowed border border-ivory/15 px-6 py-3 text-center text-[11px] uppercase tracking-[0.24em] text-ivory/45"
+          >
+            {button.label}
+          </button>
+        ) : (
+          <>
+            <a
+              href={button.href}
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label={ariaLabel}
+              className="block w-full border border-gold bg-gold/10 px-6 py-3 text-center text-[11px] uppercase tracking-[0.24em] text-gold transition-colors hover:bg-gold hover:text-ink"
+            >
+              {button.label}
+            </a>
+            <p className="mt-2 text-center text-[10px] uppercase tracking-[0.24em] text-ivory/40">
+              Opens external purchase page
+            </p>
+          </>
+        )}
+      </div>
+    </div>
+  );
+
+  if (variant === "featured") {
+    return (
+      <article className="group grid grid-cols-1 overflow-hidden border border-gold/25 bg-ink/60 backdrop-blur-sm transition-all duration-500 hover:border-gold/55 hover:shadow-[0_30px_60px_-30px_hsl(var(--gold)/0.4)] md:grid-cols-[minmax(0,0.42fr)_minmax(0,0.58fr)]">
+        <div className="relative aspect-square overflow-hidden bg-muted md:aspect-auto md:min-h-[340px]">
+          {item.productImage ? (
+            <LazyImage
+              src={item.productImage}
+              alt={`${item.title} by ${artistName}`}
+              width={1200}
+              height={1200}
+              displayWidth={640}
+              sizes="(min-width: 768px) 40vw, 100vw"
+              className="object-cover transition-transform duration-700 group-hover:scale-[1.03]"
+            />
+          ) : (
+            <div className="flex h-full w-full items-center justify-center p-6 text-center text-ivory/50">
+              Artwork coming soon.
+            </div>
+          )}
+        </div>
+        {Details}
+      </article>
+    );
+  }
 
   return (
     <article className="group flex h-full flex-col border border-gold/15 bg-ink/60 backdrop-blur-sm transition-all duration-500 hover:border-gold/45 hover:shadow-[0_30px_60px_-30px_hsl(var(--gold)/0.35)]">
@@ -70,106 +206,7 @@ export const StoreCard = ({ item }: { item: StoreItem }) => {
           </div>
         )}
       </div>
-
-      <div className="flex flex-1 flex-col gap-6 p-8 md:p-10">
-        <div className="flex flex-wrap items-center gap-2 border-b border-ivory/10 pb-4">
-          <span
-            className={`inline-flex items-center border px-3 py-1 text-[10px] uppercase tracking-[0.24em] ${statusLabelClass(item.availability)}`}
-          >
-            {item.availability}
-          </span>
-          {item.featured && (
-            <span className="inline-flex items-center border border-gold/40 px-3 py-1 text-[10px] uppercase tracking-[0.24em] text-gold">
-              Featured
-            </span>
-          )}
-          {item.displayPriceSummary && item.priceSummary && (
-            <span className="ml-auto font-serif text-lg text-gold">{item.priceSummary}</span>
-          )}
-        </div>
-
-        <header className="space-y-2">
-          {item.artist && (
-            <p className="eyebrow text-gold">{item.artist.name}</p>
-          )}
-          <h3 className="font-serif text-2xl leading-tight text-ivory md:text-3xl">
-            {item.title}
-          </h3>
-        </header>
-
-        {item.description && (
-          <p className="text-[15px] leading-relaxed text-ivory/70">{item.description}</p>
-        )}
-
-        {orderedFormats.length > 0 && (
-          <p className="text-xs uppercase tracking-[0.2em] text-ivory/65">
-            <span className="text-ivory/45">Available in: </span>
-            <span className="text-ivory/85">{formatLine}</span>
-          </p>
-        )}
-
-
-        {orderedFormats.length > 0 && (
-          <dl className="grid grid-cols-1 gap-2 text-[15px]">
-            {orderedFormats.map((f) => {
-              const raw = item.prices[f]?.trim();
-              return (
-                <div key={f} className="flex items-baseline justify-between gap-4 border-b border-ivory/10 pb-2">
-                  <dt className="text-ivory/65">{f}</dt>
-                  <dd className={raw ? "text-ivory" : "text-ivory/50 italic"}>
-                    {raw || "See purchase page"}
-                  </dd>
-                </div>
-              );
-            })}
-          </dl>
-        )}
-
-        {item.relatedTracks.length > 0 && (
-          <details className="group/inc text-sm">
-            <summary className="cursor-pointer list-none text-[11px] uppercase tracking-[0.24em] text-ivory/55 hover:text-ivory">
-              Includes ({item.relatedTracks.length})
-              <span className="ml-2 text-ivory/40 group-open/inc:hidden">+</span>
-              <span className="ml-2 hidden text-ivory/40 group-open/inc:inline">−</span>
-            </summary>
-            <ul className="mt-3 space-y-1 text-ivory/70">
-              {item.relatedTracks.map((t) => (
-                <li key={t.id} className="text-sm">
-                  {t.title}
-                </li>
-              ))}
-            </ul>
-          </details>
-        )}
-
-        <div className="mt-auto pt-4">
-          {button.disabled ? (
-            <button
-              type="button"
-              disabled
-              aria-label={ariaLabel}
-              className="block w-full cursor-not-allowed border border-ivory/15 px-6 py-3 text-center text-[11px] uppercase tracking-[0.24em] text-ivory/45"
-            >
-              {button.label}
-            </button>
-          ) : (
-            <>
-              <a
-                href={button.href}
-                target="_blank"
-                rel="noopener noreferrer"
-                aria-label={ariaLabel}
-                className="block w-full border border-gold bg-gold/10 px-6 py-3 text-center text-[11px] uppercase tracking-[0.24em] text-gold transition-colors hover:bg-gold hover:text-ink"
-              >
-                {button.label}
-              </a>
-              <p className="mt-2 text-center text-[10px] uppercase tracking-[0.24em] text-ivory/40">
-                Opens external purchase page
-              </p>
-            </>
-          )}
-        </div>
-      </div>
+      {Details}
     </article>
   );
 };
