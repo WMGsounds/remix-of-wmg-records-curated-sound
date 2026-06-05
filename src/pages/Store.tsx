@@ -3,6 +3,7 @@ import { breadcrumbSchema } from "@/lib/seo";
 import { useStoreItems } from "@/lib/queries";
 import { InlineSkeleton, PageError } from "@/components/UIStates";
 import { StoreCard } from "@/components/StoreCard";
+import storeHeroAsset from "@/assets/store-hero.png.asset.json";
 
 const Store = () => {
   const { data: items = [], isLoading, isError } = useStoreItems();
@@ -36,7 +37,17 @@ const Store = () => {
               dedicated purchase page. No cart, no checkout, just the music.
             </p>
           </div>
-          <div className="relative hidden min-h-[360px] lg:block" aria-hidden="true" />
+          <div className="relative hidden min-h-[360px] lg:block">
+            <div className="absolute right-0 top-1/2 h-[560px] w-full -translate-y-1/2 overflow-hidden [-webkit-mask-image:linear-gradient(90deg,transparent_0%,rgba(0,0,0,0.08)_14%,rgba(0,0,0,0.42)_26%,black_44%,black_56%,rgba(0,0,0,0.42)_74%,rgba(0,0,0,0.08)_86%,transparent_100%)] [mask-image:linear-gradient(90deg,transparent_0%,rgba(0,0,0,0.08)_14%,rgba(0,0,0,0.42)_26%,black_44%,black_56%,rgba(0,0,0,0.42)_74%,rgba(0,0,0,0.08)_86%,transparent_100%)] [mask-repeat:no-repeat] [mask-size:100%_100%]">
+              <div className="h-full w-full [-webkit-mask-image:radial-gradient(ellipse_at_center,black_18%,rgba(0,0,0,0.68)_38%,rgba(0,0,0,0.28)_58%,transparent_78%)] [mask-image:radial-gradient(ellipse_at_center,black_18%,rgba(0,0,0,0.68)_38%,rgba(0,0,0,0.28)_58%,transparent_78%)] [mask-repeat:no-repeat] [mask-size:100%_100%]">
+                <div
+                  aria-hidden="true"
+                  className="h-full w-full bg-cover bg-center"
+                  style={{ backgroundImage: `url(${storeHeroAsset.url})` }}
+                />
+              </div>
+            </div>
+          </div>
         </div>
         <div className="absolute inset-x-0 bottom-0 h-20 bg-gradient-to-b from-transparent to-ink" aria-hidden="true" />
         <div className="absolute inset-x-0 bottom-0 h-px bg-gold/35" aria-hidden="true" />
