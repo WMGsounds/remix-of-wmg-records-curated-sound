@@ -43,7 +43,7 @@ const Store = () => {
                 <div
                   aria-hidden="true"
                   className="h-full w-full bg-cover bg-center"
-                  style={{ backgroundImage: `url(${storeHeroAsset.url})` }}
+                  style={{ backgroundImage: `url(${storeHeroUrl})` }}
                 />
               </div>
             </div>
