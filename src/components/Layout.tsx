@@ -50,6 +50,18 @@ export const SiteHeader = () => {
               {item.label}
             </NavLink>
           ))}
+          <NavLink
+            to={storeNav.to}
+            className={({ isActive }) =>
+              `inline-flex items-center border border-gold px-4 py-2 text-[12px] uppercase tracking-[0.24em] transition-colors duration-300 ${
+                isActive
+                  ? "bg-gold text-ink font-bold"
+                  : "text-gold font-medium hover:bg-gold hover:text-ink"
+              }`
+            }
+          >
+            {storeNav.label}
+          </NavLink>
         </nav>
 
         <button
