@@ -1,4 +1,4 @@
-import type { Artist, HomepageData, Release, ReleasePageData, ArtistPageData, Track } from "./types";
+import type { Artist, HomepageData, Release, ReleasePageData, ArtistPageData, Track, StoreItem } from "./types";
 
 const image = (name: string) => `/mock/${name}`;
 
@@ -143,10 +143,71 @@ export const mockReleasePage = (slug: string): ReleasePageData | null => {
   };
 };
 
+export const mockStoreItems: StoreItem[] = [
+  {
+    id: "mock-store-glass-hours-bundle",
+    slug: "glass-hours-bundle",
+    title: "Glass Hours — Collector's Bundle",
+    artist: { id: "mock-artist-aurora-vale", slug: "aurora-vale", name: "Aurora Vale" },
+    release: { id: "mock-release-glass-hours", slug: "glass-hours", title: "Glass Hours" },
+    relatedTracks: [{ id: "mock-track-glass-hours-1", title: "Glass Hours" }],
+    formats: ["Vinyl", "CD", "iTunes"],
+    prices: { Vinyl: "£24.99", CD: "£12.99", iTunes: "£7.99" },
+    displayPriceSummary: true,
+    priceSummary: "From £7.99",
+    purchaseLink: "https://example.com/glass-hours",
+    productImage: image("release-1.jpg"),
+    description: "Limited collector's edition of Glass Hours on heavyweight vinyl, alongside CD and digital formats.",
+    availability: "Available Now",
+    featured: true,
+    buttonText: "View Purchase Options",
+  },
+  {
+    id: "mock-store-night-geometry-vinyl",
+    slug: "night-geometry-vinyl",
+    title: "Night Geometry — Limited Vinyl",
+    artist: { id: "mock-artist-milo-saint", slug: "milo-saint", name: "Milo Saint" },
+    release: { id: "mock-release-night-geometry", slug: "night-geometry", title: "Night Geometry" },
+    relatedTracks: [
+      { id: "mock-track-night-geometry-1", title: "Afterimage" },
+      { id: "mock-track-night-geometry-2", title: "Low Signal" },
+    ],
+    formats: ["Vinyl", "Digital"],
+    prices: { Vinyl: "£22.00" },
+    displayPriceSummary: false,
+    priceSummary: null,
+    purchaseLink: "https://example.com/night-geometry",
+    productImage: image("release-2.jpg"),
+    description: "Five-track EP pressed on translucent 12\" vinyl with download code.",
+    availability: "Available Now",
+    featured: false,
+    buttonText: null,
+  },
+  {
+    id: "mock-store-static-bloom-cd",
+    slug: "static-bloom-cd",
+    title: "Static Bloom — Signed CD",
+    artist: { id: "mock-artist-the-north-room", slug: "the-north-room", name: "The North Room" },
+    release: { id: "mock-release-static-bloom", slug: "static-bloom", title: "Static Bloom" },
+    relatedTracks: [],
+    formats: ["CD"],
+    prices: { CD: "£14.00" },
+    displayPriceSummary: false,
+    priceSummary: null,
+    purchaseLink: null,
+    productImage: image("release-3.jpg"),
+    description: "Hand-signed CD edition of the debut album, limited to 200 copies.",
+    availability: "Coming Soon",
+    featured: false,
+    buttonText: null,
+  },
+];
+
 export function getMockDataForPath(path: string): unknown {
   if (path === "/api/notion/artists") return mockArtists;
   if (path === "/api/notion/releases") return mockReleases;
   if (path === "/api/notion/tracks") return mockTracks;
+  if (path === "/api/notion/store") return mockStoreItems;
   if (path === "/api/notion/homepage") return mockHomepage();
   if (path === "/api/notion/journal") return [];
   const artistSlug = path.match(/^\/api\/notion\/artist\/([^/]+)$/)?.[1];

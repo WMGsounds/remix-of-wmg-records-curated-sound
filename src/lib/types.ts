@@ -146,3 +146,28 @@ export type JournalArticleData = {
   relatedArtists: Artist[];
   relatedReleases: Release[];
 };
+
+// ---------- Store ----------
+
+export type StoreFormat = "Vinyl" | "CD" | "iTunes" | "Digital" | "Merch" | "Other";
+export type StoreAvailability = "Available Now" | "Coming Soon" | "Sold Out" | "Hidden";
+
+export type StoreItem = {
+  id: string;
+  slug: string | null;
+  title: string;
+  artist: { id: string; slug: string; name: string } | null;
+  release: { id: string; slug: string; title: string } | null;
+  relatedTracks: { id: string; title: string }[];
+  formats: StoreFormat[];
+  prices: Partial<Record<StoreFormat, string>>;
+  displayPriceSummary: boolean;
+  priceSummary: string | null;
+  purchaseLink: string | null;
+  productImage: string;
+  description: string;
+  availability: StoreAvailability;
+  featured: boolean;
+  buttonText: string | null;
+};
+
