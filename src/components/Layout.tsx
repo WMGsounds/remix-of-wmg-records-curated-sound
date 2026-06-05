@@ -170,6 +170,11 @@ export const SiteFooter = () => (
               </Link>
             </li>
           ))}
+          <li>
+            <Link to={storeNav.to} className="link-underline text-ivory/70 hover:text-ivory transition-colors">
+              {storeNav.label}
+            </Link>
+          </li>
         </ul>
       </div>
     </div>
