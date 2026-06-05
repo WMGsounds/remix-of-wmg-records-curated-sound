@@ -134,7 +134,7 @@ export const StoreCard = ({ item }: { item: StoreItem }) => {
           </details>
         )}
 
-        <div className="mt-auto pt-2">
+        <div className="mt-auto pt-4">
           {button.disabled ? (
             <button
               type="button"
