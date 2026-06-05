@@ -8,6 +8,7 @@ import {
   fetchReleaseBySlug,
   fetchJournal,
   fetchJournalBySlug,
+  fetchStoreItems,
 } from "./api";
 
 const STALE = 5 * 60 * 1000; // 5 min — Notion content doesn't change every second
@@ -50,3 +51,6 @@ export const useJournalArticle = (slug: string | undefined) =>
     enabled: !!slug,
     staleTime: STALE,
   });
+
+export const useStoreItems = () =>
+  useQuery({ queryKey: ["storeItems"], queryFn: fetchStoreItems, staleTime: STALE });

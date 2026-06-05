@@ -10,6 +10,7 @@ const nav = [
   { to: "/artists", label: "Artists" },
   { to: "/releases", label: "Releases" },
   { to: "/journal", label: "Journal" },
+  { to: "/store", label: "Store" },
   { to: "/about", label: "About" },
   { to: "/contact", label: "Contact" },
 ];

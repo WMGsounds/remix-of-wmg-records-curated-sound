@@ -17,6 +17,7 @@ const REQUIRED_ENV = [
   "NOTION_RELEASES_DB_ID",
   "NOTION_TRACKS_DB_ID",
   "NOTION_RELEASE_TRACKS_DB_ID",
+  "NOTION_STORE_DB_ID",
 ] as const;
 
 export const getEnvStatus = () =>
@@ -82,6 +83,7 @@ export const DBS = {
   tracks: process.env.NOTION_TRACKS_DB_ID!,
   releaseTracks: process.env.NOTION_RELEASE_TRACKS_DB_ID!,
   journal: process.env.NOTION_JOURNAL_DB_ID!,
+  storeItems: process.env.NOTION_STORE_DB_ID!,
 };
 
 export function requireEnv(route: string, names: string[]) {

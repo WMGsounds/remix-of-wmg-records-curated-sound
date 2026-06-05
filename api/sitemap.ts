@@ -7,6 +7,7 @@ const STATIC_PATHS = [
   { path: "/artists", priority: "0.9", changefreq: "weekly" },
   { path: "/releases", priority: "0.9", changefreq: "weekly" },
   { path: "/journal", priority: "0.9", changefreq: "weekly" },
+  { path: "/store", priority: "0.8", changefreq: "weekly" },
   { path: "/about", priority: "0.6", changefreq: "monthly" },
   { path: "/contact", priority: "0.6", changefreq: "monthly" },
   { path: "/newsletter", priority: "0.5", changefreq: "monthly" },
