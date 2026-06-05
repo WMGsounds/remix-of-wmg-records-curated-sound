@@ -1,11 +1,11 @@
-import { notion, DBS, CACHE_HEADERS, logApiError, logApiFallback, logApiSuccess, validateNotionEnv, type ApiResponse } from "./_client.js";
+import { notion, DBS, CACHE_HEADERS, logApiError, logApiFallback, logApiSuccess, requireEnv, type ApiResponse } from "./_client.js";
 import { FALLBACK_HEADERS, fallbackStoreItems } from "./_fallback.js";
 import { loadAll, normalizeArtist, normalizeRelease, normalizeStoreItem } from "./_normalize.js";
 
 export default async function handler(_req: unknown, res: ApiResponse) {
   const route = "/api/notion/store";
   try {
-    validateNotionEnv(route);
+    requireEnv(route, ["NOTION_TOKEN", "NOTION_ARTISTS_DB_ID", "NOTION_RELEASES_DB_ID", "NOTION_TRACKS_DB_ID", "NOTION_STORE_DB_ID"]);
     const [artistPages, releasePages, trackPages, storePages] = await Promise.all([
       loadAll(notion, DBS.artists),
       loadAll(notion, DBS.releases),
