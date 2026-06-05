@@ -3,7 +3,7 @@ import { breadcrumbSchema } from "@/lib/seo";
 import { useStoreItems } from "@/lib/queries";
 import { InlineSkeleton, PageError } from "@/components/UIStates";
 import { StoreCard } from "@/components/StoreCard";
-import storeHeroAsset from "@/assets/store-hero.png.asset.json";
+const storeHeroUrl = "/store-hero.png";
 
 const Store = () => {
   const { data: items = [], isLoading, isError } = useStoreItems();
