@@ -205,13 +205,14 @@ const Store = () => {
                   <p className="eyebrow mb-2 text-gold-soft">Featured</p>
                   <h2 className="display-serif text-3xl md:text-4xl">Featured in the Store</h2>
                 </div>
-                <div className="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-3 md:gap-10">
+                <div className="grid grid-cols-1 gap-8">
                   {featured.map((item) => (
-                    <StoreCard key={item.id} item={item} />
+                    <StoreCard key={item.id} item={item} variant="featured" />
                   ))}
                 </div>
                 <div className="mt-10 h-px w-full bg-gradient-to-r from-transparent via-gold/30 to-transparent" aria-hidden="true" />
               </section>
+
             )}
 
             {rest.length > 0 && (
