@@ -1,16 +1,94 @@
+import { useMemo, useState } from "react";
 import { Seo } from "@/components/Seo";
 import { breadcrumbSchema } from "@/lib/seo";
 import { useStoreItems } from "@/lib/queries";
 import { InlineSkeleton, PageError } from "@/components/UIStates";
 import { StoreCard } from "@/components/StoreCard";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import type { StoreItem, StoreFormat, StoreAvailability } from "@/lib/types";
+
 const storeHeroUrl = "/store-hero.png";
+
+const formatFilters = ["All", "Vinyl", "CD", "iTunes", "Digital", "Merch", "Other"] as const;
+const availabilityFilters = ["All", "Available Now", "Coming Soon", "Sold Out"] as const;
+const sortOptions = ["Featured", "Store Item", "Artist", "Price Low to High", "Price High to Low"] as const;
+
+type FormatFilter = (typeof formatFilters)[number];
+type AvailabilityFilter = (typeof availabilityFilters)[number];
+type SortOption = (typeof sortOptions)[number];
+
+function lowestNumericPrice(item: StoreItem): number | null {
+  const values: number[] = [];
+  for (const f of item.formats) {
+    const raw = item.prices[f as StoreFormat]?.trim();
+    if (!raw) continue;
+    const m = raw.replace(/,/g, ".").match(/-?\d+(?:\.\d+)?/);
+    if (m) {
+      const n = parseFloat(m[0]);
+      if (Number.isFinite(n)) values.push(n);
+    }
+  }
+  return values.length ? Math.min(...values) : null;
+}
+
+function sortItems(list: StoreItem[], sort: SortOption): StoreItem[] {
+  const arr = [...list];
+  switch (sort) {
+    case "Store Item":
+      return arr.sort((a, b) => a.title.localeCompare(b.title));
+    case "Artist":
+      return arr.sort((a, b) =>
+        (a.artist?.name ?? "").localeCompare(b.artist?.name ?? "") || a.title.localeCompare(b.title),
+      );
+    case "Price Low to High":
+      return arr.sort((a, b) => {
+        const pa = lowestNumericPrice(a);
+        const pb = lowestNumericPrice(b);
+        if (pa === null && pb === null) return a.title.localeCompare(b.title);
+        if (pa === null) return 1;
+        if (pb === null) return -1;
+        return pa - pb;
+      });
+    case "Price High to Low":
+      return arr.sort((a, b) => {
+        const pa = lowestNumericPrice(a);
+        const pb = lowestNumericPrice(b);
+        if (pa === null && pb === null) return a.title.localeCompare(b.title);
+        if (pa === null) return 1;
+        if (pb === null) return -1;
+        return pb - pa;
+      });
+    case "Featured":
+    default:
+      return arr.sort((a, b) => {
+        if (a.featured !== b.featured) return a.featured ? -1 : 1;
+        return a.title.localeCompare(b.title);
+      });
+  }
+}
 
 const Store = () => {
   const { data: items = [], isLoading, isError } = useStoreItems();
+  const [formatFilter, setFormatFilter] = useState<FormatFilter>("All");
+  const [availabilityFilter, setAvailabilityFilter] = useState<AvailabilityFilter>("All");
+  const [sort, setSort] = useState<SortOption>("Featured");
+
+  const filtered = useMemo(() => {
+    return items.filter((i) => {
+      if (i.availability === "Hidden") return false;
+      if (formatFilter !== "All" && !i.formats.includes(formatFilter as StoreFormat)) return false;
+      if (availabilityFilter !== "All" && i.availability !== (availabilityFilter as StoreAvailability)) return false;
+      return true;
+    });
+  }, [items, formatFilter, availabilityFilter]);
+
+  const featured = useMemo(
+    () => sortItems(filtered.filter((i) => i.featured), sort === "Featured" ? "Store Item" : sort),
+    [filtered, sort],
+  );
+  const rest = useMemo(() => sortItems(filtered.filter((i) => !i.featured), sort), [filtered, sort]);
 
   if (isError) return <PageError message="Couldn't load the store." />;
-
-  const visible = items.filter((i) => i.availability !== "Hidden");
 
   return (
     <div className="bg-ink text-ivory pb-32">
@@ -54,24 +132,105 @@ const Store = () => {
       </section>
 
       <div className="container-editorial pt-16">
+        <div className="flex flex-row flex-wrap items-center justify-between gap-4 mb-16 border-y border-ivory/18 py-5">
+          <div className="flex flex-wrap items-center gap-6">
+            <div className="flex items-center gap-3">
+              <label className="hidden md:inline text-[11px] uppercase tracking-[0.24em] text-ivory/60">Format</label>
+              <Select value={formatFilter} onValueChange={(v) => setFormatFilter(v as FormatFilter)}>
+                <SelectTrigger className="w-[160px] bg-transparent border-ivory/24 text-[11px] uppercase tracking-[0.24em] text-ivory rounded-none focus:ring-ivory">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent className="bg-ink text-ivory border-ivory/24">
+                  {formatFilters.map((f) => (
+                    <SelectItem key={f} value={f} className="text-[11px] uppercase tracking-[0.24em] focus:bg-ivory/10 focus:text-ivory">
+                      {f}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="flex items-center gap-3">
+              <label className="hidden md:inline text-[11px] uppercase tracking-[0.24em] text-ivory/60">Availability</label>
+              <Select value={availabilityFilter} onValueChange={(v) => setAvailabilityFilter(v as AvailabilityFilter)}>
+                <SelectTrigger className="w-[180px] bg-transparent border-ivory/24 text-[11px] uppercase tracking-[0.24em] text-ivory rounded-none focus:ring-ivory">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent className="bg-ink text-ivory border-ivory/24">
+                  {availabilityFilters.map((f) => (
+                    <SelectItem key={f} value={f} className="text-[11px] uppercase tracking-[0.24em] focus:bg-ivory/10 focus:text-ivory">
+                      {f}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+          <div className="flex items-center gap-3">
+            <label className="hidden md:inline text-[11px] uppercase tracking-[0.24em] text-ivory/60">Sort by</label>
+            <Select value={sort} onValueChange={(v) => setSort(v as SortOption)}>
+              <SelectTrigger className="w-[200px] bg-transparent border-ivory/24 text-[11px] uppercase tracking-[0.24em] text-ivory rounded-none focus:ring-ivory">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent className="bg-ink text-ivory border-ivory/24">
+                {sortOptions.map((o) => (
+                  <SelectItem key={o} value={o} className="text-[11px] uppercase tracking-[0.24em] focus:bg-ivory/10 focus:text-ivory">
+                    {o}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+        </div>
 
         {isLoading ? (
           <InlineSkeleton count={6} />
-        ) : visible.length === 0 ? (
-          <div className="max-w-2xl py-16">
-            <p className="eyebrow mb-4">Coming Soon</p>
-            <h2 className="display-serif text-3xl md:text-4xl mb-6">The store is being prepared.</h2>
-            <p className="text-ivory/65">
-              We're getting the next batch of records ready. Check back shortly, or follow the journal
-              for release news.
-            </p>
-          </div>
+        ) : filtered.length === 0 ? (
+          items.filter((i) => i.availability !== "Hidden").length === 0 ? (
+            <div className="max-w-2xl py-16">
+              <p className="eyebrow mb-4">Coming Soon</p>
+              <h2 className="display-serif text-3xl md:text-4xl mb-6">The store is being prepared.</h2>
+              <p className="text-ivory/65">
+                We're getting the next batch of records ready. Check back shortly, or follow the journal
+                for release news.
+              </p>
+            </div>
+          ) : (
+            <p className="py-16 text-ivory/60">No store items match the selected filters.</p>
+          )
         ) : (
-          <div className="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-3 md:gap-10">
-            {visible.map((item) => (
-              <StoreCard key={item.id} item={item} />
-            ))}
-          </div>
+          <>
+            {featured.length > 0 && (
+              <section className="mb-20">
+                <div className="mb-8 flex items-baseline justify-between gap-4">
+                  <div>
+                    <p className="eyebrow mb-2 text-gold-soft">Featured</p>
+                    <h2 className="display-serif text-3xl md:text-4xl">Featured in the Store</h2>
+                  </div>
+                </div>
+                <div className="grid grid-cols-1 gap-8 md:gap-10 lg:grid-cols-2">
+                  {featured.map((item) => (
+                    <StoreCard key={item.id} item={item} />
+                  ))}
+                </div>
+              </section>
+            )}
+
+            {rest.length > 0 && (
+              <section>
+                {featured.length > 0 && (
+                  <div className="mb-8">
+                    <p className="eyebrow mb-2 text-gold-soft">The Store</p>
+                    <h2 className="display-serif text-3xl md:text-4xl">All Items</h2>
+                  </div>
+                )}
+                <div className="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-3 md:gap-10">
+                  {rest.map((item) => (
+                    <StoreCard key={item.id} item={item} />
+                  ))}
+                </div>
+              </section>
+            )}
+          </>
         )}
       </div>
     </div>
