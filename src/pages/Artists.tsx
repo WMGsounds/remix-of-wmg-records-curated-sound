@@ -19,11 +19,13 @@ const Artists = () => {
   }, [artists]);
   const [filter, setFilter] = useState<string>("All");
   const [sort, setSort] = useState<(typeof sortOptions)[number]>("Artist Name");
+  const [searchQuery, setSearchQuery] = useState<string>("");
 
   const visible = useMemo(() => {
-    const list = filter === "All"
+    const base = filter === "All"
       ? [...artists]
       : artists.filter((a) => a.genre.split(",").map((g) => g.trim()).includes(filter));
+    const list = base.filter((a) => matchesSearch(searchQuery, [a.name, a.genre]));
 
     switch (sort) {
       case "Genre":
@@ -32,7 +34,7 @@ const Artists = () => {
       default:
         return list.sort((a, b) => a.name.localeCompare(b.name));
     }
-  }, [filter, sort, artists]);
+  }, [filter, sort, artists, searchQuery]);
 
   if (isError) return <PageError message="Couldn't load the roster." />;
 
