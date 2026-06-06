@@ -10,15 +10,19 @@ type ButtonState = {
   href?: string;
 };
 
+const DEFAULT_BUY_LABEL = "Buy this release";
+const LEGACY_DEFAULT_LABEL = "view purchase options";
+
 function resolveButton(item: StoreItem): ButtonState {
   switch (item.availability) {
     case "Available Now":
       if (item.purchaseLink) {
-        return {
-          disabled: false,
-          label: item.buttonText?.trim() || "View Purchase Options",
-          href: item.purchaseLink,
-        };
+        const override = item.buttonText?.trim();
+        const label =
+          override && override.toLowerCase() !== LEGACY_DEFAULT_LABEL
+            ? override
+            : DEFAULT_BUY_LABEL;
+        return { disabled: false, label, href: item.purchaseLink };
       }
       return { disabled: true, label: "Link Coming Soon" };
     case "Coming Soon":
@@ -55,7 +59,7 @@ export const StoreCard = ({ item, variant = "grid" }: StoreCardProps) => {
   const orderedFormats = FORMAT_DISPLAY_ORDER.filter((f) => item.formats.includes(f));
   const formatLine = orderedFormats.join(" · ");
   const artistName = item.artist?.name ?? "WMG";
-  const ariaLabel = `View purchase options for ${item.title} by ${artistName}`;
+  const ariaLabel = `Buy ${item.title} by ${artistName}`;
 
   const MetaRow = (
     <div className="flex flex-wrap items-center gap-2 border-b border-ivory/10 pb-4">
@@ -80,97 +84,98 @@ export const StoreCard = ({ item, variant = "grid" }: StoreCardProps) => {
     </div>
   );
 
-  const Details = (
-    <div className="flex flex-1 flex-col gap-6 p-8 md:p-10">
-      {MetaRow}
+  const PriceList = orderedFormats.length > 0 && (
+    <dl className="flex flex-col gap-2 text-[15px]">
+      {orderedFormats.map((f) => {
+        const raw = item.prices[f]?.trim();
+        return (
+          <div
+            key={f}
+            className="flex items-baseline gap-3 border-b border-ivory/10 pb-2"
+          >
+            <dt className="w-16 shrink-0 text-ivory/65">{f}</dt>
+            <dd className={raw ? "text-ivory" : "text-ivory/50 italic"}>
+              {raw || "See purchase page"}
+            </dd>
+          </div>
+        );
+      })}
+    </dl>
+  );
 
-      <header className="space-y-2">
-        {item.artist && (
-          item.artist.slug ? (
-            <Link
-              to={`/artists/${encodeURIComponent(item.artist.slug)}`}
-              className="eyebrow text-gold inline-block transition-colors hover:text-ivory focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gold"
-            >
-              {item.artist.name}
-            </Link>
-          ) : (
-            <p className="eyebrow text-gold">{item.artist.name}</p>
-          )
-        )}
-        <h3 className="font-serif text-2xl leading-tight text-ivory md:text-3xl">{item.title}</h3>
-      </header>
+  const TrackList = item.relatedTracks.length > 0 && (
+    <div className="space-y-3">
+      <p className="text-[11px] uppercase tracking-[0.24em] text-gold-soft">Track list</p>
+      <ol className="space-y-1.5 text-sm text-ivory/75">
+        {item.relatedTracks.map((t, i) => (
+          <li key={t.id} className="flex items-baseline gap-3">
+            <span className="w-6 shrink-0 tabular-nums text-[11px] text-ivory/45">
+              {String(i + 1).padStart(2, "0")}
+            </span>
+            <span className="leading-snug">{t.title}</span>
+          </li>
+        ))}
+      </ol>
+    </div>
+  );
 
-      {item.description && (
-        <p className="text-[15px] leading-relaxed text-ivory/70">{item.description}</p>
-      )}
+  const IncludesCollapsible = item.relatedTracks.length > 0 && (
+    <details className="group/inc text-sm">
+      <summary className="cursor-pointer list-none text-[11px] uppercase tracking-[0.24em] text-ivory/55 hover:text-ivory">
+        Includes ({item.relatedTracks.length})
+        <span className="ml-2 text-ivory/40 group-open/inc:hidden">+</span>
+        <span className="ml-2 hidden text-ivory/40 group-open/inc:inline">−</span>
+      </summary>
+      <ul className="mt-3 space-y-1 text-ivory/70">
+        {item.relatedTracks.map((t) => (
+          <li key={t.id} className="text-sm">
+            {t.title}
+          </li>
+        ))}
+      </ul>
+    </details>
+  );
 
-      {orderedFormats.length > 0 && (
-        <p className="text-xs uppercase tracking-[0.2em] text-ivory/65">
-          <span className="text-ivory/45">Available in: </span>
-          <span className="text-ivory/85">{formatLine}</span>
-        </p>
-      )}
+  const ArtistLine = item.artist && (
+    item.artist.slug ? (
+      <Link
+        to={`/artists/${encodeURIComponent(item.artist.slug)}`}
+        className="eyebrow text-gold inline-block transition-colors hover:text-ivory focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gold"
+      >
+        {item.artist.name}
+      </Link>
+    ) : (
+      <p className="eyebrow text-gold">{item.artist.name}</p>
+    )
+  );
 
-      {orderedFormats.length > 0 && (
-        <dl className="grid grid-cols-1 gap-2 text-[15px]">
-          {orderedFormats.map((f) => {
-            const raw = item.prices[f]?.trim();
-            return (
-              <div key={f} className="flex items-baseline justify-between gap-4 border-b border-ivory/10 pb-2">
-                <dt className="text-ivory/65">{f}</dt>
-                <dd className={raw ? "text-ivory" : "text-ivory/50 italic"}>
-                  {raw || "See purchase page"}
-                </dd>
-              </div>
-            );
-          })}
-        </dl>
-      )}
-
-      {item.relatedTracks.length > 0 && (
-        <details className="group/inc text-sm">
-          <summary className="cursor-pointer list-none text-[11px] uppercase tracking-[0.24em] text-ivory/55 hover:text-ivory">
-            Includes ({item.relatedTracks.length})
-            <span className="ml-2 text-ivory/40 group-open/inc:hidden">+</span>
-            <span className="ml-2 hidden text-ivory/40 group-open/inc:inline">−</span>
-          </summary>
-          <ul className="mt-3 space-y-1 text-ivory/70">
-            {item.relatedTracks.map((t) => (
-              <li key={t.id} className="text-sm">
-                {t.title}
-              </li>
-            ))}
-          </ul>
-        </details>
-      )}
-
-      <div className="mt-auto pt-4">
-        {button.disabled ? (
-          <button
-            type="button"
-            disabled
+  const Button = (
+    <div className="mt-auto pt-4">
+      {button.disabled ? (
+        <button
+          type="button"
+          disabled
+          aria-label={ariaLabel}
+          className="block w-full cursor-not-allowed border border-ivory/15 px-6 py-3 text-center text-[11px] uppercase tracking-[0.24em] text-ivory/45"
+        >
+          {button.label}
+        </button>
+      ) : (
+        <>
+          <a
+            href={button.href}
+            target="_blank"
+            rel="noopener noreferrer"
             aria-label={ariaLabel}
-            className="block w-full cursor-not-allowed border border-ivory/15 px-6 py-3 text-center text-[11px] uppercase tracking-[0.24em] text-ivory/45"
+            className="block w-full border border-gold bg-gold/10 px-6 py-3 text-center text-[11px] uppercase tracking-[0.24em] text-gold transition-colors hover:bg-gold hover:text-ink"
           >
             {button.label}
-          </button>
-        ) : (
-          <>
-            <a
-              href={button.href}
-              target="_blank"
-              rel="noopener noreferrer"
-              aria-label={ariaLabel}
-              className="block w-full border border-gold bg-gold/10 px-6 py-3 text-center text-[11px] uppercase tracking-[0.24em] text-gold transition-colors hover:bg-gold hover:text-ink"
-            >
-              {button.label}
-            </a>
-            <p className="mt-2 text-center text-[10px] uppercase tracking-[0.24em] text-ivory/40">
-              Opens external purchase page
-            </p>
-          </>
-        )}
-      </div>
+          </a>
+          <p className="mt-2 text-center text-[10px] uppercase tracking-[0.24em] text-ivory/40">
+            Opens external purchase page
+          </p>
+        </>
+      )}
     </div>
   );
 
@@ -194,7 +199,25 @@ export const StoreCard = ({ item, variant = "grid" }: StoreCardProps) => {
             </div>
           )}
         </div>
-        {Details}
+        <div className="flex flex-1 flex-col gap-6 p-8 md:p-10">
+          {MetaRow}
+          <header className="space-y-2">
+            {ArtistLine}
+            <h3 className="font-serif text-2xl leading-tight text-ivory md:text-3xl">{item.title}</h3>
+          </header>
+          {item.description && (
+            <p className="text-[15px] leading-relaxed text-ivory/70">{item.description}</p>
+          )}
+          {orderedFormats.length > 0 && (
+            <p className="text-xs uppercase tracking-[0.2em] text-ivory/65">
+              <span className="text-ivory/45">Available in: </span>
+              <span className="text-ivory/85">{formatLine}</span>
+            </p>
+          )}
+          {PriceList}
+          {TrackList}
+          {Button}
+        </div>
       </article>
     );
   }
@@ -218,7 +241,25 @@ export const StoreCard = ({ item, variant = "grid" }: StoreCardProps) => {
           </div>
         )}
       </div>
-      {Details}
+      <div className="flex flex-1 flex-col gap-6 p-8 md:p-10">
+        {MetaRow}
+        <header className="space-y-2">
+          {ArtistLine}
+          <h3 className="font-serif text-2xl leading-tight text-ivory md:text-3xl">{item.title}</h3>
+        </header>
+        {item.description && (
+          <p className="line-clamp-3 text-[15px] leading-relaxed text-ivory/70">{item.description}</p>
+        )}
+        {orderedFormats.length > 0 && (
+          <p className="text-xs uppercase tracking-[0.2em] text-ivory/65">
+            <span className="text-ivory/45">Available in: </span>
+            <span className="text-ivory/85">{formatLine}</span>
+          </p>
+        )}
+        {PriceList}
+        {IncludesCollapsible}
+        {Button}
+      </div>
     </article>
   );
 };
