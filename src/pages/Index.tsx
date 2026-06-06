@@ -163,18 +163,24 @@ const Index = () => {
           <p className="mt-8 max-w-xl text-lg md:text-xl font-light text-ivory/85 animate-fade-up">
             A modern independent label curating artist worlds and timeless sound.
           </p>
-          <div className="mt-10 flex flex-wrap gap-4 animate-fade-up">
+          <div className="mt-10 flex flex-wrap gap-3 md:gap-4 animate-fade-up">
             <Link
               to="/artists"
-              className="inline-flex items-center gap-3 bg-ivory text-ink px-8 py-4 text-[12px] uppercase tracking-[0.24em] font-medium hover:bg-gold transition-colors duration-500"
+              className="inline-flex items-center gap-3 border border-gold/70 bg-gold/15 text-ivory px-7 py-3.5 text-[12px] uppercase tracking-[0.24em] font-medium hover:border-gold hover:bg-gold/25 hover:text-gold transition-colors duration-500"
             >
               Explore Artists <ArrowRight className="h-4 w-4" />
             </Link>
             <Link
               to="/releases"
-              className="inline-flex items-center gap-3 border border-ivory/60 text-ivory px-8 py-4 text-[12px] uppercase tracking-[0.24em] font-medium hover:bg-ivory hover:text-ink transition-colors duration-500"
+              className="inline-flex items-center gap-3 border border-ivory/25 bg-ink/40 text-ivory/90 px-7 py-3.5 text-[12px] uppercase tracking-[0.24em] font-medium hover:border-gold/70 hover:text-gold hover:bg-ink/60 transition-colors duration-500"
             >
               View Releases
+            </Link>
+            <Link
+              to="/store"
+              className="inline-flex items-center gap-3 border border-ivory/25 bg-ink/40 text-ivory/90 px-7 py-3.5 text-[12px] uppercase tracking-[0.24em] font-medium hover:border-gold/70 hover:text-gold hover:bg-ink/60 transition-colors duration-500"
+            >
+              Buy Releases <ShoppingBag className="h-4 w-4" />
             </Link>
           </div>
         </div>
@@ -251,7 +257,7 @@ const Index = () => {
                 </p>
               )}
               {featuredTracks.length > 0 && (
-                <div className="mb-8 max-w-xl flex-1 min-h-0 flex flex-col">
+                <div className="mb-8 max-w-xl flex-1 min-h-0 hidden md:flex flex-col">
                   <p className="eyebrow text-gold-soft mb-3">Track list</p>
                   <ol
                     ref={trackListRef}
