@@ -17,9 +17,11 @@ const Releases = () => {
   const { data: releases = [], isLoading, isError } = useReleases();
   const [filter, setFilter] = useState<(typeof filters)[number]>("All");
   const [sort, setSort] = useState<(typeof sortOptions)[number]>("Release Name");
+  const [searchQuery, setSearchQuery] = useState<string>("");
 
   const visible = useMemo(() => {
-    const list = filter === "All" ? [...releases] : releases.filter((r) => r.releaseType === filter);
+    const base = filter === "All" ? [...releases] : releases.filter((r) => r.releaseType === filter);
+    const list = base.filter((r) => matchesSearch(searchQuery, [r.title, r.artistName, r.releaseType]));
     switch (sort) {
       case "Artist Name":
         return list.sort((a, b) => a.artistName.localeCompare(b.artistName));
@@ -31,7 +33,7 @@ const Releases = () => {
           (a, b) => new Date(b.releaseDate).getTime() - new Date(a.releaseDate).getTime(),
         );
     }
-  }, [filter, sort, releases]);
+  }, [filter, sort, releases, searchQuery]);
 
   if (isError) return <PageError message="Couldn't load the catalogue." />;
 
