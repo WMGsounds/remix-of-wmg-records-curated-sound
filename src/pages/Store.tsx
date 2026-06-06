@@ -4,18 +4,16 @@ import { breadcrumbSchema } from "@/lib/seo";
 import { useStoreItems } from "@/lib/queries";
 import { InlineSkeleton, PageError } from "@/components/UIStates";
 import { StoreCard } from "@/components/StoreCard";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Select, SelectContent, SelectItem, SelectSeparator, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { FilterField, SearchInput } from "@/components/FilterBar";
 import { matchesSearch } from "@/lib/search";
-import type { StoreItem, StoreFormat, StoreAvailability } from "@/lib/types";
+import type { StoreItem, StoreFormat } from "@/lib/types";
 
 const storeHeroUrl = "/store-hero.png";
 
 const FORMAT_DISPLAY_ORDER: StoreFormat[] = ["Vinyl", "CD", "iTunes", "Digital", "Merch", "Other"];
-const availabilityFilters = ["All", "Available Now", "Coming Soon", "Sold Out"] as const;
 const sortOptions = ["Artist", "Title", "Vinyl", "CD"] as const;
 
-type AvailabilityFilter = (typeof availabilityFilters)[number];
 type SortOption = (typeof sortOptions)[number];
 
 function parsePrice(raw: string | undefined): number | null {
