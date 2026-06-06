@@ -145,41 +145,10 @@ const Index = () => {
             />
           )}
           <div className="absolute inset-0 bg-ink/75" aria-hidden="true" />
-          <div className="relative container-editorial grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-12 items-start">
-            <div className="lg:col-span-5 order-2 lg:order-1">
-              <p className="eyebrow text-gold-soft mb-4">Featured Release</p>
-              <div className="gold-rule mb-8" />
-              <h2 className="display-serif text-5xl md:text-7xl mb-6">{featured.title}</h2>
-              <p className="font-serif italic text-2xl text-ivory/68 mb-6">
-                {featured.artistName}
-              </p>
-              {featured.shortDescription && (
-                <p className="text-base font-light leading-relaxed max-w-xl mb-8 text-ivory/70">
-                  {featured.shortDescription}
-                </p>
-              )}
-              {featuredTracks.length > 0 && (
-                <div className="mb-8 max-w-xl">
-                  <p className="eyebrow text-gold-soft mb-3">Track list</p>
-                  <ol className="space-y-1.5 text-sm text-ivory/75">
-                    {featuredTracks.map((t, i) => (
-                      <li key={t.id} className="flex items-baseline gap-3">
-                        <span className="w-6 shrink-0 tabular-nums text-[11px] text-ivory/45">
-                          {String(t.trackNumber || i + 1).padStart(2, "0")}
-                        </span>
-                        <span className="leading-snug font-serif text-base">{t.trackTitle}</span>
-                      </li>
-                    ))}
-                  </ol>
-                </div>
-              )}
-              <div className="flex flex-wrap items-center gap-x-6 gap-y-3">
-                <Link
-                  to={`/releases/${encodeURIComponent(featured.slug)}`}
-                  className="inline-flex items-center gap-3 border-b border-ivory/70 pb-2 text-[12px] uppercase tracking-[0.24em] font-medium hover:text-gold hover:border-gold transition-colors duration-500"
-                >
-                  Explore Release <ArrowRight className="h-4 w-4" />
-                </Link>
+          <div className="relative container-editorial grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-12 items-stretch">
+            <div className="lg:col-span-5 order-2 lg:order-1 flex flex-col">
+              <div className="flex flex-wrap items-start justify-between gap-4 mb-4">
+                <p className="eyebrow text-gold-soft">Featured Release</p>
                 {featuredStoreCta?.kind === "available" && (
                   <a
                     href={featuredStoreCta.href}
@@ -210,9 +179,42 @@ const Index = () => {
                   </span>
                 )}
               </div>
-              <p className="mt-5 text-[11px] uppercase tracking-[0.24em] text-ivory/50">
+              <div className="gold-rule mb-4" />
+              <p className="text-[11px] uppercase tracking-[0.24em] text-ivory/55 mb-6">
                 Available on all major streaming platforms
               </p>
+              <h2 className="display-serif text-5xl md:text-7xl mb-6">{featured.title}</h2>
+              <p className="font-serif italic text-2xl text-ivory/68 mb-6">
+                {featured.artistName}
+              </p>
+              {featured.shortDescription && (
+                <p className="text-base font-light leading-relaxed max-w-xl mb-8 text-ivory/70">
+                  {featured.shortDescription}
+                </p>
+              )}
+              {featuredTracks.length > 0 && (
+                <div className="mb-8 max-w-xl">
+                  <p className="eyebrow text-gold-soft mb-3">Track list</p>
+                  <ol className="space-y-1.5 text-sm text-ivory/75">
+                    {featuredTracks.map((t, i) => (
+                      <li key={t.id} className="flex items-baseline gap-3">
+                        <span className="w-6 shrink-0 tabular-nums text-[11px] text-ivory/45">
+                          {String(t.trackNumber || i + 1).padStart(2, "0")}
+                        </span>
+                        <span className="leading-snug font-serif text-base">{t.trackTitle}</span>
+                      </li>
+                    ))}
+                  </ol>
+                </div>
+              )}
+              <div className="mt-auto pt-2">
+                <Link
+                  to={`/releases/${encodeURIComponent(featured.slug)}`}
+                  className="inline-flex items-center gap-3 border-b border-ivory/70 pb-2 text-[12px] uppercase tracking-[0.24em] font-medium hover:text-gold hover:border-gold transition-colors duration-500"
+                >
+                  Explore Release <ArrowRight className="h-4 w-4" />
+                </Link>
+              </div>
             </div>
             <div className="lg:col-span-7 order-1 lg:order-2 hover-zoom overflow-hidden">
               {featured.coverArt ? (
@@ -230,6 +232,7 @@ const Index = () => {
               )}
             </div>
           </div>
+
         </section>
       )}
 

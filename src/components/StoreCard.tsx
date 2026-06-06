@@ -1,11 +1,10 @@
-import { useMemo, useState } from "react";
+import { useLayoutEffect, useMemo, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import { LazyImage } from "@/components/LazyImage";
-import { useTracks } from "@/lib/queries";
-import type { StoreItem, StoreFormat, Track } from "@/lib/types";
+import { useTracks, useReleases } from "@/lib/queries";
+import type { StoreItem, StoreFormat, Track, Release } from "@/lib/types";
 
 const FORMAT_DISPLAY_ORDER: StoreFormat[] = ["Vinyl", "CD", "iTunes", "Digital", "Merch", "Other"];
-const COLLAPSED_TRACK_COUNT = 7;
 
 type ButtonState = {
   disabled: boolean;
@@ -57,7 +56,10 @@ type StoreCardProps = {
 
 export const StoreCard = ({ item, variant = "grid" }: StoreCardProps) => {
   const { data: allTracks = [] } = useTracks();
+  const { data: allReleases = [] } = useReleases();
   const [tracksExpanded, setTracksExpanded] = useState(false);
+  const [tracksOverflow, setTracksOverflow] = useState(false);
+  const tracksScrollRef = useRef<HTMLOListElement | null>(null);
 
   const effectiveTracks = useMemo(() => {
     if (item.relatedTracks && item.relatedTracks.length > 0) {
@@ -85,6 +87,36 @@ export const StoreCard = ({ item, variant = "grid" }: StoreCardProps) => {
       }));
   }, [item.relatedTracks, item.release, allTracks]);
 
+  const linkedReleaseShortDescription = useMemo(() => {
+    if (variant !== "featured") return "";
+    const rid = item.release?.id;
+    const rslug = item.release?.slug;
+    if (!rid && !rslug) return "";
+    const match = (allReleases as Release[]).find(
+      (r) => (rid && r.id === rid) || (rslug && r.slug === rslug),
+    );
+    return match?.shortDescription?.trim() ?? "";
+  }, [variant, item.release, allReleases]);
+
+  // Detect overflow in the collapsed (clamped) track list area.
+  useLayoutEffect(() => {
+    if (variant !== "featured") return;
+    const el = tracksScrollRef.current;
+    if (!el) return;
+    const check = () => {
+      setTracksOverflow(el.scrollHeight - el.clientHeight > 1);
+    };
+    check();
+    const ro = new ResizeObserver(check);
+    ro.observe(el);
+    if (el.parentElement) ro.observe(el.parentElement);
+    window.addEventListener("resize", check);
+    return () => {
+      ro.disconnect();
+      window.removeEventListener("resize", check);
+    };
+  }, [variant, effectiveTracks, tracksExpanded]);
+
   if (item.availability === "Hidden") return null;
 
   const button = resolveButton(item);
@@ -111,7 +143,7 @@ export const StoreCard = ({ item, variant = "grid" }: StoreCardProps) => {
   );
 
   const PriceList = orderedFormats.length > 0 && (
-    <dl className="flex w-full max-w-[260px] flex-col gap-2 text-[15px]">
+    <dl className="flex w-full flex-col gap-2 text-[15px]">
       {orderedFormats.map((f) => {
         const raw = item.prices[f]?.trim();
         return (
@@ -139,37 +171,6 @@ export const StoreCard = ({ item, variant = "grid" }: StoreCardProps) => {
     </div>
   );
 
-  const renderTrackList = (compact = false) => {
-    if (effectiveTracks.length === 0) return null;
-    const showToggle = effectiveTracks.length > COLLAPSED_TRACK_COUNT;
-    const visible = tracksExpanded ? effectiveTracks : effectiveTracks.slice(0, COLLAPSED_TRACK_COUNT);
-    return (
-      <div className="space-y-3">
-        <p className="text-[11px] uppercase tracking-[0.24em] text-gold-soft">Track list</p>
-        <ol className={`space-y-1.5 ${compact ? "text-[13px]" : "text-sm"} text-ivory/75`}>
-          {visible.map((t, i) => (
-            <li key={t.id} className="flex items-baseline gap-3">
-              <span className="w-6 shrink-0 tabular-nums text-[11px] text-ivory/45">
-                {String(t.trackNumber || i + 1).padStart(2, "0")}
-              </span>
-              <span className="leading-snug">{t.title}</span>
-            </li>
-          ))}
-        </ol>
-        {showToggle && (
-          <button
-            type="button"
-            onClick={() => setTracksExpanded((v) => !v)}
-            className="inline-flex items-center gap-1.5 text-[11px] uppercase tracking-[0.24em] text-gold/80 transition-colors hover:text-gold"
-          >
-            <span>{tracksExpanded ? "Show less" : "Show full track list"}</span>
-            <span aria-hidden>{tracksExpanded ? "▴" : "▾"}</span>
-          </button>
-        )}
-      </div>
-    );
-  };
-
   const IncludesCollapsible = effectiveTracks.length > 0 && (
     <details className="group/inc text-sm">
       <summary className="cursor-pointer list-none text-[11px] uppercase tracking-[0.24em] text-ivory/55 hover:text-ivory">
@@ -187,7 +188,7 @@ export const StoreCard = ({ item, variant = "grid" }: StoreCardProps) => {
     </details>
   );
 
-  const renderCTA = (variant: "featured" | "grid") => {
+  const renderCTA = (ctaVariant: "featured" | "grid") => {
     if (button.disabled) {
       return (
         <button
@@ -212,7 +213,7 @@ export const StoreCard = ({ item, variant = "grid" }: StoreCardProps) => {
           {button.label}
         </a>
         <p
-          className={`mt-2 text-[10px] uppercase tracking-[0.24em] text-ivory/40 ${variant === "featured" ? "text-left" : "text-center"}`}
+          className={`mt-2 text-[10px] uppercase tracking-[0.24em] text-ivory/40 ${ctaVariant === "featured" ? "text-left" : "text-center"}`}
         >
           Opens external purchase page
         </p>
@@ -243,23 +244,28 @@ export const StoreCard = ({ item, variant = "grid" }: StoreCardProps) => {
         </div>
 
         <div className="flex min-w-0 flex-col p-8 md:p-10">
-          {/* Top row: badges left, CTA right (aligned with track-list column) */}
-          <div className="grid grid-cols-1 gap-6 border-b border-ivory/10 pb-6 md:grid-cols-2 md:gap-x-12">
-            <div className="flex flex-wrap items-center gap-2">
-              <span className="inline-flex items-center border border-gold/50 bg-gold/5 px-3 py-1 text-[10px] uppercase tracking-[0.24em] text-gold">
-                Featured
-              </span>
-              <span
-                className={`inline-flex items-center border px-3 py-1 text-[10px] uppercase tracking-[0.24em] ${statusLabelClass(item.availability)}`}
-              >
-                {item.availability}
-              </span>
+          {/* Top row: badges + helper line on the left, CTA on the right */}
+          <div className="grid grid-cols-1 items-start gap-6 border-b border-ivory/10 pb-6 md:grid-cols-2 md:gap-x-12">
+            <div className="min-w-0">
+              <div className="flex flex-wrap items-center gap-2">
+                <span className="inline-flex items-center border border-gold/50 bg-gold/5 px-3 py-1 text-[10px] uppercase tracking-[0.24em] text-gold">
+                  Featured
+                </span>
+                <span
+                  className={`inline-flex items-center border px-3 py-1 text-[10px] uppercase tracking-[0.24em] ${statusLabelClass(item.availability)}`}
+                >
+                  {item.availability}
+                </span>
+              </div>
+              <p className="mt-4 text-[10px] uppercase tracking-[0.24em] text-ivory/55">
+                Available on all major streaming platforms
+              </p>
             </div>
             <div className="min-w-0">{renderCTA("featured")}</div>
           </div>
 
-          {/* Body row: left text/prices | right track list */}
-          <div className="mt-6 grid grid-cols-1 gap-y-6 md:grid-cols-2 md:gap-x-12">
+          {/* Body row: left text/prices/description | right track list */}
+          <div className="mt-6 grid flex-1 min-h-0 grid-cols-1 gap-y-6 md:grid-cols-2 md:gap-x-12">
             <div className="flex min-w-0 flex-col gap-5">
               <header className="space-y-2">
                 {ArtistLine}
@@ -267,9 +273,6 @@ export const StoreCard = ({ item, variant = "grid" }: StoreCardProps) => {
                   {item.title}
                 </h3>
               </header>
-              {!isUnavailable && item.description && (
-                <p className="text-[15px] leading-relaxed text-ivory/70">{item.description}</p>
-              )}
               {!isUnavailable && orderedFormats.length > 0 && (
                 <p className="text-xs uppercase tracking-[0.2em] text-ivory/65">
                   <span className="text-ivory/45">Available in: </span>
@@ -277,11 +280,47 @@ export const StoreCard = ({ item, variant = "grid" }: StoreCardProps) => {
                 </p>
               )}
               {!isUnavailable && PriceList}
+              {!isUnavailable && linkedReleaseShortDescription && (
+                <p className="mt-auto text-[15px] leading-relaxed text-ivory/70">
+                  {linkedReleaseShortDescription}
+                </p>
+              )}
               {isUnavailable && UnavailableCallout}
             </div>
 
-            <div className="min-w-0">
-              {!isUnavailable && renderTrackList()}
+            <div className="flex min-w-0 min-h-0 flex-col">
+              {!isUnavailable && effectiveTracks.length > 0 && (
+                <>
+                  <p className="mb-3 text-[11px] uppercase tracking-[0.24em] text-gold-soft">
+                    Track list
+                  </p>
+                  <ol
+                    ref={tracksScrollRef}
+                    className={`min-h-0 flex-1 space-y-1.5 text-sm text-ivory/75 ${
+                      tracksExpanded ? "overflow-visible" : "overflow-hidden"
+                    }`}
+                  >
+                    {effectiveTracks.map((t, i) => (
+                      <li key={t.id} className="flex items-baseline gap-3">
+                        <span className="w-6 shrink-0 tabular-nums text-[11px] text-ivory/45">
+                          {String(t.trackNumber || i + 1).padStart(2, "0")}
+                        </span>
+                        <span className="leading-snug">{t.title}</span>
+                      </li>
+                    ))}
+                  </ol>
+                  {(tracksOverflow || tracksExpanded) && (
+                    <button
+                      type="button"
+                      onClick={() => setTracksExpanded((v) => !v)}
+                      className="mt-3 inline-flex items-center gap-1.5 self-start text-[11px] uppercase tracking-[0.24em] text-gold/80 transition-colors hover:text-gold"
+                    >
+                      <span>{tracksExpanded ? "Show less" : "Show full track list"}</span>
+                      <span aria-hidden>{tracksExpanded ? "▴" : "▾"}</span>
+                    </button>
+                  )}
+                </>
+              )}
             </div>
           </div>
         </div>
@@ -349,7 +388,7 @@ export const StoreCard = ({ item, variant = "grid" }: StoreCardProps) => {
           {!isUnavailable && IncludesCollapsible}
           {isUnavailable && UnavailableCallout}
         </div>
-        <div className="mt-auto pt-6">{renderCTA("grid")}</div>
+        {!isUnavailable && <div className="mt-auto pt-6">{renderCTA("grid")}</div>}
       </div>
     </article>
   );
