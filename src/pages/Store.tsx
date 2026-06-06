@@ -115,6 +115,9 @@ const Store = () => {
               Group catalogue. Browse official WMG releases and purchase directly through each
               item's dedicated store page.
             </p>
+            <p className="mt-8 inline-flex items-center border border-gold/45 bg-gold/5 px-5 py-2.5 text-[11px] uppercase tracking-[0.24em] text-gold">
+              Available to purchase and ship worldwide!
+            </p>
           </div>
           <div className="relative hidden min-h-[360px] lg:block">
             <div className="absolute right-0 top-1/2 h-[560px] w-full -translate-y-1/2 overflow-hidden [-webkit-mask-image:linear-gradient(90deg,transparent_0%,rgba(0,0,0,0.08)_14%,rgba(0,0,0,0.42)_26%,black_44%,black_56%,rgba(0,0,0,0.42)_74%,rgba(0,0,0,0.08)_86%,transparent_100%)] [mask-image:linear-gradient(90deg,transparent_0%,rgba(0,0,0,0.08)_14%,rgba(0,0,0,0.42)_26%,black_44%,black_56%,rgba(0,0,0,0.42)_74%,rgba(0,0,0,0.08)_86%,transparent_100%)] [mask-repeat:no-repeat] [mask-size:100%_100%]">
