@@ -1,4 +1,4 @@
-import { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
+import { useLayoutEffect, useMemo, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import { LazyImage } from "@/components/LazyImage";
 import { useTracks, useReleases } from "@/lib/queries";
