@@ -67,23 +67,26 @@ const Store = () => {
   }, [items]);
   const formatFilterOptions = useMemo(() => ["All", ...availableFormats], [availableFormats]);
 
+  // Featured is computed from items independent of filters/sort so it never disappears
+  // or reshuffles when filters change.
+  const featured = useMemo(
+    () => items.filter((i) => i.featured && i.availability !== "Hidden"),
+    [items],
+  );
+
   const filtered = useMemo(() => {
     return items.filter((i) => {
       if (i.availability === "Hidden") return false;
+      if (i.featured) return false;
       if (formatFilter !== "All" && !i.formats.includes(formatFilter as StoreFormat)) return false;
       if (availabilityFilter !== "All" && i.availability !== (availabilityFilter as StoreAvailability)) return false;
       return true;
     });
   }, [items, formatFilter, availabilityFilter]);
 
-  const featured = useMemo(
-    () => filtered.filter((i) => i.featured),
-    [filtered],
-  );
-  const rest = useMemo(
-    () => sortItems(filtered.filter((i) => !i.featured), sort),
-    [filtered, sort],
-  );
+  const rest = useMemo(() => sortItems(filtered, sort), [filtered, sort]);
+
+  const hasAnyVisible = featured.length + items.filter((i) => i.availability !== "Hidden" && !i.featured).length > 0;
 
   if (isError) return <PageError message="Couldn't load the store." />;
 
