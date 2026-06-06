@@ -228,7 +228,7 @@ const Index = () => {
                   className="object-cover"
                 />
               ) : (
-                <div className="w-full aspect-square bg-muted flex items-center justify-content text-muted-foreground">Artwork coming soon.</div>
+                <div className="w-full aspect-square bg-muted flex items-center justify-center text-muted-foreground">Artwork coming soon.</div>
               )}
             </div>
           </div>
