@@ -7,6 +7,8 @@ import { InlineSkeleton, PageError, PageEmpty } from "@/components/UIStates";
 import { LazyImage } from "@/components/LazyImage";
 import { formatJournalDate } from "@/components/JournalArticle";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { FilterField, SearchInput } from "@/components/FilterBar";
+import { matchesSearch } from "@/lib/search";
 import type { JournalArticleSummary } from "@/lib/types";
 
 const CATEGORIES = ["All", "Release Story", "Artist Spotlight", "Label News", "Behind The Scenes", "Interview", "Track Story", "Album Story"] as const;
@@ -62,9 +64,19 @@ const Journal = () => {
   const { data: articles = [], isLoading, isError } = useJournal();
   const [cat, setCat] = useState<string>("All");
   const [sort, setSort] = useState<(typeof SORT_OPTIONS)[number]>("Newest");
+  const [searchQuery, setSearchQuery] = useState<string>("");
 
   const { hero, rest } = useMemo(() => {
-    const filtered = cat === "All" ? [...articles] : articles.filter((a) => a.category === cat);
+    const byCat = cat === "All" ? [...articles] : articles.filter((a) => a.category === cat);
+    const filtered = byCat.filter((a) =>
+      matchesSearch(searchQuery, [
+        a.title,
+        a.excerpt,
+        a.category,
+        a.artists[0]?.name,
+        a.releases[0]?.title,
+      ]),
+    );
     const dateOf = (a: JournalArticleSummary) => +new Date(a.publishedDate || a.lastEditedTime || a.createdTime);
     switch (sort) {
       case "Oldest":
@@ -80,7 +92,7 @@ const Journal = () => {
     const hero = filtered.find((a) => a.featured) ?? filtered[0] ?? null;
     const rest = filtered.filter((a) => a !== hero);
     return { hero, rest };
-  }, [articles, cat, sort]);
+  }, [articles, cat, sort, searchQuery]);
 
   if (isError) return <PageError message="Couldn't load the Journal." />;
 
@@ -124,9 +136,8 @@ const Journal = () => {
       </section>
 
       <div className="container-editorial pt-16">
-        <div className="flex flex-row flex-wrap items-center justify-between gap-4 mb-16 border-y border-ivory/18 py-5">
-          <div className="flex items-center gap-3">
-            <label className="hidden md:inline text-[11px] uppercase tracking-[0.24em] text-ivory/60">Category</label>
+        <div className="flex flex-wrap items-end justify-center gap-x-8 gap-y-6 mb-16 border-y border-ivory/18 py-6 md:justify-between">
+          <FilterField label="Category">
             <Select value={cat} onValueChange={setCat}>
               <SelectTrigger className="w-[200px] bg-transparent border-ivory/24 text-[11px] uppercase tracking-[0.24em] text-ivory rounded-none focus:ring-ivory">
                 <SelectValue />
@@ -139,9 +150,15 @@ const Journal = () => {
                 ))}
               </SelectContent>
             </Select>
-          </div>
-          <div className="flex items-center gap-3">
-            <label className="hidden md:inline text-[11px] uppercase tracking-[0.24em] text-ivory/60">Sort by</label>
+          </FilterField>
+          <FilterField label="Search">
+            <SearchInput
+              value={searchQuery}
+              onChange={setSearchQuery}
+              placeholder="Search articles"
+            />
+          </FilterField>
+          <FilterField label="Sort by">
             <Select value={sort} onValueChange={(v) => setSort(v as (typeof SORT_OPTIONS)[number])}>
               <SelectTrigger className="w-[160px] bg-transparent border-ivory/24 text-[11px] uppercase tracking-[0.24em] text-ivory rounded-none focus:ring-ivory">
                 <SelectValue />
@@ -154,7 +171,7 @@ const Journal = () => {
                 ))}
               </SelectContent>
             </Select>
-          </div>
+          </FilterField>
         </div>
 
         {isLoading ? (

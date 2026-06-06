@@ -1,11 +1,12 @@
 import { useMemo, useState } from "react";
-import { Search } from "lucide-react";
 import { Seo } from "@/components/Seo";
 import { breadcrumbSchema } from "@/lib/seo";
 import { useStoreItems } from "@/lib/queries";
 import { InlineSkeleton, PageError } from "@/components/UIStates";
 import { StoreCard } from "@/components/StoreCard";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { FilterField, SearchInput } from "@/components/FilterBar";
+import { matchesSearch } from "@/lib/search";
 import type { StoreItem, StoreFormat, StoreAvailability } from "@/lib/types";
 
 const storeHeroUrl = "/store-hero.png";
@@ -77,27 +78,17 @@ const Store = () => {
   );
 
   const filtered = useMemo(() => {
-    const stopWords = new Set([
-      "the", "a", "an", "and", "or", "of", "to", "in", "on", "for", "with", "by", "from", "at", "into", "your", "my", "our", "is", "it", "this", "that",
-    ]);
-    const tokenize = (str: string) =>
-      str
-        .toLowerCase()
-        .split(/\s+/)
-        .filter((w) => w.length > 0 && !stopWords.has(w));
-    const queryTokens = tokenize(searchQuery);
-
     return items.filter((i) => {
       if (i.availability === "Hidden") return false;
       if (i.featured) return false;
       if (formatFilter !== "All" && !i.formats.includes(formatFilter as StoreFormat)) return false;
       if (availabilityFilter !== "All" && i.availability !== (availabilityFilter as StoreAvailability)) return false;
-      if (queryTokens.length > 0) {
-        const haystack = tokenize(
-          [i.title, i.artist?.name ?? "", i.release?.title ?? "", i.formats.join(" ")].join(" "),
-        );
-        if (!queryTokens.every((qt) => haystack.some((ht) => ht.includes(qt)))) return false;
-      }
+      if (!matchesSearch(searchQuery, [
+        i.title,
+        i.artist?.name,
+        i.release?.title,
+        i.formats.join(" "),
+      ])) return false;
       return true;
     });
   }, [items, formatFilter, availabilityFilter, searchQuery]);
@@ -190,51 +181,43 @@ const Store = () => {
                     <h2 className="display-serif text-3xl md:text-4xl">All Items</h2>
                   </div>
                 )}
-                <div className="flex flex-row flex-wrap items-center justify-between gap-4 mb-10 border-y border-ivory/18 py-5">
-                  <div className="flex flex-wrap items-center gap-6">
-                    <div className="flex items-center gap-3">
-                      <label className="hidden md:inline text-[11px] uppercase tracking-[0.24em] text-ivory/60">Format</label>
-                      <Select value={formatFilter} onValueChange={(v) => setFormatFilter(v)}>
-                        <SelectTrigger className="w-[160px] bg-transparent border-ivory/24 text-[11px] uppercase tracking-[0.24em] text-ivory rounded-none focus:ring-ivory">
-                          <SelectValue />
-                        </SelectTrigger>
-                        <SelectContent className="bg-ink text-ivory border-ivory/24">
-                          {formatFilterOptions.map((f) => (
-                            <SelectItem key={f} value={f} className="text-[11px] uppercase tracking-[0.24em] focus:bg-ivory/10 focus:text-ivory">
-                              {f}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                    </div>
-                    <div className="flex items-center gap-3">
-                      <label className="hidden md:inline text-[11px] uppercase tracking-[0.24em] text-ivory/60">Availability</label>
-                      <Select value={availabilityFilter} onValueChange={(v) => setAvailabilityFilter(v as AvailabilityFilter)}>
-                        <SelectTrigger className="w-[180px] bg-transparent border-ivory/24 text-[11px] uppercase tracking-[0.24em] text-ivory rounded-none focus:ring-ivory">
-                          <SelectValue />
-                        </SelectTrigger>
-                        <SelectContent className="bg-ink text-ivory border-ivory/24">
-                          {availabilityFilters.map((f) => (
-                            <SelectItem key={f} value={f} className="text-[11px] uppercase tracking-[0.24em] focus:bg-ivory/10 focus:text-ivory">
-                              {f}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-3">
-                    <div className="relative">
-                      <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-ivory/40" />
-                      <input
-                        type="text"
-                        value={searchQuery}
-                        onChange={(e) => setSearchQuery(e.target.value)}
-                        placeholder="Search title or artist"
-                        className="h-10 w-[220px] bg-transparent border border-ivory/24 pl-9 pr-3 text-[11px] uppercase tracking-[0.24em] text-ivory placeholder:text-ivory/30 rounded-none focus:outline-none focus:ring-1 focus:ring-ivory/40"
-                      />
-                    </div>
-                    <label className="hidden md:inline text-[11px] uppercase tracking-[0.24em] text-ivory/60">Sort by</label>
+                <div className="flex flex-wrap items-end justify-center gap-x-8 gap-y-6 mb-10 border-y border-ivory/18 py-6 md:justify-between">
+                  <FilterField label="Format">
+                    <Select value={formatFilter} onValueChange={(v) => setFormatFilter(v)}>
+                      <SelectTrigger className="w-[160px] bg-transparent border-ivory/24 text-[11px] uppercase tracking-[0.24em] text-ivory rounded-none focus:ring-ivory">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent className="bg-ink text-ivory border-ivory/24">
+                        {formatFilterOptions.map((f) => (
+                          <SelectItem key={f} value={f} className="text-[11px] uppercase tracking-[0.24em] focus:bg-ivory/10 focus:text-ivory">
+                            {f}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </FilterField>
+                  <FilterField label="Availability">
+                    <Select value={availabilityFilter} onValueChange={(v) => setAvailabilityFilter(v as AvailabilityFilter)}>
+                      <SelectTrigger className="w-[180px] bg-transparent border-ivory/24 text-[11px] uppercase tracking-[0.24em] text-ivory rounded-none focus:ring-ivory">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent className="bg-ink text-ivory border-ivory/24">
+                        {availabilityFilters.map((f) => (
+                          <SelectItem key={f} value={f} className="text-[11px] uppercase tracking-[0.24em] focus:bg-ivory/10 focus:text-ivory">
+                            {f}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </FilterField>
+                  <FilterField label="Search">
+                    <SearchInput
+                      value={searchQuery}
+                      onChange={setSearchQuery}
+                      placeholder="Search title or artist"
+                    />
+                  </FilterField>
+                  <FilterField label="Sort by">
                     <Select value={sort} onValueChange={(v) => setSort(v as SortOption)}>
                       <SelectTrigger className="w-[200px] bg-transparent border-ivory/24 text-[11px] uppercase tracking-[0.24em] text-ivory rounded-none focus:ring-ivory">
                         <SelectValue placeholder="Sort by" />
@@ -247,7 +230,7 @@ const Store = () => {
                         ))}
                       </SelectContent>
                     </Select>
-                  </div>
+                  </FilterField>
                 </div>
                 <div className="grid grid-cols-1 items-stretch gap-8 md:grid-cols-2 lg:grid-cols-3 md:gap-10">
                   {rest.map((item) => (
