@@ -224,7 +224,6 @@ const Store = () => {
                     </div>
                   </div>
                   <div className="flex items-center gap-3">
-                    <label className="hidden md:inline text-[11px] uppercase tracking-[0.24em] text-ivory/60">Search</label>
                     <div className="relative">
                       <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-ivory/40" />
                       <input
@@ -235,8 +234,6 @@ const Store = () => {
                         className="h-10 w-[220px] bg-transparent border border-ivory/24 pl-9 pr-3 text-[11px] uppercase tracking-[0.24em] text-ivory placeholder:text-ivory/30 rounded-none focus:outline-none focus:ring-1 focus:ring-ivory/40"
                       />
                     </div>
-                  </div>
-                  <div className="flex items-center gap-3">
                     <label className="hidden md:inline text-[11px] uppercase tracking-[0.24em] text-ivory/60">Sort by</label>
                     <Select value={sort} onValueChange={(v) => setSort(v as SortOption)}>
                       <SelectTrigger className="w-[200px] bg-transparent border-ivory/24 text-[11px] uppercase tracking-[0.24em] text-ivory rounded-none focus:ring-ivory">
