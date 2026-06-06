@@ -178,22 +178,6 @@ export const StoreCard = ({ item, variant = "grid" }: StoreCardProps) => {
   ) : null;
 
 
-  const IncludesCollapsible = effectiveTracks.length > 0 && (
-    <details className="group/inc text-sm">
-      <summary className="cursor-pointer list-none text-[11px] uppercase tracking-[0.24em] text-ivory/55 hover:text-ivory">
-        Includes ({effectiveTracks.length})
-        <span className="ml-2 text-ivory/40 group-open/inc:hidden">+</span>
-        <span className="ml-2 hidden text-ivory/40 group-open/inc:inline">−</span>
-      </summary>
-      <ul className="mt-3 space-y-1 text-ivory/70">
-        {effectiveTracks.map((t) => (
-          <li key={t.id} className="text-sm">
-            {t.title}
-          </li>
-        ))}
-      </ul>
-    </details>
-  );
 
   const renderCTA = (ctaVariant: "featured" | "grid") => {
     if (button.disabled) {
@@ -395,7 +379,6 @@ export const StoreCard = ({ item, variant = "grid" }: StoreCardProps) => {
               {CommentsBlock}
             </div>
           )}
-          {!isUnavailable && IncludesCollapsible}
           {isUnavailable && UnavailableCallout}
         </div>
         {!isUnavailable && <div className="mt-auto pt-5">{renderCTA("grid")}</div>}
