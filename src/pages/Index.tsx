@@ -145,7 +145,7 @@ const Index = () => {
             />
           )}
           <div className="absolute inset-0 bg-ink/75" aria-hidden="true" />
-          <div className="relative container-editorial grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-12 items-center">
+          <div className="relative container-editorial grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-12 items-start">
             <div className="lg:col-span-5 order-2 lg:order-1">
               <p className="eyebrow text-gold-soft mb-4">Featured Release</p>
               <div className="gold-rule mb-8" />
@@ -154,16 +154,65 @@ const Index = () => {
                 {featured.artistName}
               </p>
               {featured.shortDescription && (
-                <p className="text-base font-light leading-relaxed max-w-xl mb-10 text-ivory/70">
+                <p className="text-base font-light leading-relaxed max-w-xl mb-8 text-ivory/70">
                   {featured.shortDescription}
                 </p>
               )}
-              <Link
-                to={`/releases/${encodeURIComponent(featured.slug)}`}
-                className="inline-flex items-center gap-3 border-b border-ivory/70 pb-2 text-[12px] uppercase tracking-[0.24em] font-medium hover:text-gold hover:border-gold transition-colors duration-500"
-              >
-                Explore Release <ArrowRight className="h-4 w-4" />
-              </Link>
+              {featuredTracks.length > 0 && (
+                <div className="mb-8 max-w-xl">
+                  <p className="eyebrow text-gold-soft mb-3">Track list</p>
+                  <ol className="space-y-1.5 text-sm text-ivory/75">
+                    {featuredTracks.map((t, i) => (
+                      <li key={t.id} className="flex items-baseline gap-3">
+                        <span className="w-6 shrink-0 tabular-nums text-[11px] text-ivory/45">
+                          {String(t.trackNumber || i + 1).padStart(2, "0")}
+                        </span>
+                        <span className="leading-snug font-serif text-base">{t.trackTitle}</span>
+                      </li>
+                    ))}
+                  </ol>
+                </div>
+              )}
+              <div className="flex flex-wrap items-center gap-x-6 gap-y-3">
+                <Link
+                  to={`/releases/${encodeURIComponent(featured.slug)}`}
+                  className="inline-flex items-center gap-3 border-b border-ivory/70 pb-2 text-[12px] uppercase tracking-[0.24em] font-medium hover:text-gold hover:border-gold transition-colors duration-500"
+                >
+                  Explore Release <ArrowRight className="h-4 w-4" />
+                </Link>
+                {featuredStoreCta?.kind === "available" && (
+                  <a
+                    href={featuredStoreCta.href}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-2 border border-gold bg-gold/10 px-5 py-2.5 text-[11px] uppercase tracking-[0.24em] text-gold hover:bg-gold hover:text-ink transition-colors duration-300"
+                  >
+                    <ShoppingBag className="h-3.5 w-3.5" />
+                    Available to purchase in Store
+                  </a>
+                )}
+                {featuredStoreCta?.kind === "coming" && (
+                  <span className="inline-flex items-center gap-2 border border-ivory/15 px-5 py-2.5 text-[11px] uppercase tracking-[0.24em] text-ivory/55">
+                    <ShoppingBag className="h-3.5 w-3.5" />
+                    Coming Soon in Store
+                  </span>
+                )}
+                {featuredStoreCta?.kind === "sold" && (
+                  <span className="inline-flex items-center gap-2 border border-ivory/15 px-5 py-2.5 text-[11px] uppercase tracking-[0.24em] text-ivory/55">
+                    <ShoppingBag className="h-3.5 w-3.5" />
+                    Sold Out
+                  </span>
+                )}
+                {featuredStoreCta?.kind === "pending" && (
+                  <span className="inline-flex items-center gap-2 border border-ivory/15 px-5 py-2.5 text-[11px] uppercase tracking-[0.24em] text-ivory/55">
+                    <ShoppingBag className="h-3.5 w-3.5" />
+                    Store link coming soon
+                  </span>
+                )}
+              </div>
+              <p className="mt-5 text-[11px] uppercase tracking-[0.24em] text-ivory/50">
+                Available on all major streaming platforms
+              </p>
             </div>
             <div className="lg:col-span-7 order-1 lg:order-2 hover-zoom overflow-hidden">
               {featured.coverArt ? (
