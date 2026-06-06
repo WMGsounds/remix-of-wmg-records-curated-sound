@@ -257,7 +257,7 @@ const Index = () => {
                 </p>
               )}
               {featuredTracks.length > 0 && (
-                <div className="mb-8 max-w-xl flex-1 min-h-0 flex flex-col">
+                <div className="mb-8 max-w-xl flex-1 min-h-0 hidden md:flex flex-col">
                   <p className="eyebrow text-gold-soft mb-3">Track list</p>
                   <ol
                     ref={trackListRef}
