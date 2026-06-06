@@ -215,7 +215,7 @@ export const StoreCard = ({ item, variant = "grid" }: StoreCardProps) => {
   // ----- FEATURED VARIANT -----
   if (variant === "featured") {
     return (
-      <article className="group grid grid-cols-1 overflow-hidden border border-gold/25 bg-ink/60 backdrop-blur-sm transition-all duration-500 hover:border-gold/55 hover:shadow-[0_30px_60px_-30px_hsl(var(--gold)/0.4)] md:grid-cols-[minmax(0,0.42fr)_minmax(0,0.58fr)] md:items-stretch md:[container-type:inline-size]">
+      <article className="group grid grid-cols-1 overflow-hidden border border-gold/25 bg-ink/60 backdrop-blur-sm transition-all duration-500 hover:border-gold/55 hover:shadow-[0_30px_60px_-30px_hsl(var(--gold)/0.4)] md:grid-cols-[minmax(0,0.42fr)_minmax(0,0.58fr)] md:items-stretch md:gap-4 md:[container-type:inline-size]">
         <div className="relative aspect-square overflow-hidden bg-ink md:h-full">
           {item.productImage ? (
             <LazyImage
@@ -236,7 +236,7 @@ export const StoreCard = ({ item, variant = "grid" }: StoreCardProps) => {
 
         <div className="flex min-w-0 flex-col p-8 md:p-10">
           {/* Top row: title block on the left, spacer, CTA on the right */}
-          <div className="grid grid-cols-1 items-start gap-6 border-b border-ivory/10 pb-6 md:grid-cols-[minmax(0,0.66fr)_6rem_minmax(0,1.14fr)] md:gap-x-0">
+          <div className="grid grid-cols-1 items-start gap-6 border-b border-ivory/10 pb-6 md:grid-cols-[minmax(0,0.66fr)_7rem_minmax(0,1.14fr)] md:gap-x-0">
             <div className="min-w-0 space-y-2">
               {ArtistLine}
               <h3 className="font-serif text-2xl leading-tight text-ivory md:text-3xl">
@@ -248,7 +248,7 @@ export const StoreCard = ({ item, variant = "grid" }: StoreCardProps) => {
           </div>
 
           {/* Body row: left prices/description | spacer | right track list */}
-          <div className="mt-6 grid flex-1 min-h-0 grid-cols-1 gap-y-6 md:grid-cols-[minmax(0,0.66fr)_6rem_minmax(0,1.14fr)] md:gap-x-0">
+          <div className="mt-6 grid flex-1 min-h-0 grid-cols-1 gap-y-6 md:grid-cols-[minmax(0,0.66fr)_7rem_minmax(0,1.14fr)] md:gap-x-0">
             <div className="flex min-w-0 flex-col gap-4">
               {!isUnavailable && linkedReleaseShortDescription && (
                 <p className="text-[14px] leading-relaxed text-ivory/75">
@@ -256,7 +256,7 @@ export const StoreCard = ({ item, variant = "grid" }: StoreCardProps) => {
                 </p>
               )}
               {!isUnavailable && (
-                <p className="text-[11px] tracking-[0.06em] text-ivory/45">
+                <p className="mt-2 text-[11px] tracking-[0.06em] text-ivory/45">
                   Available on all major streaming platforms
                 </p>
               )}
