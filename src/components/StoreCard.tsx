@@ -399,6 +399,7 @@ export const StoreCard = ({ item, variant = "grid" }: StoreCardProps) => {
             </p>
           )}
           {!isUnavailable && PriceList}
+          {!isUnavailable && CommentsBlock}
           {!isUnavailable && IncludesCollapsible}
           {isUnavailable && UnavailableCallout}
         </div>
