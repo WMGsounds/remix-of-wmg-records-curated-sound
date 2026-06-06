@@ -141,6 +141,7 @@ export const fallbackStoreItems = [
     availability: "Available Now",
     featured: true,
     buttonText: "View Purchase Options",
+    createdTime: "2026-01-15T10:00:00.000Z",
   },
   {
     id: "mock-store-night-geometry-vinyl",
@@ -164,6 +165,7 @@ export const fallbackStoreItems = [
     availability: "Available Now",
     featured: false,
     buttonText: null,
+    createdTime: "2026-02-20T10:00:00.000Z",
   },
   {
     id: "mock-store-static-bloom-cd",
@@ -184,6 +186,7 @@ export const fallbackStoreItems = [
     availability: "Coming Soon",
     featured: false,
     buttonText: null,
+    createdTime: "2026-03-25T10:00:00.000Z",
   },
 ];
 
