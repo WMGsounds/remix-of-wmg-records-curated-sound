@@ -203,7 +203,7 @@ const SeoDiagnostics = () => {
     <div className="min-h-screen bg-background px-6 py-16 text-foreground">
       <Seo
         title="SEO Diagnostics"
-        description="Internal SEO diagnostics for WMG Records public routes."
+        description="Internal SEO diagnostics for WMG public routes."
         noindex
         canonicalPath="/seo-diagnostics"
       />

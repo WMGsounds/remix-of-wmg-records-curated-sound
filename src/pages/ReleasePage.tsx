@@ -240,7 +240,7 @@ const ReleasePage = () => {
         description={truncate(
           (release.shortDescription || release.fullDescription)
             ? `${release.shortDescription || release.fullDescription}`
-            : `Listen to ${release.title} by ${release.artistName || artist?.name || ""}, a ${release.releaseType} release from WMG Records.`,
+            : `Listen to ${release.title} by ${release.artistName || artist?.name || ""}, a ${release.releaseType} release from WMG.`,
         )}
         canonicalPath={`/releases/${release.slug}`}
         image={release.coverArt}

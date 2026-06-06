@@ -37,7 +37,7 @@ const Releases = () => {
     <div className="bg-ink text-ivory pb-32">
       <Seo
         title="Releases"
-        description="Browse the WMG Records catalogue, including singles, double singles and albums from Betty Blane, Bobby Chills, Tony Medley, Jack Rivers and more."
+        description="Browse the WMG catalogue, including singles, double singles and albums from Betty Blane, Bobby Chills, Tony Medley, Jack Rivers and more."
         canonicalPath="/releases"
         jsonLd={breadcrumbSchema([
           { name: "Home", path: "/" },

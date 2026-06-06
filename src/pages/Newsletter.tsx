@@ -6,7 +6,7 @@ const Newsletter = () => (
   <div className="bg-ink text-ivory pt-32 pb-16">
     <Seo
       title="Newsletter"
-      description="Join the WMG Records list for new releases, limited editions and first access — sent rarely, only when there's something worth saying."
+      description="Join the WMG list for new releases, limited editions and first access — sent rarely, only when there's something worth saying."
       canonicalPath="/newsletter"
       jsonLd={breadcrumbSchema([
         { name: "Home", path: "/" },

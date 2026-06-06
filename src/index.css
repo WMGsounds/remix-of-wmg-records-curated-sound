@@ -5,7 +5,7 @@
 @tailwind components;
 @tailwind utilities;
 
-/* WMG Records — Editorial design system. All colors HSL. */
+/* WMG — Editorial design system. All colors HSL. */
 
 @layer base {
   :root {
