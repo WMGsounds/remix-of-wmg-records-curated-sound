@@ -58,6 +58,7 @@ type StoreCardProps = {
 export const StoreCard = ({ item, variant = "grid" }: StoreCardProps) => {
   const { data: allTracks = [] } = useTracks();
   const { data: allReleases = [] } = useReleases();
+  const isMobile = useIsMobile();
   const [tracksExpanded, setTracksExpanded] = useState(false);
   const [tracksOverflow, setTracksOverflow] = useState(false);
   const tracksScrollRef = useRef<HTMLOListElement | null>(null);
