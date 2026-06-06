@@ -27,10 +27,11 @@ const Index = () => {
       .filter((t) => t.releaseId === featured.id)
       .sort((a, b) => (a.trackNumber || 0) - (b.trackNumber || 0));
   }, [allTracks, featured]);
-  const TRACK_PREVIEW_COUNT = 8;
   const [tracksExpanded, setTracksExpanded] = useState(false);
   const featuredArtworkRef = useRef<HTMLDivElement>(null);
   const [featuredArtworkHeight, setFeaturedArtworkHeight] = useState<number | null>(null);
+  const trackListRef = useRef<HTMLOListElement>(null);
+  const [visibleTrackCount, setVisibleTrackCount] = useState<number>(0);
 
   useLayoutEffect(() => {
     const artwork = featuredArtworkRef.current;
