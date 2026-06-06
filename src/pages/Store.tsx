@@ -55,8 +55,8 @@ function sortItems(list: StoreItem[], sort: SortOption | undefined): StoreItem[]
 
 const Store = () => {
   const { data: items = [], isLoading, isError } = useStoreItems();
-  const [formatFilter, setFormatFilter] = useState<string>("All");
-  const [availabilityFilter, setAvailabilityFilter] = useState<AvailabilityFilter>("All");
+  // formatTypeFilter encodes: "All" | "fmt:Vinyl" | "type:Album"
+  const [formatTypeFilter, setFormatTypeFilter] = useState<string>("All");
   const [sort, setSort] = useState<SortOption | undefined>(undefined);
   const [searchQuery, setSearchQuery] = useState<string>("");
 
@@ -66,7 +66,16 @@ const Store = () => {
     items.forEach((i) => i.formats.forEach((f) => present.add(f)));
     return FORMAT_DISPLAY_ORDER.filter((f) => present.has(f));
   }, [items]);
-  const formatFilterOptions = useMemo(() => ["All", ...availableFormats], [availableFormats]);
+
+  // Build type filter options from the actually-present product types (preserve first-seen order).
+  const availableTypes = useMemo<string[]>(() => {
+    const seen: string[] = [];
+    for (const i of items) {
+      const t = i.productType?.trim();
+      if (t && !seen.includes(t)) seen.push(t);
+    }
+    return seen;
+  }, [items]);
 
   // Featured is computed from items independent of filters/sort so it never disappears
   // or reshuffles when filters change.
@@ -79,8 +88,15 @@ const Store = () => {
     return items.filter((i) => {
       if (i.availability === "Hidden") return false;
       if (i.featured) return false;
-      if (formatFilter !== "All" && !i.formats.includes(formatFilter as StoreFormat)) return false;
-      if (availabilityFilter !== "All" && i.availability !== (availabilityFilter as StoreAvailability)) return false;
+      if (formatTypeFilter !== "All") {
+        if (formatTypeFilter.startsWith("fmt:")) {
+          const f = formatTypeFilter.slice(4) as StoreFormat;
+          if (!i.formats.includes(f)) return false;
+        } else if (formatTypeFilter.startsWith("type:")) {
+          const t = formatTypeFilter.slice(5);
+          if ((i.productType ?? "") !== t) return false;
+        }
+      }
       if (!matchesSearch(searchQuery, [
         i.title,
         i.artist?.name,
@@ -89,7 +105,7 @@ const Store = () => {
       ])) return false;
       return true;
     });
-  }, [items, formatFilter, availabilityFilter, searchQuery]);
+  }, [items, formatTypeFilter, searchQuery]);
 
   const rest = useMemo(() => sortItems(filtered, sort), [filtered, sort]);
 
