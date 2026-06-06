@@ -146,10 +146,10 @@ const Index = () => {
             />
           )}
           <div className="absolute inset-0 bg-ink/75" aria-hidden="true" />
-          <div className="relative container-editorial grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-12 lg:items-stretch [container-type:inline-size]">
+          <div className="relative container-editorial grid grid-cols-1 lg:grid-cols-[minmax(0,5fr)_minmax(0,7fr)] gap-12 lg:items-start [container-type:inline-size]">
             <div
-              className={`lg:col-span-5 order-2 lg:order-1 flex flex-col min-h-0 ${
-                tracksExpanded ? "" : "lg:h-[calc(58.333cqw_-_1.25rem)] lg:max-h-[calc(58.333cqw_-_1.25rem)]"
+              className={`order-2 lg:order-1 flex flex-col min-h-0 ${
+                tracksExpanded ? "" : "lg:h-[calc(58.333cqw_-_1.75rem)] lg:max-h-[calc(58.333cqw_-_1.75rem)]"
               }`}
             >
               <div className="flex flex-wrap items-start justify-between gap-4 mb-4">
@@ -229,7 +229,7 @@ const Index = () => {
                 </Link>
               </div>
             </div>
-            <div className="lg:col-span-7 order-1 lg:order-2 hover-zoom overflow-hidden self-start">
+            <div className="order-1 lg:order-2 hover-zoom overflow-hidden self-start w-full">
               {featured.coverArt ? (
                 <LazyImage
                   src={featured.coverArt}
