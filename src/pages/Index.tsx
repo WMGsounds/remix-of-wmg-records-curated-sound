@@ -25,9 +25,10 @@ const Index = () => {
     if (!featured) return [];
     return allTracks
       .filter((t) => t.releaseId === featured.id)
-      .sort((a, b) => (a.trackNumber || 0) - (b.trackNumber || 0))
-      .slice(0, 12);
+      .sort((a, b) => (a.trackNumber || 0) - (b.trackNumber || 0));
   }, [allTracks, featured]);
+  const TRACK_PREVIEW_COUNT = 8;
+  const [tracksExpanded, setTracksExpanded] = useState(false);
 
   const featuredStoreCta = useMemo<
     | { kind: "available"; href: string }
