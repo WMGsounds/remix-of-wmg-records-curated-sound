@@ -297,7 +297,7 @@ const Index = () => {
       </section>
 
       {/* LATEST RELEASES */}
-      <section className="relative overflow-hidden bg-ink pt-10 pb-14 md:pt-20 md:pb-40 text-ivory">
+      <section className="relative overflow-hidden bg-ink pt-8 pb-14 md:pt-12 md:pb-28 text-ivory">
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_74%_38%,hsl(var(--golden-brown)/0.38),transparent_34%),radial-gradient(circle_at_18%_78%,hsl(var(--gold)/0.16),transparent_28%)]" aria-hidden="true" />
         <div className="absolute inset-0 opacity-[0.08] [background-image:linear-gradient(90deg,hsl(var(--ivory)/0.8)_1px,transparent_1px),linear-gradient(0deg,hsl(var(--ivory)/0.8)_1px,transparent_1px)] [background-size:3px_3px]" aria-hidden="true" />
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,transparent_42%,hsl(var(--ink)/0.72)_100%)]" aria-hidden="true" />
