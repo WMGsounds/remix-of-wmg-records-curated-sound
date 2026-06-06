@@ -254,36 +254,21 @@ export const StoreCard = ({ item, variant = "grid" }: StoreCardProps) => {
         </div>
 
         <div className="flex min-w-0 flex-col p-8 md:p-10 md:max-h-[42cqw] md:overflow-hidden">
-          {/* Top row: badges + helper line on the left, spacer, CTA on the right */}
+          {/* Top row: title block on the left, spacer, CTA on the right */}
           <div className="grid grid-cols-1 items-start gap-6 border-b border-ivory/10 pb-6 md:grid-cols-[minmax(0,0.66fr)_6rem_minmax(0,1.14fr)] md:gap-x-0">
-            <div className="min-w-0">
-              <div className="flex flex-wrap items-center gap-2">
-                <span className="inline-flex items-center border border-gold/50 bg-gold/5 px-3 py-1 text-[10px] uppercase tracking-[0.24em] text-gold">
-                  Featured
-                </span>
-                <span
-                  className={`inline-flex items-center border px-3 py-1 text-[10px] uppercase tracking-[0.24em] ${statusLabelClass(item.availability)}`}
-                >
-                  {item.availability}
-                </span>
-              </div>
-              <p className="mt-4 text-[10px] uppercase tracking-[0.24em] text-ivory/55">
-                Available on all major streaming platforms
-              </p>
+            <div className="min-w-0 space-y-2">
+              {ArtistLine}
+              <h3 className="font-serif text-2xl leading-tight text-ivory md:text-3xl">
+                {item.title}
+              </h3>
             </div>
             <div aria-hidden className="hidden md:block" />
             <div className="min-w-0">{renderCTA("featured")}</div>
           </div>
 
-          {/* Body row: left text/prices/description | spacer | right track list */}
+          {/* Body row: left prices/description | spacer | right track list */}
           <div className="mt-6 grid flex-1 min-h-0 grid-cols-1 gap-y-6 md:grid-cols-[minmax(0,0.66fr)_6rem_minmax(0,1.14fr)] md:gap-x-0">
             <div className="flex min-w-0 flex-col gap-5">
-              <header className="space-y-2">
-                {ArtistLine}
-                <h3 className="font-serif text-2xl leading-tight text-ivory md:text-3xl">
-                  {item.title}
-                </h3>
-              </header>
               {!isUnavailable && orderedFormats.length > 0 && (
                 <p className="text-xs uppercase tracking-[0.2em] text-ivory/65">
                   <span className="text-ivory/45">Available in: </span>
@@ -291,7 +276,13 @@ export const StoreCard = ({ item, variant = "grid" }: StoreCardProps) => {
                 </p>
               )}
               {!isUnavailable && PriceList}
+              {!isUnavailable && (
+                <p className="text-[10px] uppercase tracking-[0.24em] text-ivory/55">
+                  Available on all major streaming platforms
+                </p>
+              )}
               {!isUnavailable && CommentsBlock}
+
               {!isUnavailable && linkedReleaseShortDescription && (
                 <p className="mt-auto text-[15px] leading-relaxed text-ivory/70">
                   {linkedReleaseShortDescription}
