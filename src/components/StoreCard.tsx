@@ -264,6 +264,17 @@ export const StoreCard = ({ item, variant = "grid" }: StoreCardProps) => {
                 <span
                   className={`inline-flex items-center border px-3 py-1 text-[10px] uppercase tracking-[0.24em] ${statusLabelClass(item.availability)}`}
                 >
+        <div className="flex min-w-0 flex-col p-8 md:p-10 md:max-h-[42cqw] md:overflow-hidden">
+          {/* Top row: badges + helper line on the left, spacer, CTA on the right */}
+          <div className="grid grid-cols-1 items-start gap-6 border-b border-ivory/10 pb-6 md:grid-cols-[minmax(0,0.7fr)_3rem_minmax(0,1.18fr)] md:gap-x-0">
+            <div className="min-w-0">
+              <div className="flex flex-wrap items-center gap-2">
+                <span className="inline-flex items-center border border-gold/50 bg-gold/5 px-3 py-1 text-[10px] uppercase tracking-[0.24em] text-gold">
+                  Featured
+                </span>
+                <span
+                  className={`inline-flex items-center border px-3 py-1 text-[10px] uppercase tracking-[0.24em] ${statusLabelClass(item.availability)}`}
+                >
                   {item.availability}
                 </span>
               </div>
@@ -271,11 +282,12 @@ export const StoreCard = ({ item, variant = "grid" }: StoreCardProps) => {
                 Available on all major streaming platforms
               </p>
             </div>
+            <div aria-hidden className="hidden md:block" />
             <div className="min-w-0">{renderCTA("featured")}</div>
           </div>
 
-          {/* Body row: left text/prices/description | right track list */}
-          <div className="mt-6 grid flex-1 min-h-0 grid-cols-1 gap-y-6 md:grid-cols-[minmax(0,0.82fr)_minmax(0,1.18fr)] md:gap-x-10">
+          {/* Body row: left text/prices/description | spacer | right track list */}
+          <div className="mt-6 grid flex-1 min-h-0 grid-cols-1 gap-y-6 md:grid-cols-[minmax(0,0.7fr)_3rem_minmax(0,1.18fr)] md:gap-x-0">
             <div className="flex min-w-0 flex-col gap-5">
               <header className="space-y-2">
                 {ArtistLine}
@@ -290,6 +302,7 @@ export const StoreCard = ({ item, variant = "grid" }: StoreCardProps) => {
                 </p>
               )}
               {!isUnavailable && PriceList}
+              {!isUnavailable && CommentsBlock}
               {!isUnavailable && linkedReleaseShortDescription && (
                 <p className="mt-auto text-[15px] leading-relaxed text-ivory/70">
                   {linkedReleaseShortDescription}
@@ -297,6 +310,8 @@ export const StoreCard = ({ item, variant = "grid" }: StoreCardProps) => {
               )}
               {isUnavailable && UnavailableCallout}
             </div>
+
+            <div aria-hidden className="hidden md:block" />
 
             <div className="flex min-w-0 min-h-0 flex-col">
               {!isUnavailable && effectiveTracks.length > 0 && (
