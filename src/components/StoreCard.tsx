@@ -374,10 +374,9 @@ export const StoreCard = ({ item, variant = "grid" }: StoreCardProps) => {
               {item.title}
             </h3>
           </header>
-          {!isUnavailable && orderedFormats.length > 0 && (
-            <p className="text-xs uppercase tracking-[0.2em] text-ivory/65">
-              <span className="text-ivory/45">Available in: </span>
-              <span className="text-ivory/85">{formatLine}</span>
+          {!isUnavailable && (
+            <p className="text-[11px] tracking-[0.06em] text-ivory/55">
+              Available on all major streaming platforms
             </p>
           )}
           {!isUnavailable && (PriceList || CommentsBlock) && (
@@ -388,7 +387,7 @@ export const StoreCard = ({ item, variant = "grid" }: StoreCardProps) => {
           )}
           {isUnavailable && UnavailableCallout}
         </div>
-        {!isUnavailable && <div className="mt-auto pt-5">{renderCTA("grid")}</div>}
+        {!isUnavailable && <div className="mt-auto pt-8">{renderCTA("grid")}</div>}
       </div>
 
     </article>
