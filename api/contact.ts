@@ -390,13 +390,14 @@ export default async function handler(req: any, res: any) {
       });
     } catch (sendErr: any) {
       console.error("[contact] Notification threw:", sendErr?.message || sendErr, sendErr?.stack);
-      return res.status(502).json({ error: "Failed to send message", detail: sendErr?.message ?? String(sendErr) });
+      return res.status(502).json({ error: "Failed to send message. Please try again or email us directly." });
     }
 
     if (notifyResult?.error) {
       console.error("[contact] Notification send failed:", JSON.stringify(notifyResult.error));
-      return res.status(502).json({ error: "Failed to send message", detail: notifyResult.error?.message ?? "resend_error" });
+      return res.status(502).json({ error: "Failed to send message. Please try again or email us directly." });
     }
+
     console.log("[contact] Notification sent", { id: notifyResult?.data?.id });
 
     // Auto-response (to submitter)
