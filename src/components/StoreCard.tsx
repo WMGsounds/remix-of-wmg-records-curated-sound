@@ -85,7 +85,18 @@ export const StoreCard = ({ item, variant = "grid" }: StoreCardProps) => {
       {MetaRow}
 
       <header className="space-y-2">
-        {item.artist && <p className="eyebrow text-gold">{item.artist.name}</p>}
+        {item.artist && (
+          item.artist.slug ? (
+            <Link
+              to={`/artists/${encodeURIComponent(item.artist.slug)}`}
+              className="eyebrow text-gold inline-block transition-colors hover:text-ivory focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gold"
+            >
+              {item.artist.name}
+            </Link>
+          ) : (
+            <p className="eyebrow text-gold">{item.artist.name}</p>
+          )
+        )}
         <h3 className="font-serif text-2xl leading-tight text-ivory md:text-3xl">{item.title}</h3>
       </header>
 
