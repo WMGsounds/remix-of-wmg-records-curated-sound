@@ -1,7 +1,9 @@
 import { Link, useParams, Navigate } from "react-router-dom";
 import { ArrowRight } from "lucide-react";
-import { useArtistBySlug } from "@/lib/queries";
+import { useArtistBySlug, useStoreItems, useJournal } from "@/lib/queries";
 import { LazyImage } from "@/components/LazyImage";
+import { StoreCard } from "@/components/StoreCard";
+import { formatJournalDate } from "@/components/JournalArticle";
 
 import { Seo } from "@/components/Seo";
 import { breadcrumbSchema, absoluteUrl, truncate } from "@/lib/seo";
@@ -10,6 +12,8 @@ import { PageLoading, PageError } from "@/components/UIStates";
 const ArtistPage = () => {
   const { slug } = useParams();
   const { data, isLoading, isError } = useArtistBySlug(slug);
+  const { data: storeItems = [] } = useStoreItems();
+  const { data: journalArticles = [] } = useJournal();
 
   if (isLoading) return <PageLoading label="Opening artist" />;
   if (isError) return <PageError />;
@@ -18,6 +22,33 @@ const ArtistPage = () => {
   const { artist, discography } = data;
   const heroImage = artist.heroImage2 || artist.heroImage;
   const featured = discography[0];
+
+  const artistStoreItems = storeItems
+    .filter(
+      (s) =>
+        s.availability !== "Hidden" &&
+        s.artist &&
+        (s.artist.id === artist.id || s.artist.slug === artist.slug),
+    )
+    .sort((a, b) => {
+      if (a.featured !== b.featured) return a.featured ? -1 : 1;
+      return a.title.localeCompare(b.title);
+    })
+    .slice(0, 6);
+
+  const artistJournal = journalArticles
+    .filter(
+      (a) =>
+        a.published &&
+        (a.artistIds?.includes(artist.id) ||
+          a.artists?.some((x) => x.id === artist.id || x.slug === artist.slug)),
+    )
+    .sort(
+      (a, b) =>
+        +new Date(b.publishedDate || b.lastEditedTime || b.createdTime) -
+        +new Date(a.publishedDate || a.lastEditedTime || a.createdTime),
+    )
+    .slice(0, 3);
   const path = `/artists/${artist.slug}`;
   const seoTitle = `${artist.name}${artist.genre ? ` | ${artist.genre}` : ""} | WMG Records`;
   const seoDesc = truncate(
@@ -184,7 +215,77 @@ const ArtistPage = () => {
           </div>
         </section>
 
+      {/* Store items for this artist */}
+      {artistStoreItems.length > 0 && (
+        <section className="bg-ink text-ivory py-24 md:py-32 border-t border-ivory/10">
+          <div className="container-editorial">
+            <p className="eyebrow mb-4 text-gold-soft">Store</p>
+            <h2 className="display-serif text-4xl md:text-6xl mb-12">Available from the Store</h2>
+            <div className="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-3 md:gap-10">
+              {artistStoreItems.map((item) => (
+                <StoreCard key={item.id} item={item} />
+              ))}
+            </div>
+            <div className="mt-12">
+              <Link
+                to="/store"
+                className="inline-flex items-center gap-3 border-b border-ivory/70 pb-2 text-[12px] uppercase tracking-[0.24em] hover:text-gold hover:border-gold transition-colors duration-500"
+              >
+                Visit the Store <ArrowRight className="h-4 w-4" />
+              </Link>
+            </div>
+          </div>
+        </section>
+      )}
+
+      {/* Recent Journal articles for this artist */}
+      {artistJournal.length > 0 && (
+        <section className="bg-ink text-ivory py-24 md:py-32 border-t border-ivory/10">
+          <div className="container-editorial">
+            <p className="eyebrow mb-4 text-gold-soft">Journal</p>
+            <h2 className="display-serif text-4xl md:text-6xl mb-12">Latest from the Journal</h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10 md:gap-12">
+              {artistJournal.map((a) => (
+                <Link
+                  key={a.id}
+                  to={`/journal/${encodeURIComponent(a.slug)}`}
+                  className="group block hover-zoom focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-gold"
+                >
+                  <div className="relative aspect-[4/3] bg-ink overflow-hidden">
+                    {a.coverImage ? (
+                      <LazyImage
+                        src={a.coverImage}
+                        alt={a.imageAlt || `${a.title} cover image`}
+                        width={1200}
+                        height={900}
+                        displayWidth={640}
+                        sizes="(min-width:1024px) 33vw, (min-width:768px) 50vw, 100vw"
+                        className="object-contain"
+                      />
+                    ) : (
+                      <div className="h-full w-full bg-gradient-to-br from-ink to-ivory/10" />
+                    )}
+                  </div>
+                  <div className="pt-5">
+                    {a.category && <p className="eyebrow text-gold mb-3">{a.category}</p>}
+                    <h3 className="font-serif text-2xl md:text-3xl leading-tight text-ivory">{a.title}</h3>
+                    {a.excerpt && (
+                      <p className="text-sm text-ivory/65 mt-3 line-clamp-3 leading-relaxed">{a.excerpt}</p>
+                    )}
+                    <div className="mt-4 flex flex-wrap items-center gap-x-4 gap-y-1 text-[11px] uppercase tracking-[0.22em] text-ivory/70">
+                      {a.publishedDate && <span>{formatJournalDate(a.publishedDate)}</span>}
+                      {a.readingTime > 0 && <span>{a.readingTime} min read</span>}
+                    </div>
+                  </div>
+                </Link>
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
+
     </div>
+
   );
 };
 
