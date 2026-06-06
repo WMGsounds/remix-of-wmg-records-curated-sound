@@ -396,9 +396,6 @@ const ReleasePage = () => {
                           <ShoppingBag className="h-3.5 w-3.5" />
                           {storeCta.label}
                         </a>
-                        <p className="text-[10px] uppercase tracking-[0.24em] text-ivory/40">
-                          Opens external purchase page
-                        </p>
                       </>
                     )}
                   </div>
