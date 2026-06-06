@@ -373,8 +373,7 @@ export const StoreCard = ({ item, variant = "grid" }: StoreCardProps) => {
         )}
       </div>
       <div className="flex flex-1 flex-col p-8 md:p-10">
-        <div className="flex flex-col gap-6">
-          {MetaRow}
+        <div className="flex flex-col gap-5">
           <header className="space-y-2">
             {ArtistLine}
             <h3
@@ -390,13 +389,18 @@ export const StoreCard = ({ item, variant = "grid" }: StoreCardProps) => {
               <span className="text-ivory/85">{formatLine}</span>
             </p>
           )}
-          {!isUnavailable && PriceList}
-          {!isUnavailable && CommentsBlock}
+          {!isUnavailable && (PriceList || CommentsBlock) && (
+            <div className="flex flex-col gap-2">
+              {PriceList}
+              {CommentsBlock}
+            </div>
+          )}
           {!isUnavailable && IncludesCollapsible}
           {isUnavailable && UnavailableCallout}
         </div>
-        {!isUnavailable && <div className="mt-auto pt-6">{renderCTA("grid")}</div>}
+        {!isUnavailable && <div className="mt-auto pt-5">{renderCTA("grid")}</div>}
       </div>
+
     </article>
   );
 };
