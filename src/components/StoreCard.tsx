@@ -1,3 +1,4 @@
+import { Link } from "react-router-dom";
 import { LazyImage } from "@/components/LazyImage";
 import type { StoreItem, StoreFormat } from "@/lib/types";
 
