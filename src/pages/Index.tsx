@@ -25,9 +25,10 @@ const Index = () => {
     if (!featured) return [];
     return allTracks
       .filter((t) => t.releaseId === featured.id)
-      .sort((a, b) => (a.trackNumber || 0) - (b.trackNumber || 0))
-      .slice(0, 12);
+      .sort((a, b) => (a.trackNumber || 0) - (b.trackNumber || 0));
   }, [allTracks, featured]);
+  const TRACK_PREVIEW_COUNT = 8;
+  const [tracksExpanded, setTracksExpanded] = useState(false);
 
   const featuredStoreCta = useMemo<
     | { kind: "available"; href: string }
@@ -145,7 +146,7 @@ const Index = () => {
             />
           )}
           <div className="absolute inset-0 bg-ink/75" aria-hidden="true" />
-          <div className="relative container-editorial grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-12 items-stretch">
+          <div className="relative container-editorial grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-12 items-start">
             <div className="lg:col-span-5 order-2 lg:order-1 flex flex-col">
               <div className="flex flex-wrap items-start justify-between gap-4 mb-4">
                 <p className="eyebrow text-gold-soft">Featured Release</p>
@@ -196,7 +197,7 @@ const Index = () => {
                 <div className="mb-8 max-w-xl">
                   <p className="eyebrow text-gold-soft mb-3">Track list</p>
                   <ol className="space-y-1.5 text-sm text-ivory/75">
-                    {featuredTracks.map((t, i) => (
+                    {(tracksExpanded ? featuredTracks : featuredTracks.slice(0, TRACK_PREVIEW_COUNT)).map((t, i) => (
                       <li key={t.id} className="flex items-baseline gap-3">
                         <span className="w-6 shrink-0 tabular-nums text-[11px] text-ivory/45">
                           {String(t.trackNumber || i + 1).padStart(2, "0")}
@@ -205,6 +206,16 @@ const Index = () => {
                       </li>
                     ))}
                   </ol>
+                  {featuredTracks.length > TRACK_PREVIEW_COUNT && (
+                    <button
+                      type="button"
+                      onClick={() => setTracksExpanded((v) => !v)}
+                      className="mt-3 inline-flex items-center gap-1.5 text-[11px] uppercase tracking-[0.24em] text-gold/80 transition-colors hover:text-gold"
+                    >
+                      <span>{tracksExpanded ? "Show less" : "View all"}</span>
+                      <span aria-hidden>{tracksExpanded ? "▴" : "▾"}</span>
+                    </button>
+                  )}
                 </div>
               )}
               <div className="mt-auto pt-2">

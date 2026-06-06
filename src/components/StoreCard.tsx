@@ -224,7 +224,7 @@ export const StoreCard = ({ item, variant = "grid" }: StoreCardProps) => {
   // ----- FEATURED VARIANT -----
   if (variant === "featured") {
     return (
-      <article className="group grid grid-cols-1 overflow-hidden border border-gold/25 bg-ink/60 backdrop-blur-sm transition-all duration-500 hover:border-gold/55 hover:shadow-[0_30px_60px_-30px_hsl(var(--gold)/0.4)] md:grid-cols-[minmax(0,0.42fr)_minmax(0,0.58fr)] md:items-stretch">
+      <article className="group grid grid-cols-1 overflow-hidden border border-gold/25 bg-ink/60 backdrop-blur-sm transition-all duration-500 hover:border-gold/55 hover:shadow-[0_30px_60px_-30px_hsl(var(--gold)/0.4)] md:grid-cols-[minmax(0,0.42fr)_minmax(0,0.58fr)] md:items-stretch md:[container-type:inline-size]">
         <div className="relative aspect-square overflow-hidden bg-ink md:h-full">
           {item.productImage ? (
             <LazyImage
@@ -243,9 +243,9 @@ export const StoreCard = ({ item, variant = "grid" }: StoreCardProps) => {
           )}
         </div>
 
-        <div className="flex min-w-0 flex-col p-8 md:p-10">
+        <div className="flex min-w-0 flex-col p-8 md:p-10 md:max-h-[42cqw] md:overflow-hidden">
           {/* Top row: badges + helper line on the left, CTA on the right */}
-          <div className="grid grid-cols-1 items-start gap-6 border-b border-ivory/10 pb-6 md:grid-cols-2 md:gap-x-12">
+          <div className="grid grid-cols-1 items-start gap-6 border-b border-ivory/10 pb-6 md:grid-cols-[minmax(0,0.82fr)_minmax(0,1.18fr)] md:gap-x-10">
             <div className="min-w-0">
               <div className="flex flex-wrap items-center gap-2">
                 <span className="inline-flex items-center border border-gold/50 bg-gold/5 px-3 py-1 text-[10px] uppercase tracking-[0.24em] text-gold">
@@ -265,7 +265,7 @@ export const StoreCard = ({ item, variant = "grid" }: StoreCardProps) => {
           </div>
 
           {/* Body row: left text/prices/description | right track list */}
-          <div className="mt-6 grid flex-1 min-h-0 grid-cols-1 gap-y-6 md:grid-cols-2 md:gap-x-12">
+          <div className="mt-6 grid flex-1 min-h-0 grid-cols-1 gap-y-6 md:grid-cols-[minmax(0,0.82fr)_minmax(0,1.18fr)] md:gap-x-10">
             <div className="flex min-w-0 flex-col gap-5">
               <header className="space-y-2">
                 {ArtistLine}
