@@ -65,13 +65,14 @@ const Contact = () => {
         let detail = "";
         try {
           const data = await res.json();
-          detail = data?.detail || data?.error || "";
+          detail = data?.error || "";
         } catch {
           /* ignore */
         }
-        console.error("[contact] Submit failed", res.status, detail);
+        console.error("[contact] Submit failed", res.status);
         throw new Error(detail || "send_failed");
       }
+
       setSent(true);
       setForm({ name: "", email: "", subject: "General", message: "", website: "" });
       setDemoUploads({ 0: null, 1: null, 2: null });

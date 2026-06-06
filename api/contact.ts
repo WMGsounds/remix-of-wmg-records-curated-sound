@@ -317,11 +317,18 @@ export default async function handler(req: any, res: any) {
       : (typeof body.demoUrl === "string" && body.demoUrl.length > 0
           ? [{ label: "Demo", url: body.demoUrl, filename: body.demoFilename, size: body.demoSize }]
           : []);
+    const UPLOADCARE_HOSTS = new Set(["ucarecdn.com"]);
     for (let i = 0; i < rawDemos.length && demos.length < 3; i++) {
       const d = rawDemos[i];
       if (!d || typeof d.url !== "string" || d.url.length === 0) continue;
       const url = d.url.trim();
-      if (!/^https:\/\//i.test(url)) {
+      let parsedUrl: URL;
+      try {
+        parsedUrl = new URL(url);
+      } catch {
+        return res.status(400).json({ error: "Invalid demo file URL" });
+      }
+      if (parsedUrl.protocol !== "https:" || !UPLOADCARE_HOSTS.has(parsedUrl.hostname)) {
         return res.status(400).json({ error: "Invalid demo file URL" });
       }
       const filename =
@@ -332,6 +339,7 @@ export default async function handler(req: any, res: any) {
       const label = typeof d.label === "string" && d.label.length > 0 ? d.label.slice(0, 40) : `Demo ${demos.length + 1}`;
       demos.push({ label, url, filename, size });
     }
+
 
     // Honeypot — silently succeed
     if (honeypot.length > 0) {
@@ -382,13 +390,14 @@ export default async function handler(req: any, res: any) {
       });
     } catch (sendErr: any) {
       console.error("[contact] Notification threw:", sendErr?.message || sendErr, sendErr?.stack);
-      return res.status(502).json({ error: "Failed to send message", detail: sendErr?.message ?? String(sendErr) });
+      return res.status(502).json({ error: "Failed to send message. Please try again or email us directly." });
     }
 
     if (notifyResult?.error) {
       console.error("[contact] Notification send failed:", JSON.stringify(notifyResult.error));
-      return res.status(502).json({ error: "Failed to send message", detail: notifyResult.error?.message ?? "resend_error" });
+      return res.status(502).json({ error: "Failed to send message. Please try again or email us directly." });
     }
+
     console.log("[contact] Notification sent", { id: notifyResult?.data?.id });
 
     // Auto-response (to submitter)
@@ -413,6 +422,6 @@ export default async function handler(req: any, res: any) {
     return res.status(200).json({ ok: true });
   } catch (err: any) {
     console.error("[contact] Unexpected error:", err?.message || err, err?.stack);
-    return res.status(500).json({ error: "Unexpected server error", detail: err?.message ?? String(err) });
+    return res.status(500).json({ error: "Unexpected server error. Please try again or email us directly." });
   }
 }
