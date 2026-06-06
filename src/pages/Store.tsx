@@ -197,29 +197,37 @@ const Store = () => {
                 )}
                 <div className="flex flex-wrap items-end justify-between gap-y-6 mb-10 border-y border-ivory/18 py-6">
                   <div className="flex flex-wrap items-end gap-x-8 gap-y-6">
-                    <FilterField label="Format">
-                      <Select value={formatFilter} onValueChange={(v) => setFormatFilter(v)}>
-                        <SelectTrigger className="w-[160px] bg-transparent border-ivory/24 text-[11px] uppercase tracking-[0.24em] text-ivory rounded-none focus:ring-ivory">
+                    <FilterField label="Format / Type">
+                      <Select value={formatTypeFilter} onValueChange={(v) => setFormatTypeFilter(v)}>
+                        <SelectTrigger className="w-[200px] bg-transparent border-ivory/24 text-[11px] uppercase tracking-[0.24em] text-ivory rounded-none focus:ring-ivory">
                           <SelectValue />
                         </SelectTrigger>
                         <SelectContent className="bg-ink text-ivory border-ivory/24">
-                          {formatFilterOptions.map((f) => (
-                            <SelectItem key={f} value={f} className="text-[11px] uppercase tracking-[0.24em] focus:bg-ivory/10 focus:text-ivory">
+                          <SelectItem value="All" className="text-[11px] uppercase tracking-[0.24em] focus:bg-ivory/10 focus:text-ivory">
+                            All
+                          </SelectItem>
+                          {availableFormats.length > 0 && (
+                            <SelectSeparator className="bg-ivory/15" />
+                          )}
+                          {availableFormats.map((f) => (
+                            <SelectItem
+                              key={`fmt-${f}`}
+                              value={`fmt:${f}`}
+                              className="text-[11px] uppercase tracking-[0.24em] focus:bg-ivory/10 focus:text-ivory"
+                            >
                               {f}
                             </SelectItem>
                           ))}
-                        </SelectContent>
-                      </Select>
-                    </FilterField>
-                    <FilterField label="Availability">
-                      <Select value={availabilityFilter} onValueChange={(v) => setAvailabilityFilter(v as AvailabilityFilter)}>
-                        <SelectTrigger className="w-[180px] bg-transparent border-ivory/24 text-[11px] uppercase tracking-[0.24em] text-ivory rounded-none focus:ring-ivory">
-                          <SelectValue />
-                        </SelectTrigger>
-                        <SelectContent className="bg-ink text-ivory border-ivory/24">
-                          {availabilityFilters.map((f) => (
-                            <SelectItem key={f} value={f} className="text-[11px] uppercase tracking-[0.24em] focus:bg-ivory/10 focus:text-ivory">
-                              {f}
+                          {availableTypes.length > 0 && (
+                            <SelectSeparator className="bg-ivory/15" />
+                          )}
+                          {availableTypes.map((t) => (
+                            <SelectItem
+                              key={`type-${t}`}
+                              value={`type:${t}`}
+                              className="text-[11px] uppercase tracking-[0.24em] focus:bg-ivory/10 focus:text-ivory"
+                            >
+                              {t}
                             </SelectItem>
                           ))}
                         </SelectContent>
