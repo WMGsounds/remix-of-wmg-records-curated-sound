@@ -1,10 +1,11 @@
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import { LazyImage } from "@/components/LazyImage";
 import { useTracks } from "@/lib/queries";
 import type { StoreItem, StoreFormat, Track } from "@/lib/types";
 
 const FORMAT_DISPLAY_ORDER: StoreFormat[] = ["Vinyl", "CD", "iTunes", "Digital", "Merch", "Other"];
+const COLLAPSED_TRACK_COUNT = 7;
 
 type ButtonState = {
   disabled: boolean;
@@ -56,9 +57,9 @@ type StoreCardProps = {
 
 export const StoreCard = ({ item, variant = "grid" }: StoreCardProps) => {
   const { data: allTracks = [] } = useTracks();
+  const [tracksExpanded, setTracksExpanded] = useState(false);
 
   const effectiveTracks = useMemo(() => {
-    // Prefer the Store item's own Related Tracks if Notion provides them.
     if (item.relatedTracks && item.relatedTracks.length > 0) {
       return item.relatedTracks.map((t, i) => ({
         id: t.id,
@@ -66,7 +67,6 @@ export const StoreCard = ({ item, variant = "grid" }: StoreCardProps) => {
         trackNumber: i + 1,
       }));
     }
-    // Fall back to the linked Release's tracklist (same source as Release pages).
     const releaseId = item.release?.id;
     const releaseSlug = item.release?.slug;
     if (!releaseId && !releaseSlug) return [];
@@ -92,41 +92,35 @@ export const StoreCard = ({ item, variant = "grid" }: StoreCardProps) => {
   const formatLine = orderedFormats.join(" · ");
   const artistName = item.artist?.name ?? "WMG";
   const ariaLabel = `Buy ${item.title} by ${artistName}`;
+  const isUnavailable = item.availability === "Coming Soon" || item.availability === "Sold Out";
 
-  const MetaRow = (
-    <div className="flex min-h-[2.25rem] flex-wrap items-center gap-2 border-b border-ivory/10 pb-4">
-      {variant === "featured" && (
-        <span className="inline-flex items-center border border-gold/50 bg-gold/5 px-3 py-1 text-[10px] uppercase tracking-[0.24em] text-gold">
-          Featured
-        </span>
-      )}
-      <span
-        className={`inline-flex items-center border px-3 py-1 text-[10px] uppercase tracking-[0.24em] ${statusLabelClass(item.availability)}`}
-      >
-        {item.availability}
-      </span>
-      {variant !== "featured" && item.featured && (
-        <span className="inline-flex items-center border border-gold/40 px-3 py-1 text-[10px] uppercase tracking-[0.24em] text-gold">
-          Featured
-        </span>
-      )}
-      {item.displayPriceSummary && item.priceSummary && (
-        <span className="ml-auto font-serif text-lg text-gold">{item.priceSummary}</span>
-      )}
+  const ArtistLine = (
+    <div className="min-h-[1.25rem]">
+      {item.artist &&
+        (item.artist.slug ? (
+          <Link
+            to={`/artists/${encodeURIComponent(item.artist.slug)}`}
+            className="eyebrow text-gold inline-block transition-colors hover:text-ivory focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gold"
+          >
+            {item.artist.name}
+          </Link>
+        ) : (
+          <p className="eyebrow text-gold">{item.artist.name}</p>
+        ))}
     </div>
   );
 
   const PriceList = orderedFormats.length > 0 && (
-    <dl className="flex flex-col gap-2 text-[15px]">
+    <dl className="flex w-full max-w-[260px] flex-col gap-2 text-[15px]">
       {orderedFormats.map((f) => {
         const raw = item.prices[f]?.trim();
         return (
           <div
             key={f}
-            className="flex items-baseline gap-4 border-b border-ivory/10 pb-2"
+            className="flex items-baseline justify-between gap-4 border-b border-ivory/10 pb-2"
           >
-            <dt className="min-w-[3.5rem] text-ivory/65">{f}</dt>
-            <dd className={raw ? "text-ivory" : "text-ivory/50 italic"}>
+            <dt className="text-ivory/65">{f}</dt>
+            <dd className={raw ? "text-ivory text-right" : "text-ivory/50 italic text-right"}>
               {raw || "See purchase page"}
             </dd>
           </div>
@@ -135,21 +129,46 @@ export const StoreCard = ({ item, variant = "grid" }: StoreCardProps) => {
     </dl>
   );
 
-  const TrackList = effectiveTracks.length > 0 && (
-    <div className="space-y-3">
-      <p className="text-[11px] uppercase tracking-[0.24em] text-gold-soft">Track list</p>
-      <ol className="space-y-1.5 text-sm text-ivory/75">
-        {effectiveTracks.map((t, i) => (
-          <li key={t.id} className="flex items-baseline gap-3">
-            <span className="w-6 shrink-0 tabular-nums text-[11px] text-ivory/45">
-              {String(t.trackNumber || i + 1).padStart(2, "0")}
-            </span>
-            <span className="leading-snug">{t.title}</span>
-          </li>
-        ))}
-      </ol>
+  const UnavailableCallout = (
+    <div className="flex flex-1 items-center justify-center py-8">
+      <div className="border border-gold/30 px-8 py-5 text-center">
+        <p className="font-serif text-xl tracking-[0.08em] text-gold/85">
+          {item.availability}
+        </p>
+      </div>
     </div>
   );
+
+  const renderTrackList = (compact = false) => {
+    if (effectiveTracks.length === 0) return null;
+    const showToggle = effectiveTracks.length > COLLAPSED_TRACK_COUNT;
+    const visible = tracksExpanded ? effectiveTracks : effectiveTracks.slice(0, COLLAPSED_TRACK_COUNT);
+    return (
+      <div className="space-y-3">
+        <p className="text-[11px] uppercase tracking-[0.24em] text-gold-soft">Track list</p>
+        <ol className={`space-y-1.5 ${compact ? "text-[13px]" : "text-sm"} text-ivory/75`}>
+          {visible.map((t, i) => (
+            <li key={t.id} className="flex items-baseline gap-3">
+              <span className="w-6 shrink-0 tabular-nums text-[11px] text-ivory/45">
+                {String(t.trackNumber || i + 1).padStart(2, "0")}
+              </span>
+              <span className="leading-snug">{t.title}</span>
+            </li>
+          ))}
+        </ol>
+        {showToggle && (
+          <button
+            type="button"
+            onClick={() => setTracksExpanded((v) => !v)}
+            className="inline-flex items-center gap-1.5 text-[11px] uppercase tracking-[0.24em] text-gold/80 transition-colors hover:text-gold"
+          >
+            <span>{tracksExpanded ? "Show less" : "Show full track list"}</span>
+            <span aria-hidden>{tracksExpanded ? "▴" : "▾"}</span>
+          </button>
+        )}
+      </div>
+    );
+  };
 
   const IncludesCollapsible = effectiveTracks.length > 0 && (
     <details className="group/inc text-sm">
@@ -168,25 +187,9 @@ export const StoreCard = ({ item, variant = "grid" }: StoreCardProps) => {
     </details>
   );
 
-  const ArtistLine = (
-    <div className="min-h-[1.25rem]">
-      {item.artist &&
-        (item.artist.slug ? (
-          <Link
-            to={`/artists/${encodeURIComponent(item.artist.slug)}`}
-            className="eyebrow text-gold inline-block transition-colors hover:text-ivory focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gold"
-          >
-            {item.artist.name}
-          </Link>
-        ) : (
-          <p className="eyebrow text-gold">{item.artist.name}</p>
-        ))}
-    </div>
-  );
-
-  const ButtonBlock = (
-    <div className="mt-auto pt-6">
-      {button.disabled ? (
+  const renderCTA = (variant: "featured" | "grid") => {
+    if (button.disabled) {
+      return (
         <button
           type="button"
           disabled
@@ -195,29 +198,33 @@ export const StoreCard = ({ item, variant = "grid" }: StoreCardProps) => {
         >
           {button.label}
         </button>
-      ) : (
-        <>
-          <a
-            href={button.href}
-            target="_blank"
-            rel="noopener noreferrer"
-            aria-label={ariaLabel}
-            className="block w-full border border-gold bg-gold/10 px-6 py-3 text-center text-[11px] uppercase tracking-[0.24em] text-gold transition-colors hover:bg-gold hover:text-ink"
-          >
-            {button.label}
-          </a>
-          <p className="mt-2 text-center text-[10px] uppercase tracking-[0.24em] text-ivory/40">
-            Opens external purchase page
-          </p>
-        </>
-      )}
-    </div>
-  );
+      );
+    }
+    return (
+      <>
+        <a
+          href={button.href}
+          target="_blank"
+          rel="noopener noreferrer"
+          aria-label={ariaLabel}
+          className="block w-full border border-gold bg-gold/10 px-6 py-3 text-center text-[11px] uppercase tracking-[0.24em] text-gold transition-colors hover:bg-gold hover:text-ink"
+        >
+          {button.label}
+        </a>
+        <p
+          className={`mt-2 text-[10px] uppercase tracking-[0.24em] text-ivory/40 ${variant === "featured" ? "text-left" : "text-center"}`}
+        >
+          Opens external purchase page
+        </p>
+      </>
+    );
+  };
 
+  // ----- FEATURED VARIANT -----
   if (variant === "featured") {
     return (
-      <article className="group grid grid-cols-1 overflow-hidden border border-gold/25 bg-ink/60 backdrop-blur-sm transition-all duration-500 hover:border-gold/55 hover:shadow-[0_30px_60px_-30px_hsl(var(--gold)/0.4)] md:grid-cols-[minmax(0,0.42fr)_minmax(0,0.58fr)]">
-        <div className="relative aspect-square overflow-hidden bg-muted md:aspect-auto md:min-h-[340px]">
+      <article className="group grid grid-cols-1 overflow-hidden border border-gold/25 bg-ink/60 backdrop-blur-sm transition-all duration-500 hover:border-gold/55 hover:shadow-[0_30px_60px_-30px_hsl(var(--gold)/0.4)] md:grid-cols-[minmax(0,0.42fr)_minmax(0,0.58fr)] md:items-stretch">
+        <div className="relative aspect-square overflow-hidden bg-ink md:h-full">
           {item.productImage ? (
             <LazyImage
               src={item.productImage}
@@ -226,44 +233,84 @@ export const StoreCard = ({ item, variant = "grid" }: StoreCardProps) => {
               height={1200}
               displayWidth={640}
               sizes="(min-width: 768px) 40vw, 100vw"
-              className="object-cover transition-transform duration-700 group-hover:scale-[1.03]"
+              className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-[1.03]"
             />
           ) : (
-            <div className="flex h-full w-full items-center justify-center p-6 text-center text-ivory/50">
+            <div className="flex h-full w-full items-center justify-center bg-ink p-6 text-center text-ivory/50">
               Artwork coming soon.
             </div>
           )}
         </div>
-        <div className="flex flex-1 flex-col p-8 md:p-10">
-          <div className="flex flex-col gap-6">
-            {MetaRow}
-            <header className="space-y-2">
-              {ArtistLine}
-              <h3 className="font-serif text-2xl leading-tight text-ivory md:text-3xl">{item.title}</h3>
-            </header>
-            {item.description && (
-              <p className="text-[15px] leading-relaxed text-ivory/70">{item.description}</p>
-            )}
-            {orderedFormats.length > 0 && (
-              <p className="text-xs uppercase tracking-[0.2em] text-ivory/65">
-                <span className="text-ivory/45">Available in: </span>
-                <span className="text-ivory/85">{formatLine}</span>
-              </p>
-            )}
-            <div className={`grid gap-8 ${effectiveTracks.length > 0 ? "md:grid-cols-2" : "grid-cols-1"}`}>
-              <div>{PriceList}</div>
-              {effectiveTracks.length > 0 && <div>{TrackList}</div>}
+
+        <div className="flex min-w-0 flex-col p-8 md:p-10">
+          {/* Top row: badges left, CTA right (aligned with track-list column) */}
+          <div className="grid grid-cols-1 gap-6 border-b border-ivory/10 pb-6 md:grid-cols-2 md:gap-x-12">
+            <div className="flex flex-wrap items-center gap-2">
+              <span className="inline-flex items-center border border-gold/50 bg-gold/5 px-3 py-1 text-[10px] uppercase tracking-[0.24em] text-gold">
+                Featured
+              </span>
+              <span
+                className={`inline-flex items-center border px-3 py-1 text-[10px] uppercase tracking-[0.24em] ${statusLabelClass(item.availability)}`}
+              >
+                {item.availability}
+              </span>
+            </div>
+            <div className="min-w-0">{renderCTA("featured")}</div>
+          </div>
+
+          {/* Body row: left text/prices | right track list */}
+          <div className="mt-6 grid grid-cols-1 gap-y-6 md:grid-cols-2 md:gap-x-12">
+            <div className="flex min-w-0 flex-col gap-5">
+              <header className="space-y-2">
+                {ArtistLine}
+                <h3 className="font-serif text-2xl leading-tight text-ivory md:text-3xl">
+                  {item.title}
+                </h3>
+              </header>
+              {!isUnavailable && item.description && (
+                <p className="text-[15px] leading-relaxed text-ivory/70">{item.description}</p>
+              )}
+              {!isUnavailable && orderedFormats.length > 0 && (
+                <p className="text-xs uppercase tracking-[0.2em] text-ivory/65">
+                  <span className="text-ivory/45">Available in: </span>
+                  <span className="text-ivory/85">{formatLine}</span>
+                </p>
+              )}
+              {!isUnavailable && PriceList}
+              {isUnavailable && UnavailableCallout}
+            </div>
+
+            <div className="min-w-0">
+              {!isUnavailable && renderTrackList()}
             </div>
           </div>
-          {ButtonBlock}
         </div>
       </article>
     );
   }
 
+  // ----- GRID VARIANT -----
+  const MetaRow = (
+    <div className="flex min-h-[2.25rem] flex-wrap items-center gap-2 border-b border-ivory/10 pb-4">
+      <span
+        className={`inline-flex items-center border px-3 py-1 text-[10px] uppercase tracking-[0.24em] ${statusLabelClass(item.availability)}`}
+      >
+        {item.availability}
+      </span>
+      {item.featured && (
+        <span className="inline-flex items-center border border-gold/40 px-3 py-1 text-[10px] uppercase tracking-[0.24em] text-gold">
+          Featured
+        </span>
+      )}
+      {!isUnavailable && item.displayPriceSummary && item.priceSummary && (
+        <span className="ml-auto font-serif text-lg text-gold">{item.priceSummary}</span>
+      )}
+    </div>
+  );
+
   return (
     <article className="group flex h-full flex-col border border-gold/15 bg-ink/60 backdrop-blur-sm transition-all duration-500 hover:border-gold/45 hover:shadow-[0_30px_60px_-30px_hsl(var(--gold)/0.35)]">
-      <div className="relative aspect-square overflow-hidden bg-muted">
+      <div className="relative aspect-square overflow-hidden bg-ink">
         {item.productImage ? (
           <LazyImage
             src={item.productImage}
@@ -272,10 +319,10 @@ export const StoreCard = ({ item, variant = "grid" }: StoreCardProps) => {
             height={1200}
             displayWidth={720}
             sizes="(min-width: 1024px) 33vw, (min-width: 768px) 50vw, 100vw"
-            className="object-cover transition-transform duration-700 group-hover:scale-[1.03]"
+            className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-[1.03]"
           />
         ) : (
-          <div className="flex h-full w-full items-center justify-center p-6 text-center text-ivory/50">
+          <div className="flex h-full w-full items-center justify-center bg-ink p-6 text-center text-ivory/50">
             Artwork coming soon.
           </div>
         )}
@@ -292,16 +339,17 @@ export const StoreCard = ({ item, variant = "grid" }: StoreCardProps) => {
               {item.title}
             </h3>
           </header>
-          {orderedFormats.length > 0 && (
+          {!isUnavailable && orderedFormats.length > 0 && (
             <p className="text-xs uppercase tracking-[0.2em] text-ivory/65">
               <span className="text-ivory/45">Available in: </span>
               <span className="text-ivory/85">{formatLine}</span>
             </p>
           )}
-          {PriceList}
-          {IncludesCollapsible}
+          {!isUnavailable && PriceList}
+          {!isUnavailable && IncludesCollapsible}
+          {isUnavailable && UnavailableCallout}
         </div>
-        {ButtonBlock}
+        <div className="mt-auto pt-6">{renderCTA("grid")}</div>
       </div>
     </article>
   );
