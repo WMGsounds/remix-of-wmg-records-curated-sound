@@ -136,9 +136,8 @@ const Journal = () => {
       </section>
 
       <div className="container-editorial pt-16">
-        <div className="flex flex-row flex-wrap items-center justify-between gap-4 mb-16 border-y border-ivory/18 py-5">
-          <div className="flex items-center gap-3">
-            <label className="hidden md:inline text-[11px] uppercase tracking-[0.24em] text-ivory/60">Category</label>
+        <div className="flex flex-wrap items-end justify-center gap-x-8 gap-y-6 mb-16 border-y border-ivory/18 py-6 md:justify-between">
+          <FilterField label="Category">
             <Select value={cat} onValueChange={setCat}>
               <SelectTrigger className="w-[200px] bg-transparent border-ivory/24 text-[11px] uppercase tracking-[0.24em] text-ivory rounded-none focus:ring-ivory">
                 <SelectValue />
@@ -151,9 +150,15 @@ const Journal = () => {
                 ))}
               </SelectContent>
             </Select>
-          </div>
-          <div className="flex items-center gap-3">
-            <label className="hidden md:inline text-[11px] uppercase tracking-[0.24em] text-ivory/60">Sort by</label>
+          </FilterField>
+          <FilterField label="Search">
+            <SearchInput
+              value={searchQuery}
+              onChange={setSearchQuery}
+              placeholder="Search articles"
+            />
+          </FilterField>
+          <FilterField label="Sort by">
             <Select value={sort} onValueChange={(v) => setSort(v as (typeof SORT_OPTIONS)[number])}>
               <SelectTrigger className="w-[160px] bg-transparent border-ivory/24 text-[11px] uppercase tracking-[0.24em] text-ivory rounded-none focus:ring-ivory">
                 <SelectValue />
@@ -166,7 +171,7 @@ const Journal = () => {
                 ))}
               </SelectContent>
             </Select>
-          </div>
+          </FilterField>
         </div>
 
         {isLoading ? (
