@@ -136,71 +136,18 @@ const Store = () => {
       </section>
 
       <div className="container-editorial pt-16">
-        <div className="flex flex-row flex-wrap items-center justify-between gap-4 mb-16 border-y border-ivory/18 py-5">
-          <div className="flex flex-wrap items-center gap-6">
-            <div className="flex items-center gap-3">
-              <label className="hidden md:inline text-[11px] uppercase tracking-[0.24em] text-ivory/60">Format</label>
-              <Select value={formatFilter} onValueChange={(v) => setFormatFilter(v)}>
-                <SelectTrigger className="w-[160px] bg-transparent border-ivory/24 text-[11px] uppercase tracking-[0.24em] text-ivory rounded-none focus:ring-ivory">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent className="bg-ink text-ivory border-ivory/24">
-                  {formatFilterOptions.map((f) => (
-                    <SelectItem key={f} value={f} className="text-[11px] uppercase tracking-[0.24em] focus:bg-ivory/10 focus:text-ivory">
-                      {f}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-            <div className="flex items-center gap-3">
-              <label className="hidden md:inline text-[11px] uppercase tracking-[0.24em] text-ivory/60">Availability</label>
-              <Select value={availabilityFilter} onValueChange={(v) => setAvailabilityFilter(v as AvailabilityFilter)}>
-                <SelectTrigger className="w-[180px] bg-transparent border-ivory/24 text-[11px] uppercase tracking-[0.24em] text-ivory rounded-none focus:ring-ivory">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent className="bg-ink text-ivory border-ivory/24">
-                  {availabilityFilters.map((f) => (
-                    <SelectItem key={f} value={f} className="text-[11px] uppercase tracking-[0.24em] focus:bg-ivory/10 focus:text-ivory">
-                      {f}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-          </div>
-          <div className="flex items-center gap-3">
-            <label className="hidden md:inline text-[11px] uppercase tracking-[0.24em] text-ivory/60">Sort by</label>
-            <Select value={sort} onValueChange={(v) => setSort(v as SortOption)}>
-              <SelectTrigger className="w-[200px] bg-transparent border-ivory/24 text-[11px] uppercase tracking-[0.24em] text-ivory rounded-none focus:ring-ivory">
-                <SelectValue placeholder="Sort by" />
-              </SelectTrigger>
-              <SelectContent className="bg-ink text-ivory border-ivory/24">
-                {sortOptions.map((o) => (
-                  <SelectItem key={o} value={o} className="text-[11px] uppercase tracking-[0.24em] focus:bg-ivory/10 focus:text-ivory">
-                    {o}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-        </div>
-
+      <div className="container-editorial pt-16">
         {isLoading ? (
           <InlineSkeleton count={6} />
-        ) : filtered.length === 0 ? (
-          items.filter((i) => i.availability !== "Hidden").length === 0 ? (
-            <div className="max-w-2xl py-16">
-              <p className="eyebrow mb-4">Coming Soon</p>
-              <h2 className="display-serif text-3xl md:text-4xl mb-6">The store is being prepared.</h2>
-              <p className="text-ivory/65">
-                We're getting the next batch of records ready. Check back shortly, or follow the journal
-                for release news.
-              </p>
-            </div>
-          ) : (
-            <p className="py-16 text-ivory/60">No store items match the selected filters.</p>
-          )
+        ) : !hasAnyVisible ? (
+          <div className="max-w-2xl py-16">
+            <p className="eyebrow mb-4">Coming Soon</p>
+            <h2 className="display-serif text-3xl md:text-4xl mb-6">The store is being prepared.</h2>
+            <p className="text-ivory/65">
+              We're getting the next batch of records ready. Check back shortly, or follow the journal
+              for release news.
+            </p>
+          </div>
         ) : (
           <>
             {featured.length > 0 && (
@@ -218,7 +165,57 @@ const Store = () => {
               </section>
             )}
 
-            {rest.length > 0 && (
+            <div className="flex flex-row flex-wrap items-center justify-between gap-4 mb-12 border-y border-ivory/18 py-5">
+              <div className="flex flex-wrap items-center gap-6">
+                <div className="flex items-center gap-3">
+                  <label className="hidden md:inline text-[11px] uppercase tracking-[0.24em] text-ivory/60">Format</label>
+                  <Select value={formatFilter} onValueChange={(v) => setFormatFilter(v)}>
+                    <SelectTrigger className="w-[160px] bg-transparent border-ivory/24 text-[11px] uppercase tracking-[0.24em] text-ivory rounded-none focus:ring-ivory">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent className="bg-ink text-ivory border-ivory/24">
+                      {formatFilterOptions.map((f) => (
+                        <SelectItem key={f} value={f} className="text-[11px] uppercase tracking-[0.24em] focus:bg-ivory/10 focus:text-ivory">
+                          {f}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="flex items-center gap-3">
+                  <label className="hidden md:inline text-[11px] uppercase tracking-[0.24em] text-ivory/60">Availability</label>
+                  <Select value={availabilityFilter} onValueChange={(v) => setAvailabilityFilter(v as AvailabilityFilter)}>
+                    <SelectTrigger className="w-[180px] bg-transparent border-ivory/24 text-[11px] uppercase tracking-[0.24em] text-ivory rounded-none focus:ring-ivory">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent className="bg-ink text-ivory border-ivory/24">
+                      {availabilityFilters.map((f) => (
+                        <SelectItem key={f} value={f} className="text-[11px] uppercase tracking-[0.24em] focus:bg-ivory/10 focus:text-ivory">
+                          {f}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+              <div className="flex items-center gap-3">
+                <label className="hidden md:inline text-[11px] uppercase tracking-[0.24em] text-ivory/60">Sort by</label>
+                <Select value={sort} onValueChange={(v) => setSort(v as SortOption)}>
+                  <SelectTrigger className="w-[200px] bg-transparent border-ivory/24 text-[11px] uppercase tracking-[0.24em] text-ivory rounded-none focus:ring-ivory">
+                    <SelectValue placeholder="Sort by" />
+                  </SelectTrigger>
+                  <SelectContent className="bg-ink text-ivory border-ivory/24">
+                    {sortOptions.map((o) => (
+                      <SelectItem key={o} value={o} className="text-[11px] uppercase tracking-[0.24em] focus:bg-ivory/10 focus:text-ivory">
+                        {o}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+
+            {rest.length > 0 ? (
               <section>
                 {featured.length > 0 && (
                   <div className="mb-8">
