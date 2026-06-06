@@ -281,7 +281,7 @@ export const StoreCard = ({ item, variant = "grid" }: StoreCardProps) => {
             <div aria-hidden className="hidden md:block" />
 
             <div className="flex min-w-0 min-h-0 flex-col">
-              {!isUnavailable && effectiveTracks.length > 0 && (
+              {!isUnavailable && !isMobile && effectiveTracks.length > 0 && (
                 <>
                   <p className="mb-3 text-[11px] uppercase tracking-[0.24em] text-gold-soft">
                     Track list
