@@ -250,8 +250,10 @@ export const StoreCard = ({ item, variant = "grid" }: StoreCardProps) => {
                 <span className="text-ivory/85">{formatLine}</span>
               </p>
             )}
-            {PriceList}
-            {TrackList}
+            <div className={`grid gap-8 ${effectiveTracks.length > 0 ? "md:grid-cols-2" : "grid-cols-1"}`}>
+              <div>{PriceList}</div>
+              {effectiveTracks.length > 0 && <div>{TrackList}</div>}
+            </div>
           </div>
           {ButtonBlock}
         </div>
