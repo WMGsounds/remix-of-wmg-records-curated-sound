@@ -2,6 +2,7 @@ import { useLayoutEffect, useMemo, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import { LazyImage } from "@/components/LazyImage";
 import { useTracks, useReleases } from "@/lib/queries";
+import { useIsMobile } from "@/hooks/use-mobile";
 import type { StoreItem, StoreFormat, Track, Release } from "@/lib/types";
 
 const FORMAT_DISPLAY_ORDER: StoreFormat[] = ["Vinyl", "CD", "iTunes", "Digital", "Merch", "Other"];
