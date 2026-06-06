@@ -1,4 +1,5 @@
 import { useMemo, useState } from "react";
+import { Search } from "lucide-react";
 import { Seo } from "@/components/Seo";
 import { breadcrumbSchema } from "@/lib/seo";
 import { useStoreItems } from "@/lib/queries";
