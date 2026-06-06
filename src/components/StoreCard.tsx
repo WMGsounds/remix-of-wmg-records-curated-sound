@@ -171,15 +171,12 @@ export const StoreCard = ({ item, variant = "grid" }: StoreCardProps) => {
     </div>
   );
 
-  const CommentsBlock = (
-    <div className="min-h-[2.25rem]">
-      {item.comments && (
-        <p className="text-[12px] italic leading-snug text-ivory/60">
-          {item.comments}
-        </p>
-      )}
-    </div>
-  );
+  const CommentsBlock = item.comments ? (
+    <p className="text-[11px] italic leading-snug text-ivory/55">
+      {item.comments}
+    </p>
+  ) : null;
+
 
   const IncludesCollapsible = effectiveTracks.length > 0 && (
     <details className="group/inc text-sm">
