@@ -422,6 +422,6 @@ export default async function handler(req: any, res: any) {
     return res.status(200).json({ ok: true });
   } catch (err: any) {
     console.error("[contact] Unexpected error:", err?.message || err, err?.stack);
-    return res.status(500).json({ error: "Unexpected server error", detail: err?.message ?? String(err) });
+    return res.status(500).json({ error: "Unexpected server error. Please try again or email us directly." });
   }
 }
