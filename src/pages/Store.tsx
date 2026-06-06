@@ -229,6 +229,8 @@ const Store = () => {
                   ))}
                 </div>
               </section>
+            ) : (
+              <p className="py-8 text-ivory/60">No store items match the selected filters.</p>
             )}
           </>
         )}
