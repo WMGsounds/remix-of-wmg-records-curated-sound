@@ -123,7 +123,6 @@ export const StoreCard = ({ item, variant = "grid" }: StoreCardProps) => {
 
   const button = resolveButton(item);
   const orderedFormats = FORMAT_DISPLAY_ORDER.filter((f) => item.formats.includes(f));
-  const formatLine = orderedFormats.join(" · ");
   const artistName = item.artist?.name ?? "WMG";
   const ariaLabel = `Buy ${item.title} by ${artistName}`;
   const isUnavailable = item.availability === "Coming Soon" || item.availability === "Sold Out";
