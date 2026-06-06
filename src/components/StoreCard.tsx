@@ -285,13 +285,13 @@ export const StoreCard = ({ item, variant = "grid" }: StoreCardProps) => {
           {MetaRow}
           <header className="space-y-2">
             {ArtistLine}
-            <h3 className="min-h-[4rem] font-serif text-2xl leading-tight text-ivory md:min-h-[4.5rem] md:text-3xl">
+            <h3
+              className="font-serif text-2xl leading-tight text-ivory md:text-3xl line-clamp-2"
+              style={{ minHeight: "calc(2 * 1.2em)" }}
+            >
               {item.title}
             </h3>
           </header>
-          {item.description && (
-            <p className="line-clamp-3 text-[15px] leading-relaxed text-ivory/70">{item.description}</p>
-          )}
           {orderedFormats.length > 0 && (
             <p className="text-xs uppercase tracking-[0.2em] text-ivory/65">
               <span className="text-ivory/45">Available in: </span>
