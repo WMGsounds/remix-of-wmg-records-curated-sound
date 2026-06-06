@@ -253,24 +253,37 @@ const Index = () => {
               {featuredTracks.length > 0 && (
                 <div className="mb-8 max-w-xl flex-1 min-h-0 flex flex-col">
                   <p className="eyebrow text-gold-soft mb-3">Track list</p>
-                  <ol className={`space-y-1.5 text-sm text-ivory/75 ${tracksExpanded ? "" : "flex-1 min-h-0 overflow-hidden"}`}>
-                    {featuredTracks.map((t, i) => (
-                      <li key={t.id} className="flex items-baseline gap-3">
-                        <span className="w-6 shrink-0 tabular-nums text-[11px] text-ivory/45">
-                          {String(t.trackNumber || i + 1).padStart(2, "0")}
-                        </span>
-                        <span className="leading-snug font-serif text-base">{t.trackTitle}</span>
-                      </li>
-                    ))}
-                  </ol>
-                  <button
-                    type="button"
-                    onClick={() => setTracksExpanded((v) => !v)}
-                    className="mt-3 self-start inline-flex items-center gap-1.5 text-[11px] uppercase tracking-[0.24em] text-gold/80 transition-colors hover:text-gold"
+                  <ol
+                    ref={trackListRef}
+                    className={`space-y-1.5 text-sm text-ivory/75 ${tracksExpanded ? "" : "flex-1 min-h-0 overflow-hidden"}`}
                   >
-                    <span>{tracksExpanded ? "Show less" : "View all"}</span>
-                    <span aria-hidden>{tracksExpanded ? "▴" : "▾"}</span>
-                  </button>
+                    {featuredTracks.map((t, i) => {
+                      const hidden = !tracksExpanded && i >= visibleTrackCount && visibleTrackCount > 0;
+                      return (
+                        <li
+                          key={t.id}
+                          data-track
+                          className={`flex items-baseline gap-3 ${hidden ? "invisible" : ""}`}
+                          aria-hidden={hidden || undefined}
+                        >
+                          <span className="w-6 shrink-0 tabular-nums text-[11px] text-ivory/45">
+                            {String(t.trackNumber || i + 1).padStart(2, "0")}
+                          </span>
+                          <span className="leading-snug font-serif text-base">{t.trackTitle}</span>
+                        </li>
+                      );
+                    })}
+                  </ol>
+                  {(tracksExpanded || visibleTrackCount < featuredTracks.length) && (
+                    <button
+                      type="button"
+                      onClick={() => setTracksExpanded((v) => !v)}
+                      className="mt-3 self-start inline-flex items-center gap-1.5 text-[11px] uppercase tracking-[0.24em] text-gold/80 transition-colors hover:text-gold"
+                    >
+                      <span>{tracksExpanded ? "Show less" : "View all"}</span>
+                      <span aria-hidden>{tracksExpanded ? "▴" : "▾"}</span>
+                    </button>
+                  )}
                 </div>
               )}
               <div className="mt-auto pt-2 shrink-0">
