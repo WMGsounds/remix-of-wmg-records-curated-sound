@@ -1,4 +1,5 @@
 import { useMemo, useState } from "react";
+import { Search } from "lucide-react";
 import { Seo } from "@/components/Seo";
 import { breadcrumbSchema } from "@/lib/seo";
 import { useStoreItems } from "@/lib/queries";
@@ -58,6 +59,7 @@ const Store = () => {
   const [formatFilter, setFormatFilter] = useState<string>("All");
   const [availabilityFilter, setAvailabilityFilter] = useState<AvailabilityFilter>("All");
   const [sort, setSort] = useState<SortOption | undefined>(undefined);
+  const [searchQuery, setSearchQuery] = useState<string>("");
 
   // Build format filter options from the actually-present formats.
   const availableFormats = useMemo<StoreFormat[]>(() => {
@@ -75,14 +77,30 @@ const Store = () => {
   );
 
   const filtered = useMemo(() => {
+    const stopWords = new Set([
+      "the", "a", "an", "and", "or", "of", "to", "in", "on", "for", "with", "by", "from", "at", "into", "your", "my", "our", "is", "it", "this", "that",
+    ]);
+    const tokenize = (str: string) =>
+      str
+        .toLowerCase()
+        .split(/\s+/)
+        .filter((w) => w.length > 0 && !stopWords.has(w));
+    const queryTokens = tokenize(searchQuery);
+
     return items.filter((i) => {
       if (i.availability === "Hidden") return false;
       if (i.featured) return false;
       if (formatFilter !== "All" && !i.formats.includes(formatFilter as StoreFormat)) return false;
       if (availabilityFilter !== "All" && i.availability !== (availabilityFilter as StoreAvailability)) return false;
+      if (queryTokens.length > 0) {
+        const haystack = tokenize(
+          [i.title, i.artist?.name ?? "", i.release?.title ?? "", i.formats.join(" ")].join(" "),
+        );
+        if (!queryTokens.every((qt) => haystack.some((ht) => ht.includes(qt)))) return false;
+      }
       return true;
     });
-  }, [items, formatFilter, availabilityFilter]);
+  }, [items, formatFilter, availabilityFilter, searchQuery]);
 
   const rest = useMemo(() => sortItems(filtered, sort), [filtered, sort]);
 
@@ -203,6 +221,19 @@ const Store = () => {
                           ))}
                         </SelectContent>
                       </Select>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <label className="hidden md:inline text-[11px] uppercase tracking-[0.24em] text-ivory/60">Search</label>
+                    <div className="relative">
+                      <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-ivory/40" />
+                      <input
+                        type="text"
+                        value={searchQuery}
+                        onChange={(e) => setSearchQuery(e.target.value)}
+                        placeholder="Search title or artist"
+                        className="h-10 w-[220px] bg-transparent border border-ivory/24 pl-9 pr-3 text-[11px] uppercase tracking-[0.24em] text-ivory placeholder:text-ivory/30 rounded-none focus:outline-none focus:ring-1 focus:ring-ivory/40"
+                      />
                     </div>
                   </div>
                   <div className="flex items-center gap-3">
