@@ -165,10 +165,12 @@ const Index = () => {
           <div className="absolute inset-0 bg-ink/75" aria-hidden="true" />
           <div className="relative container-editorial grid grid-cols-1 lg:grid-cols-[minmax(0,5fr)_minmax(0,7fr)] gap-12 lg:items-start">
             <div
-              className="order-2 lg:order-1 flex flex-col min-h-0"
+              className={`order-2 lg:order-1 flex flex-col min-h-0 ${
+                tracksExpanded ? "" : "lg:h-[var(--featured-artwork-height)] lg:max-h-[var(--featured-artwork-height)]"
+              }`}
               style={
-                !tracksExpanded && featuredArtworkHeight
-                  ? { height: featuredArtworkHeight, maxHeight: featuredArtworkHeight }
+                featuredArtworkHeight
+                  ? ({ "--featured-artwork-height": `${featuredArtworkHeight}px` } as React.CSSProperties)
                   : undefined
               }
             >
