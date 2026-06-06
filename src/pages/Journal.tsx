@@ -152,6 +152,8 @@ const Journal = () => {
                 </SelectContent>
               </Select>
             </FilterField>
+          </div>
+          <div className="flex flex-wrap items-end gap-x-8 gap-y-6">
             <FilterField label="Search">
               <SearchInput
                 value={searchQuery}
@@ -159,8 +161,6 @@ const Journal = () => {
                 placeholder="Search articles"
               />
             </FilterField>
-          </div>
-          <div className="flex flex-wrap items-end gap-x-8 gap-y-6">
             <FilterField label="Sort by">
               <Select value={sort} onValueChange={(v) => setSort(v as (typeof SORT_OPTIONS)[number])}>
                 <SelectTrigger className="w-[160px] bg-transparent border-ivory/24 text-[11px] uppercase tracking-[0.24em] text-ivory rounded-none focus:ring-ivory">
