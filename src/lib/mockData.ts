@@ -161,6 +161,7 @@ export const mockStoreItems: StoreItem[] = [
     availability: "Available Now",
     featured: true,
     buttonText: "View Purchase Options",
+    comments: null,
   },
   {
     id: "mock-store-night-geometry-vinyl",
@@ -182,6 +183,7 @@ export const mockStoreItems: StoreItem[] = [
     availability: "Available Now",
     featured: false,
     buttonText: null,
+    comments: null,
   },
   {
     id: "mock-store-static-bloom-cd",
@@ -200,6 +202,7 @@ export const mockStoreItems: StoreItem[] = [
     availability: "Coming Soon",
     featured: false,
     buttonText: null,
+    comments: null,
   },
 ];
 
