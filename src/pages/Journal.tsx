@@ -7,6 +7,8 @@ import { InlineSkeleton, PageError, PageEmpty } from "@/components/UIStates";
 import { LazyImage } from "@/components/LazyImage";
 import { formatJournalDate } from "@/components/JournalArticle";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { FilterField, SearchInput } from "@/components/FilterBar";
+import { matchesSearch } from "@/lib/search";
 import type { JournalArticleSummary } from "@/lib/types";
 
 const CATEGORIES = ["All", "Release Story", "Artist Spotlight", "Label News", "Behind The Scenes", "Interview", "Track Story", "Album Story"] as const;
