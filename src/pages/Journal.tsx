@@ -136,42 +136,46 @@ const Journal = () => {
       </section>
 
       <div className="container-editorial pt-16">
-        <div className="flex flex-wrap items-end justify-center gap-x-8 gap-y-6 mb-16 border-y border-ivory/18 py-6 md:justify-between">
-          <FilterField label="Category">
-            <Select value={cat} onValueChange={setCat}>
-              <SelectTrigger className="w-[200px] bg-transparent border-ivory/24 text-[11px] uppercase tracking-[0.24em] text-ivory rounded-none focus:ring-ivory">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent className="bg-ink text-ivory border-ivory/24">
-                {CATEGORIES.map((c) => (
-                  <SelectItem key={c} value={c} className="text-[11px] uppercase tracking-[0.24em] focus:bg-ivory/10 focus:text-ivory">
-                    {c}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </FilterField>
-          <FilterField label="Search">
-            <SearchInput
-              value={searchQuery}
-              onChange={setSearchQuery}
-              placeholder="Search articles"
-            />
-          </FilterField>
-          <FilterField label="Sort by">
-            <Select value={sort} onValueChange={(v) => setSort(v as (typeof SORT_OPTIONS)[number])}>
-              <SelectTrigger className="w-[160px] bg-transparent border-ivory/24 text-[11px] uppercase tracking-[0.24em] text-ivory rounded-none focus:ring-ivory">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent className="bg-ink text-ivory border-ivory/24">
-                {SORT_OPTIONS.map((o) => (
-                  <SelectItem key={o} value={o} className="text-[11px] uppercase tracking-[0.24em] focus:bg-ivory/10 focus:text-ivory">
-                    {o}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </FilterField>
+        <div className="flex flex-wrap items-end justify-between gap-y-6 mb-16 border-y border-ivory/18 py-6">
+          <div className="flex flex-wrap items-end gap-x-8 gap-y-6">
+            <FilterField label="Category">
+              <Select value={cat} onValueChange={setCat}>
+                <SelectTrigger className="w-[200px] bg-transparent border-ivory/24 text-[11px] uppercase tracking-[0.24em] text-ivory rounded-none focus:ring-ivory">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent className="bg-ink text-ivory border-ivory/24">
+                  {CATEGORIES.map((c) => (
+                    <SelectItem key={c} value={c} className="text-[11px] uppercase tracking-[0.24em] focus:bg-ivory/10 focus:text-ivory">
+                      {c}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </FilterField>
+            <FilterField label="Search">
+              <SearchInput
+                value={searchQuery}
+                onChange={setSearchQuery}
+                placeholder="Search articles"
+              />
+            </FilterField>
+          </div>
+          <div className="flex flex-wrap items-end gap-x-8 gap-y-6">
+            <FilterField label="Sort by">
+              <Select value={sort} onValueChange={(v) => setSort(v as (typeof SORT_OPTIONS)[number])}>
+                <SelectTrigger className="w-[160px] bg-transparent border-ivory/24 text-[11px] uppercase tracking-[0.24em] text-ivory rounded-none focus:ring-ivory">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent className="bg-ink text-ivory border-ivory/24">
+                  {SORT_OPTIONS.map((o) => (
+                    <SelectItem key={o} value={o} className="text-[11px] uppercase tracking-[0.24em] focus:bg-ivory/10 focus:text-ivory">
+                      {o}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </FilterField>
+          </div>
         </div>
 
         {isLoading ? (

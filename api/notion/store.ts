@@ -45,7 +45,9 @@ export default async function handler(_req: unknown, res: ApiResponse) {
       .sort((a, b) => {
         if (a.featured !== b.featured) return a.featured ? -1 : 1;
         if (a.sortOrder !== b.sortOrder) return a.sortOrder - b.sortOrder;
-        return a.title.localeCompare(b.title);
+        const ta = new Date(a.createdTime).getTime() || 0;
+        const tb = new Date(b.createdTime).getTime() || 0;
+        return tb - ta;
       });
 
     // Strip internal-only fields before sending.

@@ -397,6 +397,7 @@ export function normalizeStoreItem(
     sortOrder: num(props["Store Sort Order"]),
     buttonText: buttonTextRaw || null,
     comments: commentsRaw || null,
+    createdTime: page.created_time ?? "",
   };
 }
 

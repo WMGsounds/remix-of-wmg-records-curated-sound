@@ -181,56 +181,60 @@ const Store = () => {
                     <h2 className="display-serif text-3xl md:text-4xl">All Items</h2>
                   </div>
                 )}
-                <div className="flex flex-wrap items-end justify-center gap-x-8 gap-y-6 mb-10 border-y border-ivory/18 py-6 md:justify-between">
-                  <FilterField label="Format">
-                    <Select value={formatFilter} onValueChange={(v) => setFormatFilter(v)}>
-                      <SelectTrigger className="w-[160px] bg-transparent border-ivory/24 text-[11px] uppercase tracking-[0.24em] text-ivory rounded-none focus:ring-ivory">
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent className="bg-ink text-ivory border-ivory/24">
-                        {formatFilterOptions.map((f) => (
-                          <SelectItem key={f} value={f} className="text-[11px] uppercase tracking-[0.24em] focus:bg-ivory/10 focus:text-ivory">
-                            {f}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </FilterField>
-                  <FilterField label="Availability">
-                    <Select value={availabilityFilter} onValueChange={(v) => setAvailabilityFilter(v as AvailabilityFilter)}>
-                      <SelectTrigger className="w-[180px] bg-transparent border-ivory/24 text-[11px] uppercase tracking-[0.24em] text-ivory rounded-none focus:ring-ivory">
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent className="bg-ink text-ivory border-ivory/24">
-                        {availabilityFilters.map((f) => (
-                          <SelectItem key={f} value={f} className="text-[11px] uppercase tracking-[0.24em] focus:bg-ivory/10 focus:text-ivory">
-                            {f}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </FilterField>
-                  <FilterField label="Search">
-                    <SearchInput
-                      value={searchQuery}
-                      onChange={setSearchQuery}
-                      placeholder="Search title or artist"
-                    />
-                  </FilterField>
-                  <FilterField label="Sort by">
-                    <Select value={sort} onValueChange={(v) => setSort(v as SortOption)}>
-                      <SelectTrigger className="w-[200px] bg-transparent border-ivory/24 text-[11px] uppercase tracking-[0.24em] text-ivory rounded-none focus:ring-ivory">
-                        <SelectValue placeholder="Sort by" />
-                      </SelectTrigger>
-                      <SelectContent className="bg-ink text-ivory border-ivory/24">
-                        {sortOptions.map((o) => (
-                          <SelectItem key={o} value={o} className="text-[11px] uppercase tracking-[0.24em] focus:bg-ivory/10 focus:text-ivory">
-                            {o}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </FilterField>
+                <div className="flex flex-wrap items-end justify-between gap-y-6 mb-10 border-y border-ivory/18 py-6">
+                  <div className="flex flex-wrap items-end gap-x-8 gap-y-6">
+                    <FilterField label="Format">
+                      <Select value={formatFilter} onValueChange={(v) => setFormatFilter(v)}>
+                        <SelectTrigger className="w-[160px] bg-transparent border-ivory/24 text-[11px] uppercase tracking-[0.24em] text-ivory rounded-none focus:ring-ivory">
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent className="bg-ink text-ivory border-ivory/24">
+                          {formatFilterOptions.map((f) => (
+                            <SelectItem key={f} value={f} className="text-[11px] uppercase tracking-[0.24em] focus:bg-ivory/10 focus:text-ivory">
+                              {f}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </FilterField>
+                    <FilterField label="Availability">
+                      <Select value={availabilityFilter} onValueChange={(v) => setAvailabilityFilter(v as AvailabilityFilter)}>
+                        <SelectTrigger className="w-[180px] bg-transparent border-ivory/24 text-[11px] uppercase tracking-[0.24em] text-ivory rounded-none focus:ring-ivory">
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent className="bg-ink text-ivory border-ivory/24">
+                          {availabilityFilters.map((f) => (
+                            <SelectItem key={f} value={f} className="text-[11px] uppercase tracking-[0.24em] focus:bg-ivory/10 focus:text-ivory">
+                              {f}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </FilterField>
+                  </div>
+                  <div className="flex flex-wrap items-end gap-x-8 gap-y-6">
+                    <FilterField label="Search">
+                      <SearchInput
+                        value={searchQuery}
+                        onChange={setSearchQuery}
+                        placeholder="Search title or artist"
+                      />
+                    </FilterField>
+                    <FilterField label="Sort by">
+                      <Select value={sort} onValueChange={(v) => setSort(v as SortOption)}>
+                        <SelectTrigger className="w-[200px] bg-transparent border-ivory/24 text-[11px] uppercase tracking-[0.24em] text-ivory rounded-none focus:ring-ivory">
+                          <SelectValue placeholder="Sort by" />
+                        </SelectTrigger>
+                        <SelectContent className="bg-ink text-ivory border-ivory/24">
+                          {sortOptions.map((o) => (
+                            <SelectItem key={o} value={o} className="text-[11px] uppercase tracking-[0.24em] focus:bg-ivory/10 focus:text-ivory">
+                              {o}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </FilterField>
+                  </div>
                 </div>
                 <div className="grid grid-cols-1 items-stretch gap-8 md:grid-cols-2 lg:grid-cols-3 md:gap-10">
                   {rest.map((item) => (

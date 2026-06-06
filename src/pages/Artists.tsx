@@ -81,44 +81,48 @@ const Artists = () => {
       <div className="container-editorial pt-16">
 
         {!isLoading && artists.length > 0 && (
-          <div className="flex flex-wrap items-end justify-center gap-x-8 gap-y-6 mb-16 border-y border-ivory/18 py-6 md:justify-between">
-            {genres.length > 1 && (
-              <FilterField label="Genre">
-                <Select value={filter} onValueChange={setFilter}>
-                  <SelectTrigger className="w-[200px] bg-transparent border-ivory/24 text-[11px] uppercase tracking-[0.24em] text-ivory rounded-none focus:ring-ivory">
+          <div className="flex flex-wrap items-end justify-between gap-y-6 mb-16 border-y border-ivory/18 py-6">
+            <div className="flex flex-wrap items-end gap-x-8 gap-y-6">
+              {genres.length > 1 && (
+                <FilterField label="Genre">
+                  <Select value={filter} onValueChange={setFilter}>
+                    <SelectTrigger className="w-[200px] bg-transparent border-ivory/24 text-[11px] uppercase tracking-[0.24em] text-ivory rounded-none focus:ring-ivory">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent className="bg-ink text-ivory border-ivory/24">
+                      {genres.map((f) => (
+                        <SelectItem key={f} value={f} className="text-[11px] uppercase tracking-[0.24em] focus:bg-ivory/10 focus:text-ivory">
+                          {f}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </FilterField>
+              )}
+              <FilterField label="Search">
+                <SearchInput
+                  value={searchQuery}
+                  onChange={setSearchQuery}
+                  placeholder="Search artist or genre"
+                />
+              </FilterField>
+            </div>
+            <div className="flex flex-wrap items-end gap-x-8 gap-y-6">
+              <FilterField label="Sort by">
+                <Select value={sort} onValueChange={(v) => setSort(v as (typeof sortOptions)[number])}>
+                  <SelectTrigger className="w-[180px] bg-transparent border-ivory/24 text-[11px] uppercase tracking-[0.24em] text-ivory rounded-none focus:ring-ivory">
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent className="bg-ink text-ivory border-ivory/24">
-                    {genres.map((f) => (
-                      <SelectItem key={f} value={f} className="text-[11px] uppercase tracking-[0.24em] focus:bg-ivory/10 focus:text-ivory">
-                        {f}
+                    {sortOptions.map((o) => (
+                      <SelectItem key={o} value={o} className="text-[11px] uppercase tracking-[0.24em] focus:bg-ivory/10 focus:text-ivory">
+                        {o}
                       </SelectItem>
                     ))}
                   </SelectContent>
                 </Select>
               </FilterField>
-            )}
-            <FilterField label="Search">
-              <SearchInput
-                value={searchQuery}
-                onChange={setSearchQuery}
-                placeholder="Search artist or genre"
-              />
-            </FilterField>
-            <FilterField label="Sort by">
-              <Select value={sort} onValueChange={(v) => setSort(v as (typeof sortOptions)[number])}>
-                <SelectTrigger className="w-[180px] bg-transparent border-ivory/24 text-[11px] uppercase tracking-[0.24em] text-ivory rounded-none focus:ring-ivory">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent className="bg-ink text-ivory border-ivory/24">
-                  {sortOptions.map((o) => (
-                    <SelectItem key={o} value={o} className="text-[11px] uppercase tracking-[0.24em] focus:bg-ivory/10 focus:text-ivory">
-                      {o}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </FilterField>
+            </div>
           </div>
         )}
 
