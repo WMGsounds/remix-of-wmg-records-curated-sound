@@ -78,27 +78,17 @@ const Store = () => {
   );
 
   const filtered = useMemo(() => {
-    const stopWords = new Set([
-      "the", "a", "an", "and", "or", "of", "to", "in", "on", "for", "with", "by", "from", "at", "into", "your", "my", "our", "is", "it", "this", "that",
-    ]);
-    const tokenize = (str: string) =>
-      str
-        .toLowerCase()
-        .split(/\s+/)
-        .filter((w) => w.length > 0 && !stopWords.has(w));
-    const queryTokens = tokenize(searchQuery);
-
     return items.filter((i) => {
       if (i.availability === "Hidden") return false;
       if (i.featured) return false;
       if (formatFilter !== "All" && !i.formats.includes(formatFilter as StoreFormat)) return false;
       if (availabilityFilter !== "All" && i.availability !== (availabilityFilter as StoreAvailability)) return false;
-      if (queryTokens.length > 0) {
-        const haystack = tokenize(
-          [i.title, i.artist?.name ?? "", i.release?.title ?? "", i.formats.join(" ")].join(" "),
-        );
-        if (!queryTokens.every((qt) => haystack.some((ht) => ht.includes(qt)))) return false;
-      }
+      if (!matchesSearch(searchQuery, [
+        i.title,
+        i.artist?.name,
+        i.release?.title,
+        i.formats.join(" "),
+      ])) return false;
       return true;
     });
   }, [items, formatFilter, availabilityFilter, searchQuery]);
