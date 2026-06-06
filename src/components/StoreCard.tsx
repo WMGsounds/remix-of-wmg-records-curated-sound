@@ -171,6 +171,16 @@ export const StoreCard = ({ item, variant = "grid" }: StoreCardProps) => {
     </div>
   );
 
+  const CommentsBlock = (
+    <div className="min-h-[2.25rem]">
+      {item.comments && (
+        <p className="text-[12px] italic leading-snug text-ivory/60">
+          {item.comments}
+        </p>
+      )}
+    </div>
+  );
+
   const IncludesCollapsible = effectiveTracks.length > 0 && (
     <details className="group/inc text-sm">
       <summary className="cursor-pointer list-none text-[11px] uppercase tracking-[0.24em] text-ivory/55 hover:text-ivory">
