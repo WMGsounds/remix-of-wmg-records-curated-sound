@@ -170,6 +170,7 @@ export type StoreItem = {
   featured: boolean;
   buttonText: string | null;
   comments: string | null;
+  productType: string | null;
   createdTime: string;
 };
 
