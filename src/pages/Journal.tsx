@@ -123,7 +123,7 @@ const Journal = () => {
         <div className="absolute inset-x-0 bottom-0 h-px bg-gold/35" aria-hidden="true" />
       </section>
 
-      <div className="container-editorial">
+      <div className="container-editorial pt-16">
         <div className="flex flex-row flex-wrap items-center justify-between gap-4 mb-16 border-y border-ivory/18 py-5">
           <div className="flex items-center gap-3">
             <label className="hidden md:inline text-[11px] uppercase tracking-[0.24em] text-ivory/60">Category</label>
