@@ -197,7 +197,7 @@ const Index = () => {
                 <div className="mb-8 max-w-xl">
                   <p className="eyebrow text-gold-soft mb-3">Track list</p>
                   <ol className="space-y-1.5 text-sm text-ivory/75">
-                    {featuredTracks.map((t, i) => (
+                    {(tracksExpanded ? featuredTracks : featuredTracks.slice(0, TRACK_PREVIEW_COUNT)).map((t, i) => (
                       <li key={t.id} className="flex items-baseline gap-3">
                         <span className="w-6 shrink-0 tabular-nums text-[11px] text-ivory/45">
                           {String(t.trackNumber || i + 1).padStart(2, "0")}
@@ -206,6 +206,16 @@ const Index = () => {
                       </li>
                     ))}
                   </ol>
+                  {featuredTracks.length > TRACK_PREVIEW_COUNT && (
+                    <button
+                      type="button"
+                      onClick={() => setTracksExpanded((v) => !v)}
+                      className="mt-3 inline-flex items-center gap-1.5 text-[11px] uppercase tracking-[0.24em] text-gold/80 transition-colors hover:text-gold"
+                    >
+                      <span>{tracksExpanded ? "Show less" : "View all"}</span>
+                      <span aria-hidden>{tracksExpanded ? "▴" : "▾"}</span>
+                    </button>
+                  )}
                 </div>
               )}
               <div className="mt-auto pt-2">
