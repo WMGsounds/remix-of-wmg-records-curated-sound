@@ -99,6 +99,8 @@ const Artists = () => {
                   </Select>
                 </FilterField>
               )}
+            </div>
+            <div className="flex flex-wrap items-end gap-x-8 gap-y-6">
               <FilterField label="Search">
                 <SearchInput
                   value={searchQuery}
@@ -106,8 +108,6 @@ const Artists = () => {
                   placeholder="Search artist or genre"
                 />
               </FilterField>
-            </div>
-            <div className="flex flex-wrap items-end gap-x-8 gap-y-6">
               <FilterField label="Sort by">
                 <Select value={sort} onValueChange={(v) => setSort(v as (typeof sortOptions)[number])}>
                   <SelectTrigger className="w-[180px] bg-transparent border-ivory/24 text-[11px] uppercase tracking-[0.24em] text-ivory rounded-none focus:ring-ivory">
