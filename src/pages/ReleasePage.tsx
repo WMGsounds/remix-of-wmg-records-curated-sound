@@ -361,7 +361,7 @@ const ReleasePage = () => {
               </p>
             )}
             {(release.streamingLinks?.spotify || storeCta) && (
-              <div className="mt-8 flex flex-wrap items-center gap-3">
+              <div className="mt-8 flex flex-wrap items-start gap-x-8 gap-y-5">
                 {release.streamingLinks?.spotify && (
                   <a
                     href={release.streamingLinks.spotify}
@@ -374,35 +374,39 @@ const ReleasePage = () => {
                   </a>
                 )}
                 {storeCta && (
-                  storeCta.disabled ? (
-                    <button
-                      type="button"
-                      disabled
-                      className="inline-flex cursor-not-allowed items-center gap-2 border border-ivory/15 px-6 py-3 text-[11px] uppercase tracking-[0.28em] text-ivory/45"
-                    >
-                      <ShoppingBag className="h-3.5 w-3.5" />
-                      {storeCta.label}
-                    </button>
-                  ) : (
-                    <a
-                      href={storeCta.href}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      aria-label={`Buy ${release.title}`}
-                      className="inline-flex items-center gap-2 border border-gold bg-gold/10 px-6 py-3 text-[11px] uppercase tracking-[0.28em] text-gold transition-colors hover:bg-gold hover:text-ink"
-                    >
-                      <ShoppingBag className="h-3.5 w-3.5" />
-                      {storeCta.label}
-                    </a>
-                  )
+                  <div className="flex flex-col items-start gap-2">
+                    {storeCta.disabled ? (
+                      <button
+                        type="button"
+                        disabled
+                        className="inline-flex cursor-not-allowed items-center gap-2 border border-ivory/15 px-6 py-3 text-[11px] uppercase tracking-[0.28em] text-ivory/45"
+                      >
+                        <ShoppingBag className="h-3.5 w-3.5" />
+                        {storeCta.label}
+                      </button>
+                    ) : (
+                      <>
+                        <a
+                          href={storeCta.href}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          aria-label={`Buy ${release.title}`}
+                          className="inline-flex items-center gap-2 border border-gold bg-gold/10 px-6 py-3 text-[11px] uppercase tracking-[0.28em] text-gold transition-colors hover:bg-gold hover:text-ink"
+                        >
+                          <ShoppingBag className="h-3.5 w-3.5" />
+                          {storeCta.label}
+                        </a>
+                        <p className="text-[10px] uppercase tracking-[0.24em] text-ivory/40">
+                          Opens external purchase page
+                        </p>
+                      </>
+                    )}
+                  </div>
                 )}
               </div>
             )}
-            {storeCta && !storeCta.disabled && (
-              <p className="mt-2 text-[10px] uppercase tracking-[0.24em] text-ivory/40">
-                Opens external purchase page
-              </p>
-            )}
+
+
 
           </div>
         </div>
