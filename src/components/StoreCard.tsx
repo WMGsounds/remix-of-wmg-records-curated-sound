@@ -2,6 +2,7 @@ import { useLayoutEffect, useMemo, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import { LazyImage } from "@/components/LazyImage";
 import { useTracks, useReleases } from "@/lib/queries";
+import { useIsMobile } from "@/hooks/use-mobile";
 import type { StoreItem, StoreFormat, Track, Release } from "@/lib/types";
 
 const FORMAT_DISPLAY_ORDER: StoreFormat[] = ["Vinyl", "CD", "iTunes", "Digital", "Merch", "Other"];
@@ -57,6 +58,7 @@ type StoreCardProps = {
 export const StoreCard = ({ item, variant = "grid" }: StoreCardProps) => {
   const { data: allTracks = [] } = useTracks();
   const { data: allReleases = [] } = useReleases();
+  const isMobile = useIsMobile();
   const [tracksExpanded, setTracksExpanded] = useState(false);
   const [tracksOverflow, setTracksOverflow] = useState(false);
   const tracksScrollRef = useRef<HTMLOListElement | null>(null);
@@ -279,7 +281,7 @@ export const StoreCard = ({ item, variant = "grid" }: StoreCardProps) => {
             <div aria-hidden className="hidden md:block" />
 
             <div className="flex min-w-0 min-h-0 flex-col">
-              {!isUnavailable && effectiveTracks.length > 0 && (
+              {!isUnavailable && !isMobile && effectiveTracks.length > 0 && (
                 <>
                   <p className="mb-3 text-[11px] uppercase tracking-[0.24em] text-gold-soft">
                     Track list
