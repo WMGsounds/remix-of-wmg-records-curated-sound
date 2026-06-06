@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useLayoutEffect, useMemo, useRef, useState, type CSSProperties } from "react";
 import { Link } from "react-router-dom";
 import { ArrowRight, ShoppingBag } from "lucide-react";
 import hero from "@/assets/hero-cinematic.jpg";
@@ -29,6 +29,23 @@ const Index = () => {
   }, [allTracks, featured]);
   const TRACK_PREVIEW_COUNT = 8;
   const [tracksExpanded, setTracksExpanded] = useState(false);
+  const featuredArtworkRef = useRef<HTMLDivElement>(null);
+  const [featuredArtworkHeight, setFeaturedArtworkHeight] = useState<number | null>(null);
+
+  useLayoutEffect(() => {
+    const artwork = featuredArtworkRef.current;
+    if (!artwork) return;
+
+    const updateArtworkHeight = () => {
+      setFeaturedArtworkHeight(artwork.getBoundingClientRect().height);
+    };
+
+    updateArtworkHeight();
+    const observer = new ResizeObserver(updateArtworkHeight);
+    observer.observe(artwork);
+
+    return () => observer.disconnect();
+  }, [featured?.coverArt]);
 
   const featuredStoreCta = useMemo<
     | { kind: "available"; href: string }
@@ -146,8 +163,17 @@ const Index = () => {
             />
           )}
           <div className="absolute inset-0 bg-ink/75" aria-hidden="true" />
-          <div className="relative container-editorial grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-12 lg:items-stretch">
-            <div className="lg:col-span-5 order-2 lg:order-1 flex flex-col min-h-0">
+          <div className="relative container-editorial grid grid-cols-1 lg:grid-cols-[minmax(0,5fr)_minmax(0,7fr)] gap-12 lg:items-start">
+            <div
+              className={`order-2 lg:order-1 flex flex-col min-h-0 ${
+                tracksExpanded ? "" : "lg:h-[var(--featured-artwork-height)] lg:max-h-[var(--featured-artwork-height)]"
+              }`}
+              style={
+                featuredArtworkHeight
+                  ? ({ "--featured-artwork-height": `${featuredArtworkHeight}px` } as CSSProperties)
+                  : undefined
+              }
+            >
               <div className="flex flex-wrap items-start justify-between gap-4 mb-4">
                 <p className="eyebrow text-gold-soft">Featured Release</p>
                 {featuredStoreCta?.kind === "available" && (
@@ -216,7 +242,7 @@ const Index = () => {
                   </button>
                 </div>
               )}
-              <div className="mt-auto pt-2">
+              <div className="mt-auto pt-2 shrink-0">
                 <Link
                   to={`/releases/${encodeURIComponent(featured.slug)}`}
                   className="inline-flex items-center gap-3 border-b border-ivory/70 pb-2 text-[12px] uppercase tracking-[0.24em] font-medium hover:text-gold hover:border-gold transition-colors duration-500"
@@ -225,7 +251,7 @@ const Index = () => {
                 </Link>
               </div>
             </div>
-            <div className="lg:col-span-7 order-1 lg:order-2 hover-zoom overflow-hidden self-start">
+            <div ref={featuredArtworkRef} className="order-1 lg:order-2 hover-zoom overflow-hidden self-start w-full">
               {featured.coverArt ? (
                 <LazyImage
                   src={featured.coverArt}
