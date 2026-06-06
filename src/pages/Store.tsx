@@ -59,6 +59,7 @@ const Store = () => {
   const [formatFilter, setFormatFilter] = useState<string>("All");
   const [availabilityFilter, setAvailabilityFilter] = useState<AvailabilityFilter>("All");
   const [sort, setSort] = useState<SortOption | undefined>(undefined);
+  const [searchQuery, setSearchQuery] = useState<string>("");
 
   // Build format filter options from the actually-present formats.
   const availableFormats = useMemo<StoreFormat[]>(() => {
