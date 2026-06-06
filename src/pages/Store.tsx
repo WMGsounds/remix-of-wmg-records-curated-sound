@@ -1,11 +1,12 @@
 import { useMemo, useState } from "react";
-import { Search } from "lucide-react";
 import { Seo } from "@/components/Seo";
 import { breadcrumbSchema } from "@/lib/seo";
 import { useStoreItems } from "@/lib/queries";
 import { InlineSkeleton, PageError } from "@/components/UIStates";
 import { StoreCard } from "@/components/StoreCard";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { FilterField, SearchInput } from "@/components/FilterBar";
+import { matchesSearch } from "@/lib/search";
 import type { StoreItem, StoreFormat, StoreAvailability } from "@/lib/types";
 
 const storeHeroUrl = "/store-hero.png";
