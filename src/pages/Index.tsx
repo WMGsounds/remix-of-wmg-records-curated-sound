@@ -146,8 +146,12 @@ const Index = () => {
             />
           )}
           <div className="absolute inset-0 bg-ink/75" aria-hidden="true" />
-          <div className="relative container-editorial grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-12 lg:items-stretch">
-            <div className="lg:col-span-5 order-2 lg:order-1 flex flex-col min-h-0">
+          <div className="relative container-editorial grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-12 lg:items-stretch [container-type:inline-size]">
+            <div
+              className={`lg:col-span-5 order-2 lg:order-1 flex flex-col min-h-0 ${
+                tracksExpanded ? "" : "lg:h-[calc(58.333cqw-1.25rem)] lg:max-h-[calc(58.333cqw-1.25rem)]"
+              }`}
+            >
               <div className="flex flex-wrap items-start justify-between gap-4 mb-4">
                 <p className="eyebrow text-gold-soft">Featured Release</p>
                 {featuredStoreCta?.kind === "available" && (
@@ -216,7 +220,7 @@ const Index = () => {
                   </button>
                 </div>
               )}
-              <div className="mt-auto pt-2">
+              <div className="mt-auto pt-2 shrink-0">
                 <Link
                   to={`/releases/${encodeURIComponent(featured.slug)}`}
                   className="inline-flex items-center gap-3 border-b border-ivory/70 pb-2 text-[12px] uppercase tracking-[0.24em] font-medium hover:text-gold hover:border-gold transition-colors duration-500"
