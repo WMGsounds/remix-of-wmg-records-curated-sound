@@ -146,8 +146,8 @@ const Index = () => {
             />
           )}
           <div className="absolute inset-0 bg-ink/75" aria-hidden="true" />
-          <div className="relative container-editorial grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-12 items-start">
-            <div className="lg:col-span-5 order-2 lg:order-1 flex flex-col">
+          <div className="relative container-editorial grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-12 lg:items-stretch">
+            <div className="lg:col-span-5 order-2 lg:order-1 flex flex-col min-h-0">
               <div className="flex flex-wrap items-start justify-between gap-4 mb-4">
                 <p className="eyebrow text-gold-soft">Featured Release</p>
                 {featuredStoreCta?.kind === "available" && (
@@ -194,10 +194,10 @@ const Index = () => {
                 </p>
               )}
               {featuredTracks.length > 0 && (
-                <div className="mb-8 max-w-xl">
+                <div className="mb-8 max-w-xl flex-1 min-h-0 flex flex-col">
                   <p className="eyebrow text-gold-soft mb-3">Track list</p>
-                  <ol className="space-y-1.5 text-sm text-ivory/75">
-                    {(tracksExpanded ? featuredTracks : featuredTracks.slice(0, TRACK_PREVIEW_COUNT)).map((t, i) => (
+                  <ol className={`space-y-1.5 text-sm text-ivory/75 ${tracksExpanded ? "" : "flex-1 min-h-0 overflow-hidden"}`}>
+                    {featuredTracks.map((t, i) => (
                       <li key={t.id} className="flex items-baseline gap-3">
                         <span className="w-6 shrink-0 tabular-nums text-[11px] text-ivory/45">
                           {String(t.trackNumber || i + 1).padStart(2, "0")}
@@ -206,16 +206,14 @@ const Index = () => {
                       </li>
                     ))}
                   </ol>
-                  {featuredTracks.length > TRACK_PREVIEW_COUNT && (
-                    <button
-                      type="button"
-                      onClick={() => setTracksExpanded((v) => !v)}
-                      className="mt-3 inline-flex items-center gap-1.5 text-[11px] uppercase tracking-[0.24em] text-gold/80 transition-colors hover:text-gold"
-                    >
-                      <span>{tracksExpanded ? "Show less" : "View all"}</span>
-                      <span aria-hidden>{tracksExpanded ? "▴" : "▾"}</span>
-                    </button>
-                  )}
+                  <button
+                    type="button"
+                    onClick={() => setTracksExpanded((v) => !v)}
+                    className="mt-3 self-start inline-flex items-center gap-1.5 text-[11px] uppercase tracking-[0.24em] text-gold/80 transition-colors hover:text-gold"
+                  >
+                    <span>{tracksExpanded ? "Show less" : "View all"}</span>
+                    <span aria-hidden>{tracksExpanded ? "▴" : "▾"}</span>
+                  </button>
                 </div>
               )}
               <div className="mt-auto pt-2">
@@ -227,7 +225,7 @@ const Index = () => {
                 </Link>
               </div>
             </div>
-            <div className="lg:col-span-7 order-1 lg:order-2 hover-zoom overflow-hidden">
+            <div className="lg:col-span-7 order-1 lg:order-2 hover-zoom overflow-hidden self-start">
               {featured.coverArt ? (
                 <LazyImage
                   src={featured.coverArt}
@@ -236,7 +234,7 @@ const Index = () => {
                   height={1200}
                   displayWidth={640}
                   sizes="(min-width: 1024px) 40vw, 100vw"
-                  className="object-cover"
+                  className="object-cover aspect-square w-full"
                 />
               ) : (
                 <div className="w-full aspect-square bg-muted flex items-center justify-center text-muted-foreground">Artwork coming soon.</div>

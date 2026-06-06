@@ -169,5 +169,6 @@ export type StoreItem = {
   availability: StoreAvailability;
   featured: boolean;
   buttonText: string | null;
+  comments: string | null;
 };
 

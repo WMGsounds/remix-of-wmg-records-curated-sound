@@ -375,6 +375,7 @@ export function normalizeStoreItem(
 
   const purchaseLinkRaw = url(props["Purchase Link"]);
   const buttonTextRaw = text(props["Button Text"]);
+  const commentsRaw = text(findProp(props, "Comments", "Comment", "Store Comments"));
 
   return {
     id: page.id,
@@ -395,6 +396,7 @@ export function normalizeStoreItem(
     featured: bool(props["Featured"]),
     sortOrder: num(props["Store Sort Order"]),
     buttonText: buttonTextRaw || null,
+    comments: commentsRaw || null,
   };
 }
 
