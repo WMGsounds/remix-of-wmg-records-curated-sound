@@ -133,7 +133,7 @@ const Index = () => {
 
       {/* FEATURED RELEASE */}
       {featured && (
-        <section className="relative overflow-hidden bg-ink py-16 md:py-20 text-ivory border-t border-b border-gold/30">
+        <section className="relative overflow-hidden bg-ink pt-16 pb-10 md:pt-20 md:pb-14 text-ivory border-t border-b border-gold/30">
           {featuredBgUrl && (
             <div
               className={`absolute inset-0 scale-110 bg-cover bg-center transition-opacity duration-300 ${bgReady ? "opacity-100" : "opacity-0"}`}
