@@ -1,6 +1,8 @@
+import { useMemo } from "react";
 import { Link } from "react-router-dom";
 import { LazyImage } from "@/components/LazyImage";
-import type { StoreItem, StoreFormat } from "@/lib/types";
+import { useTracks } from "@/lib/queries";
+import type { StoreItem, StoreFormat, Track } from "@/lib/types";
 
 const FORMAT_DISPLAY_ORDER: StoreFormat[] = ["Vinyl", "CD", "iTunes", "Digital", "Merch", "Other"];
 
@@ -53,6 +55,36 @@ type StoreCardProps = {
 };
 
 export const StoreCard = ({ item, variant = "grid" }: StoreCardProps) => {
+  const { data: allTracks = [] } = useTracks();
+
+  const effectiveTracks = useMemo(() => {
+    // Prefer the Store item's own Related Tracks if Notion provides them.
+    if (item.relatedTracks && item.relatedTracks.length > 0) {
+      return item.relatedTracks.map((t, i) => ({
+        id: t.id,
+        title: t.title,
+        trackNumber: i + 1,
+      }));
+    }
+    // Fall back to the linked Release's tracklist (same source as Release pages).
+    const releaseId = item.release?.id;
+    const releaseSlug = item.release?.slug;
+    if (!releaseId && !releaseSlug) return [];
+    return (allTracks as Track[])
+      .filter(
+        (t) =>
+          (releaseId && t.releaseId === releaseId) ||
+          (releaseSlug && t.releaseSlug === releaseSlug),
+      )
+      .slice()
+      .sort((a, b) => (a.trackNumber || 0) - (b.trackNumber || 0))
+      .map((t) => ({
+        id: t.id,
+        title: t.trackTitle,
+        trackNumber: t.trackNumber || 0,
+      }));
+  }, [item.relatedTracks, item.release, allTracks]);
+
   if (item.availability === "Hidden") return null;
 
   const button = resolveButton(item);
@@ -62,7 +94,7 @@ export const StoreCard = ({ item, variant = "grid" }: StoreCardProps) => {
   const ariaLabel = `Buy ${item.title} by ${artistName}`;
 
   const MetaRow = (
-    <div className="flex flex-wrap items-center gap-2 border-b border-ivory/10 pb-4">
+    <div className="flex min-h-[2.25rem] flex-wrap items-center gap-2 border-b border-ivory/10 pb-4">
       {variant === "featured" && (
         <span className="inline-flex items-center border border-gold/50 bg-gold/5 px-3 py-1 text-[10px] uppercase tracking-[0.24em] text-gold">
           Featured
@@ -91,9 +123,9 @@ export const StoreCard = ({ item, variant = "grid" }: StoreCardProps) => {
         return (
           <div
             key={f}
-            className="flex items-baseline gap-3 border-b border-ivory/10 pb-2"
+            className="flex items-baseline gap-4 border-b border-ivory/10 pb-2"
           >
-            <dt className="w-16 shrink-0 text-ivory/65">{f}</dt>
+            <dt className="min-w-[3.5rem] text-ivory/65">{f}</dt>
             <dd className={raw ? "text-ivory" : "text-ivory/50 italic"}>
               {raw || "See purchase page"}
             </dd>
@@ -103,14 +135,14 @@ export const StoreCard = ({ item, variant = "grid" }: StoreCardProps) => {
     </dl>
   );
 
-  const TrackList = item.relatedTracks.length > 0 && (
+  const TrackList = effectiveTracks.length > 0 && (
     <div className="space-y-3">
       <p className="text-[11px] uppercase tracking-[0.24em] text-gold-soft">Track list</p>
       <ol className="space-y-1.5 text-sm text-ivory/75">
-        {item.relatedTracks.map((t, i) => (
+        {effectiveTracks.map((t, i) => (
           <li key={t.id} className="flex items-baseline gap-3">
             <span className="w-6 shrink-0 tabular-nums text-[11px] text-ivory/45">
-              {String(i + 1).padStart(2, "0")}
+              {String(t.trackNumber || i + 1).padStart(2, "0")}
             </span>
             <span className="leading-snug">{t.title}</span>
           </li>
@@ -119,15 +151,15 @@ export const StoreCard = ({ item, variant = "grid" }: StoreCardProps) => {
     </div>
   );
 
-  const IncludesCollapsible = item.relatedTracks.length > 0 && (
+  const IncludesCollapsible = effectiveTracks.length > 0 && (
     <details className="group/inc text-sm">
       <summary className="cursor-pointer list-none text-[11px] uppercase tracking-[0.24em] text-ivory/55 hover:text-ivory">
-        Includes ({item.relatedTracks.length})
+        Includes ({effectiveTracks.length})
         <span className="ml-2 text-ivory/40 group-open/inc:hidden">+</span>
         <span className="ml-2 hidden text-ivory/40 group-open/inc:inline">−</span>
       </summary>
       <ul className="mt-3 space-y-1 text-ivory/70">
-        {item.relatedTracks.map((t) => (
+        {effectiveTracks.map((t) => (
           <li key={t.id} className="text-sm">
             {t.title}
           </li>
@@ -136,21 +168,24 @@ export const StoreCard = ({ item, variant = "grid" }: StoreCardProps) => {
     </details>
   );
 
-  const ArtistLine = item.artist && (
-    item.artist.slug ? (
-      <Link
-        to={`/artists/${encodeURIComponent(item.artist.slug)}`}
-        className="eyebrow text-gold inline-block transition-colors hover:text-ivory focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gold"
-      >
-        {item.artist.name}
-      </Link>
-    ) : (
-      <p className="eyebrow text-gold">{item.artist.name}</p>
-    )
+  const ArtistLine = (
+    <div className="min-h-[1.25rem]">
+      {item.artist &&
+        (item.artist.slug ? (
+          <Link
+            to={`/artists/${encodeURIComponent(item.artist.slug)}`}
+            className="eyebrow text-gold inline-block transition-colors hover:text-ivory focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gold"
+          >
+            {item.artist.name}
+          </Link>
+        ) : (
+          <p className="eyebrow text-gold">{item.artist.name}</p>
+        ))}
+    </div>
   );
 
-  const Button = (
-    <div className="mt-auto pt-4">
+  const ButtonBlock = (
+    <div className="mt-auto pt-6">
       {button.disabled ? (
         <button
           type="button"
@@ -199,24 +234,26 @@ export const StoreCard = ({ item, variant = "grid" }: StoreCardProps) => {
             </div>
           )}
         </div>
-        <div className="flex flex-1 flex-col gap-6 p-8 md:p-10">
-          {MetaRow}
-          <header className="space-y-2">
-            {ArtistLine}
-            <h3 className="font-serif text-2xl leading-tight text-ivory md:text-3xl">{item.title}</h3>
-          </header>
-          {item.description && (
-            <p className="text-[15px] leading-relaxed text-ivory/70">{item.description}</p>
-          )}
-          {orderedFormats.length > 0 && (
-            <p className="text-xs uppercase tracking-[0.2em] text-ivory/65">
-              <span className="text-ivory/45">Available in: </span>
-              <span className="text-ivory/85">{formatLine}</span>
-            </p>
-          )}
-          {PriceList}
-          {TrackList}
-          {Button}
+        <div className="flex flex-1 flex-col p-8 md:p-10">
+          <div className="flex flex-col gap-6">
+            {MetaRow}
+            <header className="space-y-2">
+              {ArtistLine}
+              <h3 className="font-serif text-2xl leading-tight text-ivory md:text-3xl">{item.title}</h3>
+            </header>
+            {item.description && (
+              <p className="text-[15px] leading-relaxed text-ivory/70">{item.description}</p>
+            )}
+            {orderedFormats.length > 0 && (
+              <p className="text-xs uppercase tracking-[0.2em] text-ivory/65">
+                <span className="text-ivory/45">Available in: </span>
+                <span className="text-ivory/85">{formatLine}</span>
+              </p>
+            )}
+            {PriceList}
+            {TrackList}
+          </div>
+          {ButtonBlock}
         </div>
       </article>
     );
@@ -241,24 +278,28 @@ export const StoreCard = ({ item, variant = "grid" }: StoreCardProps) => {
           </div>
         )}
       </div>
-      <div className="flex flex-1 flex-col gap-6 p-8 md:p-10">
-        {MetaRow}
-        <header className="space-y-2">
-          {ArtistLine}
-          <h3 className="font-serif text-2xl leading-tight text-ivory md:text-3xl">{item.title}</h3>
-        </header>
-        {item.description && (
-          <p className="line-clamp-3 text-[15px] leading-relaxed text-ivory/70">{item.description}</p>
-        )}
-        {orderedFormats.length > 0 && (
-          <p className="text-xs uppercase tracking-[0.2em] text-ivory/65">
-            <span className="text-ivory/45">Available in: </span>
-            <span className="text-ivory/85">{formatLine}</span>
-          </p>
-        )}
-        {PriceList}
-        {IncludesCollapsible}
-        {Button}
+      <div className="flex flex-1 flex-col p-8 md:p-10">
+        <div className="flex flex-col gap-6">
+          {MetaRow}
+          <header className="space-y-2">
+            {ArtistLine}
+            <h3 className="min-h-[4rem] font-serif text-2xl leading-tight text-ivory md:min-h-[4.5rem] md:text-3xl">
+              {item.title}
+            </h3>
+          </header>
+          {item.description && (
+            <p className="line-clamp-3 text-[15px] leading-relaxed text-ivory/70">{item.description}</p>
+          )}
+          {orderedFormats.length > 0 && (
+            <p className="text-xs uppercase tracking-[0.2em] text-ivory/65">
+              <span className="text-ivory/45">Available in: </span>
+              <span className="text-ivory/85">{formatLine}</span>
+            </p>
+          )}
+          {PriceList}
+          {IncludesCollapsible}
+        </div>
+        {ButtonBlock}
       </div>
     </article>
   );
