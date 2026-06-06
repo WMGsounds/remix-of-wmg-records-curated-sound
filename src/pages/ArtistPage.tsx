@@ -12,6 +12,8 @@ import { PageLoading, PageError } from "@/components/UIStates";
 const ArtistPage = () => {
   const { slug } = useParams();
   const { data, isLoading, isError } = useArtistBySlug(slug);
+  const { data: storeItems = [] } = useStoreItems();
+  const { data: journalArticles = [] } = useJournal();
 
   if (isLoading) return <PageLoading label="Opening artist" />;
   if (isError) return <PageError />;
@@ -20,6 +22,33 @@ const ArtistPage = () => {
   const { artist, discography } = data;
   const heroImage = artist.heroImage2 || artist.heroImage;
   const featured = discography[0];
+
+  const artistStoreItems = storeItems
+    .filter(
+      (s) =>
+        s.availability !== "Hidden" &&
+        s.artist &&
+        (s.artist.id === artist.id || s.artist.slug === artist.slug),
+    )
+    .sort((a, b) => {
+      if (a.featured !== b.featured) return a.featured ? -1 : 1;
+      return a.title.localeCompare(b.title);
+    })
+    .slice(0, 6);
+
+  const artistJournal = journalArticles
+    .filter(
+      (a) =>
+        a.published &&
+        (a.artistIds?.includes(artist.id) ||
+          a.artists?.some((x) => x.id === artist.id || x.slug === artist.slug)),
+    )
+    .sort(
+      (a, b) =>
+        +new Date(b.publishedDate || b.lastEditedTime || b.createdTime) -
+        +new Date(a.publishedDate || a.lastEditedTime || a.createdTime),
+    )
+    .slice(0, 3);
   const path = `/artists/${artist.slug}`;
   const seoTitle = `${artist.name}${artist.genre ? ` | ${artist.genre}` : ""} | WMG Records`;
   const seoDesc = truncate(
