@@ -276,7 +276,7 @@ export const StoreCard = ({ item, variant = "grid" }: StoreCardProps) => {
           </div>
 
           {/* Body row: left text/prices/description | spacer | right track list */}
-          <div className="mt-6 grid flex-1 min-h-0 grid-cols-1 gap-y-6 md:grid-cols-[minmax(0,0.66fr)_5rem_minmax(0,1.14fr)] md:gap-x-0">
+          <div className="mt-6 grid flex-1 min-h-0 grid-cols-1 gap-y-6 md:grid-cols-[minmax(0,0.66fr)_6rem_minmax(0,1.14fr)] md:gap-x-0">
             <div className="flex min-w-0 flex-col gap-5">
               <header className="space-y-2">
                 {ArtistLine}
