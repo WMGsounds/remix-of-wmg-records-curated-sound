@@ -62,13 +62,13 @@ const JournalCategory = () => {
   }
 
   const path = `/journal/category/${slug}`;
-  const title = `${categoryName || "Category"} | WMG Journal`;
-  const description = `${categoryName} stories from WMG Records — release notes, artist features and label editorial from Wareham Music Group.`;
+  const title = categoryName || "Category";
+  const description = `${categoryName} stories from WMG — release notes, artist features and label editorial from Wareham Music Group.`;
 
   return (
     <div className="bg-ink text-ivory pb-32 min-h-screen">
       <Seo
-        title={title.replace(" | WMG Records", "")}
+        title={title}
         description={description}
         canonicalPath={path}
         jsonLd={breadcrumbSchema([

@@ -72,7 +72,7 @@ export const Seo = ({
   modifiedTime,
 }: SeoProps) => {
   const location = useLocation();
-  const pageTitle = title ? `${title} | ${SITE_NAME}` : DEFAULT_TITLE;
+  const pageTitle = title ? `${SITE_NAME} | ${title}` : DEFAULT_TITLE;
   const pageDesc = truncate(description || DEFAULT_DESCRIPTION);
   const pagePath = canonicalPath ?? location.pathname;
   const canonical = canonicalUrl || absoluteUrl(pagePath);

@@ -1,4 +1,4 @@
-// Central SEO constants and helpers for WMG Records.
+// Central SEO constants and helpers for WMG (Wareham Music Group).
 export const SITE_URL = "https://www.wmgsounds.com";
 export const SITE_NAME = "WMG";
 export const SITE_LEGAL_NAME = "Wareham Music Group";

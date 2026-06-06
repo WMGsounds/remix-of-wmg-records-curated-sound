@@ -1,14 +1,14 @@
-# WMG Records
+# WMG
 
-> WMG Records (Wareham Music Group) is an independent label curating artist worlds and story-led releases across soul, blues, country, crooner and cinematic music.
+> WMG (Wareham Music Group) is an independent label curating artist worlds and story-led releases across soul, blues, country, crooner and cinematic music.
 
 ## Pages
 
 - [Home](/): Label overview, featured artists and latest releases.
-- [Artists](/artists): The WMG Records roster.
+- [Artists](/artists): The WMG roster.
 - [Releases](/releases): Catalogue of singles, EPs and albums.
 - [Journal](/journal): Essays, interviews and label notes.
-- [About](/about): About Wareham Music Group and the WMG Records label.
+- [About](/about): About Wareham Music Group and the WMG label.
 - [Contact](/contact): Demos, press, sync and general enquiries.
 - [Newsletter](/newsletter): Join the list for new releases and first access.
 - [Legal](/legal): Privacy, terms and legal information.

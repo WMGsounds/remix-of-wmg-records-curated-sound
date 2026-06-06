@@ -5,7 +5,7 @@ import { breadcrumbSchema } from "@/lib/seo";
 const copy: Record<string, { title: string; description: string; body: string[] }> = {
   privacy: {
     title: "Privacy Policy",
-    description: "How WMG Records (Wareham Music Group) collects, uses and protects information submitted through this website.",
+    description: "How Wareham Music Group collects, uses and protects information submitted through this website.",
     body: [
       "This Privacy Policy describes how Wareham Music Group ('WMG', 'we', 'our') collects, uses and protects information you provide when using this website.",
       "We collect only the minimum information required to operate the site and our services — including email addresses submitted to our newsletter and messages submitted via our contact form.",
@@ -14,7 +14,7 @@ const copy: Record<string, { title: string; description: string; body: string[] 
   },
   terms: {
     title: "Terms of Use",
-    description: "Terms governing use of the WMG Records website, including content rights and acceptable use.",
+    description: "Terms governing use of the WMG website, including content rights and acceptable use.",
     body: [
       "By accessing this website you agree to these Terms of Use. All content on this site, including images, audio, video and text, is the property of Wareham Music Group or its licensors and is protected by copyright.",
       "You may not reproduce, distribute or commercially exploit any material from this site without prior written consent.",
@@ -22,7 +22,7 @@ const copy: Record<string, { title: string; description: string; body: string[] 
   },
   cookies: {
     title: "Cookies",
-    description: "Information about how WMG Records uses cookies on this website.",
+    description: "Information about how WMG uses cookies on this website.",
     body: [
       "This site uses a small number of essential cookies to operate properly. Optional analytics cookies may be used to help us understand how the site is used. You can control cookies through your browser settings.",
     ],

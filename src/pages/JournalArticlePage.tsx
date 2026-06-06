@@ -19,7 +19,7 @@ const JournalArticlePage = () => {
   const heroArtist = relatedArtists[0];
   const heroRelease = relatedReleases[0];
   const path = `/journal/${a.slug}`;
-  const seoTitle = a.seoTitle || `${a.title} | WMG Journal`;
+  const seoTitle = a.seoTitle || a.title;
   const seoDesc = truncate(a.seoDescription || a.excerpt || a.summary || "");
 
   const articleSchema: Record<string, unknown> = {

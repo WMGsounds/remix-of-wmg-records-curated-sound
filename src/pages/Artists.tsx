@@ -38,7 +38,7 @@ const Artists = () => {
     <div className="bg-ink text-ivory pb-32">
       <Seo
         title="Artists"
-        description="Explore the WMG Records artist roster, from classic soul and blues-soul to crooner, country-soul, Americana and cinematic music worlds."
+        description="Explore the WMG artist roster, from classic soul and blues-soul to crooner, country-soul, Americana and cinematic music worlds."
         canonicalPath="/artists"
         jsonLd={breadcrumbSchema([
           { name: "Home", path: "/" },

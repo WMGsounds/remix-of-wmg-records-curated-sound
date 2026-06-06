@@ -50,11 +50,11 @@ const ArtistPage = () => {
     )
     .slice(0, 3);
   const path = `/artists/${artist.slug}`;
-  const seoTitle = `${artist.name}${artist.genre ? ` | ${artist.genre}` : ""} | WMG Records`;
+  const seoTitle = artist.name;
   const seoDesc = truncate(
     artist.shortDescription
-      ? `${artist.name} — ${artist.shortDescription} Explore releases, stories and music from ${artist.name} on WMG Records.`
-      : `${artist.name} on WMG Records. Explore releases, stories and music from ${artist.name}.`,
+      ? `${artist.name} — ${artist.shortDescription} Explore releases, stories and music from ${artist.name} on WMG.`
+      : `${artist.name} on WMG. Explore releases, stories and music from ${artist.name}.`,
   );
   const musicGroup = {
     "@context": "https://schema.org",
@@ -75,7 +75,7 @@ const ArtistPage = () => {
   return (
     <div>
       <Seo
-        title={seoTitle.replace(" | WMG Records", "")}
+        title={seoTitle}
         description={seoDesc}
         canonicalPath={path}
         image={artist.heroImage}
