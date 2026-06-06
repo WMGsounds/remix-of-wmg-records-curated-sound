@@ -4,18 +4,16 @@ import { breadcrumbSchema } from "@/lib/seo";
 import { useStoreItems } from "@/lib/queries";
 import { InlineSkeleton, PageError } from "@/components/UIStates";
 import { StoreCard } from "@/components/StoreCard";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Select, SelectContent, SelectItem, SelectSeparator, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { FilterField, SearchInput } from "@/components/FilterBar";
 import { matchesSearch } from "@/lib/search";
-import type { StoreItem, StoreFormat, StoreAvailability } from "@/lib/types";
+import type { StoreItem, StoreFormat } from "@/lib/types";
 
 const storeHeroUrl = "/store-hero.png";
 
 const FORMAT_DISPLAY_ORDER: StoreFormat[] = ["Vinyl", "CD", "iTunes", "Digital", "Merch", "Other"];
-const availabilityFilters = ["All", "Available Now", "Coming Soon", "Sold Out"] as const;
 const sortOptions = ["Artist", "Title", "Vinyl", "CD"] as const;
 
-type AvailabilityFilter = (typeof availabilityFilters)[number];
 type SortOption = (typeof sortOptions)[number];
 
 function parsePrice(raw: string | undefined): number | null {
@@ -57,8 +55,8 @@ function sortItems(list: StoreItem[], sort: SortOption | undefined): StoreItem[]
 
 const Store = () => {
   const { data: items = [], isLoading, isError } = useStoreItems();
-  const [formatFilter, setFormatFilter] = useState<string>("All");
-  const [availabilityFilter, setAvailabilityFilter] = useState<AvailabilityFilter>("All");
+  // formatTypeFilter encodes: "All" | "fmt:Vinyl" | "type:Album"
+  const [formatTypeFilter, setFormatTypeFilter] = useState<string>("All");
   const [sort, setSort] = useState<SortOption | undefined>(undefined);
   const [searchQuery, setSearchQuery] = useState<string>("");
 
@@ -68,7 +66,16 @@ const Store = () => {
     items.forEach((i) => i.formats.forEach((f) => present.add(f)));
     return FORMAT_DISPLAY_ORDER.filter((f) => present.has(f));
   }, [items]);
-  const formatFilterOptions = useMemo(() => ["All", ...availableFormats], [availableFormats]);
+
+  // Build type filter options from the actually-present product types (preserve first-seen order).
+  const availableTypes = useMemo<string[]>(() => {
+    const seen: string[] = [];
+    for (const i of items) {
+      const t = i.productType?.trim();
+      if (t && !seen.includes(t)) seen.push(t);
+    }
+    return seen;
+  }, [items]);
 
   // Featured is computed from items independent of filters/sort so it never disappears
   // or reshuffles when filters change.
@@ -81,8 +88,15 @@ const Store = () => {
     return items.filter((i) => {
       if (i.availability === "Hidden") return false;
       if (i.featured) return false;
-      if (formatFilter !== "All" && !i.formats.includes(formatFilter as StoreFormat)) return false;
-      if (availabilityFilter !== "All" && i.availability !== (availabilityFilter as StoreAvailability)) return false;
+      if (formatTypeFilter !== "All") {
+        if (formatTypeFilter.startsWith("fmt:")) {
+          const f = formatTypeFilter.slice(4) as StoreFormat;
+          if (!i.formats.includes(f)) return false;
+        } else if (formatTypeFilter.startsWith("type:")) {
+          const t = formatTypeFilter.slice(5);
+          if ((i.productType ?? "") !== t) return false;
+        }
+      }
       if (!matchesSearch(searchQuery, [
         i.title,
         i.artist?.name,
@@ -91,7 +105,7 @@ const Store = () => {
       ])) return false;
       return true;
     });
-  }, [items, formatFilter, availabilityFilter, searchQuery]);
+  }, [items, formatTypeFilter, searchQuery]);
 
   const rest = useMemo(() => sortItems(filtered, sort), [filtered, sort]);
 
@@ -183,29 +197,37 @@ const Store = () => {
                 )}
                 <div className="flex flex-wrap items-end justify-between gap-y-6 mb-10 border-y border-ivory/18 py-6">
                   <div className="flex flex-wrap items-end gap-x-8 gap-y-6">
-                    <FilterField label="Format">
-                      <Select value={formatFilter} onValueChange={(v) => setFormatFilter(v)}>
-                        <SelectTrigger className="w-[160px] bg-transparent border-ivory/24 text-[11px] uppercase tracking-[0.24em] text-ivory rounded-none focus:ring-ivory">
+                    <FilterField label="Format / Type">
+                      <Select value={formatTypeFilter} onValueChange={(v) => setFormatTypeFilter(v)}>
+                        <SelectTrigger className="w-[200px] bg-transparent border-ivory/24 text-[11px] uppercase tracking-[0.24em] text-ivory rounded-none focus:ring-ivory">
                           <SelectValue />
                         </SelectTrigger>
                         <SelectContent className="bg-ink text-ivory border-ivory/24">
-                          {formatFilterOptions.map((f) => (
-                            <SelectItem key={f} value={f} className="text-[11px] uppercase tracking-[0.24em] focus:bg-ivory/10 focus:text-ivory">
+                          <SelectItem value="All" className="text-[11px] uppercase tracking-[0.24em] focus:bg-ivory/10 focus:text-ivory">
+                            All
+                          </SelectItem>
+                          {availableFormats.length > 0 && (
+                            <SelectSeparator className="bg-ivory/15" />
+                          )}
+                          {availableFormats.map((f) => (
+                            <SelectItem
+                              key={`fmt-${f}`}
+                              value={`fmt:${f}`}
+                              className="text-[11px] uppercase tracking-[0.24em] focus:bg-ivory/10 focus:text-ivory"
+                            >
                               {f}
                             </SelectItem>
                           ))}
-                        </SelectContent>
-                      </Select>
-                    </FilterField>
-                    <FilterField label="Availability">
-                      <Select value={availabilityFilter} onValueChange={(v) => setAvailabilityFilter(v as AvailabilityFilter)}>
-                        <SelectTrigger className="w-[180px] bg-transparent border-ivory/24 text-[11px] uppercase tracking-[0.24em] text-ivory rounded-none focus:ring-ivory">
-                          <SelectValue />
-                        </SelectTrigger>
-                        <SelectContent className="bg-ink text-ivory border-ivory/24">
-                          {availabilityFilters.map((f) => (
-                            <SelectItem key={f} value={f} className="text-[11px] uppercase tracking-[0.24em] focus:bg-ivory/10 focus:text-ivory">
-                              {f}
+                          {availableTypes.length > 0 && (
+                            <SelectSeparator className="bg-ivory/15" />
+                          )}
+                          {availableTypes.map((t) => (
+                            <SelectItem
+                              key={`type-${t}`}
+                              value={`type:${t}`}
+                              className="text-[11px] uppercase tracking-[0.24em] focus:bg-ivory/10 focus:text-ivory"
+                            >
+                              {t}
                             </SelectItem>
                           ))}
                         </SelectContent>

@@ -162,6 +162,7 @@ export const mockStoreItems: StoreItem[] = [
     featured: true,
     buttonText: "View Purchase Options",
     comments: null,
+    productType: null,
     createdTime: "2026-01-15T10:00:00.000Z",
   },
   {
@@ -185,6 +186,7 @@ export const mockStoreItems: StoreItem[] = [
     featured: false,
     buttonText: null,
     comments: null,
+    productType: null,
     createdTime: "2026-02-20T10:00:00.000Z",
   },
   {
@@ -205,6 +207,7 @@ export const mockStoreItems: StoreItem[] = [
     featured: false,
     buttonText: null,
     comments: null,
+    productType: null,
     createdTime: "2026-03-25T10:00:00.000Z",
   },
 ];

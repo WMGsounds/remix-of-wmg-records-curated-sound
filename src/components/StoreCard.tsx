@@ -123,24 +123,28 @@ export const StoreCard = ({ item, variant = "grid" }: StoreCardProps) => {
 
   const button = resolveButton(item);
   const orderedFormats = FORMAT_DISPLAY_ORDER.filter((f) => item.formats.includes(f));
-  const formatLine = orderedFormats.join(" · ");
   const artistName = item.artist?.name ?? "WMG";
   const ariaLabel = `Buy ${item.title} by ${artistName}`;
   const isUnavailable = item.availability === "Coming Soon" || item.availability === "Sold Out";
 
   const ArtistLine = (
-    <div className="min-h-[1.25rem]">
-      {item.artist &&
-        (item.artist.slug ? (
-          <Link
-            to={`/artists/${encodeURIComponent(item.artist.slug)}`}
-            className="eyebrow text-gold inline-block transition-colors hover:text-ivory focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gold"
-          >
-            {item.artist.name}
-          </Link>
-        ) : (
-          <p className="eyebrow text-gold">{item.artist.name}</p>
-        ))}
+    <div className="flex min-h-[1.25rem] items-baseline justify-between gap-3">
+      <div className="min-w-0">
+        {item.artist &&
+          (item.artist.slug ? (
+            <Link
+              to={`/artists/${encodeURIComponent(item.artist.slug)}`}
+              className="eyebrow text-gold inline-block transition-colors hover:text-ivory focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gold"
+            >
+              {item.artist.name}
+            </Link>
+          ) : (
+            <p className="eyebrow text-gold">{item.artist.name}</p>
+          ))}
+      </div>
+      {item.productType && (
+        <span className="eyebrow shrink-0 text-right text-ivory/55">{item.productType}</span>
+      )}
     </div>
   );
 
@@ -369,10 +373,9 @@ export const StoreCard = ({ item, variant = "grid" }: StoreCardProps) => {
               {item.title}
             </h3>
           </header>
-          {!isUnavailable && orderedFormats.length > 0 && (
-            <p className="text-xs uppercase tracking-[0.2em] text-ivory/65">
-              <span className="text-ivory/45">Available in: </span>
-              <span className="text-ivory/85">{formatLine}</span>
+          {!isUnavailable && (
+            <p className="text-[11px] tracking-[0.06em] text-ivory/55">
+              Available on all major streaming platforms
             </p>
           )}
           {!isUnavailable && (PriceList || CommentsBlock) && (
@@ -383,7 +386,7 @@ export const StoreCard = ({ item, variant = "grid" }: StoreCardProps) => {
           )}
           {isUnavailable && UnavailableCallout}
         </div>
-        {!isUnavailable && <div className="mt-auto pt-5">{renderCTA("grid")}</div>}
+        {!isUnavailable && <div className="mt-auto pt-8">{renderCTA("grid")}</div>}
       </div>
 
     </article>
