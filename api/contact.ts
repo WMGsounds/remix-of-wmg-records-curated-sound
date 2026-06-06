@@ -317,11 +317,18 @@ export default async function handler(req: any, res: any) {
       : (typeof body.demoUrl === "string" && body.demoUrl.length > 0
           ? [{ label: "Demo", url: body.demoUrl, filename: body.demoFilename, size: body.demoSize }]
           : []);
+    const UPLOADCARE_HOSTS = new Set(["ucarecdn.com"]);
     for (let i = 0; i < rawDemos.length && demos.length < 3; i++) {
       const d = rawDemos[i];
       if (!d || typeof d.url !== "string" || d.url.length === 0) continue;
       const url = d.url.trim();
-      if (!/^https:\/\//i.test(url)) {
+      let parsedUrl: URL;
+      try {
+        parsedUrl = new URL(url);
+      } catch {
+        return res.status(400).json({ error: "Invalid demo file URL" });
+      }
+      if (parsedUrl.protocol !== "https:" || !UPLOADCARE_HOSTS.has(parsedUrl.hostname)) {
         return res.status(400).json({ error: "Invalid demo file URL" });
       }
       const filename =
@@ -332,6 +339,7 @@ export default async function handler(req: any, res: any) {
       const label = typeof d.label === "string" && d.label.length > 0 ? d.label.slice(0, 40) : `Demo ${demos.length + 1}`;
       demos.push({ label, url, filename, size });
     }
+
 
     // Honeypot — silently succeed
     if (honeypot.length > 0) {
