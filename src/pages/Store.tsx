@@ -9,69 +9,63 @@ import type { StoreItem, StoreFormat, StoreAvailability } from "@/lib/types";
 
 const storeHeroUrl = "/store-hero.png";
 
-const formatFilters = ["All", "Vinyl", "CD", "iTunes", "Digital", "Merch", "Other"] as const;
+const FORMAT_DISPLAY_ORDER: StoreFormat[] = ["Vinyl", "CD", "iTunes", "Digital", "Merch", "Other"];
 const availabilityFilters = ["All", "Available Now", "Coming Soon", "Sold Out"] as const;
-const sortOptions = ["Featured", "Store Item", "Artist", "Price Low to High", "Price High to Low"] as const;
+const sortOptions = ["Artist", "Title", "Vinyl", "CD"] as const;
 
-type FormatFilter = (typeof formatFilters)[number];
 type AvailabilityFilter = (typeof availabilityFilters)[number];
 type SortOption = (typeof sortOptions)[number];
 
-function lowestNumericPrice(item: StoreItem): number | null {
-  const values: number[] = [];
-  for (const f of item.formats) {
-    const raw = item.prices[f as StoreFormat]?.trim();
-    if (!raw) continue;
-    const m = raw.replace(/,/g, ".").match(/-?\d+(?:\.\d+)?/);
-    if (m) {
-      const n = parseFloat(m[0]);
-      if (Number.isFinite(n)) values.push(n);
-    }
-  }
-  return values.length ? Math.min(...values) : null;
+function parsePrice(raw: string | undefined): number | null {
+  if (!raw) return null;
+  const m = raw.replace(/,/g, ".").match(/-?\d+(?:\.\d+)?/);
+  if (!m) return null;
+  const n = parseFloat(m[0]);
+  return Number.isFinite(n) ? n : null;
 }
 
-function sortItems(list: StoreItem[], sort: SortOption): StoreItem[] {
+function sortItems(list: StoreItem[], sort: SortOption | undefined): StoreItem[] {
+  if (!sort) return list;
   const arr = [...list];
   switch (sort) {
-    case "Store Item":
+    case "Title":
       return arr.sort((a, b) => a.title.localeCompare(b.title));
     case "Artist":
-      return arr.sort((a, b) =>
-        (a.artist?.name ?? "").localeCompare(b.artist?.name ?? "") || a.title.localeCompare(b.title),
+      return arr.sort(
+        (a, b) =>
+          (a.artist?.name ?? "").localeCompare(b.artist?.name ?? "") ||
+          a.title.localeCompare(b.title),
       );
-    case "Price Low to High":
+    case "Vinyl":
+    case "CD": {
+      const fmt: StoreFormat = sort;
       return arr.sort((a, b) => {
-        const pa = lowestNumericPrice(a);
-        const pb = lowestNumericPrice(b);
+        const pa = parsePrice(a.prices[fmt]);
+        const pb = parsePrice(b.prices[fmt]);
         if (pa === null && pb === null) return a.title.localeCompare(b.title);
         if (pa === null) return 1;
         if (pb === null) return -1;
         return pa - pb;
       });
-    case "Price High to Low":
-      return arr.sort((a, b) => {
-        const pa = lowestNumericPrice(a);
-        const pb = lowestNumericPrice(b);
-        if (pa === null && pb === null) return a.title.localeCompare(b.title);
-        if (pa === null) return 1;
-        if (pb === null) return -1;
-        return pb - pa;
-      });
-    case "Featured":
+    }
     default:
-      return arr.sort((a, b) => {
-        if (a.featured !== b.featured) return a.featured ? -1 : 1;
-        return a.title.localeCompare(b.title);
-      });
+      return arr;
   }
 }
 
 const Store = () => {
   const { data: items = [], isLoading, isError } = useStoreItems();
-  const [formatFilter, setFormatFilter] = useState<FormatFilter>("All");
+  const [formatFilter, setFormatFilter] = useState<string>("All");
   const [availabilityFilter, setAvailabilityFilter] = useState<AvailabilityFilter>("All");
-  const [sort, setSort] = useState<SortOption>("Featured");
+  const [sort, setSort] = useState<SortOption | undefined>(undefined);
+
+  // Build format filter options from the actually-present formats.
+  const availableFormats = useMemo<StoreFormat[]>(() => {
+    const present = new Set<StoreFormat>();
+    items.forEach((i) => i.formats.forEach((f) => present.add(f)));
+    return FORMAT_DISPLAY_ORDER.filter((f) => present.has(f));
+  }, [items]);
+  const formatFilterOptions = useMemo(() => ["All", ...availableFormats], [availableFormats]);
 
   const filtered = useMemo(() => {
     return items.filter((i) => {
@@ -83,10 +77,13 @@ const Store = () => {
   }, [items, formatFilter, availabilityFilter]);
 
   const featured = useMemo(
-    () => sortItems(filtered.filter((i) => i.featured), sort === "Featured" ? "Store Item" : sort),
+    () => filtered.filter((i) => i.featured),
+    [filtered],
+  );
+  const rest = useMemo(
+    () => sortItems(filtered.filter((i) => !i.featured), sort),
     [filtered, sort],
   );
-  const rest = useMemo(() => sortItems(filtered.filter((i) => !i.featured), sort), [filtered, sort]);
 
   if (isError) return <PageError message="Couldn't load the store." />;
 
@@ -111,8 +108,9 @@ const Store = () => {
             <p className="eyebrow mb-6 text-gold-soft">The Store</p>
             <h1 className="display-serif text-6xl md:text-8xl lg:text-9xl mb-10">Store</h1>
             <p className="max-w-2xl text-lg text-ivory/65">
-              Records, bundles and limited editions from the WMG roster. Each item links directly to its
-              dedicated purchase page. No cart, no checkout, just the music.
+              Physical editions, digital releases and selected collectables from the Wareham Music
+              Group catalogue. Browse official WMG releases and purchase directly through each
+              item's dedicated store page.
             </p>
           </div>
           <div className="relative hidden min-h-[360px] lg:block">
@@ -136,12 +134,12 @@ const Store = () => {
           <div className="flex flex-wrap items-center gap-6">
             <div className="flex items-center gap-3">
               <label className="hidden md:inline text-[11px] uppercase tracking-[0.24em] text-ivory/60">Format</label>
-              <Select value={formatFilter} onValueChange={(v) => setFormatFilter(v as FormatFilter)}>
+              <Select value={formatFilter} onValueChange={(v) => setFormatFilter(v)}>
                 <SelectTrigger className="w-[160px] bg-transparent border-ivory/24 text-[11px] uppercase tracking-[0.24em] text-ivory rounded-none focus:ring-ivory">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent className="bg-ink text-ivory border-ivory/24">
-                  {formatFilters.map((f) => (
+                  {formatFilterOptions.map((f) => (
                     <SelectItem key={f} value={f} className="text-[11px] uppercase tracking-[0.24em] focus:bg-ivory/10 focus:text-ivory">
                       {f}
                     </SelectItem>
@@ -169,7 +167,7 @@ const Store = () => {
             <label className="hidden md:inline text-[11px] uppercase tracking-[0.24em] text-ivory/60">Sort by</label>
             <Select value={sort} onValueChange={(v) => setSort(v as SortOption)}>
               <SelectTrigger className="w-[200px] bg-transparent border-ivory/24 text-[11px] uppercase tracking-[0.24em] text-ivory rounded-none focus:ring-ivory">
-                <SelectValue />
+                <SelectValue placeholder="Sort by" />
               </SelectTrigger>
               <SelectContent className="bg-ink text-ivory border-ivory/24">
                 {sortOptions.map((o) => (
@@ -212,7 +210,6 @@ const Store = () => {
                 </div>
                 <div className="mt-10 h-px w-full bg-gradient-to-r from-transparent via-gold/30 to-transparent" aria-hidden="true" />
               </section>
-
             )}
 
             {rest.length > 0 && (
@@ -223,7 +220,7 @@ const Store = () => {
                     <h2 className="display-serif text-3xl md:text-4xl">All Items</h2>
                   </div>
                 )}
-                <div className="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-3 md:gap-10">
+                <div className="grid grid-cols-1 items-stretch gap-8 md:grid-cols-2 lg:grid-cols-3 md:gap-10">
                   {rest.map((item) => (
                     <StoreCard key={item.id} item={item} />
                   ))}
