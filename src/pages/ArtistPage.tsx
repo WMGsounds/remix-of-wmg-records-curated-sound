@@ -75,7 +75,7 @@ const ArtistPage = () => {
   return (
     <div>
       <Seo
-        title={seoTitle.replace(" | WMG Records", "")}
+        title={seoTitle}
         description={seoDesc}
         canonicalPath={path}
         image={artist.heroImage}
