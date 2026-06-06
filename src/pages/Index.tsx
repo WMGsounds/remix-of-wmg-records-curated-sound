@@ -1,4 +1,4 @@
-import { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useLayoutEffect, useMemo, useRef, useState, type CSSProperties } from "react";
 import { Link } from "react-router-dom";
 import { ArrowRight, ShoppingBag } from "lucide-react";
 import hero from "@/assets/hero-cinematic.jpg";
@@ -170,7 +170,7 @@ const Index = () => {
               }`}
               style={
                 featuredArtworkHeight
-                  ? ({ "--featured-artwork-height": `${featuredArtworkHeight}px` } as React.CSSProperties)
+                  ? ({ "--featured-artwork-height": `${featuredArtworkHeight}px` } as CSSProperties)
                   : undefined
               }
             >
