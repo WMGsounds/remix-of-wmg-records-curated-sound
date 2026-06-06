@@ -166,9 +166,9 @@ const Index = () => {
           <div className="mt-10 flex flex-wrap gap-3 md:gap-4 animate-fade-up">
             <Link
               to="/artists"
-              className="inline-flex items-center gap-3 border border-gold/70 bg-gold/15 text-ivory px-7 py-3.5 text-[12px] uppercase tracking-[0.24em] font-medium hover:border-gold hover:bg-gold/25 hover:text-gold transition-colors duration-500"
+              className="inline-flex items-center gap-3 border border-ivory/25 bg-ink/40 text-ivory/90 px-7 py-3.5 text-[12px] uppercase tracking-[0.24em] font-medium hover:border-gold/70 hover:text-gold hover:bg-ink/60 transition-colors duration-500"
             >
-              Explore Artists <ArrowRight className="h-4 w-4" />
+              Explore Artists
             </Link>
             <Link
               to="/releases"
