@@ -149,7 +149,7 @@ const Index = () => {
           <div className="relative container-editorial grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-12 lg:items-stretch [container-type:inline-size]">
             <div
               className={`lg:col-span-5 order-2 lg:order-1 flex flex-col min-h-0 ${
-                tracksExpanded ? "" : "lg:h-[calc(58.333cqw-1.25rem)] lg:max-h-[calc(58.333cqw-1.25rem)]"
+                tracksExpanded ? "" : "lg:h-[calc(58.333cqw_-_1.25rem)] lg:max-h-[calc(58.333cqw_-_1.25rem)]"
               }`}
             >
               <div className="flex flex-wrap items-start justify-between gap-4 mb-4">
