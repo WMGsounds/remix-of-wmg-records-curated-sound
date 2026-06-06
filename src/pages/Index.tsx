@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import { ArrowRight, ShoppingBag } from "lucide-react";
 import hero from "@/assets/hero-cinematic.jpg";
@@ -29,6 +29,23 @@ const Index = () => {
   }, [allTracks, featured]);
   const TRACK_PREVIEW_COUNT = 8;
   const [tracksExpanded, setTracksExpanded] = useState(false);
+  const featuredArtworkRef = useRef<HTMLDivElement>(null);
+  const [featuredArtworkHeight, setFeaturedArtworkHeight] = useState<number | null>(null);
+
+  useLayoutEffect(() => {
+    const artwork = featuredArtworkRef.current;
+    if (!artwork) return;
+
+    const updateArtworkHeight = () => {
+      setFeaturedArtworkHeight(artwork.getBoundingClientRect().height);
+    };
+
+    updateArtworkHeight();
+    const observer = new ResizeObserver(updateArtworkHeight);
+    observer.observe(artwork);
+
+    return () => observer.disconnect();
+  }, [featured?.coverArt]);
 
   const featuredStoreCta = useMemo<
     | { kind: "available"; href: string }
@@ -146,11 +163,14 @@ const Index = () => {
             />
           )}
           <div className="absolute inset-0 bg-ink/75" aria-hidden="true" />
-          <div className="relative container-editorial grid grid-cols-1 lg:grid-cols-[minmax(0,5fr)_minmax(0,7fr)] gap-12 lg:items-start [container-type:inline-size]">
+          <div className="relative container-editorial grid grid-cols-1 lg:grid-cols-[minmax(0,5fr)_minmax(0,7fr)] gap-12 lg:items-start">
             <div
-              className={`order-2 lg:order-1 flex flex-col min-h-0 ${
-                tracksExpanded ? "" : "lg:h-[calc(58.333cqw_-_1.75rem)] lg:max-h-[calc(58.333cqw_-_1.75rem)]"
-              }`}
+              className="order-2 lg:order-1 flex flex-col min-h-0"
+              style={
+                !tracksExpanded && featuredArtworkHeight
+                  ? { height: featuredArtworkHeight, maxHeight: featuredArtworkHeight }
+                  : undefined
+              }
             >
               <div className="flex flex-wrap items-start justify-between gap-4 mb-4">
                 <p className="eyebrow text-gold-soft">Featured Release</p>
@@ -229,7 +249,7 @@ const Index = () => {
                 </Link>
               </div>
             </div>
-            <div className="order-1 lg:order-2 hover-zoom overflow-hidden self-start w-full">
+            <div ref={featuredArtworkRef} className="order-1 lg:order-2 hover-zoom overflow-hidden self-start w-full">
               {featured.coverArt ? (
                 <LazyImage
                   src={featured.coverArt}
