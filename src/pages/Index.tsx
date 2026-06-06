@@ -48,6 +48,36 @@ const Index = () => {
     return () => observer.disconnect();
   }, [featured?.coverArt]);
 
+  // Measure which tracks fit fully inside the collapsed track list area.
+  useLayoutEffect(() => {
+    if (tracksExpanded) {
+      setVisibleTrackCount(featuredTracks.length);
+      return;
+    }
+    const ol = trackListRef.current;
+    if (!ol || featuredTracks.length === 0) return;
+    const measure = () => {
+      const items = Array.from(ol.querySelectorAll<HTMLLIElement>("li[data-track]"));
+      if (items.length === 0) return;
+      const olBottom = ol.getBoundingClientRect().bottom;
+      let count = 0;
+      for (const li of items) {
+        if (li.getBoundingClientRect().bottom <= olBottom + 0.5) count++;
+        else break;
+      }
+      setVisibleTrackCount(count);
+    };
+    measure();
+    const ro = new ResizeObserver(measure);
+    ro.observe(ol);
+    if (ol.parentElement) ro.observe(ol.parentElement);
+    window.addEventListener("resize", measure);
+    return () => {
+      ro.disconnect();
+      window.removeEventListener("resize", measure);
+    };
+  }, [tracksExpanded, featuredTracks, featuredArtworkHeight]);
+
   const featuredStoreCta = useMemo<
     | { kind: "available"; href: string }
     | { kind: "coming" }
