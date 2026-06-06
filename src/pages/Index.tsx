@@ -133,7 +133,7 @@ const Index = () => {
 
       {/* FEATURED RELEASE */}
       {featured && (
-        <section className="relative overflow-hidden bg-ink py-16 md:py-20 text-ivory border-t border-b border-gold/30">
+        <section className="relative overflow-hidden bg-ink pt-16 pb-10 md:pt-20 md:pb-14 text-ivory border-t border-b border-gold/30">
           {featuredBgUrl && (
             <div
               className={`absolute inset-0 scale-110 bg-cover bg-center transition-opacity duration-300 ${bgReady ? "opacity-100" : "opacity-0"}`}
@@ -234,7 +234,7 @@ const Index = () => {
       )}
 
       {/* ARTIST ROSTER (Featured Artists) */}
-      <section className="relative overflow-hidden bg-ink text-ivory pt-14 pb-10 md:pt-40 md:pb-20">
+      <section className="relative overflow-hidden bg-ink text-ivory pt-12 pb-8 md:pt-20 md:pb-12">
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_78%_22%,hsl(var(--golden-brown)/0.24),transparent_28%),radial-gradient(circle_at_30%_36%,hsl(var(--gold)/0.10),transparent_30%)]" aria-hidden="true" />
         <div className="absolute inset-0 opacity-[0.07] [background-image:linear-gradient(90deg,hsl(var(--ivory)/0.72)_1px,transparent_1px),linear-gradient(0deg,hsl(var(--ivory)/0.72)_1px,transparent_1px)] [background-size:3px_3px]" aria-hidden="true" />
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,transparent_38%,hsl(var(--ink)/0.72)_100%)]" aria-hidden="true" />
@@ -297,7 +297,7 @@ const Index = () => {
       </section>
 
       {/* LATEST RELEASES */}
-      <section className="relative overflow-hidden bg-ink pt-10 pb-14 md:pt-20 md:pb-40 text-ivory">
+      <section className="relative overflow-hidden bg-ink pt-8 pb-14 md:pt-12 md:pb-28 text-ivory">
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_74%_38%,hsl(var(--golden-brown)/0.38),transparent_34%),radial-gradient(circle_at_18%_78%,hsl(var(--gold)/0.16),transparent_28%)]" aria-hidden="true" />
         <div className="absolute inset-0 opacity-[0.08] [background-image:linear-gradient(90deg,hsl(var(--ivory)/0.8)_1px,transparent_1px),linear-gradient(0deg,hsl(var(--ivory)/0.8)_1px,transparent_1px)] [background-size:3px_3px]" aria-hidden="true" />
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,transparent_42%,hsl(var(--ink)/0.72)_100%)]" aria-hidden="true" />
