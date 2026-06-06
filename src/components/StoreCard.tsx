@@ -254,17 +254,6 @@ export const StoreCard = ({ item, variant = "grid" }: StoreCardProps) => {
         </div>
 
         <div className="flex min-w-0 flex-col p-8 md:p-10 md:max-h-[42cqw] md:overflow-hidden">
-          {/* Top row: badges + helper line on the left, CTA on the right */}
-          <div className="grid grid-cols-1 items-start gap-6 border-b border-ivory/10 pb-6 md:grid-cols-[minmax(0,0.82fr)_minmax(0,1.18fr)] md:gap-x-10">
-            <div className="min-w-0">
-              <div className="flex flex-wrap items-center gap-2">
-                <span className="inline-flex items-center border border-gold/50 bg-gold/5 px-3 py-1 text-[10px] uppercase tracking-[0.24em] text-gold">
-                  Featured
-                </span>
-                <span
-                  className={`inline-flex items-center border px-3 py-1 text-[10px] uppercase tracking-[0.24em] ${statusLabelClass(item.availability)}`}
-                >
-        <div className="flex min-w-0 flex-col p-8 md:p-10 md:max-h-[42cqw] md:overflow-hidden">
           {/* Top row: badges + helper line on the left, spacer, CTA on the right */}
           <div className="grid grid-cols-1 items-start gap-6 border-b border-ivory/10 pb-6 md:grid-cols-[minmax(0,0.7fr)_3rem_minmax(0,1.18fr)] md:gap-x-0">
             <div className="min-w-0">
