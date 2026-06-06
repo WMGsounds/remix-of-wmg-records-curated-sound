@@ -1,22 +1,56 @@
 import { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
-import { ArrowRight } from "lucide-react";
+import { ArrowRight, ShoppingBag } from "lucide-react";
 import hero from "@/assets/hero-cinematic.jpg";
 import { ArtistCard, ReleaseCard } from "@/components/Cards";
 import { Seo } from "@/components/Seo";
 import { organizationSchema, websiteSchema } from "@/lib/seo";
 import { LazyImage } from "@/components/LazyImage";
-import { useHomepageData, useJournal } from "@/lib/queries";
+import { useHomepageData, useJournal, useTracks, useStoreItems } from "@/lib/queries";
 import { InlineSkeleton } from "@/components/UIStates";
 import { formatJournalDate } from "@/components/JournalArticle";
+import type { StoreItem } from "@/lib/types";
 
 const Index = () => {
   const { data, isLoading, isError } = useHomepageData();
   const { data: journalArticles = [], isLoading: journalLoading } = useJournal();
+  const { data: allTracks = [] } = useTracks();
+  const { data: storeItems = [] } = useStoreItems();
   const featured = data?.featuredRelease ?? null;
   const featuredArtists = data?.featuredArtists ?? [];
   const latestReleases = data?.latestReleases ?? [];
   const latestArticles = journalArticles.slice(0, 3);
+
+  const featuredTracks = useMemo(() => {
+    if (!featured) return [];
+    return allTracks
+      .filter((t) => t.releaseId === featured.id)
+      .sort((a, b) => (a.trackNumber || 0) - (b.trackNumber || 0))
+      .slice(0, 12);
+  }, [allTracks, featured]);
+
+  const featuredStoreCta = useMemo<
+    | { kind: "available"; href: string }
+    | { kind: "coming" }
+    | { kind: "sold" }
+    | { kind: "pending" }
+    | null
+  >(() => {
+    if (!featured) return null;
+    const matches = storeItems.filter(
+      (s: StoreItem) =>
+        s.availability !== "Hidden" &&
+        s.release &&
+        (s.release.id === featured.id || s.release.slug === featured.slug),
+    );
+    if (matches.length === 0) return null;
+    const live = matches.find((s) => s.availability === "Available Now" && s.purchaseLink);
+    if (live) return { kind: "available", href: live.purchaseLink! };
+    if (matches.find((s) => s.availability === "Available Now")) return { kind: "pending" };
+    if (matches.find((s) => s.availability === "Coming Soon")) return { kind: "coming" };
+    if (matches.find((s) => s.availability === "Sold Out")) return { kind: "sold" };
+    return null;
+  }, [storeItems, featured]);
 
   // Reuse the same URL for the blurred background — the browser dedupes the request.
   const featuredBgUrl = useMemo(() => {
