@@ -1,7 +1,9 @@
 import { Link, useParams, Navigate } from "react-router-dom";
 import { ArrowRight } from "lucide-react";
-import { useArtistBySlug } from "@/lib/queries";
+import { useArtistBySlug, useStoreItems, useJournal } from "@/lib/queries";
 import { LazyImage } from "@/components/LazyImage";
+import { StoreCard } from "@/components/StoreCard";
+import { formatJournalDate } from "@/components/JournalArticle";
 
 import { Seo } from "@/components/Seo";
 import { breadcrumbSchema, absoluteUrl, truncate } from "@/lib/seo";
