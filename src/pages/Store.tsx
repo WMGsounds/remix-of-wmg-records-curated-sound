@@ -136,7 +136,6 @@ const Store = () => {
       </section>
 
       <div className="container-editorial pt-16">
-      <div className="container-editorial pt-16">
         {isLoading ? (
           <InlineSkeleton count={6} />
         ) : !hasAnyVisible ? (
