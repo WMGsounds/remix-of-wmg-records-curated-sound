@@ -268,20 +268,29 @@ export const StoreCard = ({ item, variant = "grid" }: StoreCardProps) => {
 
           {/* Body row: left prices/description | spacer | right track list */}
           <div className="mt-6 grid flex-1 min-h-0 grid-cols-1 gap-y-6 md:grid-cols-[minmax(0,0.66fr)_6rem_minmax(0,1.14fr)] md:gap-x-0">
-            <div className="flex min-w-0 flex-col gap-5">
+            <div className="flex min-w-0 flex-col gap-4">
+              {!isUnavailable && linkedReleaseShortDescription && (
+                <p className="text-[14px] leading-relaxed text-ivory/75 md:line-clamp-2">
+                  {linkedReleaseShortDescription}
+                </p>
+              )}
               {!isUnavailable && (
-                <p className="text-[10px] uppercase tracking-[0.24em] text-ivory/55">
+                <p className="text-[11px] tracking-[0.06em] text-ivory/45">
                   Available on all major streaming platforms
                 </p>
               )}
-              {!isUnavailable && PriceList}
-              {!isUnavailable && CommentsBlock}
-
-
-              {!isUnavailable && linkedReleaseShortDescription && (
-                <p className="mt-auto text-[15px] leading-relaxed text-ivory/70">
-                  {linkedReleaseShortDescription}
-                </p>
+              {!isUnavailable && orderedFormats.length > 0 && (
+                <div className="flex flex-col gap-2">
+                  <p className="text-[10px] uppercase tracking-[0.24em] text-gold-soft/80">
+                    Formats
+                  </p>
+                  {PriceList}
+                  {item.comments && (
+                    <p className="-mt-0.5 text-[11px] italic leading-snug text-ivory/55">
+                      {item.comments}
+                    </p>
+                  )}
+                </div>
               )}
               {isUnavailable && UnavailableCallout}
             </div>
