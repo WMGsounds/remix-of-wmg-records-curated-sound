@@ -64,9 +64,19 @@ const Journal = () => {
   const { data: articles = [], isLoading, isError } = useJournal();
   const [cat, setCat] = useState<string>("All");
   const [sort, setSort] = useState<(typeof SORT_OPTIONS)[number]>("Newest");
+  const [searchQuery, setSearchQuery] = useState<string>("");
 
   const { hero, rest } = useMemo(() => {
-    const filtered = cat === "All" ? [...articles] : articles.filter((a) => a.category === cat);
+    const byCat = cat === "All" ? [...articles] : articles.filter((a) => a.category === cat);
+    const filtered = byCat.filter((a) =>
+      matchesSearch(searchQuery, [
+        a.title,
+        a.excerpt,
+        a.category,
+        a.artists[0]?.name,
+        a.releases[0]?.title,
+      ]),
+    );
     const dateOf = (a: JournalArticleSummary) => +new Date(a.publishedDate || a.lastEditedTime || a.createdTime);
     switch (sort) {
       case "Oldest":
@@ -82,7 +92,7 @@ const Journal = () => {
     const hero = filtered.find((a) => a.featured) ?? filtered[0] ?? null;
     const rest = filtered.filter((a) => a !== hero);
     return { hero, rest };
-  }, [articles, cat, sort]);
+  }, [articles, cat, sort, searchQuery]);
 
   if (isError) return <PageError message="Couldn't load the Journal." />;
 
