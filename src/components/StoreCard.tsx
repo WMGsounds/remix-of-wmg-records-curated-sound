@@ -253,7 +253,7 @@ export const StoreCard = ({ item, variant = "grid" }: StoreCardProps) => {
           )}
         </div>
 
-        <div className="flex min-w-0 flex-col p-8 md:p-10 md:max-h-[42cqw] md:overflow-hidden">
+        <div className="flex min-w-0 flex-col p-8 md:p-10">
           {/* Top row: title block on the left, spacer, CTA on the right */}
           <div className="grid grid-cols-1 items-start gap-6 border-b border-ivory/10 pb-6 md:grid-cols-[minmax(0,0.66fr)_6rem_minmax(0,1.14fr)] md:gap-x-0">
             <div className="min-w-0 space-y-2">
