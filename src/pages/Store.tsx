@@ -48,7 +48,7 @@ const Store = () => {
   const { data: items = [], isLoading, isError } = useStoreItems();
   // formatTypeFilter encodes: "All" | "fmt:Vinyl" | "type:Album"
   const [formatTypeFilter, setFormatTypeFilter] = useState<string>("All");
-  const [sort, setSort] = useState<SortOption | undefined>(undefined);
+  const [sort, setSort] = useState<SortOption>("Latest");
   const [searchQuery, setSearchQuery] = useState<string>("");
 
   // Build format filter options from the actually-present formats.
