@@ -1,5 +1,5 @@
 import { ShoppingBag, Music } from "lucide-react";
-import { SiYoutube, SiSpotify, SiApplemusic, SiAmazonmusic } from "react-icons/si";
+import { SiYoutube, SiSpotify, SiApplemusic } from "react-icons/si";
 import type { ComponentType, SVGProps } from "react";
 import type { ArtistLinks as ArtistLinksType } from "@/lib/types";
 
