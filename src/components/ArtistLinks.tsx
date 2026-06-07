@@ -1,18 +1,22 @@
-import { ShoppingBag, Youtube, Music2, Apple, Music } from "lucide-react";
+import { ShoppingBag, Music } from "lucide-react";
+import { SiYoutube, SiSpotify, SiApplemusic, SiAmazonmusic } from "react-icons/si";
+import type { ComponentType, SVGProps } from "react";
 import type { ArtistLinks as ArtistLinksType } from "@/lib/types";
+
+type IconComponent = ComponentType<SVGProps<SVGSVGElement>>;
 
 type Entry = {
   key: keyof ArtistLinksType;
   label: string;
-  Icon: typeof ShoppingBag;
+  Icon: IconComponent;
 };
 
 const ORDER: Entry[] = [
-  { key: "store", label: "Shop", Icon: ShoppingBag },
-  { key: "youtube", label: "YouTube", Icon: Youtube },
-  { key: "spotify", label: "Spotify", Icon: Music2 },
-  { key: "appleMusic", label: "Apple Music", Icon: Apple },
-  { key: "amazonMusic", label: "Amazon Music", Icon: Music },
+  { key: "store", label: "Shop", Icon: ShoppingBag as IconComponent },
+  { key: "youtube", label: "YouTube", Icon: SiYoutube as IconComponent },
+  { key: "spotify", label: "Spotify", Icon: SiSpotify as IconComponent },
+  { key: "appleMusic", label: "Apple Music", Icon: SiApplemusic as IconComponent },
+  { key: "amazonMusic", label: "Amazon Music", Icon: (SiAmazonmusic ?? Music) as IconComponent },
 ];
 
 export const ArtistLinks = ({ links }: { links?: ArtistLinksType }) => {
@@ -36,7 +40,11 @@ export const ArtistLinks = ({ links }: { links?: ArtistLinksType }) => {
               rel="noopener noreferrer"
               className="group inline-flex items-center justify-center gap-2 rounded-full border border-gold/40 bg-ink/80 px-5 py-2.5 text-[11px] uppercase tracking-[0.22em] text-ivory transition-colors duration-300 hover:border-gold hover:bg-gold/10 hover:text-gold focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gold"
             >
-              <Icon className="h-4 w-4 text-gold-soft transition-colors duration-300 group-hover:text-gold" aria-hidden="true" />
+              <Icon
+                className="h-4 w-4 text-gold-soft transition-colors duration-300 group-hover:text-gold"
+                aria-hidden="true"
+                fill="currentColor"
+              />
               <span>{label}</span>
             </a>
           ))}
