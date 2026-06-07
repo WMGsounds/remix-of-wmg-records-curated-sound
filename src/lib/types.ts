@@ -13,6 +13,14 @@ export type StreamingLinks = {
   amazonMusic?: string;
 };
 
+export type ArtistLinks = {
+  store?: string;
+  youtube?: string;
+  spotify?: string;
+  appleMusic?: string;
+  amazonMusic?: string;
+};
+
 export type Artist = {
   id: string;
   slug: string;
@@ -27,8 +35,10 @@ export type Artist = {
   showOnWebsite?: boolean;
   displayOrder: number;
   accentColour?: string | null;
-  // future:
-  artistLinks?: StreamingLinks;
+  // Links shown in the Artist page "Listen & Watch" section.
+  artistLinks?: ArtistLinks;
+  // Reserved for future expansion; kept for backwards-compat.
+  streamingLinks?: StreamingLinks;
 };
 
 export type Release = {

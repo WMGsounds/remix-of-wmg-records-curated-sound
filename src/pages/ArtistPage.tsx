@@ -3,6 +3,7 @@ import { ArrowRight } from "lucide-react";
 import { useArtistBySlug, useStoreItems, useJournal } from "@/lib/queries";
 import { LazyImage } from "@/components/LazyImage";
 import { StoreCard } from "@/components/StoreCard";
+import { ArtistLinks } from "@/components/ArtistLinks";
 import { formatJournalDate } from "@/components/JournalArticle";
 
 import { Seo } from "@/components/Seo";
@@ -117,6 +118,9 @@ const ArtistPage = () => {
           )}
         </div>
       </section>
+
+      {/* Listen & Watch */}
+      <ArtistLinks links={artist.artistLinks} />
 
       {/* Bio */}
       <section className="bg-ink text-ivory py-20 md:py-28">
