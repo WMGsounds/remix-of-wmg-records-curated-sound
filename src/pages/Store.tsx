@@ -24,10 +24,13 @@ function parsePrice(raw: string | undefined): number | null {
   return Number.isFinite(n) ? n : null;
 }
 
-function sortItems(list: StoreItem[], sort: SortOption | undefined): StoreItem[] {
-  if (!sort) return list;
+function sortItems(list: StoreItem[], sort: SortOption): StoreItem[] {
   const arr = [...list];
   switch (sort) {
+    case "Latest":
+      return arr.sort(
+        (a, b) => new Date(b.createdTime).getTime() - new Date(a.createdTime).getTime(),
+      );
     case "Title":
       return arr.sort((a, b) => a.title.localeCompare(b.title));
     case "Artist":
@@ -36,18 +39,6 @@ function sortItems(list: StoreItem[], sort: SortOption | undefined): StoreItem[]
           (a.artist?.name ?? "").localeCompare(b.artist?.name ?? "") ||
           a.title.localeCompare(b.title),
       );
-    case "Vinyl":
-    case "CD": {
-      const fmt: StoreFormat = sort;
-      return arr.sort((a, b) => {
-        const pa = parsePrice(a.prices[fmt]);
-        const pb = parsePrice(b.prices[fmt]);
-        if (pa === null && pb === null) return a.title.localeCompare(b.title);
-        if (pa === null) return 1;
-        if (pb === null) return -1;
-        return pa - pb;
-      });
-    }
     default:
       return arr;
   }
