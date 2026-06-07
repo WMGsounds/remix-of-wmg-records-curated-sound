@@ -20,6 +20,13 @@ export const mockArtists: Artist[] = [
     featured: true,
     displayOrder: 1,
     accentColour: null,
+    artistLinks: {
+      store: "https://example.com/shop/aurora-vale",
+      youtube: "https://youtube.com/@auroravale",
+      spotify: "https://open.spotify.com/artist/auroravale",
+      appleMusic: "https://music.apple.com/artist/auroravale",
+      amazonMusic: "https://music.amazon.com/artists/auroravale",
+    },
   },
   {
     id: "mock-artist-milo-saint",
