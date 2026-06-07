@@ -8,7 +8,7 @@ const copy: Record<string, { title: string; description: string; body: string[] 
     description: "How Wareham Music Group collects, uses and protects information submitted through this website.",
     body: [
       "This Privacy Policy describes how Wareham Music Group ('WMG', 'we', 'our') collects, uses and protects information you provide when using this website.",
-      "We collect only the minimum information required to operate the site and our services — including email addresses submitted to our newsletter and messages submitted via our contact form.",
+      "We collect only the minimum information required to operate the site and our services, including email addresses submitted to our newsletter and messages submitted via our contact form.",
       "We do not sell your personal data. For any privacy enquiry, contact privacy@wmgsounds.com.",
     ],
   },
@@ -31,7 +31,7 @@ const copy: Record<string, { title: string; description: string; body: string[] 
 
 const Legal = () => {
   const { doc } = useParams();
-  const key = (doc && doc in copy) ? doc : "privacy";
+  const key = doc && doc in copy ? doc : "privacy";
   const page = copy[key];
   const path = `/legal/${key}`;
 
@@ -50,7 +50,9 @@ const Legal = () => {
         <p className="eyebrow mb-6">Legal</p>
         <h1 className="display-serif text-5xl md:text-7xl mb-12">{page.title}</h1>
         <div className="space-y-6 text-lg leading-relaxed font-light">
-          {page.body.map((p, i) => <p key={i}>{p}</p>)}
+          {page.body.map((p, i) => (
+            <p key={i}>{p}</p>
+          ))}
         </div>
         <p className="text-sm text-muted-foreground mt-16">Last updated: April 2026</p>
       </div>
