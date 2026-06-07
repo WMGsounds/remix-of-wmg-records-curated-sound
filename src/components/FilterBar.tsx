@@ -32,7 +32,7 @@ export const SearchInput = ({
       onChange={(e) => onChange(e.target.value)}
       placeholder={placeholder}
       aria-label={placeholder}
-      className="h-10 w-[220px] bg-transparent border border-ivory/24 pl-9 pr-3 text-[11px] uppercase tracking-[0.24em] text-ivory placeholder:text-ivory/30 rounded-none focus:outline-none focus:ring-1 focus:ring-ivory/40"
+      className="h-10 w-[300px] bg-transparent border border-ivory/24 pl-9 pr-3 text-[11px] uppercase tracking-[0.24em] text-ivory placeholder:text-ivory/30 rounded-none focus:outline-none focus:ring-1 focus:ring-ivory/40"
     />
   </div>
 );
