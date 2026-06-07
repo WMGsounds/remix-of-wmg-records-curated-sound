@@ -90,6 +90,7 @@ export function normalizeArtist(page: any) {
     artistLinks: {
       store: url(findProp(props, "Store - Artist URL", "Store Artist URL", "Artist Store URL")),
       youtube: url(findProp(props, "Artist YouTube URL", "YouTube URL")),
+      youtubeMusic: url(findProp(props, "Artist YouTube Music URL", "YouTube Music URL")),
       spotify: url(findProp(props, "Artist Spotify URL", "Spotify URL")),
       appleMusic: url(findProp(props, "Artist Apple Music URL", "Apple Music URL")),
       amazonMusic: url(findProp(props, "Artist Amazon Music URL", "Amazon Music URL")),

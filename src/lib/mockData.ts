@@ -23,6 +23,7 @@ export const mockArtists: Artist[] = [
     artistLinks: {
       store: "https://example.com/shop/aurora-vale",
       youtube: "https://youtube.com/@auroravale",
+      youtubeMusic: "https://music.youtube.com/channel/auroravale",
       spotify: "https://open.spotify.com/artist/auroravale",
       appleMusic: "https://music.apple.com/artist/auroravale",
       amazonMusic: "https://music.amazon.com/artists/auroravale",
