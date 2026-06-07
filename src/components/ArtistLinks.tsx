@@ -1,5 +1,5 @@
 import { ShoppingBag, Music } from "lucide-react";
-import { SiYoutube, SiYoutubemusic, SiSpotify, SiApplemusic } from "react-icons/si";
+import { SiYoutube, SiSpotify, SiApplemusic } from "react-icons/si";
 import type { ComponentType, SVGProps } from "react";
 import type { ArtistLinks as ArtistLinksType } from "@/lib/types";
 
@@ -12,10 +12,17 @@ type Entry = {
   fill?: boolean;
 };
 
+const YouTubeMusicIcon = (props: SVGProps<SVGSVGElement>) => (
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}>
+    <circle cx="12" cy="12" r="10" />
+    <polygon points="10,8 16,12 10,16" fill="currentColor" stroke="none" />
+  </svg>
+);
+
 const ORDER: Entry[] = [
   { key: "store", label: "Shop", Icon: ShoppingBag as IconComponent },
   { key: "youtube", label: "YouTube", Icon: SiYoutube as IconComponent, fill: true },
-  { key: "youtubeMusic", label: "YouTube Music", Icon: SiYoutubemusic as IconComponent, fill: true },
+  { key: "youtubeMusic", label: "YouTube Music", Icon: YouTubeMusicIcon },
   { key: "spotify", label: "Spotify", Icon: SiSpotify as IconComponent, fill: true },
   { key: "appleMusic", label: "Apple Music", Icon: SiApplemusic as IconComponent, fill: true },
   { key: "amazonMusic", label: "Amazon Music", Icon: Music as IconComponent, fill: true },
