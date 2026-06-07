@@ -12,7 +12,7 @@ import type { StoreItem, StoreFormat } from "@/lib/types";
 const storeHeroUrl = "/store-hero.png";
 
 const FORMAT_DISPLAY_ORDER: StoreFormat[] = ["Vinyl", "CD", "iTunes", "Digital", "Merch", "Other"];
-const sortOptions = ["Artist", "Title", "Vinyl", "CD"] as const;
+const sortOptions = ["Latest", "Artist", "Title"] as const;
 
 type SortOption = (typeof sortOptions)[number];
 
