@@ -1,5 +1,5 @@
 import { ShoppingBag, Music } from "lucide-react";
-import { SiYoutube, SiSpotify, SiApplemusic } from "react-icons/si";
+import { SiYoutube, SiYoutubemusic, SiSpotify, SiApplemusic } from "react-icons/si";
 import type { ComponentType, SVGProps } from "react";
 import type { ArtistLinks as ArtistLinksType } from "@/lib/types";
 
@@ -15,6 +15,7 @@ type Entry = {
 const ORDER: Entry[] = [
   { key: "store", label: "Shop", Icon: ShoppingBag as IconComponent },
   { key: "youtube", label: "YouTube", Icon: SiYoutube as IconComponent, fill: true },
+  { key: "youtubeMusic", label: "YouTube Music", Icon: SiYoutubemusic as IconComponent, fill: true },
   { key: "spotify", label: "Spotify", Icon: SiSpotify as IconComponent, fill: true },
   { key: "appleMusic", label: "Apple Music", Icon: SiApplemusic as IconComponent, fill: true },
   { key: "amazonMusic", label: "Amazon Music", Icon: Music as IconComponent, fill: true },

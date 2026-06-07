@@ -16,6 +16,7 @@ export type StreamingLinks = {
 export type ArtistLinks = {
   store?: string;
   youtube?: string;
+  youtubeMusic?: string;
   spotify?: string;
   appleMusic?: string;
   amazonMusic?: string;
