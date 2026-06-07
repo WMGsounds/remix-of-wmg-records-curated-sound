@@ -1,4 +1,4 @@
-import { ShoppingBag, Music } from "lucide-react";
+import { ShoppingBag } from "lucide-react";
 import { SiYoutube, SiSpotify, SiApplemusic } from "react-icons/si";
 import type { ComponentType, SVGProps } from "react";
 import type { ArtistLinks as ArtistLinksType } from "@/lib/types";
@@ -19,13 +19,20 @@ const YouTubeMusicIcon = (props: SVGProps<SVGSVGElement>) => (
   </svg>
 );
 
+const AmazonMusicIcon = (props: SVGProps<SVGSVGElement>) => (
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}>
+    <path d="M4 14c2.5 3 5.5 4.5 8.5 4.5S18.5 17 21 14.5" />
+    <polyline points="21 18.5 21 14.5 17 14.5" />
+  </svg>
+);
+
 const ORDER: Entry[] = [
   { key: "store", label: "Shop", Icon: ShoppingBag as IconComponent },
   { key: "youtube", label: "YouTube", Icon: SiYoutube as IconComponent, fill: true },
   { key: "youtubeMusic", label: "YouTube Music", Icon: YouTubeMusicIcon },
   { key: "spotify", label: "Spotify", Icon: SiSpotify as IconComponent, fill: true },
   { key: "appleMusic", label: "Apple Music", Icon: SiApplemusic as IconComponent, fill: true },
-  { key: "amazonMusic", label: "Amazon Music", Icon: Music as IconComponent, fill: true },
+  { key: "amazonMusic", label: "Amazon Music", Icon: AmazonMusicIcon },
 ];
 
 export const ArtistLinks = ({ links }: { links?: ArtistLinksType }) => {
