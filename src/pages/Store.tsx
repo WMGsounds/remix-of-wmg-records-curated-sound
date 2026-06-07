@@ -16,14 +16,6 @@ const sortOptions = ["Latest", "Artist", "Title"] as const;
 
 type SortOption = (typeof sortOptions)[number];
 
-function parsePrice(raw: string | undefined): number | null {
-  if (!raw) return null;
-  const m = raw.replace(/,/g, ".").match(/-?\d+(?:\.\d+)?/);
-  if (!m) return null;
-  const n = parseFloat(m[0]);
-  return Number.isFinite(n) ? n : null;
-}
-
 function sortItems(list: StoreItem[], sort: SortOption): StoreItem[] {
   const arr = [...list];
   switch (sort) {
