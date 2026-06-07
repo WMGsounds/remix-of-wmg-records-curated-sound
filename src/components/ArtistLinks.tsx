@@ -16,7 +16,7 @@ const ORDER: Entry[] = [
   { key: "youtube", label: "YouTube", Icon: SiYoutube as IconComponent },
   { key: "spotify", label: "Spotify", Icon: SiSpotify as IconComponent },
   { key: "appleMusic", label: "Apple Music", Icon: SiApplemusic as IconComponent },
-  { key: "amazonMusic", label: "Amazon Music", Icon: (SiAmazonmusic ?? Music) as IconComponent },
+  { key: "amazonMusic", label: "Amazon Music", Icon: Music as IconComponent },
 ];
 
 export const ArtistLinks = ({ links }: { links?: ArtistLinksType }) => {
