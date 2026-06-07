@@ -12,22 +12,17 @@ import type { StoreItem, StoreFormat } from "@/lib/types";
 const storeHeroUrl = "/store-hero.png";
 
 const FORMAT_DISPLAY_ORDER: StoreFormat[] = ["Vinyl", "CD", "iTunes", "Digital", "Merch", "Other"];
-const sortOptions = ["Artist", "Title", "Vinyl", "CD"] as const;
+const sortOptions = ["Latest", "Artist", "Title"] as const;
 
 type SortOption = (typeof sortOptions)[number];
 
-function parsePrice(raw: string | undefined): number | null {
-  if (!raw) return null;
-  const m = raw.replace(/,/g, ".").match(/-?\d+(?:\.\d+)?/);
-  if (!m) return null;
-  const n = parseFloat(m[0]);
-  return Number.isFinite(n) ? n : null;
-}
-
-function sortItems(list: StoreItem[], sort: SortOption | undefined): StoreItem[] {
-  if (!sort) return list;
+function sortItems(list: StoreItem[], sort: SortOption): StoreItem[] {
   const arr = [...list];
   switch (sort) {
+    case "Latest":
+      return arr.sort(
+        (a, b) => new Date(b.createdTime).getTime() - new Date(a.createdTime).getTime(),
+      );
     case "Title":
       return arr.sort((a, b) => a.title.localeCompare(b.title));
     case "Artist":
@@ -36,18 +31,6 @@ function sortItems(list: StoreItem[], sort: SortOption | undefined): StoreItem[]
           (a.artist?.name ?? "").localeCompare(b.artist?.name ?? "") ||
           a.title.localeCompare(b.title),
       );
-    case "Vinyl":
-    case "CD": {
-      const fmt: StoreFormat = sort;
-      return arr.sort((a, b) => {
-        const pa = parsePrice(a.prices[fmt]);
-        const pb = parsePrice(b.prices[fmt]);
-        if (pa === null && pb === null) return a.title.localeCompare(b.title);
-        if (pa === null) return 1;
-        if (pb === null) return -1;
-        return pa - pb;
-      });
-    }
     default:
       return arr;
   }
@@ -57,7 +40,7 @@ const Store = () => {
   const { data: items = [], isLoading, isError } = useStoreItems();
   // formatTypeFilter encodes: "All" | "fmt:Vinyl" | "type:Album"
   const [formatTypeFilter, setFormatTypeFilter] = useState<string>("All");
-  const [sort, setSort] = useState<SortOption | undefined>(undefined);
+  const [sort, setSort] = useState<SortOption>("Latest");
   const [searchQuery, setSearchQuery] = useState<string>("");
 
   // Build format filter options from the actually-present formats.
