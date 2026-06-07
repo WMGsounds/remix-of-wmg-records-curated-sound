@@ -360,48 +360,33 @@ const ReleasePage = () => {
                 {release.fullDescription || release.shortDescription}
               </p>
             )}
-            {(release.streamingLinks?.spotify || storeCta) && (
-              <div className="mt-8 flex flex-wrap items-start gap-x-8 gap-y-5">
-                {release.streamingLinks?.spotify && (
+            {storeCta && (
+              <div className="mt-8">
+                {storeCta.disabled ? (
+                  <button
+                    type="button"
+                    disabled
+                    className="inline-flex cursor-not-allowed items-center gap-2 border border-ivory/15 px-6 py-3 text-[11px] uppercase tracking-[0.28em] text-ivory/45"
+                  >
+                    <ShoppingBag className="h-3.5 w-3.5" />
+                    {storeCta.label}
+                  </button>
+                ) : (
                   <a
-                    href={release.streamingLinks.spotify}
+                    href={storeCta.href}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="inline-flex items-center gap-2 border border-ivory/30 px-6 py-3 text-[11px] uppercase tracking-[0.28em] text-ivory hover:bg-ivory hover:text-ink transition-colors duration-300"
+                    aria-label={`Buy ${release.title}`}
+                    className="inline-flex items-center gap-2 border border-gold bg-gold/10 px-6 py-3 text-[11px] uppercase tracking-[0.28em] text-gold transition-colors hover:bg-gold hover:text-ink"
                   >
-                    <Play className="h-3.5 w-3.5" />
-                    Listen on Spotify
+                    <ShoppingBag className="h-3.5 w-3.5" />
+                    {storeCta.label}
                   </a>
-                )}
-                {storeCta && (
-                  <div className="flex flex-col items-start gap-2">
-                    {storeCta.disabled ? (
-                      <button
-                        type="button"
-                        disabled
-                        className="inline-flex cursor-not-allowed items-center gap-2 border border-ivory/15 px-6 py-3 text-[11px] uppercase tracking-[0.28em] text-ivory/45"
-                      >
-                        <ShoppingBag className="h-3.5 w-3.5" />
-                        {storeCta.label}
-                      </button>
-                    ) : (
-                      <>
-                        <a
-                          href={storeCta.href}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          aria-label={`Buy ${release.title}`}
-                          className="inline-flex items-center gap-2 border border-gold bg-gold/10 px-6 py-3 text-[11px] uppercase tracking-[0.28em] text-gold transition-colors hover:bg-gold hover:text-ink"
-                        >
-                          <ShoppingBag className="h-3.5 w-3.5" />
-                          {storeCta.label}
-                        </a>
-                      </>
-                    )}
-                  </div>
                 )}
               </div>
             )}
+
+            <ReleaseLinks links={release.streamingLinks} />
 
 
 
