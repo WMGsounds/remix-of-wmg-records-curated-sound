@@ -9,14 +9,15 @@ type Entry = {
   key: keyof ArtistLinksType;
   label: string;
   Icon: IconComponent;
+  fill?: boolean;
 };
 
 const ORDER: Entry[] = [
   { key: "store", label: "Shop", Icon: ShoppingBag as IconComponent },
-  { key: "youtube", label: "YouTube", Icon: SiYoutube as IconComponent },
-  { key: "spotify", label: "Spotify", Icon: SiSpotify as IconComponent },
-  { key: "appleMusic", label: "Apple Music", Icon: SiApplemusic as IconComponent },
-  { key: "amazonMusic", label: "Amazon Music", Icon: Music as IconComponent },
+  { key: "youtube", label: "YouTube", Icon: SiYoutube as IconComponent, fill: true },
+  { key: "spotify", label: "Spotify", Icon: SiSpotify as IconComponent, fill: true },
+  { key: "appleMusic", label: "Apple Music", Icon: SiApplemusic as IconComponent, fill: true },
+  { key: "amazonMusic", label: "Amazon Music", Icon: Music as IconComponent, fill: true },
 ];
 
 export const ArtistLinks = ({ links }: { links?: ArtistLinksType }) => {
@@ -32,7 +33,7 @@ export const ArtistLinks = ({ links }: { links?: ArtistLinksType }) => {
       <div className="container-editorial">
         <p className="eyebrow mb-5 text-gold-soft">Listen &amp; Watch</p>
         <div className="grid grid-cols-2 gap-3 sm:flex sm:flex-wrap sm:gap-3">
-          {items.map(({ key, label, Icon }) => (
+          {items.map(({ key, label, Icon, fill }) => (
             <a
               key={key}
               href={links[key]!}
@@ -43,7 +44,7 @@ export const ArtistLinks = ({ links }: { links?: ArtistLinksType }) => {
               <Icon
                 className="h-4 w-4 text-gold-soft transition-colors duration-300 group-hover:text-gold"
                 aria-hidden="true"
-                fill="currentColor"
+                {...(fill ? { fill: "currentColor" } : {})}
               />
               <span>{label}</span>
             </a>
