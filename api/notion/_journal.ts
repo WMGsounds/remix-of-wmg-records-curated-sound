@@ -181,8 +181,29 @@ export async function fetchPageBlocks(notion: any, pageId: string): Promise<Arti
     }
   }
   flushList();
-  return blocks;
+  return applyBracketCaptions(blocks);
 }
+
+// Paragraphs shaped like "[Caption: ...]" directly after an image become that image's caption.
+const CAPTION_RE = /^\[\s*caption\s*:\s*([\s\S]*?)\s*\]$/i;
+
+export function applyBracketCaptions(blocks: ArticleBlock[]): ArticleBlock[] {
+  const out: ArticleBlock[] = [];
+  for (const b of blocks) {
+    const prev = out[out.length - 1];
+    if (prev && prev.type === "image" && b.type === "paragraph") {
+      const plain = b.rich.map((r) => r.text).join("").trim();
+      const m = plain.match(CAPTION_RE);
+      if (m && m[1].trim()) {
+        out[out.length - 1] = { ...prev, caption: m[1].trim() };
+        continue;
+      }
+    }
+    out.push(b);
+  }
+  return out;
+}
+
 
 export function estimateReadingTime(blocks: ArticleBlock[]): number {
   const words = blocks
