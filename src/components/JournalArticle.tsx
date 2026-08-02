@@ -68,7 +68,7 @@ export const ArticleBody = ({ blocks }: { blocks: JournalBlock[] }) => (
             ? [480, 720, 960, 1280, 1600].map((w) => `${widthFor(w)} ${w}w`).join(", ")
             : undefined;
           return (
-            <figure key={i} className="my-10">
+            <figure key={i} className="mt-10 mb-6">
               <img
                 src={widthFor(960)}
                 srcSet={srcSet}
@@ -79,10 +79,13 @@ export const ArticleBody = ({ blocks }: { blocks: JournalBlock[] }) => (
                 className="w-full h-auto block bg-ivory/5"
               />
               {b.caption && (
-                <figcaption className="mt-3 text-sm text-ivory/75 italic text-center">{b.caption}</figcaption>
+                <figcaption className="mt-[0.4rem] mb-6 max-w-full text-left text-[0.82rem] leading-[1.4] font-normal text-ivory/55">
+                  {b.caption}
+                </figcaption>
               )}
             </figure>
           );
+
         }
 
         default:
