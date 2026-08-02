@@ -167,12 +167,24 @@ export const StoreCard = ({ item, variant = "grid" }: StoreCardProps) => {
     </dl>
   );
 
+  const availabilityNote =
+    item.availability === "Sold Out"
+      ? "Order your copy now and it will be shipped as soon as it is available."
+      : item.availability === "Coming Soon" && item.preOrder
+        ? "Pre-order your copy now!"
+        : null;
+
   const UnavailableCallout = (
     <div className="flex flex-1 items-center justify-center py-8">
-      <div className="border border-gold/30 px-8 py-5 text-center">
+      <div className="max-w-xs border border-gold/30 px-8 py-5 text-center">
         <p className="font-serif text-xl tracking-[0.08em] text-gold/85">
           {item.availability}
         </p>
+        {availabilityNote && (
+          <p className="mt-2 text-[11px] leading-snug text-ivory/60">
+            {availabilityNote}
+          </p>
+        )}
       </div>
     </div>
   );
