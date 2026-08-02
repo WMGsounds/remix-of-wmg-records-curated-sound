@@ -406,6 +406,7 @@ export function normalizeStoreItem(
     buttonText: buttonTextRaw || null,
     comments: commentsRaw || null,
     productType: select(props["Type"]) || null,
+    preOrder: bool(findProp(props, "Pre-order?", "Pre-order", "Preorder", "Pre Order")),
     createdTime: page.created_time ?? "",
   };
 }
