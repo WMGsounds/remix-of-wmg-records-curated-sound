@@ -182,6 +182,7 @@ export type StoreItem = {
   buttonText: string | null;
   comments: string | null;
   productType: string | null;
+  preOrder: boolean;
   createdTime: string;
 };
 
