@@ -26,20 +26,24 @@ Server side only, in every route that reads the Releases database:
 - `api/notion/artist/[slug].ts` — artist discography
 - `api/notion/release/[slug].ts` — detail route; ineligible slug returns the existing 404, and its `related` list and `parentAlbum` link are filtered too
 - `api/notion/journal.ts` and `api/notion/journal/[slug].ts` — release chips attached to articles
-- `api/notion/store.ts` and `api/notion/tracks.ts` — release lookups used for store items and track listings
+- `api/notion/tracks.ts` — release lookups used for track listings
 - `api/sitemap.ts` — sitemap entries
 
 Filtering happens before sorting, so ordering (newest release date first) is unchanged until an item becomes eligible.
 
+## Store exception
+
+`api/notion/store.ts` keeps its own rules. Store item visibility continues to depend solely on the item's own `Published`, `Availability` and `Pre-order?` values — Coming Soon and pre-order items for future releases stay on the Store exactly as they are today. Release records are still used internally as metadata (artist, title, artwork) to render those items. The only change: when the linked release is not yet eligible, the store item exposes no working public release-page link, so nothing links to a URL that would 404.
+
 ## Notion property handling
 
-`normalizeRelease` already reads `Release Date` and `Show on Website` / `Show On Website`. It will additionally accept the exact `Show on website` casing, and `releaseDate` normalisation keeps its current string type while an explicit `null`-safe check is used in the eligibility helper. No new UI fields; no defaulted or invented dates.
-
-One judgement call to confirm: today, when the checkbox property is entirely absent from a page, the normaliser treats it as `true`. The spec says a missing value should hide the release. Since the property exists in your database, absence would only happen through a schema change — I will keep the existing `true` default so a Notion rename can't wipe the whole site, and the missing-date rule will still hide anything unscheduled. Say the word if you'd rather it default to hidden.
+`normalizeRelease` reads `Release Date` and the `Show on website` checkbox, accepting `Show on website`, `Show on Website` and `Show On Website`. Visibility now fails closed: if none of those names is present, or the property is not a recognisable checkbox, `showOnWebsite` is `false` and a deduplicated server-side warning names the affected release, so a Notion rename or schema issue hides content rather than publishing it. No defaulted or invented dates; no new UI fields.
 
 ## Caching
 
-Release routes currently use `CACHE_HEADERS` (50-minute CDN lifetime), too slow for scheduling. A new `RELEASE_CACHE_HEADERS` constant in `api/notion/_client.ts` with `max-age=60, s-maxage=300, stale-while-revalidate=60` is applied to the release-bearing routes, so a scheduled release appears within about five minutes. Journal keeps its own constant. No cron job or external service.
+Release routes currently use `CACHE_HEADERS` (50-minute CDN lifetime), too slow for scheduling. A new `RELEASE_CACHE_HEADERS` constant in `api/notion/_client.ts` with `max-age=60, s-maxage=300, stale-while-revalidate=60` is applied to the release-bearing routes, so a scheduled release appears within about five minutes.
+
+Journal routes carry release chips, so their current `stale-while-revalidate=300` is tightened to 60 seconds (`max-age=60, s-maxage=300, stale-while-revalidate=60`), matching the release policy. Journal publishing behaviour itself is unchanged. No cron job or external service.
 
 ## Warnings and fallback data
 
