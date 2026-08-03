@@ -1,7 +1,8 @@
-import { notion, DBS, CACHE_HEADERS, logApiError, logApiSuccess, requireEnv, type ApiResponse } from "./_client.js";
+import { notion, DBS, JOURNAL_CACHE_HEADERS, logApiError, logApiSuccess, requireEnv, type ApiResponse } from "./_client.js";
 import { FALLBACK_HEADERS } from "./_fallback.js";
 import { loadAll, normalizeArtist, normalizeRelease } from "./_normalize.js";
-import { normalizeJournal, type JournalArticle } from "./_journal.js";
+import { normalizeJournal, isJournalPublished, type JournalArticle } from "./_journal.js";
+
 
 export type JournalListItem = JournalArticle & {
   artists: { id: string; slug: string; name: string }[];
