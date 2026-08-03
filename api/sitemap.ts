@@ -51,7 +51,7 @@ export default async function handler(req: any, res: any) {
     const artists = artistPages.map(normalizeArtist);
     const artistMap = new Map(artists.map((a) => [a.id, a]));
     const releases = releasePages.map((p) => normalizeRelease(p, artistMap));
-    const journal = journalPages.map(normalizeJournal).filter((a: any) => a.published && !a.noindex);
+    const journal = journalPages.map(normalizeJournal).filter((a: any) => isJournalPublished(a) && !a.noindex);
 
     // Journal categories
     const cats = new Set<string>();
