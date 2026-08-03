@@ -50,8 +50,16 @@ export default async function handler(_req: unknown, res: ApiResponse) {
         return tb - ta;
       });
 
-    // Strip internal-only fields before sending.
-    const payload = items.map(({ published, sortOrder, ...rest }) => rest);
+    // Strip internal-only fields before sending. Store visibility keeps its own
+    // rules (Published / Availability / Pre-order?), but a store item must not
+    // link to a release page that isn't publicly eligible yet — drop the slug so
+    // the item still renders with its release metadata, minus a dead link.
+    const payload = items.map(({ published, sortOrder, ...rest }) => {
+      if (!rest.release) return rest;
+      const linked = releaseLookup.get(rest.release.id);
+      const eligible = linked ? isReleasePublished(linked) : false;
+      return eligible ? rest : { ...rest, release: { ...rest.release, slug: "" } };
+    });
 
     logApiSuccess(route, {
       storePageCount: storePages.length,
