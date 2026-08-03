@@ -17,7 +17,8 @@ export default async function handler(req: ApiRequest, res: ApiResponse) {
 
     const articles = journalPages.map(normalizeJournal);
     const article = articles.find((a) => a.slug === slug);
-    if (!article || !article.published) return res.status(404).json(null);
+    if (!article || !isJournalPublished(article)) return res.status(404).json(null);
+
 
     const blocks = await fetchPageBlocks(notion, article.id);
 
