@@ -102,10 +102,13 @@ export function normalizeRelease(page: any, artistLookup: Map<string, any>) {
   const props = page.properties;
   const artistRel = props["Artist"]?.relation?.[0]?.id ?? "";
   const artist = artistLookup.get(artistRel);
-  // Default to true if the property is missing entirely (e.g. older rows
-  // before the column existed) so we don't hide releases unintentionally.
-  const showOnWebsiteProp = props["Show on Website"] ?? props["Show On Website"];
-  const showOnWebsite = showOnWebsiteProp === undefined ? true : bool(showOnWebsiteProp);
+  // Fail closed: a missing or unrecognised checkbox hides the release rather
+  // than risking accidental publication after a Notion rename/schema change.
+  const showOnWebsiteProp = findProp(props, "Show on website", "Show on Website", "Show On Website");
+  const showOnWebsite = showOnWebsiteProp?.type === "checkbox" ? showOnWebsiteProp.checkbox === true : false;
+  if (showOnWebsiteProp?.type !== "checkbox") {
+    warnMissingShowOnWebsite(page.id, text(titleProp(props)));
+  }
   const parentAlbumRel =
     props["Album"]?.relation?.[0]?.id ??
     props["Parent Album"]?.relation?.[0]?.id ??
