@@ -1,5 +1,5 @@
 import { notion, DBS, requireEnv } from "./notion/_client.js";
-import { loadAll, normalizeArtist, normalizeRelease } from "./notion/_normalize.js";
+import { loadAll, normalizeArtist, normalizeRelease, isReleasePublished } from "./notion/_normalize.js";
 import { normalizeJournal, isJournalPublished } from "./notion/_journal.js";
 
 const STATIC_PATHS = [
@@ -67,7 +67,7 @@ export default async function handler(req: any, res: any) {
       if (a.slug && a.showOnWebsite !== false) urls.push(urlEntry(`${base}/artists/${a.slug}`, undefined, "monthly", "0.7"));
     }
     for (const r of releases as any[]) {
-      if (r.slug && r.showOnWebsite !== false) urls.push(urlEntry(`${base}/releases/${r.slug}`, r.releaseDate, "monthly", "0.8"));
+      if (r.slug && isReleasePublished(r)) urls.push(urlEntry(`${base}/releases/${r.slug}`, r.releaseDate, "monthly", "0.8"));
     }
     for (const j of journal as any[]) {
       if (j.slug) {

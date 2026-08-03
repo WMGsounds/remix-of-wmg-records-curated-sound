@@ -1,6 +1,6 @@
 import { notion, DBS, JOURNAL_CACHE_HEADERS, logApiError, logApiSuccess, requireEnv, type ApiResponse } from "./_client.js";
 import { FALLBACK_HEADERS } from "./_fallback.js";
-import { loadAll, normalizeArtist, normalizeRelease } from "./_normalize.js";
+import { loadAll, normalizeArtist, normalizeRelease, isReleasePublished } from "./_normalize.js";
 import { normalizeJournal, isJournalPublished, type JournalArticle } from "./_journal.js";
 
 
@@ -21,7 +21,7 @@ export default async function handler(_req: unknown, res: ApiResponse) {
 
     const artists = artistPages.map(normalizeArtist);
     const artistMap = new Map(artists.map((a) => [a.id, a]));
-    const releases = releasePages.map((p) => normalizeRelease(p, artistMap));
+    const releases = releasePages.map((p) => normalizeRelease(p, artistMap)).filter((r) => isReleasePublished(r));
     const releaseMap = new Map(releases.map((r) => [r.id, r]));
 
     const now = Date.now();

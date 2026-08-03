@@ -24,7 +24,7 @@ export default async function handler(_req: unknown, res: ApiResponse) {
       .map((p) => normalizeReleaseTrack(p, trackPageLookup))
       .filter((rt) => {
         const rel = releaseLookup.get(rt.releaseId);
-        return Boolean(rel) && isReleasePublished(rel);
+        return rel ? isReleasePublished(rel) : false;
       })
       .map((rt) => {
         const rel = releaseLookup.get(rt.releaseId);
