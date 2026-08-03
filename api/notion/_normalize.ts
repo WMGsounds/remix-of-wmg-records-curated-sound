@@ -98,6 +98,43 @@ export function normalizeArtist(page: any) {
   };
 }
 
+// ---------- Release scheduled publishing ----------
+
+const warnedShowOnWebsite = new Set<string>();
+function warnMissingShowOnWebsite(id: string, title: string) {
+  if (warnedShowOnWebsite.has(id)) return;
+  warnedShowOnWebsite.add(id);
+  console.warn(
+    "[notion-api] Release is missing a recognisable 'Show on website' checkbox — hidden (fail closed)",
+    { id, title: title || "Untitled" },
+  );
+}
+
+const warnedMissingReleaseDate = new Set<string>();
+/**
+ * A release is public only when 'Show on website' is checked, a valid
+ * Release Date exists, and that date/time has arrived in Europe/London.
+ */
+export function isReleasePublished(
+  release: { id?: string; title?: string; slug?: string; showOnWebsite?: boolean; releaseDate?: string },
+  now: number = Date.now(),
+): boolean {
+  if (release.showOnWebsite === false) return false;
+  const instant = resolvePublishInstant(release.releaseDate);
+  if (instant === null) {
+    const key = release.id ?? release.slug ?? release.title ?? "";
+    if (key && !warnedMissingReleaseDate.has(key)) {
+      warnedMissingReleaseDate.add(key);
+      console.warn(
+        "[notion-api] Releases marked Show on website but missing a valid Release Date (hidden)",
+        { id: release.id, slug: release.slug, title: release.title },
+      );
+    }
+    return false;
+  }
+  return instant <= now;
+}
+
 export function normalizeRelease(page: any, artistLookup: Map<string, any>) {
   const props = page.properties;
   const artistRel = props["Artist"]?.relation?.[0]?.id ?? "";
