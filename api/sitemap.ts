@@ -1,6 +1,6 @@
 import { notion, DBS, requireEnv } from "./notion/_client.js";
 import { loadAll, normalizeArtist, normalizeRelease } from "./notion/_normalize.js";
-import { normalizeJournal } from "./notion/_journal.js";
+import { normalizeJournal, isJournalPublished } from "./notion/_journal.js";
 
 const STATIC_PATHS = [
   { path: "/", priority: "1.0", changefreq: "weekly" },
