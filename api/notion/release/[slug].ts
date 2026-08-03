@@ -1,6 +1,6 @@
-import { notion, DBS, CACHE_HEADERS, logApiError, validateNotionEnv, type ApiRequest, type ApiResponse } from "../_client.js";
+import { notion, DBS, RELEASE_CACHE_HEADERS, logApiError, validateNotionEnv, type ApiRequest, type ApiResponse } from "../_client.js";
 import { FALLBACK_HEADERS, fallbackReleasePage } from "../_fallback.js";
-import { loadAll, normalizeArtist, normalizeRelease, normalizeReleaseTrack } from "../_normalize.js";
+import { loadAll, normalizeArtist, normalizeRelease, normalizeReleaseTrack, isReleasePublished } from "../_normalize.js";
 
 export default async function handler(req: ApiRequest, res: ApiResponse) {
   const route = "/api/notion/release/[slug]";
@@ -17,14 +17,14 @@ export default async function handler(req: ApiRequest, res: ApiResponse) {
     const artistLookup = new Map(artists.map((a) => [a.id, a]));
     const releases = releasePages.map((p) => normalizeRelease(p, artistLookup));
     const release = releases.find((r) => r.slug === slug);
-    if (!release || release.showOnWebsite === false) return res.status(404).json(null);
+    if (!release || !isReleasePublished(release)) return res.status(404).json(null);
     const releaseArtist = artists.find((a) => a.id === release.artistId) ?? null;
     if (releaseArtist && releaseArtist.showOnWebsite === false) return res.status(404).json(null);
 
     // Resolve parent album relation (only meaningful for Singles, but attach if present).
     if (release.parentAlbumId) {
       const parent = releases.find((r) => r.id === release.parentAlbumId);
-      if (parent && parent.showOnWebsite !== false) {
+      if (parent && isReleasePublished(parent)) {
         release.parentAlbum = { id: parent.id, title: parent.title, slug: parent.slug || null };
       } else if (parent) {
         release.parentAlbum = { id: parent.id, title: parent.title, slug: null };
@@ -58,11 +58,11 @@ export default async function handler(req: ApiRequest, res: ApiResponse) {
 
     const artist = artists.find((a) => a.id === release.artistId) ?? null;
     const related = releases
-      .filter((r) => r.artistSlug === release.artistSlug && r.slug !== slug && r.showOnWebsite !== false)
+      .filter((r) => r.artistSlug === release.artistSlug && r.slug !== slug && isReleasePublished(r))
       .sort((a, b) => +new Date(b.releaseDate) - +new Date(a.releaseDate))
       .slice(0, 3);
 
-    res.writeHead(200, CACHE_HEADERS).end(
+    res.writeHead(200, RELEASE_CACHE_HEADERS).end(
       JSON.stringify({ release, artist, tracks, related }),
     );
   } catch (e: unknown) {

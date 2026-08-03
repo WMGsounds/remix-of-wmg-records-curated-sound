@@ -1,6 +1,6 @@
-import { notion, DBS, CACHE_HEADERS, logApiError, logApiFallback, logApiSuccess, validateNotionEnv, type ApiResponse } from "./_client.js";
+import { notion, DBS, RELEASE_CACHE_HEADERS, logApiError, logApiFallback, logApiSuccess, validateNotionEnv, type ApiResponse } from "./_client.js";
 import { FALLBACK_HEADERS, fallbackHomepage } from "./_fallback.js";
-import { loadAll, normalizeArtist, normalizeRelease } from "./_normalize.js";
+import { loadAll, normalizeArtist, normalizeRelease, isReleasePublished } from "./_normalize.js";
 
 const summarizeCheckbox = (page: any, propertyName: string) => ({
   id: page.id,
@@ -29,7 +29,7 @@ export default async function handler(_req: unknown, res: ApiResponse) {
     const artistLookup = new Map(artists.map((a) => [a.id, a]));
     const releases = releasePages
       .map((p) => normalizeRelease(p, artistLookup))
-      .filter((r) => artistLookup.has(r.artistId) && r.showOnWebsite !== false);
+      .filter((r) => artistLookup.has(r.artistId) && isReleasePublished(r));
 
     console.log("[notion-homepage] normalized artist Featured values", artists.map((artist) => ({
       id: artist.id,
@@ -72,7 +72,7 @@ export default async function handler(_req: unknown, res: ApiResponse) {
       featuredReleaseTitle: featuredRelease?.title ?? null,
     });
 
-    res.writeHead(200, CACHE_HEADERS).end(
+    res.writeHead(200, RELEASE_CACHE_HEADERS).end(
       JSON.stringify({ featuredArtists, latestReleases, featuredRelease }),
     );
   } catch (e: unknown) {
