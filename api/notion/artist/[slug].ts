@@ -1,6 +1,6 @@
-import { notion, DBS, CACHE_HEADERS, logApiError, validateNotionEnv, type ApiRequest, type ApiResponse } from "../_client.js";
+import { notion, DBS, RELEASE_CACHE_HEADERS, logApiError, validateNotionEnv, type ApiRequest, type ApiResponse } from "../_client.js";
 import { FALLBACK_HEADERS, fallbackArtistPage } from "../_fallback.js";
-import { loadAll, normalizeArtist, normalizeRelease } from "../_normalize.js";
+import { loadAll, normalizeArtist, normalizeRelease, isReleasePublished } from "../_normalize.js";
 
 export default async function handler(req: ApiRequest, res: ApiResponse) {
   const route = "/api/notion/artist/[slug]";
@@ -18,10 +18,10 @@ export default async function handler(req: ApiRequest, res: ApiResponse) {
     const artistLookup = new Map(artists.map((a) => [a.id, a]));
     const discography = releasePages
       .map((p) => normalizeRelease(p, artistLookup))
-      .filter((r) => r.artistSlug === slug && r.showOnWebsite !== false)
+      .filter((r) => r.artistSlug === slug && isReleasePublished(r))
       .sort((a, b) => +new Date(b.releaseDate) - +new Date(a.releaseDate));
 
-    res.writeHead(200, CACHE_HEADERS).end(JSON.stringify({ artist, discography }));
+    res.writeHead(200, RELEASE_CACHE_HEADERS).end(JSON.stringify({ artist, discography }));
   } catch (e: unknown) {
     logApiError(route, e, { slug });
     const fallback = fallbackArtistPage(String(slug ?? ""));

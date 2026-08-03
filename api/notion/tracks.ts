@@ -1,6 +1,6 @@
-import { notion, DBS, CACHE_HEADERS, logApiError, logApiFallback, logApiSuccess, validateNotionEnv, type ApiResponse } from "./_client.js";
+import { notion, DBS, RELEASE_CACHE_HEADERS, logApiError, logApiFallback, logApiSuccess, validateNotionEnv, type ApiResponse } from "./_client.js";
 import { FALLBACK_HEADERS, fallbackTracks } from "./_fallback.js";
-import { loadAll, normalizeRelease, normalizeArtist, normalizeReleaseTrack } from "./_normalize.js";
+import { loadAll, normalizeRelease, normalizeArtist, normalizeReleaseTrack, isReleasePublished } from "./_normalize.js";
 
 export default async function handler(_req: unknown, res: ApiResponse) {
   const route = "/api/notion/tracks";
@@ -24,7 +24,7 @@ export default async function handler(_req: unknown, res: ApiResponse) {
       .map((p) => normalizeReleaseTrack(p, trackPageLookup))
       .filter((rt) => {
         const rel = releaseLookup.get(rt.releaseId);
-        return rel && rel.showOnWebsite !== false;
+        return rel ? isReleasePublished(rel) : false;
       })
       .map((rt) => {
         const rel = releaseLookup.get(rt.releaseId);
@@ -50,7 +50,7 @@ export default async function handler(_req: unknown, res: ApiResponse) {
       releaseTrackPageCount: releaseTrackPages.length,
       trackCount: tracks.length,
     });
-    res.writeHead(200, CACHE_HEADERS).end(JSON.stringify(tracks));
+    res.writeHead(200, RELEASE_CACHE_HEADERS).end(JSON.stringify(tracks));
   } catch (e: unknown) {
     logApiError(route, e);
     logApiFallback(route, e, { fallbackTrackCount: fallbackTracks.length });

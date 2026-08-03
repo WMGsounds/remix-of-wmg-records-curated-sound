@@ -1,4 +1,5 @@
 // Convert Notion property objects into the clean shape src/lib/types.ts expects.
+import { resolvePublishInstant } from "./_schedule.js";
 
 const text = (p: any): string => {
   if (!p) return "";
@@ -98,14 +99,54 @@ export function normalizeArtist(page: any) {
   };
 }
 
+// ---------- Release scheduled publishing ----------
+
+const warnedShowOnWebsite = new Set<string>();
+function warnMissingShowOnWebsite(id: string, title: string) {
+  if (warnedShowOnWebsite.has(id)) return;
+  warnedShowOnWebsite.add(id);
+  console.warn(
+    "[notion-api] Release is missing a recognisable 'Show on website' checkbox — hidden (fail closed)",
+    { id, title: title || "Untitled" },
+  );
+}
+
+const warnedMissingReleaseDate = new Set<string>();
+/**
+ * A release is public only when 'Show on website' is checked, a valid
+ * Release Date exists, and that date/time has arrived in Europe/London.
+ */
+export function isReleasePublished(
+  release: { id?: string; title?: string; slug?: string; showOnWebsite?: boolean; releaseDate?: string },
+  now: number = Date.now(),
+): boolean {
+  if (release.showOnWebsite === false) return false;
+  const instant = resolvePublishInstant(release.releaseDate);
+  if (instant === null) {
+    const key = release.id ?? release.slug ?? release.title ?? "";
+    if (key && !warnedMissingReleaseDate.has(key)) {
+      warnedMissingReleaseDate.add(key);
+      console.warn(
+        "[notion-api] Releases marked Show on website but missing a valid Release Date (hidden)",
+        { id: release.id, slug: release.slug, title: release.title },
+      );
+    }
+    return false;
+  }
+  return instant <= now;
+}
+
 export function normalizeRelease(page: any, artistLookup: Map<string, any>) {
   const props = page.properties;
   const artistRel = props["Artist"]?.relation?.[0]?.id ?? "";
   const artist = artistLookup.get(artistRel);
-  // Default to true if the property is missing entirely (e.g. older rows
-  // before the column existed) so we don't hide releases unintentionally.
-  const showOnWebsiteProp = props["Show on Website"] ?? props["Show On Website"];
-  const showOnWebsite = showOnWebsiteProp === undefined ? true : bool(showOnWebsiteProp);
+  // Fail closed: a missing or unrecognised checkbox hides the release rather
+  // than risking accidental publication after a Notion rename/schema change.
+  const showOnWebsiteProp = findProp(props, "Show on website", "Show on Website", "Show On Website");
+  const showOnWebsite = showOnWebsiteProp?.type === "checkbox" ? showOnWebsiteProp.checkbox === true : false;
+  if (showOnWebsiteProp?.type !== "checkbox") {
+    warnMissingShowOnWebsite(page.id, text(titleProp(props)));
+  }
   const parentAlbumRel =
     props["Album"]?.relation?.[0]?.id ??
     props["Parent Album"]?.relation?.[0]?.id ??
