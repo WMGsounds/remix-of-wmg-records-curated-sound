@@ -101,3 +101,12 @@ export const CACHE_HEADERS = {
   "Content-Type": "application/json",
   "X-Data-Source": "notion",
 };
+
+// Journal supports scheduled publishing, so it must revalidate within ~5 min
+// for a scheduled article to appear on time without a redeploy.
+export const JOURNAL_CACHE_HEADERS = {
+  "Cache-Control": "public, max-age=60, s-maxage=300, stale-while-revalidate=300",
+  "Content-Type": "application/json",
+  "X-Data-Source": "notion",
+};
+
