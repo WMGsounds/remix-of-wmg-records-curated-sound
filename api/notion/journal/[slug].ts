@@ -33,7 +33,7 @@ export default async function handler(req: ApiRequest, res: ApiResponse) {
     const excerpt = article.excerpt || deriveExcerpt(blocks);
     const readingTime = article.readingTime > 0 ? article.readingTime : estimateReadingTime(blocks);
 
-    res.writeHead(200, CACHE_HEADERS).end(JSON.stringify({
+    res.writeHead(200, JOURNAL_CACHE_HEADERS).end(JSON.stringify({
       article: { ...article, excerpt, readingTime },
       blocks,
       relatedArtists,
