@@ -1,7 +1,8 @@
-import { notion, DBS, CACHE_HEADERS, logApiError, logApiSuccess, requireEnv, type ApiResponse } from "./_client.js";
+import { notion, DBS, JOURNAL_CACHE_HEADERS, logApiError, logApiSuccess, requireEnv, type ApiResponse } from "./_client.js";
 import { FALLBACK_HEADERS } from "./_fallback.js";
 import { loadAll, normalizeArtist, normalizeRelease } from "./_normalize.js";
-import { normalizeJournal, type JournalArticle } from "./_journal.js";
+import { normalizeJournal, isJournalPublished, type JournalArticle } from "./_journal.js";
+
 
 export type JournalListItem = JournalArticle & {
   artists: { id: string; slug: string; name: string }[];
@@ -23,9 +24,18 @@ export default async function handler(_req: unknown, res: ApiResponse) {
     const releases = releasePages.map((p) => normalizeRelease(p, artistMap));
     const releaseMap = new Map(releases.map((r) => [r.id, r]));
 
-    const articles: JournalListItem[] = journalPages
-      .map(normalizeJournal)
-      .filter((a) => a.published && !a.noindex)
+    const now = Date.now();
+    const allArticles = journalPages.map(normalizeJournal);
+    const missingPublishDate = allArticles.filter((a) => a.published && !a.publishDate).map((a) => a.slug);
+    if (missingPublishDate.length > 0) {
+      console.warn("[notion-api] Journal articles marked Published but missing a Publish Date (hidden)", {
+        route,
+        slugs: missingPublishDate,
+      });
+    }
+
+    const articles: JournalListItem[] = allArticles
+      .filter((a) => isJournalPublished(a, now) && !a.noindex)
       .map((a) => ({
         ...a,
         artists: a.artistIds.map((id) => artistMap.get(id)).filter(Boolean).map((x: any) => ({ id: x.id, slug: x.slug, name: x.name })),
@@ -38,7 +48,8 @@ export default async function handler(_req: unknown, res: ApiResponse) {
       });
 
     logApiSuccess(route, { count: articles.length });
-    res.writeHead(200, CACHE_HEADERS).end(JSON.stringify(articles));
+    res.writeHead(200, JOURNAL_CACHE_HEADERS).end(JSON.stringify(articles));
+
   } catch (e: unknown) {
     logApiError(route, e);
     res.writeHead(200, FALLBACK_HEADERS).end(JSON.stringify([]));

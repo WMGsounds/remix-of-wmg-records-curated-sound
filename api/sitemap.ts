@@ -1,6 +1,6 @@
 import { notion, DBS, requireEnv } from "./notion/_client.js";
 import { loadAll, normalizeArtist, normalizeRelease } from "./notion/_normalize.js";
-import { normalizeJournal } from "./notion/_journal.js";
+import { normalizeJournal, isJournalPublished } from "./notion/_journal.js";
 
 const STATIC_PATHS = [
   { path: "/", priority: "1.0", changefreq: "weekly" },
@@ -51,7 +51,7 @@ export default async function handler(req: any, res: any) {
     const artists = artistPages.map(normalizeArtist);
     const artistMap = new Map(artists.map((a) => [a.id, a]));
     const releases = releasePages.map((p) => normalizeRelease(p, artistMap));
-    const journal = journalPages.map(normalizeJournal).filter((a: any) => a.published && !a.noindex);
+    const journal = journalPages.map(normalizeJournal).filter((a: any) => isJournalPublished(a) && !a.noindex);
 
     // Journal categories
     const cats = new Set<string>();

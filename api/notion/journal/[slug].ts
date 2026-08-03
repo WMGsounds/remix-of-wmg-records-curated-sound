@@ -1,7 +1,8 @@
-import { notion, DBS, CACHE_HEADERS, logApiError, requireEnv, type ApiRequest, type ApiResponse } from "../_client.js";
+import { notion, DBS, JOURNAL_CACHE_HEADERS, logApiError, requireEnv, type ApiRequest, type ApiResponse } from "../_client.js";
 import { FALLBACK_HEADERS } from "../_fallback.js";
 import { loadAll, normalizeArtist, normalizeRelease } from "../_normalize.js";
-import { normalizeJournal, fetchPageBlocks, estimateReadingTime, deriveExcerpt } from "../_journal.js";
+import { normalizeJournal, fetchPageBlocks, estimateReadingTime, deriveExcerpt, isJournalPublished } from "../_journal.js";
+
 
 export default async function handler(req: ApiRequest, res: ApiResponse) {
   const route = "/api/notion/journal/[slug]";
@@ -16,7 +17,8 @@ export default async function handler(req: ApiRequest, res: ApiResponse) {
 
     const articles = journalPages.map(normalizeJournal);
     const article = articles.find((a) => a.slug === slug);
-    if (!article || !article.published) return res.status(404).json(null);
+    if (!article || !isJournalPublished(article)) return res.status(404).json(null);
+
 
     const blocks = await fetchPageBlocks(notion, article.id);
 
@@ -31,7 +33,7 @@ export default async function handler(req: ApiRequest, res: ApiResponse) {
     const excerpt = article.excerpt || deriveExcerpt(blocks);
     const readingTime = article.readingTime > 0 ? article.readingTime : estimateReadingTime(blocks);
 
-    res.writeHead(200, CACHE_HEADERS).end(JSON.stringify({
+    res.writeHead(200, JOURNAL_CACHE_HEADERS).end(JSON.stringify({
       article: { ...article, excerpt, readingTime },
       blocks,
       relatedArtists,
