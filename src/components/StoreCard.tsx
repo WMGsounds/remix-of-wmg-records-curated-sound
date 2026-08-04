@@ -167,21 +167,22 @@ export const StoreCard = ({ item, variant = "grid" }: StoreCardProps) => {
     </dl>
   );
 
+  const isPreorder =
+    item.availability === "Coming Soon" && item.preOrder && !!item.purchaseLink;
+
   const availabilityNote =
     item.availability === "Sold Out"
       ? "Order your copy now and it will be shipped as soon as it is available."
-      : item.availability === "Coming Soon" && item.preOrder
-        ? "Pre-order your copy now!"
-        : null;
+      : null;
 
   const UnavailableCallout = (
     <div className="flex flex-1 items-center justify-center py-8">
-      <div className="max-w-xs border border-gold/30 px-8 py-5 text-center">
-        <p className="font-serif text-xl tracking-[0.08em] text-gold/85">
+      <div className="max-w-xs border border-gold/40 bg-gold/[0.04] px-10 py-7 text-center">
+        <p className="font-serif text-2xl tracking-[0.12em] text-gold/90 md:text-[26px]">
           {item.availability}
         </p>
         {availabilityNote && (
-          <p className="mt-2 text-[11px] leading-snug text-ivory/60">
+          <p className="mt-3 text-[11px] leading-snug text-ivory/60">
             {availabilityNote}
           </p>
         )}
@@ -198,7 +199,12 @@ export const StoreCard = ({ item, variant = "grid" }: StoreCardProps) => {
 
 
   const renderCTA = (ctaVariant: "featured" | "grid") => {
-    if (button.disabled) {
+    const href = isPreorder ? item.purchaseLink! : button.href;
+    const label = isPreorder ? "Pre-order this release" : button.label;
+    const cardAriaLabel = isPreorder
+      ? `Pre-order ${item.title} by ${artistName}`
+      : ariaLabel;
+    if (!isPreorder && button.disabled) {
       return (
         <button
           type="button"
@@ -213,13 +219,13 @@ export const StoreCard = ({ item, variant = "grid" }: StoreCardProps) => {
     return (
       <>
         <a
-          href={button.href}
+          href={href}
           target="_blank"
           rel="noopener noreferrer"
-          aria-label={ariaLabel}
+          aria-label={cardAriaLabel}
           className="block w-full border border-gold bg-gold/10 px-6 py-3 text-center text-[11px] uppercase tracking-[0.24em] text-gold transition-colors hover:bg-gold hover:text-ink"
         >
-          {button.label}
+          {label}
         </a>
         <p
           className={`mt-2 text-[10px] uppercase tracking-[0.24em] text-ivory/40 ${ctaVariant === "featured" ? "text-left" : "text-center"}`}
@@ -229,6 +235,7 @@ export const StoreCard = ({ item, variant = "grid" }: StoreCardProps) => {
       </>
     );
   };
+
 
   // ----- FEATURED VARIANT -----
   if (variant === "featured") {
@@ -398,7 +405,9 @@ export const StoreCard = ({ item, variant = "grid" }: StoreCardProps) => {
           )}
           {isUnavailable && UnavailableCallout}
         </div>
-        {!isUnavailable && <div className="mt-auto pt-8">{renderCTA("grid")}</div>}
+        {(!isUnavailable || isPreorder) && (
+          <div className="mt-auto pt-8">{renderCTA("grid")}</div>
+        )}
       </div>
 
     </article>
