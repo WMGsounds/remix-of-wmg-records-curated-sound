@@ -50,6 +50,7 @@ const App = () => (
             <Route path="/newsletter" element={<Newsletter />} />
             <Route path="/legal/:doc" element={<Legal />} />
             <Route path="/seo-diagnostics" element={<Suspense fallback={null}><SeoDiagnostics /></Suspense>} />
+            <Route path="/media-library" element={<Suspense fallback={null}><MediaLibrary /></Suspense>} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </main>
