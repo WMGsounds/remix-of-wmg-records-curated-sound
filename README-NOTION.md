@@ -483,7 +483,12 @@ resolves the current Notion file URL server-side on every CDN revalidation:
 https://www.wmgsounds.com/api/media/release/<release-slug>.jpg
 ```
 
-- Route file: `api/media/release/[slug].ts`
+- There is **no dedicated route file**. Vercel's Hobby plan allows a maximum of
+  12 Serverless Functions, so `vercel.json` rewrites
+  `/api/media/release/:slug` → `/api/image-proxy?releaseSlug=:slug`. The public
+  URL is unchanged and the feature consumes **no extra function slot** — it is
+  handled by the existing `api/image-proxy.ts` function (its `?url=`, width,
+  blur and HTML-viewer behaviour is untouched).
 - The extension may be `.jpg`, `.jpeg`, `.png` or `.webp` — it is stripped before
   matching the Notion Releases `Slug` property. The response is always JPEG.
 - Reads the first file from the `Cover Art` property (Notion-uploaded or external).

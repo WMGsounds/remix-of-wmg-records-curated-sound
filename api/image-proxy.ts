@@ -1,5 +1,5 @@
 import sharp from "sharp";
-import type { ApiRequest, ApiResponse } from "./notion/_client.js";
+import { notion, DBS, logApiError, logApiSuccess, requireEnv, type ApiRequest, type ApiResponse } from "./notion/_client.js";
 
 // Browsers cache the resized result for a year (URL is unique per width).
 // CDN keeps it hot, with stale-while-revalidate as a safety net.
@@ -20,6 +20,7 @@ type ImageProxyResponse = ApiResponse & {
 
 type ImageProxyRequest = ApiRequest & {
   headers?: Record<string, string | string[] | undefined>;
+  method?: string;
 };
 
 const sendError = (res: ImageProxyResponse, status: number, message: string) => {
@@ -85,10 +86,160 @@ const sendHtmlViewer = (req: ImageProxyRequest, res: ImageProxyResponse, rawUrl:
   }).end(`<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>WMG image</title><link rel="icon" href="/favicon.ico" sizes="any"><link rel="icon" type="image/png" sizes="48x48" href="/favicon-48x48.png"><style>html,body{margin:0;min-height:100%;background:#050505}body{display:grid;place-items:center;padding:48px;box-sizing:border-box}img{display:block;max-width:100%;height:auto}</style></head><body><img src="${escapeHtml(imageSrc)}" alt=""></body></html>`);
 };
 
+// ---------------------------------------------------------------------------
+// Release cover-art mode: /api/image-proxy?releaseSlug=<slug>
+// Rewritten from the permanent public URL /api/media/release/<slug>.jpg so the
+// feature doesn't consume an extra serverless-function slot.
+// ---------------------------------------------------------------------------
+
+const MEDIA_CACHE_CONTROL = "public, max-age=600, s-maxage=3600, stale-while-revalidate=86400";
+
+const MEDIA_HEADERS: Record<string, string> = {
+  "Content-Type": "image/jpeg",
+  "Content-Disposition": "inline",
+  "Access-Control-Allow-Origin": "*",
+  "X-Content-Type-Options": "nosniff",
+  "Cache-Control": MEDIA_CACHE_CONTROL,
+};
+
+const stripExtension = (raw: string) => raw.replace(/\.(jpg|jpeg|png|webp)$/i, "");
+
+const plain = (prop: any): string => {
+  if (!prop) return "";
+  const parts = prop.rich_text ?? prop.title ?? [];
+  return Array.isArray(parts) ? parts.map((t: any) => t.plain_text).join("").trim() : "";
+};
+
+const findProp = (props: Record<string, any>, ...names: string[]): any => {
+  for (const n of names) if (props[n] !== undefined) return props[n];
+  const norm = (s: string) => s.normalize("NFKC").replace(/\s+/g, "").toLowerCase();
+  const targets = names.map(norm);
+  for (const key of Object.keys(props)) {
+    if (targets.includes(norm(key))) return props[key];
+  }
+  return undefined;
+};
+
+const firstFileUrl = (prop: any): string => {
+  const files = prop?.files ?? [];
+  for (const f of files) {
+    const u = f?.type === "external" ? f.external?.url : f?.file?.url;
+    if (typeof u === "string" && u.trim()) return u.trim();
+  }
+  return "";
+};
+
+const sendMediaError = (res: ImageProxyResponse, status: number, message: string) => {
+  res.writeHead(status, {
+    "Content-Type": "application/json",
+    "Cache-Control": "no-store",
+    "Access-Control-Allow-Origin": "*",
+    "X-Content-Type-Options": "nosniff",
+  }).end(JSON.stringify({ error: message }));
+};
+
+async function findReleasePage(slug: string) {
+  try {
+    const r: any = await (notion as any).databases.query({
+      database_id: DBS.releases,
+      filter: { property: "Slug", rich_text: { equals: slug } },
+      page_size: 5,
+    });
+    if (r?.results?.length) return r.results[0];
+  } catch {
+    /* fall through to full scan */
+  }
+
+  let cursor: string | undefined;
+  do {
+    const r: any = await (notion as any).databases.query({
+      database_id: DBS.releases,
+      start_cursor: cursor,
+      page_size: 100,
+    });
+    for (const page of r.results ?? []) {
+      const props = page.properties ?? {};
+      if (plain(findProp(props, "Slug")).toLowerCase() === slug.toLowerCase()) return page;
+    }
+    cursor = r.has_more ? r.next_cursor : undefined;
+  } while (cursor);
+
+  return null;
+}
+
+async function handleReleaseArtwork(req: ImageProxyRequest, res: ImageProxyResponse, rawSlug: string) {
+  const route = "/api/image-proxy?releaseSlug";
+  const method = (req.method ?? "GET").toUpperCase();
+  const slug = stripExtension(decodeURIComponent(rawSlug)).trim();
+
+  if (method !== "GET" && method !== "HEAD") {
+    return sendMediaError(res, 405, "Method not allowed.");
+  }
+  if (!slug) return sendMediaError(res, 404, "Not found.");
+
+  try {
+    requireEnv(route, ["NOTION_TOKEN", "NOTION_RELEASES_DB_ID"]);
+
+    const page = await findReleasePage(slug);
+    if (!page) {
+      console.warn("[media-api] Release not found", { route, slug });
+      return sendMediaError(res, 404, "Not found.");
+    }
+
+    const props = page.properties ?? {};
+    const showProp = findProp(props, "Show on website", "Show on Website", "Show On Website");
+    const visible = showProp?.type === "checkbox" ? showProp.checkbox === true : false;
+    if (!visible) {
+      console.warn("[media-api] Release hidden or missing Show on website checkbox", {
+        route,
+        slug,
+        propertyType: showProp?.type ?? "missing",
+      });
+      return sendMediaError(res, 404, "Not found.");
+    }
+
+    const sourceUrl = firstFileUrl(findProp(props, "Cover Art"));
+    if (!sourceUrl) {
+      console.warn("[media-api] Release has no Cover Art file", { route, slug });
+      return sendMediaError(res, 404, "Not found.");
+    }
+
+    const source = await fetch(sourceUrl, {
+      headers: { Accept: "image/avif,image/webp,image/*,*/*;q=0.8" },
+    });
+    if (!source.ok) {
+      logApiError(route, new Error(`Cover art fetch failed (${source.status})`), { slug });
+      return sendMediaError(res, 502, "Could not load artwork.");
+    }
+
+    const input = Buffer.from(await source.arrayBuffer());
+    const output = await sharp(input, { failOn: "none" })
+      .rotate()
+      .jpeg({ quality: 92, chromaSubsampling: "4:4:4", mozjpeg: true })
+      .toBuffer();
+
+    logApiSuccess(route, { slug, bytes: output.length });
+
+    const headers = { ...MEDIA_HEADERS, "Content-Length": String(output.length) };
+    if (method === "HEAD") {
+      res.writeHead(200, headers).end("");
+      return;
+    }
+    res.writeHead(200, headers).end(output as unknown as string);
+  } catch (error) {
+    logApiError(route, error, { slug });
+    return sendMediaError(res, 500, "Artwork request failed.");
+  }
+}
+
 export default async function handler(req: ImageProxyRequest, res: ImageProxyResponse) {
+  const releaseSlug = getQueryValue(req.query.releaseSlug);
+  if (releaseSlug) return handleReleaseArtwork(req, res, releaseSlug);
+
   const rawUrl = getQueryValue(req.query.url);
   const width = pickWidth(getQueryValue(req.query.w));
   const wantBlur = getQueryValue(req.query.blur) === "1";
+
 
   if (!rawUrl) return sendError(res, 400, "Missing image URL.");
   if (!isAllowedImageUrl(rawUrl)) return sendError(res, 400, "Unsupported image URL.");
