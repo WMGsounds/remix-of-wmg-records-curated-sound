@@ -480,7 +480,13 @@ Genius or other platforms. The site exposes a **permanent** artwork endpoint tha
 resolves the current Notion file URL server-side on every CDN revalidation:
 
 ```
-https://www.wmgsounds.com/api/media/release/<release-slug>.jpg
+https://www.wmgsounds.com/api/media/release/<artist-slug>-<release-slug>.jpg
+```
+
+Example:
+
+```
+https://www.wmgsounds.com/api/media/release/betty-blane-heaven-in-your-arms.jpg
 ```
 
 - There is **no dedicated route file**. Vercel's Hobby plan allows a maximum of
@@ -489,8 +495,14 @@ https://www.wmgsounds.com/api/media/release/<release-slug>.jpg
   URL is unchanged and the feature consumes **no extra function slot** — it is
   handled by the existing `api/image-proxy.ts` function (its `?url=`, width,
   blur and HTML-viewer behaviour is untouched).
+- The key is the **composite** `[artist-slug]-[release-slug]`. Both parts can
+  contain hyphens, so the endpoint never splits on a hyphen: it builds
+  `${artistSlug}-${releaseSlug}` for each release (artist slug resolved via the
+  Releases `Artist` relation into the Artists database) and compares
+  case-insensitively. Release-only keys return 404.
 - The extension may be `.jpg`, `.jpeg`, `.png` or `.webp` — it is stripped before
-  matching the Notion Releases `Slug` property. The response is always JPEG.
+  matching. The response is always JPEG, served with
+  `Content-Disposition: inline; filename="<artist-slug>-<release-slug>.jpg"`.
 - Reads the first file from the `Cover Art` property (Notion-uploaded or external).
 - Requires the release's `Show on website` checkbox to be ticked. The Release Date
   is **not** required, so artwork can be prepared before release day.

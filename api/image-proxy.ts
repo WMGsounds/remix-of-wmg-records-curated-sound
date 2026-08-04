@@ -138,17 +138,34 @@ const sendMediaError = (res: ImageProxyResponse, status: number, message: string
   }).end(JSON.stringify({ error: message }));
 };
 
-async function findReleasePage(slug: string) {
-  try {
+const sanitizeFilename = (value: string) =>
+  value.replace(/[^a-zA-Z0-9._-]/g, "-").replace(/-+/g, "-").replace(/^-|-$/g, "") || "artwork";
+
+const artistSlugCache = new Map<string, string>();
+
+async function loadArtistSlugs(): Promise<Map<string, string>> {
+  if (artistSlugCache.size > 0) return artistSlugCache;
+  let cursor: string | undefined;
+  do {
     const r: any = await (notion as any).databases.query({
-      database_id: DBS.releases,
-      filter: { property: "Slug", rich_text: { equals: slug } },
-      page_size: 5,
+      database_id: DBS.artists,
+      start_cursor: cursor,
+      page_size: 100,
     });
-    if (r?.results?.length) return r.results[0];
-  } catch {
-    /* fall through to full scan */
-  }
+    for (const page of r.results ?? []) {
+      const slug = plain(findProp(page.properties ?? {}, "Slug"));
+      if (slug) artistSlugCache.set(page.id, slug);
+    }
+    cursor = r.has_more ? r.next_cursor : undefined;
+  } while (cursor);
+  return artistSlugCache;
+}
+
+// Resolve a release from the composite public key `[artist-slug]-[release-slug]`.
+// Both parts can contain hyphens, so we compare full built keys instead of splitting.
+async function findReleasePage(compositeKey: string) {
+  const target = compositeKey.toLowerCase();
+  const artists = await loadArtistSlugs();
 
   let cursor: string | undefined;
   do {
@@ -159,13 +176,19 @@ async function findReleasePage(slug: string) {
     });
     for (const page of r.results ?? []) {
       const props = page.properties ?? {};
-      if (plain(findProp(props, "Slug")).toLowerCase() === slug.toLowerCase()) return page;
+      const releaseSlug = plain(findProp(props, "Slug"));
+      if (!releaseSlug) continue;
+      const artistId = props["Artist"]?.relation?.[0]?.id ?? "";
+      const artistSlug = artists.get(artistId) ?? "";
+      if (!artistSlug) continue;
+      if (`${artistSlug}-${releaseSlug}`.toLowerCase() === target) return page;
     }
     cursor = r.has_more ? r.next_cursor : undefined;
   } while (cursor);
 
   return null;
 }
+
 
 async function handleReleaseArtwork(req: ImageProxyRequest, res: ImageProxyResponse, rawSlug: string) {
   const route = "/api/image-proxy?releaseSlug";
@@ -178,7 +201,7 @@ async function handleReleaseArtwork(req: ImageProxyRequest, res: ImageProxyRespo
   if (!slug) return sendMediaError(res, 404, "Not found.");
 
   try {
-    requireEnv(route, ["NOTION_TOKEN", "NOTION_RELEASES_DB_ID"]);
+    requireEnv(route, ["NOTION_TOKEN", "NOTION_RELEASES_DB_ID", "NOTION_ARTISTS_DB_ID"]);
 
     const page = await findReleasePage(slug);
     if (!page) {
@@ -220,7 +243,11 @@ async function handleReleaseArtwork(req: ImageProxyRequest, res: ImageProxyRespo
 
     logApiSuccess(route, { slug, bytes: output.length });
 
-    const headers = { ...MEDIA_HEADERS, "Content-Length": String(output.length) };
+    const headers = {
+      ...MEDIA_HEADERS,
+      "Content-Disposition": `inline; filename="${sanitizeFilename(slug)}.jpg"`,
+      "Content-Length": String(output.length),
+    };
     if (method === "HEAD") {
       res.writeHead(200, headers).end("");
       return;
