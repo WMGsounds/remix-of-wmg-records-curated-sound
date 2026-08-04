@@ -470,3 +470,37 @@ The data layer is already structured to make adding a Shopify-driven shop trivia
 - Add `/shop` route + cart icon in `Layout.tsx`.
 
 No refactor required — the page components already consume normalized data via hooks.
+
+---
+
+## Permanent public cover-art URLs
+
+Notion's file URLs are signed and expire (~1h), so they can't be pasted into
+Genius or other platforms. The site exposes a **permanent** artwork endpoint that
+resolves the current Notion file URL server-side on every CDN revalidation:
+
+```
+https://www.wmgsounds.com/api/media/release/<release-slug>.jpg
+```
+
+- Route file: `api/media/release/[slug].ts`
+- The extension may be `.jpg`, `.jpeg`, `.png` or `.webp` — it is stripped before
+  matching the Notion Releases `Slug` property. The response is always JPEG.
+- Reads the first file from the `Cover Art` property (Notion-uploaded or external).
+- Requires the release's `Show on website` checkbox to be ticked. The Release Date
+  is **not** required, so artwork can be prepared before release day.
+- Returns 404 for a missing release, a hidden release or missing artwork.
+- Output: sharp-normalised JPEG (quality 92, auto-rotated, original dimensions,
+  never upscaled) with `Content-Type: image/jpeg`, `Content-Disposition: inline`,
+  `Access-Control-Allow-Origin: *`, `X-Content-Type-Options: nosniff` and
+  `Cache-Control: public, max-age=600, s-maxage=3600, stale-while-revalidate=86400`
+  (replacing Cover Art in Notion becomes visible within ~1 hour).
+- `GET` and `HEAD` are both supported. The Notion token and the temporary Notion
+  URL are never sent to the browser.
+
+### `/media-library` utility page
+
+An unlinked, `noindex, nofollow` internal tool (not in the nav, not in the sitemap)
+at `/media-library`. It lists every publicly available release with its cover,
+artist, title and release type, shows the permanent artwork URL, and provides
+**Copy Genius artwork URL** and **Open image** actions per release.

@@ -22,6 +22,7 @@ const JournalArticlePage = lazy(() => import("./pages/JournalArticlePage.tsx"));
 const JournalCategory = lazy(() => import("./pages/JournalCategory.tsx"));
 const Store = lazy(() => import("./pages/Store.tsx"));
 const SeoDiagnostics = lazy(() => import("./pages/SeoDiagnostics.tsx"));
+const MediaLibrary = lazy(() => import("./pages/MediaLibrary.tsx"));
 
 const queryClient = new QueryClient();
 
@@ -49,6 +50,7 @@ const App = () => (
             <Route path="/newsletter" element={<Newsletter />} />
             <Route path="/legal/:doc" element={<Legal />} />
             <Route path="/seo-diagnostics" element={<Suspense fallback={null}><SeoDiagnostics /></Suspense>} />
+            <Route path="/media-library" element={<Suspense fallback={null}><MediaLibrary /></Suspense>} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </main>
