@@ -102,33 +102,6 @@ const MEDIA_HEADERS: Record<string, string> = {
   "Cache-Control": MEDIA_CACHE_CONTROL,
 };
 
-const stripExtension = (raw: string) => raw.replace(/\.(jpg|jpeg|png|webp)$/i, "");
-
-const plain = (prop: any): string => {
-  if (!prop) return "";
-  const parts = prop.rich_text ?? prop.title ?? [];
-  return Array.isArray(parts) ? parts.map((t: any) => t.plain_text).join("").trim() : "";
-};
-
-const findProp = (props: Record<string, any>, ...names: string[]): any => {
-  for (const n of names) if (props[n] !== undefined) return props[n];
-  const norm = (s: string) => s.normalize("NFKC").replace(/\s+/g, "").toLowerCase();
-  const targets = names.map(norm);
-  for (const key of Object.keys(props)) {
-    if (targets.includes(norm(key))) return props[key];
-  }
-  return undefined;
-};
-
-const firstFileUrl = (prop: any): string => {
-  const files = prop?.files ?? [];
-  for (const f of files) {
-    const u = f?.type === "external" ? f.external?.url : f?.file?.url;
-    if (typeof u === "string" && u.trim()) return u.trim();
-  }
-  return "";
-};
-
 const sendMediaError = (res: ImageProxyResponse, status: number, message: string) => {
   res.writeHead(status, {
     "Content-Type": "application/json",
@@ -138,56 +111,16 @@ const sendMediaError = (res: ImageProxyResponse, status: number, message: string
   }).end(JSON.stringify({ error: message }));
 };
 
-const sanitizeFilename = (value: string) =>
-  value.replace(/[^a-zA-Z0-9._-]/g, "-").replace(/-+/g, "-").replace(/^-|-$/g, "") || "artwork";
-
-const artistSlugCache = new Map<string, string>();
-
-async function loadArtistSlugs(): Promise<Map<string, string>> {
-  if (artistSlugCache.size > 0) return artistSlugCache;
-  let cursor: string | undefined;
-  do {
-    const r: any = await (notion as any).databases.query({
-      database_id: DBS.artists,
-      start_cursor: cursor,
-      page_size: 100,
-    });
-    for (const page of r.results ?? []) {
-      const slug = plain(findProp(page.properties ?? {}, "Slug"));
-      if (slug) artistSlugCache.set(page.id, slug);
-    }
-    cursor = r.has_more ? r.next_cursor : undefined;
-  } while (cursor);
-  return artistSlugCache;
-}
-
-// Resolve a release from the composite public key `[artist-slug]-[release-slug]`.
-// Both parts can contain hyphens, so we compare full built keys instead of splitting.
+// Resolve a release from the composite public key `[artist-slug]-[release-slug]`
+// using the shared loadAll() helper (v5 dataSources.query + fallback).
 async function findReleasePage(compositeKey: string) {
-  const target = compositeKey.toLowerCase();
-  const artists = await loadArtistSlugs();
-
-  let cursor: string | undefined;
-  do {
-    const r: any = await (notion as any).databases.query({
-      database_id: DBS.releases,
-      start_cursor: cursor,
-      page_size: 100,
-    });
-    for (const page of r.results ?? []) {
-      const props = page.properties ?? {};
-      const releaseSlug = plain(findProp(props, "Slug"));
-      if (!releaseSlug) continue;
-      const artistId = props["Artist"]?.relation?.[0]?.id ?? "";
-      const artistSlug = artists.get(artistId) ?? "";
-      if (!artistSlug) continue;
-      if (`${artistSlug}-${releaseSlug}`.toLowerCase() === target) return page;
-    }
-    cursor = r.has_more ? r.next_cursor : undefined;
-  } while (cursor);
-
-  return null;
+  const [artistPages, releasePages] = await Promise.all([
+    loadAll(notion, DBS.artists),
+    loadAll(notion, DBS.releases),
+  ]);
+  return matchReleaseByCompositeKey(releasePages, artistSlugMap(artistPages), compositeKey);
 }
+
 
 
 async function handleReleaseArtwork(req: ImageProxyRequest, res: ImageProxyResponse, rawSlug: string) {
