@@ -201,7 +201,7 @@ async function handleReleaseArtwork(req: ImageProxyRequest, res: ImageProxyRespo
   if (!slug) return sendMediaError(res, 404, "Not found.");
 
   try {
-    requireEnv(route, ["NOTION_TOKEN", "NOTION_RELEASES_DB_ID"]);
+    requireEnv(route, ["NOTION_TOKEN", "NOTION_RELEASES_DB_ID", "NOTION_ARTISTS_DB_ID"]);
 
     const page = await findReleasePage(slug);
     if (!page) {
