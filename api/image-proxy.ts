@@ -243,7 +243,11 @@ async function handleReleaseArtwork(req: ImageProxyRequest, res: ImageProxyRespo
 
     logApiSuccess(route, { slug, bytes: output.length });
 
-    const headers = { ...MEDIA_HEADERS, "Content-Length": String(output.length) };
+    const headers = {
+      ...MEDIA_HEADERS,
+      "Content-Disposition": `inline; filename="${sanitizeFilename(slug)}.jpg"`,
+      "Content-Length": String(output.length),
+    };
     if (method === "HEAD") {
       res.writeHead(200, headers).end("");
       return;
