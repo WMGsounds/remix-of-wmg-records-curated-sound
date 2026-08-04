@@ -11,7 +11,7 @@ const mediaUrlFor = (slug: string, origin: string) =>
   `${origin}/api/media/release/${encodeURIComponent(slug)}.jpg`;
 
 const MediaLibrary = () => {
-  const { data: releases, isLoading, isError, refetch } = useReleases();
+  const { data: releases, isLoading, isError } = useReleases();
   const [copied, setCopied] = useState<string | null>(null);
 
   const origin = useMemo(
@@ -47,7 +47,7 @@ const MediaLibrary = () => {
         </p>
 
         {isLoading && <InlineSkeleton />}
-        {isError && <PageError onRetry={() => refetch()} />}
+        {isError && <PageError />}
 
         {!isLoading && !isError && (
           <div className="mt-10 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
@@ -62,6 +62,9 @@ const MediaLibrary = () => {
                     <LazyImage
                       src={release.coverArt}
                       alt={`${release.title} cover art`}
+                      width={600}
+                      height={600}
+                      displayWidth={400}
                       className="h-full w-full object-cover"
                     />
                   </div>
