@@ -22,6 +22,7 @@ const JournalArticlePage = lazy(() => import("./pages/JournalArticlePage.tsx"));
 const JournalCategory = lazy(() => import("./pages/JournalCategory.tsx"));
 const Store = lazy(() => import("./pages/Store.tsx"));
 const SeoDiagnostics = lazy(() => import("./pages/SeoDiagnostics.tsx"));
+const MediaLibrary = lazy(() => import("./pages/MediaLibrary.tsx"));
 
 const queryClient = new QueryClient();
 
