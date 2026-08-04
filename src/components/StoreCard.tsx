@@ -405,7 +405,9 @@ export const StoreCard = ({ item, variant = "grid" }: StoreCardProps) => {
           )}
           {isUnavailable && UnavailableCallout}
         </div>
-        {!isUnavailable && <div className="mt-auto pt-8">{renderCTA("grid")}</div>}
+        {(!isUnavailable || isPreorder) && (
+          <div className="mt-auto pt-8">{renderCTA("grid")}</div>
+        )}
       </div>
 
     </article>
