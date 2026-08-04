@@ -1,5 +1,14 @@
 import sharp from "sharp";
 import { notion, DBS, logApiError, logApiSuccess, requireEnv, type ApiRequest, type ApiResponse } from "./notion/_client.js";
+import { loadAll } from "./notion/_normalize.js";
+import {
+  artistSlugMap,
+  findProp,
+  firstFileUrl,
+  matchReleaseByCompositeKey,
+  normalizeCompositeKey,
+  sanitizeFilename,
+} from "./notion/_media.js";
 
 // Browsers cache the resized result for a year (URL is unique per width).
 // CDN keeps it hot, with stale-while-revalidate as a safety net.
