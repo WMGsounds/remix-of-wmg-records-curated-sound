@@ -126,7 +126,7 @@ async function findReleasePage(compositeKey: string) {
 async function handleReleaseArtwork(req: ImageProxyRequest, res: ImageProxyResponse, rawSlug: string) {
   const route = "/api/image-proxy?releaseSlug";
   const method = (req.method ?? "GET").toUpperCase();
-  const slug = stripExtension(decodeURIComponent(rawSlug)).trim();
+  const slug = normalizeCompositeKey(rawSlug);
 
   if (method !== "GET" && method !== "HEAD") {
     return sendMediaError(res, 405, "Method not allowed.");
@@ -136,9 +136,16 @@ async function handleReleaseArtwork(req: ImageProxyRequest, res: ImageProxyRespo
   try {
     requireEnv(route, ["NOTION_TOKEN", "NOTION_RELEASES_DB_ID", "NOTION_ARTISTS_DB_ID"]);
 
-    const page = await findReleasePage(slug);
+    const match = await findReleasePage(slug);
+    const page = match.page;
     if (!page) {
-      console.warn("[media-api] Release not found", { route, slug });
+      const detail =
+        match.reason === "missing_artist_slug"
+          ? "Artist slug missing on the linked artist page"
+          : match.reason === "missing_release_slug"
+            ? "Release slug missing on the release page"
+            : "Composite key not found in the Releases database";
+      console.warn(`[media-api] ${detail}`, { route, slug, reason: match.reason });
       return sendMediaError(res, 404, "Not found.");
     }
 
@@ -156,23 +163,47 @@ async function handleReleaseArtwork(req: ImageProxyRequest, res: ImageProxyRespo
 
     const sourceUrl = firstFileUrl(findProp(props, "Cover Art"));
     if (!sourceUrl) {
-      console.warn("[media-api] Release has no Cover Art file", { route, slug });
+      console.warn("[media-api] Cover art missing on release page", { route, slug });
       return sendMediaError(res, 404, "Not found.");
     }
 
-    const source = await fetch(sourceUrl, {
-      headers: { Accept: "image/avif,image/webp,image/*,*/*;q=0.8" },
-    });
+    let source: Response;
+    try {
+      source = await fetch(sourceUrl, {
+        headers: { Accept: "image/avif,image/webp,image/*,*/*;q=0.8" },
+      });
+    } catch (fetchError) {
+      logApiError(route, fetchError, { slug, stage: "source-fetch" });
+      return sendMediaError(res, 502, "Could not load artwork.");
+    }
     if (!source.ok) {
-      logApiError(route, new Error(`Cover art fetch failed (${source.status})`), { slug });
+      logApiError(route, new Error(`Source fetch failure (${source.status})`), {
+        slug,
+        stage: "source-fetch",
+      });
+      return sendMediaError(res, 502, "Could not load artwork.");
+    }
+
+    const sourceType = source.headers.get("content-type") || "";
+    if (!sourceType.toLowerCase().startsWith("image/")) {
+      logApiError(route, new Error(`Source is not an image (content-type: ${sourceType || "unknown"})`), {
+        slug,
+        stage: "source-content-type",
+      });
       return sendMediaError(res, 502, "Could not load artwork.");
     }
 
     const input = Buffer.from(await source.arrayBuffer());
-    const output = await sharp(input, { failOn: "none" })
-      .rotate()
-      .jpeg({ quality: 92, chromaSubsampling: "4:4:4", mozjpeg: true })
-      .toBuffer();
+    let output: Buffer;
+    try {
+      output = await sharp(input, { failOn: "none" })
+        .rotate()
+        .jpeg({ quality: 92, chromaSubsampling: "4:4:4", mozjpeg: true })
+        .toBuffer();
+    } catch (sharpError) {
+      logApiError(route, sharpError, { slug, stage: "sharp-conversion" });
+      return sendMediaError(res, 502, "Could not process artwork.");
+    }
 
     logApiSuccess(route, { slug, bytes: output.length });
 
@@ -187,10 +218,11 @@ async function handleReleaseArtwork(req: ImageProxyRequest, res: ImageProxyRespo
     }
     res.writeHead(200, headers).end(output as unknown as string);
   } catch (error) {
-    logApiError(route, error, { slug });
+    logApiError(route, error, { slug, stage: "handler" });
     return sendMediaError(res, 500, "Artwork request failed.");
   }
 }
+
 
 export default async function handler(req: ImageProxyRequest, res: ImageProxyResponse) {
   const releaseSlug = getQueryValue(req.query.releaseSlug);
