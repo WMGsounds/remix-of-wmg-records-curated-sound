@@ -7,8 +7,8 @@ import { LazyImage } from "@/components/LazyImage";
 
 const SITE_ORIGIN = "https://www.wmgsounds.com";
 
-const mediaUrlFor = (slug: string, origin: string) =>
-  `${origin}/api/media/release/${encodeURIComponent(slug)}.jpg`;
+const mediaUrlFor = (artistSlug: string, slug: string, origin: string) =>
+  `${origin}/api/media/release/${encodeURIComponent(`${artistSlug}-${slug}`)}.jpg`;
 
 const MediaLibrary = () => {
   const { data: releases, isLoading, isError } = useReleases();
@@ -24,11 +24,11 @@ const MediaLibrary = () => {
     [releases],
   );
 
-  const copy = async (slug: string) => {
+  const copy = async (key: string, url: string) => {
     try {
-      await navigator.clipboard.writeText(mediaUrlFor(slug, origin));
-      setCopied(slug);
-      window.setTimeout(() => setCopied((c) => (c === slug ? null : c)), 2000);
+      await navigator.clipboard.writeText(url);
+      setCopied(key);
+      window.setTimeout(() => setCopied((c) => (c === key ? null : c)), 2000);
     } catch {
       setCopied(null);
     }
