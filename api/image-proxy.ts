@@ -20,6 +20,7 @@ type ImageProxyResponse = ApiResponse & {
 
 type ImageProxyRequest = ApiRequest & {
   headers?: Record<string, string | string[] | undefined>;
+  method?: string;
 };
 
 const sendError = (res: ImageProxyResponse, status: number, message: string) => {
