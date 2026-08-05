@@ -10,9 +10,9 @@ type Props = {
 
 /** Fixed frames keep the composition stable while images decode (no layout shift). */
 const FRAMES = [
-  "absolute right-[4%] top-1/2 h-[380px] w-[300px] -translate-y-[54%] rotate-[-1.2deg] z-30",
-  "absolute right-[32%] top-[8%] h-[248px] w-[196px] rotate-[2deg] z-20",
-  "absolute right-[26%] bottom-[4%] h-[212px] w-[268px] rotate-[-2.4deg] z-10",
+  "absolute right-[10%] top-1/2 h-[340px] w-[268px] -translate-y-[54%] rotate-[-1.2deg] z-30",
+  "absolute right-[34%] top-[12%] h-[220px] w-[174px] rotate-[2deg] z-20",
+  "absolute right-[30%] bottom-[10%] h-[190px] w-[240px] rotate-[-2.4deg] z-10",
 ];
 
 export const GalleryHero = ({ images, fallbackImage }: Props) => {

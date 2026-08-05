@@ -43,6 +43,8 @@ export const enlargedTileIds = (images: GalleryImage[], spacing = 9): Set<string
   let last = -Infinity;
   images.forEach((image, index) => {
     if (!image.featured) return;
+    // Very tall portraits become unwieldy when doubled in width.
+    if (image.aspectRatio !== null && image.aspectRatio < 0.9) return;
     if (index - last < spacing) return;
     out.add(image.id);
     last = index;
