@@ -13,6 +13,7 @@ const releasesHeroDataUrl = "data:image/webp;base64,UklGRi4lAABXRUJQVlA4ICIlAACQ
 
 const filters = ["All", "Single", "Album", "EP"] as const;
 const sortOptions = ["Release Date", "Artist Name", "Release Name"] as const;
+const ALL_ARTISTS = "all";
 
 const Releases = () => {
   const { data: releases = [], isLoading, isError } = useReleases();
