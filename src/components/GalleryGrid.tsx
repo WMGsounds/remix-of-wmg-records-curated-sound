@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import type { GalleryImage } from "@/lib/types";
 
 type Props = {
@@ -59,12 +59,46 @@ const GalleryTile = ({ image, onSelect }: { image: GalleryImage; onSelect: () =>
   );
 };
 
-export const GalleryGrid = ({ images, onSelect }: Props) => (
-  <div className="columns-1 gap-6 sm:columns-2 lg:columns-3">
-    {images.map((image, i) => (
-      <GalleryTile key={image.id} image={image} onSelect={() => onSelect(i)} />
-    ))}
-  </div>
-);
+const useColumnCount = () => {
+  const get = () => {
+    if (typeof window === "undefined") return 3;
+    if (window.matchMedia("(min-width: 1024px)").matches) return 3;
+    if (window.matchMedia("(min-width: 640px)").matches) return 2;
+    return 1;
+  };
+  const [count, setCount] = useState(get);
+  useEffect(() => {
+    const onResize = () => setCount(get());
+    window.addEventListener("resize", onResize);
+    return () => window.removeEventListener("resize", onResize);
+  }, []);
+  return count;
+};
+
+export const GalleryGrid = ({ images, onSelect }: Props) => {
+  const columnCount = useColumnCount();
+
+  // Round-robin distribution keeps the left-to-right reading order of the
+  // source list (CSS `columns` would fill column-by-column instead).
+  const columns: { image: GalleryImage; index: number }[][] = Array.from(
+    { length: columnCount },
+    () => [],
+  );
+  images.forEach((image, index) => {
+    columns[index % columnCount].push({ image, index });
+  });
+
+  return (
+    <div className="flex gap-6">
+      {columns.map((column, ci) => (
+        <div key={ci} className="flex-1 min-w-0">
+          {column.map(({ image, index }) => (
+            <GalleryTile key={image.id} image={image} onSelect={() => onSelect(index)} />
+          ))}
+        </div>
+      ))}
+    </div>
+  );
+};
 
 export default GalleryGrid;
