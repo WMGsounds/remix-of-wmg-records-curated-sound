@@ -186,3 +186,30 @@ export type StoreItem = {
   createdTime: string;
 };
 
+
+// ---------------------------------------------------------------------------
+//  Gallery
+// ---------------------------------------------------------------------------
+export type GalleryImage = {
+  id: string;
+  galleryId: string;
+  title: string;
+  imageUrl: string;
+  width: number | null;
+  height: number | null;
+  aspectRatio: number | null;
+  artistName: string;
+  artistSlug: string;
+  imageType: string;
+  caption: string;
+  altText: string;
+  credit: string;
+  imageDate: string;
+  publishDate: string;
+  featured: boolean;
+  sortOrder: number | null;
+  focalPoint: string;
+  relatedRelease: string;
+  relatedReleaseUrl: string;
+  fileHash: string;
+};

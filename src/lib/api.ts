@@ -17,6 +17,7 @@ import type {
   JournalArticleSummary,
   JournalArticleData,
   StoreItem,
+  GalleryImage,
 } from "./types";
 import { getMockDataForPath } from "./mockData";
 
@@ -100,4 +101,8 @@ export async function fetchJournalBySlug(slug: string): Promise<JournalArticleDa
 
 export async function fetchStoreItems(): Promise<StoreItem[]> {
   return fetchJson<StoreItem[]>("/api/notion/store");
+}
+
+export async function fetchGallery(): Promise<GalleryImage[]> {
+  return fetchJson<GalleryImage[]>("/api/notion/gallery");
 }
