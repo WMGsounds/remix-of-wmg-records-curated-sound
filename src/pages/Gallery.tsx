@@ -90,7 +90,7 @@ const Gallery = () => {
                   style={{
                     backgroundImage: `url(${galleryHeroDataUrl})`,
                     backgroundSize: "auto 100%",
-                    backgroundPosition: "right center",
+                    backgroundPosition: "right 90px center",
                   }}
                 />
               </div>
