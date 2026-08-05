@@ -15,12 +15,36 @@ const sortOptions = ["Release Date", "Artist Name", "Release Name"] as const;
 
 const Releases = () => {
   const { data: releases = [], isLoading, isError } = useReleases();
+  const [searchParams, setSearchParams] = useSearchParams();
   const [filter, setFilter] = useState<(typeof filters)[number]>("All");
   const [sort, setSort] = useState<(typeof sortOptions)[number]>("Release Date");
   const [searchQuery, setSearchQuery] = useState<string>("");
 
+  const artistOptions = useMemo(() => {
+    const map = new Map<string, string>();
+    releases.forEach((r) => {
+      if (r.artistSlug && !map.has(r.artistSlug)) map.set(r.artistSlug, r.artistName);
+    });
+    return [...map.entries()]
+      .map(([slug, name]) => ({ slug, name }))
+      .sort((a, b) => a.name.localeCompare(b.name));
+  }, [releases]);
+
+  const artistParam = searchParams.get("artist") ?? "";
+  const artistSlug =
+    artistParam && artistOptions.some((a) => a.slug === artistParam) ? artistParam : ALL_ARTISTS;
+
+  const setArtist = (value: string) => {
+    const next = new URLSearchParams(searchParams);
+    if (value === ALL_ARTISTS) next.delete("artist");
+    else next.set("artist", value);
+    setSearchParams(next);
+  };
+
   const visible = useMemo(() => {
-    const base = filter === "All" ? [...releases] : releases.filter((r) => r.releaseType === filter);
+    const byArtist =
+      artistSlug === ALL_ARTISTS ? releases : releases.filter((r) => r.artistSlug === artistSlug);
+    const base = filter === "All" ? [...byArtist] : byArtist.filter((r) => r.releaseType === filter);
     const list = base.filter((r) => matchesSearch(searchQuery, [r.title, r.artistName, r.releaseType]));
     switch (sort) {
       case "Artist Name":
@@ -33,7 +57,7 @@ const Releases = () => {
           (a, b) => new Date(b.releaseDate).getTime() - new Date(a.releaseDate).getTime(),
         );
     }
-  }, [filter, sort, releases, searchQuery]);
+  }, [filter, sort, releases, searchQuery, artistSlug]);
 
   if (isError) return <PageError message="Couldn't load the catalogue." />;
 
