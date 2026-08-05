@@ -1,4 +1,5 @@
 import { useMemo, useState } from "react";
+import { useSearchParams } from "react-router-dom";
 import { ReleaseCard } from "@/components/Cards";
 import { Seo } from "@/components/Seo";
 import { breadcrumbSchema } from "@/lib/seo";
