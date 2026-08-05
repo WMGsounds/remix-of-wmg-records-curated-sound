@@ -119,3 +119,10 @@ export const RELEASE_CACHE_HEADERS = {
   "Content-Type": "application/json",
   "X-Data-Source": "notion",
 };
+
+// Gallery supports scheduled publishing (Publish Date) — revalidate within ~5 min.
+export const GALLERY_CACHE_HEADERS = {
+  "Cache-Control": "public, max-age=60, s-maxage=300, stale-while-revalidate=60",
+  "Content-Type": "application/json",
+  "X-Data-Source": "notion",
+};
