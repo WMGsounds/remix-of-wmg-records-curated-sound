@@ -449,7 +449,17 @@ const ReleasePage = () => {
         <section className="bg-ink text-ivory py-28">
           <div className="container-editorial">
             <p className="eyebrow mb-4 text-gold-soft">More from {artist?.name ?? "this artist"}</p>
-            <h2 className="display-serif text-5xl md:text-6xl mb-16">Related Releases</h2>
+            <div className="mb-16 flex flex-col gap-6 md:flex-row md:items-center md:justify-between md:gap-10">
+              <h2 className="display-serif text-5xl md:text-6xl">Related Releases</h2>
+              {release.artistSlug && (
+                <Link
+                  to={`/releases?artist=${encodeURIComponent(release.artistSlug)}`}
+                  className="inline-flex w-full items-center justify-center border border-ivory/40 px-6 py-3 text-[11px] uppercase tracking-[0.24em] text-ivory text-center break-words transition-colors duration-500 hover:border-gold hover:text-gold focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-gold md:w-auto md:shrink-0"
+                >
+                  See all releases by {release.artistName}
+                </Link>
+              )}
+            </div>
             <div className="grid grid-cols-2 md:grid-cols-3 gap-8">
               {related.map((r) => (
                 <Link key={r.slug} to={`/releases/${encodeURIComponent(r.slug)}`} className="group block hover-zoom cursor-pointer focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-ivory">

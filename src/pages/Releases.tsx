@@ -1,4 +1,5 @@
 import { useMemo, useState } from "react";
+import { useSearchParams } from "react-router-dom";
 import { ReleaseCard } from "@/components/Cards";
 import { Seo } from "@/components/Seo";
 import { breadcrumbSchema } from "@/lib/seo";
@@ -12,15 +13,40 @@ const releasesHeroDataUrl = "data:image/webp;base64,UklGRi4lAABXRUJQVlA4ICIlAACQ
 
 const filters = ["All", "Single", "Album", "EP"] as const;
 const sortOptions = ["Release Date", "Artist Name", "Release Name"] as const;
+const ALL_ARTISTS = "all";
 
 const Releases = () => {
   const { data: releases = [], isLoading, isError } = useReleases();
+  const [searchParams, setSearchParams] = useSearchParams();
   const [filter, setFilter] = useState<(typeof filters)[number]>("All");
   const [sort, setSort] = useState<(typeof sortOptions)[number]>("Release Date");
   const [searchQuery, setSearchQuery] = useState<string>("");
 
+  const artistOptions = useMemo(() => {
+    const map = new Map<string, string>();
+    releases.forEach((r) => {
+      if (r.artistSlug && !map.has(r.artistSlug)) map.set(r.artistSlug, r.artistName);
+    });
+    return [...map.entries()]
+      .map(([slug, name]) => ({ slug, name }))
+      .sort((a, b) => a.name.localeCompare(b.name));
+  }, [releases]);
+
+  const artistParam = searchParams.get("artist") ?? "";
+  const artistSlug =
+    artistParam && artistOptions.some((a) => a.slug === artistParam) ? artistParam : ALL_ARTISTS;
+
+  const setArtist = (value: string) => {
+    const next = new URLSearchParams(searchParams);
+    if (value === ALL_ARTISTS) next.delete("artist");
+    else next.set("artist", value);
+    setSearchParams(next);
+  };
+
   const visible = useMemo(() => {
-    const base = filter === "All" ? [...releases] : releases.filter((r) => r.releaseType === filter);
+    const byArtist =
+      artistSlug === ALL_ARTISTS ? releases : releases.filter((r) => r.artistSlug === artistSlug);
+    const base = filter === "All" ? [...byArtist] : byArtist.filter((r) => r.releaseType === filter);
     const list = base.filter((r) => matchesSearch(searchQuery, [r.title, r.artistName, r.releaseType]));
     switch (sort) {
       case "Artist Name":
@@ -33,7 +59,7 @@ const Releases = () => {
           (a, b) => new Date(b.releaseDate).getTime() - new Date(a.releaseDate).getTime(),
         );
     }
-  }, [filter, sort, releases, searchQuery]);
+  }, [filter, sort, releases, searchQuery, artistSlug]);
 
   if (isError) return <PageError message="Couldn't load the catalogue." />;
 
@@ -90,6 +116,23 @@ const Releases = () => {
                   {filters.map((f) => (
                     <SelectItem key={f} value={f} className="text-[11px] uppercase tracking-[0.24em] focus:bg-ivory/10 focus:text-ivory">
                       {f}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </FilterField>
+            <FilterField label="Artist">
+              <Select value={artistSlug} onValueChange={setArtist}>
+                <SelectTrigger className="w-[200px] bg-transparent border-ivory/24 text-[11px] uppercase tracking-[0.24em] text-ivory rounded-none focus:ring-ivory">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent className="bg-ink text-ivory border-ivory/24">
+                  <SelectItem value={ALL_ARTISTS} className="text-[11px] uppercase tracking-[0.24em] focus:bg-ivory/10 focus:text-ivory">
+                    All Artists
+                  </SelectItem>
+                  {artistOptions.map((a) => (
+                    <SelectItem key={a.slug} value={a.slug} className="text-[11px] uppercase tracking-[0.24em] focus:bg-ivory/10 focus:text-ivory">
+                      {a.name}
                     </SelectItem>
                   ))}
                 </SelectContent>
