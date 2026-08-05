@@ -1,4 +1,4 @@
-import type { Artist, HomepageData, Release, ReleasePageData, ArtistPageData, Track, StoreItem } from "./types";
+import type { Artist, HomepageData, Release, ReleasePageData, ArtistPageData, Track, StoreItem, GalleryImage } from "./types";
 
 const image = (name: string) => `/mock/${name}`;
 
@@ -223,6 +223,43 @@ export const mockStoreItems: StoreItem[] = [
   },
 ];
 
+
+// DEV-ONLY mock gallery — only ever returned via getMockDataForPath, which is
+// gated behind import.meta.env.DEV in src/lib/api.ts. Never served in production.
+export const mockGalleryImages: GalleryImage[] = [
+  ["Soundcheck, Camden", "Aurora Vale", "aurora-vale", "Live Performance", 1200, 1600],
+  ["Studio B, take nine", "Bobby Chills", "bobby-chills", "Behind the Scenes", 1600, 1067],
+  ["Portrait in low light", "Aurora Vale", "aurora-vale", "Portrait", 1000, 1500],
+  ["Tape machine detail", "", "", "Editorial", 1600, 900],
+  ["Sleeve shoot", "Tony Medley", "tony-medley", "Release Artwork", 1400, 1400],
+  ["Backstage, second night", "Jack Rivers", "jack-rivers", "Behind the Scenes", 1500, 1000],
+  ["Stage lights", "Jack Rivers", "jack-rivers", "Live Performance", 1080, 1620],
+  ["WMG signage", "", "", "WMG / Brand", 1600, 1200],
+  ["Rehearsal room", "Bobby Chills", "bobby-chills", "Portrait", 1200, 1500],
+].map(([title, artistName, artistSlug, imageType, width, height], i) => ({
+  id: `mock-gallery-${i + 1}`,
+  galleryId: `GAL-${i + 1}`,
+  title: title as string,
+  imageUrl: `https://picsum.photos/seed/wmg-gallery-${i + 1}/${width}/${height}`,
+  width: width as number,
+  height: height as number,
+  aspectRatio: (width as number) / (height as number),
+  artistName: artistName as string,
+  artistSlug: artistSlug as string,
+  imageType: imageType as string,
+  caption: `${title} — preview placeholder image.`,
+  altText: `${title} (preview placeholder)`,
+  credit: "WMG Archive",
+  imageDate: `2025-0${(i % 9) + 1}-14`,
+  publishDate: "2025-01-01",
+  featured: i < 2,
+  sortOrder: i + 1,
+  focalPoint: "Centre",
+  relatedRelease: "",
+  relatedReleaseUrl: "",
+  fileHash: `mock-hash-${i + 1}`,
+}));
+
 export function getMockDataForPath(path: string): unknown {
   if (path === "/api/notion/artists") return mockArtists;
   if (path === "/api/notion/releases") return mockReleases;
@@ -230,6 +267,7 @@ export function getMockDataForPath(path: string): unknown {
   if (path === "/api/notion/store") return mockStoreItems;
   if (path === "/api/notion/homepage") return mockHomepage();
   if (path === "/api/notion/journal") return [];
+  if (path === "/api/notion/gallery") return mockGalleryImages;
   const artistSlug = path.match(/^\/api\/notion\/artist\/([^/]+)$/)?.[1];
   if (artistSlug) return mockArtistPage(decodeURIComponent(artistSlug));
   const releaseSlug = path.match(/^\/api\/notion\/release\/([^/]+)$/)?.[1];

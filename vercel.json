@@ -1,6 +1,13 @@
 {
   "rewrites": [
-    { "source": "/sitemap.xml", "destination": "/api/sitemap" },
+    {
+      "source": "/sitemap.xml",
+      "destination": "/api/sitemap"
+    },
+    {
+      "source": "/api/notion/tracks",
+      "destination": "/api/notion/artists?dataset=tracks"
+    },
     {
       "source": "/api/media/release/:slug",
       "destination": "/api/image-proxy?releaseSlug=:slug"
@@ -13,13 +20,23 @@
   "redirects": [
     {
       "source": "/(.*)",
-      "has": [{ "type": "host", "value": "wmgsounds.com" }],
+      "has": [
+        {
+          "type": "host",
+          "value": "wmgsounds.com"
+        }
+      ],
       "destination": "https://www.wmgsounds.com/$1",
       "permanent": true
     },
     {
       "source": "/(.*)",
-      "has": [{ "type": "host", "value": "wmgr-soundscapes.lovable.app" }],
+      "has": [
+        {
+          "type": "host",
+          "value": "wmgr-soundscapes.lovable.app"
+        }
+      ],
       "destination": "https://www.wmgsounds.com/$1",
       "permanent": true
     }

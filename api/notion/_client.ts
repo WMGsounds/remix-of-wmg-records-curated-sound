@@ -83,6 +83,7 @@ export const DBS = {
   releaseTracks: process.env.NOTION_RELEASE_TRACKS_DB_ID!,
   journal: process.env.NOTION_JOURNAL_DB_ID!,
   storeItems: process.env.NOTION_STORE_DB_ID!,
+  gallery: process.env.NOTION_GALLERY_DATABASE_ID!,
 };
 
 export function requireEnv(route: string, names: string[]) {
@@ -114,6 +115,13 @@ export const JOURNAL_CACHE_HEADERS = {
 // Releases support scheduled publishing too — same ~5 min revalidation window.
 // Journal routes embed release chips, so they share this policy (see below).
 export const RELEASE_CACHE_HEADERS = {
+  "Cache-Control": "public, max-age=60, s-maxage=300, stale-while-revalidate=60",
+  "Content-Type": "application/json",
+  "X-Data-Source": "notion",
+};
+
+// Gallery supports scheduled publishing (Publish Date) — revalidate within ~5 min.
+export const GALLERY_CACHE_HEADERS = {
   "Cache-Control": "public, max-age=60, s-maxage=300, stale-while-revalidate=60",
   "Content-Type": "application/json",
   "X-Data-Source": "notion",

@@ -17,6 +17,7 @@ import NotFound from "./pages/NotFound.tsx";
 
 const Artists = lazy(() => import("./pages/Artists.tsx"));
 const Releases = lazy(() => import("./pages/Releases.tsx"));
+const Gallery = lazy(() => import("./pages/Gallery.tsx"));
 const Journal = lazy(() => import("./pages/Journal.tsx"));
 const JournalArticlePage = lazy(() => import("./pages/JournalArticlePage.tsx"));
 const JournalCategory = lazy(() => import("./pages/JournalCategory.tsx"));
@@ -41,6 +42,7 @@ const App = () => (
             <Route path="/artists/:slug" element={<ArtistPage />} />
             <Route path="/releases" element={<Suspense fallback={null}><Releases /></Suspense>} />
             <Route path="/releases/:slug" element={<ReleasePage />} />
+            <Route path="/gallery" element={<Suspense fallback={null}><Gallery /></Suspense>} />
             <Route path="/journal" element={<Suspense fallback={null}><Journal /></Suspense>} />
             <Route path="/journal/category/:slug" element={<Suspense fallback={null}><JournalCategory /></Suspense>} />
             <Route path="/journal/:slug" element={<Suspense fallback={null}><JournalArticlePage /></Suspense>} />
