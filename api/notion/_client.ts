@@ -83,6 +83,7 @@ export const DBS = {
   releaseTracks: process.env.NOTION_RELEASE_TRACKS_DB_ID!,
   journal: process.env.NOTION_JOURNAL_DB_ID!,
   storeItems: process.env.NOTION_STORE_DB_ID!,
+  gallery: process.env.NOTION_GALLERY_DATABASE_ID!,
 };
 
 export function requireEnv(route: string, names: string[]) {
