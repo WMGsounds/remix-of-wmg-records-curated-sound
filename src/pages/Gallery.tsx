@@ -1,5 +1,6 @@
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { useSearchParams } from "react-router-dom";
+import { ChevronDown } from "lucide-react";
 import { Seo } from "@/components/Seo";
 import { breadcrumbSchema } from "@/lib/seo";
 import { useGallery } from "@/lib/queries";
@@ -15,6 +16,7 @@ const galleryHeroDataUrl = "data:image/webp;base64,UklGRn6IAABXRUJQVlA4IHKIAADQt
 
 const ALL = "all";
 const sortOptions = ["Curated", "Newest", "Artist"] as const;
+const GALLERY_BATCH_SIZE = 24;
 
 const Gallery = () => {
   const { data: images = [], isLoading, isError } = useGallery();
@@ -25,6 +27,7 @@ const Gallery = () => {
   const [lightboxIndex, setLightboxIndex] = useState<number | null>(null);
   // Stable for the whole visit; changes once per day.
   const [curationSeed] = useState(() => dailySeed());
+  const [visibleCount, setVisibleCount] = useState<number>(GALLERY_BATCH_SIZE);
 
   const artistOptions = useMemo(() => {
     const map = new Map<string, string>();
@@ -44,6 +47,10 @@ const Gallery = () => {
   // Fall back to "All Artists" when the param doesn't match a known artist.
   const artist =
     artistParam && artistOptions.some((a) => a.key === artistParam) ? artistParam : ALL;
+
+  useEffect(() => {
+    setVisibleCount(GALLERY_BATCH_SIZE);
+  }, [artist, type, searchQuery, sort]);
 
   const setArtist = useCallback(
     (value: string) => {
@@ -78,6 +85,8 @@ const Gallery = () => {
         return artist === ALL ? curateGalleryOrder(list, curationSeed) : list;
     }
   }, [images, artist, type, searchQuery, sort, curationSeed]);
+
+  const displayed = useMemo(() => visible.slice(0, visibleCount), [visible, visibleCount]);
 
   if (isError) return <PageError message="Couldn't load the gallery." />;
 
@@ -198,13 +207,27 @@ const Gallery = () => {
             </p>
           </div>
         ) : (
-          <GalleryGrid images={visible} onSelect={setLightboxIndex} />
+          <>
+            <GalleryGrid images={displayed} onSelect={setLightboxIndex} />
+            {visible.length > displayed.length && (
+              <div className="mt-12 flex justify-center">
+                <button
+                  type="button"
+                  onClick={() => setVisibleCount((c) => c + GALLERY_BATCH_SIZE)}
+                  className="group inline-flex items-center gap-2 border border-ivory/24 bg-ink/40 px-8 py-3 text-[11px] uppercase tracking-[0.24em] text-ivory/80 transition-colors hover:border-gold/45 hover:text-gold-soft focus:outline-none focus-visible:ring-1 focus-visible:ring-gold"
+                >
+                  Show more
+                  <ChevronDown className="h-4 w-4 transition-transform group-hover:translate-y-0.5" />
+                </button>
+              </div>
+            )}
+          </>
         )}
       </div>
 
-      {lightboxIndex !== null && visible[lightboxIndex] && (
+      {lightboxIndex !== null && displayed[lightboxIndex] && (
         <GalleryLightbox
-          images={visible}
+          images={displayed}
           index={lightboxIndex}
           onClose={() => setLightboxIndex(null)}
           onNavigate={setLightboxIndex}
