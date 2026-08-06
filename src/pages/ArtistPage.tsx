@@ -13,6 +13,7 @@ import { PageLoading, PageError } from "@/components/UIStates";
 
 const ArtistPage = () => {
   const { slug } = useParams();
+  const headerHeight = useHeaderHeight();
   const { data, isLoading, isError } = useArtistBySlug(slug);
   const { data: storeItems = [] } = useStoreItems();
   const { data: journalArticles = [] } = useJournal();
