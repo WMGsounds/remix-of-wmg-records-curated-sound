@@ -121,6 +121,8 @@ export const ArtistGalleryPreview = ({ artist }: Props) => {
   const [lightboxIndex, setLightboxIndex] = useState<number | null>(null);
   const isDesktop = useIsDesktop();
   const columnCount = useBreakpointColumns();
+  // Seed generated once per mount, so the selection is stable across re-renders.
+  const [seed] = useState(() => (Math.random() * 0xffffffff) >>> 0);
 
   const preview = useMemo(() => {
     const seen = new Set<string>();
