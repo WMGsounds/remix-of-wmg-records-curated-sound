@@ -5,6 +5,7 @@ import { LazyImage } from "@/components/LazyImage";
 import { StoreCard } from "@/components/StoreCard";
 import { ArtistLinks } from "@/components/ArtistLinks";
 import { formatJournalDate } from "@/components/JournalArticle";
+import { ArtistGalleryPreview } from "@/components/ArtistGalleryPreview";
 
 import { Seo } from "@/components/Seo";
 import { breadcrumbSchema, absoluteUrl, truncate } from "@/lib/seo";
