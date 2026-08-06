@@ -1,21 +1,106 @@
 import { Link, NavLink, useLocation } from "react-router-dom";
-import { useEffect, useState } from "react";
-import { Menu, X, ArrowRight } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
+import { Menu, X, ChevronDown } from "lucide-react";
 import logo from "@/assets/wmg-logo-stacked.png";
 import footerLogo from "@/assets/wmg-logo-full.png";
 
 
-const nav = [
+type NavItem = { to: string; label: string; children?: { to: string; label: string }[] };
+
+const nav: NavItem[] = [
   { to: "/", label: "Home" },
   { to: "/artists", label: "Artists" },
   { to: "/releases", label: "Releases" },
   { to: "/journal", label: "Journal" },
-  { to: "/gallery", label: "Gallery" },
+  {
+    to: "/gallery",
+    label: "Media",
+    children: [
+      { to: "/gallery", label: "Gallery" },
+      { to: "/videos", label: "Videos" },
+    ],
+  },
   { to: "/about", label: "About" },
   { to: "/contact", label: "Contact" },
 ];
 
+// Flat list used by the footer — Media is expanded into its children.
+const footerNav = nav.flatMap((item) => (item.children ? item.children : [item]));
+
 const storeNav = { to: "/store", label: "Store" };
+
+const MediaMenu = ({ item }: { item: NavItem }) => {
+  const [open, setOpen] = useState(false);
+  const location = useLocation();
+  const ref = useRef<HTMLDivElement>(null);
+  const children = item.children ?? [];
+  const isActive = children.some((c) => location.pathname === c.to || location.pathname.startsWith(`${c.to}/`));
+
+  useEffect(() => {
+    if (!open) return;
+    const onDown = (e: MouseEvent) => {
+      if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false);
+    };
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setOpen(false);
+    };
+    document.addEventListener("mousedown", onDown);
+    document.addEventListener("keydown", onKey);
+    return () => {
+      document.removeEventListener("mousedown", onDown);
+      document.removeEventListener("keydown", onKey);
+    };
+  }, [open]);
+
+  return (
+    <div
+      ref={ref}
+      className="relative"
+      onMouseEnter={() => setOpen(true)}
+      onMouseLeave={() => setOpen(false)}
+      onBlur={(e) => {
+        if (!e.currentTarget.contains(e.relatedTarget as Node)) setOpen(false);
+      }}
+    >
+      <button
+        type="button"
+        aria-expanded={open}
+        aria-controls="media-menu"
+        aria-haspopup="true"
+        onClick={() => setOpen((s) => !s)}
+        className={`flex items-center gap-1.5 text-[12px] uppercase tracking-[0.24em] link-underline transition-colors ${
+          isActive ? "text-gold font-bold" : "text-ivory/70 font-medium hover:text-ivory"
+        }`}
+      >
+        {item.label}
+        <ChevronDown className={`h-3 w-3 transition-transform duration-300 ${open ? "rotate-180" : ""}`} aria-hidden="true" />
+      </button>
+
+      {open && (
+        <div
+          id="media-menu"
+          className="absolute left-1/2 top-full z-20 min-w-[180px] -translate-x-1/2 border border-ivory/15 bg-ink/95 backdrop-blur-md py-2 shadow-soft"
+        >
+          {children.map((child) => (
+            <NavLink
+              key={child.to}
+              to={child.to}
+              onClick={() => setOpen(false)}
+              className={({ isActive: childActive }) =>
+                `block px-5 py-2.5 text-[12px] uppercase tracking-[0.24em] transition-colors ${
+                  childActive ? "text-gold font-bold" : "text-ivory/70 font-medium hover:text-ivory"
+                }`
+              }
+            >
+              {child.label}
+            </NavLink>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+};
+
 
 export const SiteHeader = () => {
   const [open, setOpen] = useState(false);
