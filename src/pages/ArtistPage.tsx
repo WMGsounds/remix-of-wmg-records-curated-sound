@@ -91,7 +91,10 @@ const ArtistPage = () => {
         ]}
       />
       {/* Hero */}
-      <section className="relative h-[85vh] min-h-[600px] bg-ink text-ivory overflow-hidden">
+      <section
+        className="relative h-[85vh] min-h-[600px] bg-ink text-ivory overflow-hidden"
+        style={{ marginTop: headerHeight, minHeight: `calc(600px - ${headerHeight}px)` }}
+      >
         {heroImage ? (
           <LazyImage
             src={heroImage}
@@ -103,11 +106,12 @@ const ArtistPage = () => {
             loading="eager"
             fetchPriority="high"
             fill
-            className="object-cover opacity-80"
+            className="object-cover object-top opacity-80"
           />
         ) : (
           <div className="absolute inset-0 bg-secondary" />
         )}
+
         <div className="absolute inset-0 bg-gradient-to-t from-ink via-ink/40 to-ink/30" />
         <div className="relative z-10 h-full container-editorial flex flex-col justify-end pb-20">
           <p className="eyebrow mb-4 text-gold-soft">{artist.genre}</p>
