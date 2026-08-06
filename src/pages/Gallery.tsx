@@ -27,6 +27,11 @@ const Gallery = () => {
   const [lightboxIndex, setLightboxIndex] = useState<number | null>(null);
   // Stable for the whole visit; changes once per day.
   const [curationSeed] = useState(() => dailySeed());
+  const [visibleCount, setVisibleCount] = useState<number>(GALLERY_BATCH_SIZE);
+
+  useEffect(() => {
+    setVisibleCount(GALLERY_BATCH_SIZE);
+  }, [artist, type, searchQuery, sort]);
 
   const artistOptions = useMemo(() => {
     const map = new Map<string, string>();
