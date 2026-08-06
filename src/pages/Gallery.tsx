@@ -1,4 +1,5 @@
-import { useMemo, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
+import { useSearchParams } from "react-router-dom";
 import { Seo } from "@/components/Seo";
 import { breadcrumbSchema } from "@/lib/seo";
 import { useGallery } from "@/lib/queries";
@@ -17,7 +18,7 @@ const sortOptions = ["Curated", "Newest", "Artist"] as const;
 
 const Gallery = () => {
   const { data: images = [], isLoading, isError } = useGallery();
-  const [artist, setArtist] = useState<string>(ALL);
+  const [searchParams, setSearchParams] = useSearchParams();
   const [type, setType] = useState<string>(ALL);
   const [searchQuery, setSearchQuery] = useState<string>("");
   const [sort, setSort] = useState<(typeof sortOptions)[number]>("Curated");
@@ -37,6 +38,26 @@ const Gallery = () => {
   const typeOptions = useMemo(
     () => [...new Set(images.map((i) => i.imageType).filter(Boolean))].sort(),
     [images],
+  );
+
+  const artistParam = searchParams.get("artist");
+  // Fall back to "All Artists" when the param doesn't match a known artist.
+  const artist =
+    artistParam && artistOptions.some((a) => a.key === artistParam) ? artistParam : ALL;
+
+  const setArtist = useCallback(
+    (value: string) => {
+      setSearchParams(
+        (prev) => {
+          const next = new URLSearchParams(prev);
+          if (value === ALL) next.delete("artist");
+          else next.set("artist", value);
+          return next;
+        },
+        { replace: false },
+      );
+    },
+    [setSearchParams],
   );
 
   const visible = useMemo(() => {
