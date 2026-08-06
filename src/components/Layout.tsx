@@ -170,29 +170,67 @@ export const SiteHeader = () => {
       {open && (
         <div className="relative z-10 md:hidden border-t border-gold/30 bg-ink text-ivory shadow-soft">
           <nav className="container-editorial flex flex-col py-8 gap-3" aria-label="Mobile navigation">
-            {nav.map((item) => (
-              <NavLink
-                key={item.to}
-                to={item.to}
-                end={item.to === "/"}
-                className={({ isActive }) =>
-                  `group flex min-h-12 items-center justify-between font-serif text-3xl leading-none transition-colors duration-300 ${
-                    isActive ? "text-gold" : "text-ivory hover:text-gold"
-                  }`
-                }
-              >
-                {({ isActive }) => (
-                  <>
+            {nav.map((item) =>
+              item.children ? (
+                <div key={item.label}>
+                  <button
+                    type="button"
+                    aria-expanded={mediaOpen}
+                    aria-controls="mobile-media-menu"
+                    onClick={() => setMediaOpen((s) => !s)}
+                    className={`group flex w-full min-h-12 items-center justify-between font-serif text-3xl leading-none transition-colors duration-300 ${
+                      item.children.some((c) => location.pathname.startsWith(c.to)) ? "text-gold" : "text-ivory hover:text-gold"
+                    }`}
+                  >
                     <span>{item.label}</span>
-                    <span
-                      className={`h-px w-12 origin-right transition-transform duration-500 ${
-                        isActive ? "scale-x-100 bg-gold" : "scale-x-0 bg-ivory group-hover:scale-x-100 group-hover:bg-gold"
-                      }`}
+                    <ChevronDown
+                      className={`h-5 w-5 transition-transform duration-300 ${mediaOpen ? "rotate-180" : ""}`}
+                      aria-hidden="true"
                     />
-                  </>
-                )}
-              </NavLink>
-            ))}
+                  </button>
+                  {mediaOpen && (
+                    <div id="mobile-media-menu" className="mt-1 flex flex-col gap-1 border-l border-gold/30 pl-5">
+                      {item.children.map((child) => (
+                        <NavLink
+                          key={child.to}
+                          to={child.to}
+                          className={({ isActive }) =>
+                            `flex min-h-11 items-center font-serif text-2xl leading-none transition-colors duration-300 ${
+                              isActive ? "text-gold" : "text-ivory/80 hover:text-gold"
+                            }`
+                          }
+                        >
+                          {child.label}
+                        </NavLink>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              ) : (
+                <NavLink
+                  key={item.to}
+                  to={item.to}
+                  end={item.to === "/"}
+                  className={({ isActive }) =>
+                    `group flex min-h-12 items-center justify-between font-serif text-3xl leading-none transition-colors duration-300 ${
+                      isActive ? "text-gold" : "text-ivory hover:text-gold"
+                    }`
+                  }
+                >
+                  {({ isActive }) => (
+                    <>
+                      <span>{item.label}</span>
+                      <span
+                        className={`h-px w-12 origin-right transition-transform duration-500 ${
+                          isActive ? "scale-x-100 bg-gold" : "scale-x-0 bg-ivory group-hover:scale-x-100 group-hover:bg-gold"
+                        }`}
+                      />
+                    </>
+                  )}
+                </NavLink>
+              ),
+            )}
+
             <NavLink
               to={storeNav.to}
               className={({ isActive }) =>
