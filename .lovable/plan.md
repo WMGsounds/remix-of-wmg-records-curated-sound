@@ -1,22 +1,51 @@
-# Artist page Gallery preview: editorial strip
+# Media navigation + Videos page
 
-Replace the four identical 4:5 portrait cards with a relaxed, mixed-proportion gallery strip that reuses the main Gallery page's aspect-ratio logic.
+Add a `Media` dropdown to the main navigation (Gallery + Videos) and build a new `/videos` page populated from the YouTube link fields already stored in the Tracks Notion database.
 
-## What changes
+## 1. Navigation
 
-- Each tile renders at its own aspect ratio (`image.aspectRatio`, falling back to 3/4 when Notion has no dimensions) — the same rule the main Gallery grid uses. No more forced 4:5 cropping.
-- Desktop: a single justified row of up to four images. Tile widths are proportional to each image's aspect ratio, so landscape images get more width and portraits less, all sharing a common row height inside the existing content width.
-- Slight vertical offsets are applied to alternating tiles so the row reads as a casual editorial composition rather than a flush-edged grid.
-- Tablet: three-column layout; small screens: two columns; very narrow: one column. Tiles keep their native proportions at every breakpoint (column-based layout, so heights vary naturally).
-- Selection logic is untouched: featured first, then `sortOrder`, then most recent `imageDate`/`publishDate`, take the first four regardless of orientation.
+`src/components/Layout.tsx`
 
-## Preserved
+- Replace the `Gallery` nav entry with a `Media` group in the same position, containing `Gallery` (`/gallery`) and `Videos` (`/videos`).
+- Desktop: a real `<button>` with `aria-expanded` / `aria-controls`, opening on hover and click, matching the existing header typography, borders, gold accents and transitions. `Media` shows the active (gold, bold) state on `/gallery` and `/videos`; the current child is highlighted inside the panel.
+- Escape closes; outside click and focus-leaving close; visible keyboard focus preserved.
+- Mobile: `Media` expands in place to reveal both links, touch and keyboard driven, reusing the existing serif mobile-menu styling.
+- Footer: `Media` heading is not needed — list `Gallery` and `Videos` as separate links in the existing Explore list, in Journal → Gallery → Videos order.
+- No other nav item, styling or header structure changes.
 
-Heading block, section padding/border/width, focal-point positioning, hover zoom and border treatment, lazy loading and alt text, the existing `GalleryLightbox` wiring and indexes, the centred "Visit the gallery" link, artist filtering/deep-links, and hiding the section when the artist has no images.
+## 2. Data (no new Notion database)
 
-## Technical notes
+`api/notion/_normalize.ts` + the tracks handler in `api/notion/artists.ts`
 
-- Only `src/components/ArtistGalleryPreview.tsx` changes.
-- Desktop row uses flex with `flex-grow` weighted by each image's aspect ratio and a shared row height, mirroring `GalleryGrid`'s `aspectRatio` styling on the inner wrapper.
-- Vertical rhythm via a small deterministic `translate-y` per index (no randomness), applied only at the desktop breakpoint.
-- Smaller breakpoints reuse the round-robin column approach from `GalleryGrid` so both areas share one visual system.
+- Read `YouTube OA`, `YouTube OLV`, `YouTube OMV` from the Tracks database page (with the release-track pivot fallback already used for other track metadata) and expose them on each track.
+- Also expose `artistName`, `artistSlug` and the release date on each track (currently absent) so the Videos page can filter and sort without a second join.
+- Existing visibility rules stay authoritative: the tracks route already filters through `isReleasePublished`, so scheduled/hidden releases never produce videos.
+- Extend `Track` in `src/lib/types.ts` with the optional YouTube fields, artist fields and release date. Add matching mock tracks in `src/lib/mockData.ts` so the Lovable preview renders.
+
+## 3. Video item derivation (frontend, `src/lib/videos.ts`)
+
+- `extractYouTubeId(url)` handles `watch?v=`, `youtu.be/`, `/shorts/`, `/embed/`, extra query params; returns `null` for anything that isn't an 11-char YouTube ID.
+- `buildVideoItems(tracks)` produces up to three entries per track: `{ id: "<track-id>-omv|-olv|-oa", trackId, trackTitle, artistName, artistSlug, url, videoId, type, label, date }`.
+- Labels: Official Music Video / Official Lyric Video / Official Audio.
+- Invalid or empty URLs are skipped silently (no blank cards).
+- Duplicate `videoId` collapses to one entry with priority OMV > OLV > OA; duplicates are `console.warn`-logged in dev only.
+
+## 4. `/videos` page
+
+`src/pages/Videos.tsx`, registered as a lazy route in `src/App.tsx`.
+
+- Header block matching Gallery's structure and spacing, no hero image: eyebrow `MEDIA`, `display-serif` heading `Videos`, intro copy as specified, same `container-editorial` width and dark background.
+- Filter bar reuses `FilterField`, `SearchInput` and the Gallery select styling: Artist (All Artists + artists present in results, keyed by slug), Video Type (All Videos / the three types), Search, Sort by (Random default, plus Newest, Artist, Title).
+- Card grid (responsive 1/2/3 columns) using the YouTube thumbnail (`i.ytimg.com/vi/<id>/hqdefault.jpg`) with a gold play affordance, track title, artist name and type label — same restrained hover/border treatment as gallery tiles.
+- Clicking a card opens a modal player that mounts a validated `youtube-nocookie.com/embed/<id>` iframe built only from the extracted ID, with Escape/backdrop close and prev/next navigation, styled like `GalleryLightbox`.
+- `Show more` batching of 24, matching the Gallery control exactly.
+- SEO: `Seo` component with title `Videos`, canonical `/videos`, breadcrumb JSON-LD; add `/videos` to `api/sitemap.ts`.
+
+## 5. Stable random order
+
+Extend `src/lib/galleryOrder.ts` (or a sibling helper) with a Europe/London daily seed. The seed is `londonDate + artistFilter + typeFilter`, held in state so the order is stable across re-renders, playback, filter-state UI changes and `Show more`, and refreshes on a new London calendar day. No `Math.random()` during render.
+
+## Assumptions
+
+- Videos open in an in-page modal player rather than navigating to YouTube.
+- Thumbnails come from YouTube's public image CDN; no artwork needs storing in Notion.
