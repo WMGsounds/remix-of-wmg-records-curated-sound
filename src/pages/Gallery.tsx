@@ -227,7 +227,7 @@ const Gallery = () => {
 
       {lightboxIndex !== null && displayed[lightboxIndex] && (
         <GalleryLightbox
-          images={visible}
+          images={displayed}
           index={lightboxIndex}
           onClose={() => setLightboxIndex(null)}
           onNavigate={setLightboxIndex}
