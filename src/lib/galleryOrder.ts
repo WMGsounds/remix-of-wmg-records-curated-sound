@@ -89,3 +89,20 @@ export const curateGalleryOrder = (images: GalleryImage[], seed: number): Galler
 
   return spreadFeatured(out);
 };
+
+/** Today's date in Europe/London, as YYYY-MM-DD. */
+export const londonDateKey = (d: Date = new Date()): string =>
+  new Intl.DateTimeFormat("en-CA", { timeZone: "Europe/London" }).format(d);
+
+/** Deterministic 32-bit hash for building stable seeds from strings. */
+export const seedFromString = (value: string): number => {
+  let h = 2166136261;
+  for (let i = 0; i < value.length; i++) {
+    h ^= value.charCodeAt(i);
+    h = Math.imul(h, 16777619);
+  }
+  return h >>> 0;
+};
+
+/** Deterministic shuffle — same seed always yields the same order. */
+export const seededShuffle = <T,>(items: T[], seed: number): T[] => shuffle(items, rng(seed));
