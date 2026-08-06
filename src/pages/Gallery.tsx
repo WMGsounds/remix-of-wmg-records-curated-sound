@@ -207,11 +207,25 @@ const Gallery = () => {
             </p>
           </div>
         ) : (
-          <GalleryGrid images={visible} onSelect={setLightboxIndex} />
+          <>
+            <GalleryGrid images={displayed} onSelect={setLightboxIndex} />
+            {visible.length > displayed.length && (
+              <div className="mt-12 flex justify-center">
+                <button
+                  type="button"
+                  onClick={() => setVisibleCount((c) => c + GALLERY_BATCH_SIZE)}
+                  className="group inline-flex items-center gap-2 border border-ivory/24 bg-ink/40 px-8 py-3 text-[11px] uppercase tracking-[0.24em] text-ivory/80 transition-colors hover:border-gold/45 hover:text-gold-soft focus:outline-none focus-visible:ring-1 focus-visible:ring-gold"
+                >
+                  Show more
+                  <ChevronDown className="h-4 w-4 transition-transform group-hover:translate-y-0.5" />
+                </button>
+              </div>
+            )}
+          </>
         )}
       </div>
 
-      {lightboxIndex !== null && visible[lightboxIndex] && (
+      {lightboxIndex !== null && displayed[lightboxIndex] && (
         <GalleryLightbox
           images={visible}
           index={lightboxIndex}
