@@ -6,6 +6,7 @@ import { StoreCard } from "@/components/StoreCard";
 import { ArtistLinks } from "@/components/ArtistLinks";
 import { formatJournalDate } from "@/components/JournalArticle";
 import { ArtistGalleryPreview } from "@/components/ArtistGalleryPreview";
+import { useHeaderHeight } from "@/hooks/use-header-height";
 
 import { Seo } from "@/components/Seo";
 import { breadcrumbSchema, absoluteUrl, truncate } from "@/lib/seo";
