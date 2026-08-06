@@ -48,6 +48,10 @@ const Gallery = () => {
   const artist =
     artistParam && artistOptions.some((a) => a.key === artistParam) ? artistParam : ALL;
 
+  useEffect(() => {
+    setVisibleCount(GALLERY_BATCH_SIZE);
+  }, [artist, type, searchQuery, sort]);
+
   const setArtist = useCallback(
     (value: string) => {
       setSearchParams(
