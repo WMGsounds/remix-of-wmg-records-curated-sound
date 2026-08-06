@@ -183,8 +183,31 @@ const ArtistPage = () => {
         </section>
       )}
 
+      {/* Store items for this artist */}
+      {artistStoreItems.length > 0 && (
+        <section className="bg-ink text-ivory py-24 md:py-32">
+          <div className="container-editorial">
+            <p className="eyebrow mb-4 text-gold-soft">Store</p>
+            <h2 className="display-serif text-4xl md:text-6xl mb-12">Available from the Store</h2>
+            <div className="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-3 md:gap-10">
+              {artistStoreItems.map((item) => (
+                <StoreCard key={item.id} item={item} />
+              ))}
+            </div>
+            <div className="mt-12">
+              <Link
+                to="/store"
+                className="inline-flex items-center gap-3 border-b border-ivory/70 pb-2 text-[12px] uppercase tracking-[0.24em] hover:text-gold hover:border-gold transition-colors duration-500"
+              >
+                Visit the Store <ArrowRight className="h-4 w-4" />
+              </Link>
+            </div>
+          </div>
+        </section>
+      )}
+
       {/* Discography */}
-      <section className="bg-ink text-ivory py-28 md:py-36">
+      <section className="bg-ink text-ivory py-28 md:py-36 border-t border-ivory/10">
           <div className="container-editorial">
             <p className="eyebrow mb-4 text-gold-soft">Discography</p>
             <h2 className="display-serif text-5xl md:text-7xl mb-16">Selected Works</h2>
@@ -219,29 +242,6 @@ const ArtistPage = () => {
             )}
           </div>
         </section>
-
-      {/* Store items for this artist */}
-      {artistStoreItems.length > 0 && (
-        <section className="bg-ink text-ivory py-24 md:py-32 border-t border-ivory/10">
-          <div className="container-editorial">
-            <p className="eyebrow mb-4 text-gold-soft">Store</p>
-            <h2 className="display-serif text-4xl md:text-6xl mb-12">Available from the Store</h2>
-            <div className="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-3 md:gap-10">
-              {artistStoreItems.map((item) => (
-                <StoreCard key={item.id} item={item} />
-              ))}
-            </div>
-            <div className="mt-12">
-              <Link
-                to="/store"
-                className="inline-flex items-center gap-3 border-b border-ivory/70 pb-2 text-[12px] uppercase tracking-[0.24em] hover:text-gold hover:border-gold transition-colors duration-500"
-              >
-                Visit the Store <ArrowRight className="h-4 w-4" />
-              </Link>
-            </div>
-          </div>
-        </section>
-      )}
 
       {/* Recent Journal articles for this artist */}
       {artistJournal.length > 0 && (
