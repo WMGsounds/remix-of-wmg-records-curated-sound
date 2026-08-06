@@ -64,13 +64,21 @@ async function handleTracks(res: ApiResponse) {
           trackTitle: rt.title,
           releaseId: rt.releaseId,
           releaseSlug: rel?.slug ?? "",
+          releaseTitle: rel?.title ?? "",
+          releaseDate: rel?.releaseDate ?? "",
+          artistName: rel?.artistName ?? "",
+          artistSlug: rel?.artistSlug ?? "",
           trackNumber: rt.trackNumber,
           duration: rt.duration,
           lyrics: rt.lyrics,
           spotifyUrl: rt.spotifyUrl,
+          youtubeOfficialAudio: rt.youtubeOfficialAudio,
+          youtubeLyricVideo: rt.youtubeLyricVideo,
+          youtubeMusicVideo: rt.youtubeMusicVideo,
           side: rt.side,
           versionLabel: rt.versionLabel,
         };
+
       })
       .sort((a, b) => a.trackNumber - b.trackNumber);
 
