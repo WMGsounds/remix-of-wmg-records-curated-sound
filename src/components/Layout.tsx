@@ -104,10 +104,12 @@ const MediaMenu = ({ item }: { item: NavItem }) => {
 
 export const SiteHeader = () => {
   const [open, setOpen] = useState(false);
+  const [mediaOpen, setMediaOpen] = useState(false);
   const location = useLocation();
 
   useEffect(() => {
     setOpen(false);
+    setMediaOpen(false);
   }, [location.pathname]);
 
   return (
