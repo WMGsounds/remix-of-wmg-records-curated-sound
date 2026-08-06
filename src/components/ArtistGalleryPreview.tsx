@@ -20,8 +20,27 @@ const objectPosition = (focalPoint: string) => {
   }
 };
 
-const timeOf = (image: GalleryImage) =>
-  Date.parse(image.imageDate || image.publishDate || "") || 0;
+/** Deterministic PRNG (mulberry32) — seeded once per mount, never during render. */
+const rng = (seed: number) => {
+  let a = seed >>> 0;
+  return () => {
+    a = (a + 0x6d2b79f5) >>> 0;
+    let t = a;
+    t = Math.imul(t ^ (t >>> 15), t | 1);
+    t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+  };
+};
+
+const shuffle = <T,>(items: T[], source: number | (() => number)): T[] => {
+  const rand = typeof source === "number" ? rng(source) : source;
+  const out = [...items];
+  for (let i = out.length - 1; i > 0; i--) {
+    const j = Math.floor(rand() * (i + 1));
+    [out[i], out[j]] = [out[j], out[i]];
+  }
+  return out;
+};
 
 /** Safe numeric aspect ratio, clamped so extreme panoramas/slivers stay usable. */
 const ratioOf = (image: GalleryImage) => {
@@ -111,16 +130,46 @@ export const ArtistGalleryPreview = ({ artist }: Props) => {
       seen.add(i.id);
       return true;
     });
-    return matches
-      .sort((a, b) => {
-        if (a.featured !== b.featured) return a.featured ? -1 : 1;
-        const ao = a.sortOrder ?? Number.MAX_SAFE_INTEGER;
-        const bo = b.sortOrder ?? Number.MAX_SAFE_INTEGER;
-        if (ao !== bo) return ao - bo;
-        return timeOf(b) - timeOf(a);
-      })
-      .slice(0, 4);
-  }, [images, artist.slug, artist.name]);
+    if (matches.length <= 4) return shuffle(matches, seed);
+
+    const rand = rng(seed);
+
+    // Group by Image Type; blank/missing counts as "Other".
+    const groups = new Map<string, GalleryImage[]>();
+    matches.forEach((img) => {
+      const key = (img.imageType || "").trim() || "Other";
+      const bucket = groups.get(key);
+      if (bucket) bucket.push(img);
+      else groups.set(key, [img]);
+    });
+
+    // Typed groups first, "Other" last.
+    const typed = shuffle([...groups.entries()].filter(([k]) => k !== "Other"), rand);
+    const other = groups.has("Other") ? [["Other", groups.get("Other")!] as const] : [];
+    const ordered = [...typed, ...other];
+
+    const chosen: GalleryImage[] = [];
+    const used = new Set<string>();
+    for (const [, bucket] of ordered) {
+      if (chosen.length >= 4) break;
+      const pick = shuffle(bucket, rand)[0];
+      if (pick && !used.has(pick.id)) {
+        used.add(pick.id);
+        chosen.push(pick);
+      }
+    }
+
+    if (chosen.length < 4) {
+      const pool = shuffle(matches.filter((i) => !used.has(i.id)), rand);
+      for (const img of pool) {
+        if (chosen.length >= 4) break;
+        used.add(img.id);
+        chosen.push(img);
+      }
+    }
+
+    return shuffle(chosen, rand);
+  }, [images, artist.slug, artist.name, seed]);
 
   const tiles: TileItem[] = preview.map((image, index) => ({ image, index }));
 
