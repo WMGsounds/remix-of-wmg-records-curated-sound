@@ -231,6 +231,19 @@ export function normalizeReleaseTrack(page: any, trackPageLookup: Map<string, an
     // Per-release Spotify URL only — never fall back to the Tracks DB URL,
     // so a track on multiple releases links to the correct version each time.
     spotifyUrl: url(props["Spotify URL (Release-Specific)"]) || null,
+    // YouTube links live on the Tracks DB; allow a per-release override on the pivot row.
+    youtubeOfficialAudio:
+      url(findProp(props, "YouTube OA", "YouTube Official Audio"))
+      || url(findProp(trackProps, "YouTube OA", "YouTube Official Audio"))
+      || null,
+    youtubeLyricVideo:
+      url(findProp(props, "YouTube OLV", "YouTube Official Lyric Video"))
+      || url(findProp(trackProps, "YouTube OLV", "YouTube Official Lyric Video"))
+      || null,
+    youtubeMusicVideo:
+      url(findProp(props, "YouTube OMV", "YouTube Official Music Video"))
+      || url(findProp(trackProps, "YouTube OMV", "YouTube Official Music Video"))
+      || null,
   };
 }
 
