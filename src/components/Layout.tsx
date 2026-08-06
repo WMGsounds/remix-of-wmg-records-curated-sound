@@ -297,7 +297,7 @@ export const SiteFooter = () => (
       <div className="md:text-right md:justify-self-end">
         <p className="eyebrow mb-3 text-gold">Explore</p>
         <ul className="space-y-1.5 text-sm">
-          {nav.map((n) => (
+          {footerNav.map((n) => (
             <li key={n.to}>
               <Link to={n.to} className="link-underline text-ivory/70 hover:text-ivory transition-colors">
                 {n.label}
