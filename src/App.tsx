@@ -18,6 +18,7 @@ import NotFound from "./pages/NotFound.tsx";
 const Artists = lazy(() => import("./pages/Artists.tsx"));
 const Releases = lazy(() => import("./pages/Releases.tsx"));
 const Gallery = lazy(() => import("./pages/Gallery.tsx"));
+const Videos = lazy(() => import("./pages/Videos.tsx"));
 const Journal = lazy(() => import("./pages/Journal.tsx"));
 const JournalArticlePage = lazy(() => import("./pages/JournalArticlePage.tsx"));
 const JournalCategory = lazy(() => import("./pages/JournalCategory.tsx"));
