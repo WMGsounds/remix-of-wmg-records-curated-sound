@@ -16,6 +16,7 @@ const galleryHeroDataUrl = "data:image/webp;base64,UklGRn6IAABXRUJQVlA4IHKIAADQt
 
 const ALL = "all";
 const sortOptions = ["Curated", "Newest", "Artist"] as const;
+const GALLERY_BATCH_SIZE = 24;
 
 const Gallery = () => {
   const { data: images = [], isLoading, isError } = useGallery();
