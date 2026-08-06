@@ -122,21 +122,26 @@ export const SiteHeader = () => {
         </Link>
 
         <nav className="hidden md:flex items-center gap-10 md:justify-self-center">
-          {nav.map((item) => (
-            <NavLink
-              key={item.to}
-              to={item.to}
-              end={item.to === "/"}
-              className={({ isActive }) =>
-                `text-[12px] uppercase tracking-[0.24em] link-underline transition-colors ${
-                  isActive ? "text-gold font-bold" : "text-ivory/70 font-medium hover:text-ivory"
-                }`
-              }
-            >
-              {item.label}
-            </NavLink>
-          ))}
+          {nav.map((item) =>
+            item.children ? (
+              <MediaMenu key={item.label} item={item} />
+            ) : (
+              <NavLink
+                key={item.to}
+                to={item.to}
+                end={item.to === "/"}
+                className={({ isActive }) =>
+                  `text-[12px] uppercase tracking-[0.24em] link-underline transition-colors ${
+                    isActive ? "text-gold font-bold" : "text-ivory/70 font-medium hover:text-ivory"
+                  }`
+                }
+              >
+                {item.label}
+              </NavLink>
+            ),
+          )}
         </nav>
+
 
         <div className="hidden md:flex justify-end">
           <NavLink
