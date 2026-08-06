@@ -117,11 +117,12 @@ export const mockReleases: Release[] = [
 ];
 
 export const mockTracks: Track[] = [
-  { id: "mock-track-glass-hours-1", trackTitle: "Glass Hours", releaseId: "mock-release-glass-hours", releaseSlug: "glass-hours", trackNumber: 1, duration: "3:42", lyrics: null },
-  { id: "mock-track-night-geometry-1", trackTitle: "Afterimage", releaseId: "mock-release-night-geometry", releaseSlug: "night-geometry", trackNumber: 1, duration: "2:58", lyrics: null },
-  { id: "mock-track-night-geometry-2", trackTitle: "Low Signal", releaseId: "mock-release-night-geometry", releaseSlug: "night-geometry", trackNumber: 2, duration: "3:21", lyrics: null },
-  { id: "mock-track-static-bloom-1", trackTitle: "First Light Static", releaseId: "mock-release-static-bloom", releaseSlug: "static-bloom", trackNumber: 1, duration: "4:06", lyrics: null },
+  { id: "mock-track-glass-hours-1", trackTitle: "Glass Hours", releaseId: "mock-release-glass-hours", releaseSlug: "glass-hours", releaseTitle: "Glass Hours", releaseDate: "2024-09-13", artistName: "Aurora Vale", artistSlug: "aurora-vale", trackNumber: 1, duration: "3:42", lyrics: null, youtubeMusicVideo: "https://www.youtube.com/watch?v=dQw4w9WgXcQ", youtubeOfficialAudio: "https://youtu.be/9bZkp7q19f0" },
+  { id: "mock-track-night-geometry-1", trackTitle: "Afterimage", releaseId: "mock-release-night-geometry", releaseSlug: "night-geometry", releaseTitle: "Night Geometry", releaseDate: "2024-04-05", artistName: "Kestrel Lane", artistSlug: "kestrel-lane", trackNumber: 1, duration: "2:58", lyrics: null, youtubeLyricVideo: "https://www.youtube.com/watch?v=3JZ_D3ELwOQ" },
+  { id: "mock-track-night-geometry-2", trackTitle: "Low Signal", releaseId: "mock-release-night-geometry", releaseSlug: "night-geometry", releaseTitle: "Night Geometry", releaseDate: "2024-04-05", artistName: "Kestrel Lane", artistSlug: "kestrel-lane", trackNumber: 2, duration: "3:21", lyrics: null, youtubeOfficialAudio: "https://www.youtube.com/watch?v=M7lc1UVf-VE" },
+  { id: "mock-track-static-bloom-1", trackTitle: "First Light Static", releaseId: "mock-release-static-bloom", releaseSlug: "static-bloom", releaseTitle: "Static Bloom", releaseDate: "2023-11-17", artistName: "Aurora Vale", artistSlug: "aurora-vale", trackNumber: 1, duration: "4:06", lyrics: null, youtubeMusicVideo: "https://www.youtube.com/shorts/aqz-KE-bpKQ" },
 ];
+
 
 export const mockHomepage = (): HomepageData => ({
   featuredArtists: mockArtists.filter((a) => a.featured).slice(0, 6),
