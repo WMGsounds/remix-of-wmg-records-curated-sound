@@ -289,7 +289,11 @@ const ArtistPage = () => {
         </section>
       )}
 
+      {/* Gallery preview for this artist */}
+      <ArtistGalleryPreview artist={artist} />
+
     </div>
+
 
   );
 };
