@@ -92,6 +92,13 @@ const ArtistPage = () => {
           musicGroup,
         ]}
       />
+      {/* Header backdrop — matches the artist section background, header height only */}
+      <div
+        aria-hidden="true"
+        className="fixed inset-x-0 top-0 z-40 bg-ink pointer-events-none"
+        style={{ height: headerHeight }}
+      />
+
       {/* Hero */}
       <section
         className="relative h-[85vh] min-h-[600px] bg-ink text-ivory overflow-hidden"
