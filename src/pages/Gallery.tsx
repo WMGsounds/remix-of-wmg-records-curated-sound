@@ -86,6 +86,8 @@ const Gallery = () => {
     }
   }, [images, artist, type, searchQuery, sort, curationSeed]);
 
+  const displayed = useMemo(() => visible.slice(0, visibleCount), [visible, visibleCount]);
+
   if (isError) return <PageError message="Couldn't load the gallery." />;
 
   return (
