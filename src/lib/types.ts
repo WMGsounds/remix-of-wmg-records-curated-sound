@@ -72,10 +72,17 @@ export type Track = {
   trackTitle: string;
   releaseId: string;
   releaseSlug: string;
+  releaseTitle?: string;
+  releaseDate?: string;
+  artistName?: string;
+  artistSlug?: string;
   trackNumber: number;
   duration: string; // mm:ss
   lyrics?: string | null;
   spotifyUrl?: string | null;
+  youtubeOfficialAudio?: string | null;
+  youtubeLyricVideo?: string | null;
+  youtubeMusicVideo?: string | null;
   // future:
   isrc?: string | null;
   writers?: string[];
