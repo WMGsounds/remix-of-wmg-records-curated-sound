@@ -11,14 +11,14 @@ type Entry = {
   fill?: boolean;
 };
 
-const YouTubeMusicIcon = (props: SVGProps<SVGSVGElement>) => (
+export const YouTubeMusicIcon = (props: SVGProps<SVGSVGElement>) => (
   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}>
     <circle cx="12" cy="12" r="10" />
     <polygon points="10,8 16,12 10,16" fill="currentColor" stroke="none" />
   </svg>
 );
 
-const AmazonMusicIcon = (props: SVGProps<SVGSVGElement>) => (
+export const AmazonMusicIcon = (props: SVGProps<SVGSVGElement>) => (
   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}>
     <path d="M4 14c2.5 3 5.5 4.5 8.5 4.5S18.5 17 21 14.5" />
     <polyline points="21 18.5 21 14.5 17 14.5" />

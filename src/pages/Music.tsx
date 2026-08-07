@@ -1,6 +1,8 @@
 import { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import { ChevronDown } from "lucide-react";
+import { SiSpotify, SiApplemusic } from "react-icons/si";
+import type { ComponentType, SVGProps } from "react";
 import { Seo } from "@/components/Seo";
 import { breadcrumbSchema } from "@/lib/seo";
 import { useCatalogue } from "@/lib/queries";
@@ -9,15 +11,18 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { FilterField, SearchInput } from "@/components/FilterBar";
 import { matchesSearch } from "@/lib/search";
 import { musicHeroDataUrl } from "@/assets/musicHero";
+import { AmazonMusicIcon, YouTubeMusicIcon } from "@/components/ReleaseLinks";
 import type { CatalogueTrack } from "@/lib/types";
+
+type IconComponent = ComponentType<SVGProps<SVGSVGElement>>;
 
 const sortOptions = ["Artist", "Title (A-Z)"] as const;
 
 const SERVICES = [
-  { key: "spotify", label: "Spotify" },
-  { key: "appleMusic", label: "Apple Music" },
-  { key: "amazonMusic", label: "Amazon Music" },
-  { key: "youtubeMusic", label: "YouTube Music" },
+  { key: "spotify", label: "Spotify", Icon: SiSpotify as IconComponent, fill: true },
+  { key: "appleMusic", label: "Apple Music", Icon: SiApplemusic as IconComponent, fill: true },
+  { key: "amazonMusic", label: "Amazon Music", Icon: AmazonMusicIcon as IconComponent },
+  { key: "youtubeMusic", label: "YouTube Music", Icon: YouTubeMusicIcon as IconComponent },
 ] as const;
 
 const StreamingLinks = ({ track, size = "sm" }: { track: CatalogueTrack; size?: "sm" | "md" }) => {
@@ -33,11 +38,16 @@ const StreamingLinks = ({ track, size = "sm" }: { track: CatalogueTrack; size?: 
             rel="noopener noreferrer"
             onClick={(e) => e.stopPropagation()}
             aria-label={`Listen to ${track.title} on ${s.label} (opens in a new tab)`}
-            className={`inline-flex items-center border border-ivory/22 text-ivory/70 uppercase tracking-[0.22em] transition-colors hover:border-gold/50 hover:text-gold-soft focus:outline-none focus-visible:ring-1 focus-visible:ring-gold ${
+            className={`group inline-flex items-center gap-2 border border-ivory/22 text-ivory/70 uppercase tracking-[0.22em] transition-colors hover:border-gold/50 hover:text-gold-soft focus:outline-none focus-visible:ring-1 focus-visible:ring-gold ${
               size === "md" ? "px-4 py-2 text-[11px]" : "px-3 py-1.5 text-[10px]"
             }`}
           >
-            {s.label}
+            <s.Icon
+              className="h-4 w-4 text-gold-soft transition-colors duration-300 group-hover:text-gold"
+              aria-hidden="true"
+              {...(("fill" in s && s.fill) ? { fill: "currentColor" } : {})}
+            />
+            <span>{s.label}</span>
           </a>
         </li>
       ))}
@@ -105,7 +115,6 @@ const AppearsOn = ({ track }: { track: CatalogueTrack }) => {
 const TrackRow = ({ track, expanded, onToggle }: { track: CatalogueTrack; expanded: boolean; onToggle: () => void }) => {
   const panelId = `track-panel-${track.id}`;
   const artistName = track.artists.map((a) => a.name).join(", ");
-  const primaryAppearance = track.appearsOn[0];
 
   return (
     <li className="border-b border-ivory/12">
@@ -121,30 +130,27 @@ const TrackRow = ({ track, expanded, onToggle }: { track: CatalogueTrack; expand
             onToggle();
           }
         }}
-        className="grid cursor-pointer grid-cols-1 items-center gap-x-6 gap-y-3 px-1 py-5 transition-colors hover:bg-ivory/[0.03] focus:outline-none focus-visible:ring-1 focus-visible:ring-gold md:grid-cols-[minmax(0,1.2fr)_minmax(0,1fr)_auto_auto] md:py-6"
+        className="flex cursor-pointer items-center justify-between gap-x-8 gap-y-3 px-1 py-6 transition-colors hover:bg-ivory/[0.03] focus:outline-none focus-visible:ring-1 focus-visible:ring-gold md:py-7"
       >
         <div className="min-w-0">
-          <h4 className="font-serif text-xl leading-snug text-ivory md:text-2xl">{track.title}</h4>
+          <h4 className="font-serif text-xl leading-snug text-ivory md:text-2xl">
+            {track.title}
+            {track.duration && (
+              <span className="ml-2 text-sm font-sans text-ivory/45 md:text-[15px]">({track.duration})</span>
+            )}
+          </h4>
           {artistName && <p className="mt-1 text-sm text-ivory/50">{artistName}</p>}
         </div>
 
-        <div className="min-w-0 text-sm text-ivory/50">
-          {primaryAppearance && <p className="truncate">{primaryAppearance.title}</p>}
-          {track.duration && <p className="mt-1 text-ivory/45">{track.duration}</p>}
-        </div>
-
-        <div className="md:justify-self-end">
-          <StreamingLinks track={track} />
-        </div>
-
         <span
-          className="hidden items-center gap-2 text-[10px] uppercase tracking-[0.24em] text-ivory/50 md:inline-flex md:justify-self-end"
+          className="inline-flex flex-none items-center gap-2 self-center text-[10px] uppercase tracking-[0.24em] text-ivory/50"
           aria-hidden="true"
         >
-          {expanded ? "Close" : "View track"}
+          <span className="hidden sm:inline">{expanded ? "Close" : "View track"}</span>
           <ChevronDown className={`h-4 w-4 transition-transform duration-300 ${expanded ? "rotate-180" : ""}`} />
         </span>
       </div>
+
 
       {expanded && (
         <div id={panelId} className="border-t border-ivory/10 bg-ivory/[0.02] px-1 py-10 md:px-6 md:py-12">
