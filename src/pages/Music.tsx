@@ -352,13 +352,15 @@ const Music = () => {
         ) : (
           <div className="space-y-20">
             {groups.map((group) => (
-              <section key={group.key} aria-labelledby={`artist-${group.key}`}>
-                <h3
-                  id={`artist-${group.key}`}
-                  className="mb-6 border-b border-gold/25 pb-4 text-[12px] uppercase tracking-[0.3em] text-gold-soft"
-                >
-                  {group.name}
-                </h3>
+              <section key={group.key} aria-label={group.name || "All tracks"}>
+                {group.name && (
+                  <h3
+                    id={`artist-${group.key}`}
+                    className="mb-6 border-b border-gold/25 pb-4 text-[12px] uppercase tracking-[0.3em] text-gold-soft"
+                  >
+                    {group.name}
+                  </h3>
+                )}
                 <ul className="border-t border-ivory/12">
                   {group.tracks.map((track) => (
                     <TrackRow
