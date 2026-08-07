@@ -16,7 +16,7 @@ import type { CatalogueTrack } from "@/lib/types";
 
 type IconComponent = ComponentType<SVGProps<SVGSVGElement>>;
 
-const sortOptions = ["Artist", "Title (A-Z)"] as const;
+const sortOptions = ["Artist", "Title (A-Z)", "Title (Z-A)"] as const;
 
 const SERVICES = [
   { key: "spotify", label: "Spotify", Icon: SiSpotify as IconComponent, fill: true },
@@ -218,13 +218,14 @@ const Music = () => {
   );
 
   const groups = useMemo(() => {
-    if (sort === "Title (A-Z)") {
+    if (sort === "Title (A-Z)" || sort === "Title (Z-A)") {
+      const sorted = [...visible].sort((a, b) => a.title.localeCompare(b.title));
       return [
         {
           key: "all",
           name: "",
           displayOrder: 0,
-          tracks: [...visible].sort((a, b) => a.title.localeCompare(b.title)),
+          tracks: sort === "Title (Z-A)" ? sorted.reverse() : sorted,
         },
       ];
     }
