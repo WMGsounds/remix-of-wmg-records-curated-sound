@@ -13,11 +13,12 @@ const nav: NavItem[] = [
   { to: "/releases", label: "Releases" },
   { to: "/journal", label: "Journal" },
   {
-    to: "/gallery",
+    to: "/videos",
     label: "Media",
     children: [
-      { to: "/gallery", label: "Gallery" },
       { to: "/videos", label: "Videos" },
+      { to: "/music", label: "Music" },
+      { to: "/gallery", label: "Gallery" },
     ],
   },
   { to: "/about", label: "About" },
