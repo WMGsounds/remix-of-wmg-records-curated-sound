@@ -149,6 +149,8 @@ const Videos = () => {
   const [sort, setSort] = useState<(typeof sortOptions)[number]>("Featured");
   const [playerIndex, setPlayerIndex] = useState<number | null>(null);
   const [visibleCount, setVisibleCount] = useState<number>(VIDEO_BATCH_SIZE);
+  const [openArtists, setOpenArtists] = useState<Set<string>>(new Set());
+  const [expandedArtists, setExpandedArtists] = useState<Set<string>>(new Set());
   // Stable for the whole visit; refreshes on a new London calendar day.
   const [dayKey] = useState(() => londonDateKey());
 
