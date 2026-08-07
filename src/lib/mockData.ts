@@ -261,6 +261,27 @@ export const mockGalleryImages: GalleryImage[] = [
   fileHash: `mock-hash-${i + 1}`,
 }));
 
+// DEV-ONLY mock videos (see note above) — never served in production.
+export const mockVideos = [
+  ["Golden Hour", "Aurora Vale", "aurora-vale", "Official Music Video", "dQw4w9WgXcQ"],
+  ["Slow Tide", "Aurora Vale", "aurora-vale", "Official Lyric Video", "9bZkp7q19f0"],
+  ["Ridgeline", "Jack Rivers", "jack-rivers", "Official Audio", "3JZ_D3ELwOQ"],
+  ["The Complete Sessions", "", "", "Full Album", "kJQP7kiw5Fk"],
+].map(([title, artistName, artistSlug, videoType, id], i) => ({
+  id: `mock-video-${i + 1}`,
+  title: title as string,
+  youtubeUrl: `https://www.youtube.com/watch?v=${id}`,
+  youtubeId: id as string,
+  videoType: videoType as string,
+  artists: artistName ? [{ id: `mock-artist-${i}`, name: artistName as string, slug: artistSlug as string }] : [],
+  relatedTrackIds: [],
+  relatedReleaseIds: [],
+  releaseDate: `2025-0${(i % 9) + 1}-12`,
+  description: `${title} — preview placeholder video.`,
+  featured: i === 0,
+  sortOrder: null,
+}));
+
 export function getMockDataForPath(path: string): unknown {
   if (path === "/api/notion/artists") return mockArtists;
   if (path === "/api/notion/releases") return mockReleases;
@@ -269,6 +290,7 @@ export function getMockDataForPath(path: string): unknown {
   if (path === "/api/notion/homepage") return mockHomepage();
   if (path === "/api/notion/journal") return [];
   if (path === "/api/notion/gallery") return mockGalleryImages;
+  if (path === "/api/notion/videos") return mockVideos;
   const artistSlug = path.match(/^\/api\/notion\/artist\/([^/]+)$/)?.[1];
   if (artistSlug) return mockArtistPage(decodeURIComponent(artistSlug));
   const releaseSlug = path.match(/^\/api\/notion\/release\/([^/]+)$/)?.[1];
