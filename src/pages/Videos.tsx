@@ -218,21 +218,39 @@ const Videos = () => {
         ])}
       />
 
-      <section className="relative overflow-hidden bg-ink pt-40 pb-20 md:pb-24">
-        <div
-          className="absolute inset-0 bg-[radial-gradient(circle_at_74%_38%,hsl(var(--golden-brown)/0.32),transparent_36%),radial-gradient(circle_at_18%_78%,hsl(var(--gold)/0.14),transparent_28%)]"
-          aria-hidden="true"
-        />
-        <div className="relative container-editorial">
-          <p className="eyebrow mb-6 text-gold-soft">Media</p>
-          <h1 className="display-serif text-6xl md:text-8xl lg:text-9xl mb-10">Videos</h1>
-          <p className="max-w-2xl text-lg text-ivory/65">
-            Official music videos, lyric videos and official audio from across the Wareham Music
-            Group roster — collected in one place.
-          </p>
+      <section className="relative overflow-hidden bg-ink pt-40 pb-24 md:pb-28">
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_74%_38%,hsl(var(--golden-brown)/0.38),transparent_34%),radial-gradient(circle_at_18%_78%,hsl(var(--gold)/0.16),transparent_28%)]" aria-hidden="true" />
+        <div className="absolute inset-0 opacity-[0.08] [background-image:linear-gradient(90deg,hsl(var(--ivory)/0.8)_1px,transparent_1px),linear-gradient(0deg,hsl(var(--ivory)/0.8)_1px,transparent_1px)] [background-size:3px_3px]" aria-hidden="true" />
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,transparent_42%,hsl(var(--ink)/0.72)_100%)]" aria-hidden="true" />
+        <div className="relative container-editorial grid items-center gap-14 lg:grid-cols-[0.9fr_1.1fr]">
+          <div>
+            <p className="eyebrow mb-6 text-gold-soft">Media</p>
+            <h1 className="display-serif text-6xl md:text-8xl lg:text-9xl mb-10">Videos</h1>
+            <p className="max-w-2xl text-lg text-ivory/65">
+              Explore official audio, lyric videos and music videos from across the Wareham Music
+              Group catalogue.
+            </p>
+          </div>
+          <div className="relative hidden min-h-[360px] lg:block">
+            <div className="absolute right-0 top-1/2 h-[560px] w-full -translate-y-1/2 overflow-hidden [-webkit-mask-image:linear-gradient(90deg,transparent_0%,rgba(0,0,0,0.08)_14%,rgba(0,0,0,0.42)_26%,black_44%,black_56%,rgba(0,0,0,0.42)_74%,rgba(0,0,0,0.08)_86%,transparent_100%)] [mask-image:linear-gradient(90deg,transparent_0%,rgba(0,0,0,0.08)_14%,rgba(0,0,0,0.42)_26%,black_44%,black_56%,rgba(0,0,0,0.42)_74%,rgba(0,0,0,0.08)_86%,transparent_100%)] [mask-repeat:no-repeat] [mask-size:100%_100%]">
+              <div className="h-full w-full [-webkit-mask-image:radial-gradient(ellipse_at_center,black_18%,rgba(0,0,0,0.68)_38%,rgba(0,0,0,0.28)_58%,transparent_78%)] [mask-image:radial-gradient(ellipse_at_center,black_18%,rgba(0,0,0,0.68)_38%,rgba(0,0,0,0.28)_58%,transparent_78%)] [mask-repeat:no-repeat] [mask-size:100%_100%]">
+                <div
+                  aria-hidden="true"
+                  className="h-full w-full bg-no-repeat opacity-90"
+                  style={{
+                    backgroundImage: `url(${videosHeroDataUrl})`,
+                    backgroundSize: "auto 100%",
+                    backgroundPosition: "right 90px center",
+                  }}
+                />
+              </div>
+            </div>
+          </div>
         </div>
+        <div className="absolute inset-x-0 bottom-0 h-20 bg-gradient-to-b from-transparent to-ink" aria-hidden="true" />
         <div className="absolute inset-x-0 bottom-0 h-px bg-gold/35" aria-hidden="true" />
       </section>
+
 
       <div className="container-editorial pt-16">
         <div className="flex flex-wrap items-end justify-between gap-y-6 mb-16 border-y border-ivory/18 py-6">
