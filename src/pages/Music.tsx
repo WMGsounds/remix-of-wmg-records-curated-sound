@@ -30,29 +30,34 @@ const StreamingLinks = ({ track, size = "sm" }: { track: CatalogueTrack; size?: 
   const available = SERVICES.filter((s) => Boolean(track.links[s.key]));
   if (available.length === 0) return null;
   return (
-    <ul className="flex flex-wrap items-center gap-2">
-      {available.map((s) => (
-        <li key={s.key}>
-          <a
-            href={track.links[s.key] as string}
-            target="_blank"
-            rel="noopener noreferrer"
-            onClick={(e) => e.stopPropagation()}
-            aria-label={`Listen to ${track.title} on ${s.label} (opens in a new tab)`}
-            className={`group inline-flex items-center gap-2 border border-ivory/22 text-ivory/70 uppercase tracking-[0.22em] transition-colors hover:border-gold/50 hover:text-gold-soft focus:outline-none focus-visible:ring-1 focus-visible:ring-gold ${
-              size === "md" ? "px-4 py-2 text-[11px]" : "px-3 py-1.5 text-[10px]"
-            }`}
-          >
-            <s.Icon
-              className="h-4 w-4 text-gold-soft transition-colors duration-300 group-hover:text-gold"
-              aria-hidden="true"
-              {...(("fill" in s && s.fill) ? { fill: "currentColor" } : {})}
-            />
-            <span>{s.label}</span>
-          </a>
-        </li>
-      ))}
-    </ul>
+    <div className="space-y-2">
+      <ul className="flex flex-wrap items-center gap-2">
+        {available.map((s) => (
+          <li key={s.key}>
+            <a
+              href={track.links[s.key] as string}
+              target="_blank"
+              rel="noopener noreferrer"
+              onClick={(e) => e.stopPropagation()}
+              aria-label={`Listen to ${track.title} on ${s.label} (opens in a new tab)`}
+              className={`group inline-flex items-center gap-2 border border-ivory/22 text-ivory/70 uppercase tracking-[0.22em] transition-colors hover:border-gold/50 hover:text-gold-soft focus:outline-none focus-visible:ring-1 focus-visible:ring-gold ${
+                size === "md" ? "px-4 py-2 text-[11px]" : "px-3 py-1.5 text-[10px]"
+              }`}
+            >
+              <s.Icon
+                className="h-4 w-4 text-gold-soft transition-colors duration-300 group-hover:text-gold"
+                aria-hidden="true"
+                {...(("fill" in s && s.fill) ? { fill: "currentColor" } : {})}
+              />
+              <span>{s.label}</span>
+            </a>
+          </li>
+        ))}
+      </ul>
+      <p className="text-[10px] italic text-ivory/40">
+        Available on all major streaming platforms (including - but not limited to - those shown above)
+      </p>
+    </div>
   );
 };
 
