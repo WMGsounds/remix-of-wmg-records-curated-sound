@@ -10,6 +10,7 @@ import { FilterField, SearchInput } from "@/components/FilterBar";
 import { matchesSearch } from "@/lib/search";
 import { buildVideoItems, embedUrl, thumbnailUrl, type VideoItem, type VideoType } from "@/lib/videos";
 import { londonDateKey, seedFromString, seededShuffle } from "@/lib/galleryOrder";
+import { videosHeroDataUrl } from "@/assets/videosHero";
 
 const ALL = "all";
 const VIDEO_BATCH_SIZE = 24;
