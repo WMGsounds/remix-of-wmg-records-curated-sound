@@ -308,21 +308,18 @@ const Music = () => {
             </FilterField>
           </div>
           <div className="flex flex-wrap items-end gap-x-8 gap-y-6">
-            <FilterField label="Artist">
-              <Select value={artist} onValueChange={setArtist}>
+            <FilterField label="Sort by">
+              <Select value={sort} onValueChange={(v) => setSort(v as (typeof sortOptions)[number])}>
                 <SelectTrigger
-                  aria-label="Filter by artist"
-                  className="w-[220px] bg-transparent border-ivory/24 text-[11px] uppercase tracking-[0.24em] text-ivory rounded-none focus:ring-ivory"
+                  aria-label="Sort tracks"
+                  className="w-[180px] bg-transparent border-ivory/24 text-[11px] uppercase tracking-[0.24em] text-ivory rounded-none focus:ring-ivory"
                 >
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent className="bg-ink text-ivory border-ivory/24">
-                  <SelectItem value={ALL} className="text-[11px] uppercase tracking-[0.24em] focus:bg-ivory/10 focus:text-ivory">
-                    All Artists
-                  </SelectItem>
-                  {artistOptions.map((a) => (
-                    <SelectItem key={a.key} value={a.key} className="text-[11px] uppercase tracking-[0.24em] focus:bg-ivory/10 focus:text-ivory">
-                      {a.name}
+                  {sortOptions.map((o) => (
+                    <SelectItem key={o} value={o} className="text-[11px] uppercase tracking-[0.24em] focus:bg-ivory/10 focus:text-ivory">
+                      {o}
                     </SelectItem>
                   ))}
                 </SelectContent>
