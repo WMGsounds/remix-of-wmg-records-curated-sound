@@ -112,7 +112,17 @@ const AppearsOn = ({ track }: { track: CatalogueTrack }) => {
   );
 };
 
-const TrackRow = ({ track, expanded, onToggle }: { track: CatalogueTrack; expanded: boolean; onToggle: () => void }) => {
+const TrackRow = ({
+  track,
+  expanded,
+  onToggle,
+  showArtist = true,
+}: {
+  track: CatalogueTrack;
+  expanded: boolean;
+  onToggle: () => void;
+  showArtist?: boolean;
+}) => {
   const panelId = `track-panel-${track.id}`;
   const artistName = track.artists.map((a) => a.name).join(", ");
 
@@ -139,8 +149,9 @@ const TrackRow = ({ track, expanded, onToggle }: { track: CatalogueTrack; expand
               <span className="ml-3 text-sm font-sans text-ivory/45 md:ml-4 md:text-[15px]">({track.duration})</span>
             )}
           </h4>
-          {artistName && <p className="mt-1 text-sm text-ivory/50">{artistName}</p>}
+          {showArtist && artistName && <p className="mt-1 text-sm text-ivory/50">{artistName}</p>}
         </div>
+
 
         <span
           className="inline-flex flex-none items-center gap-2 self-center text-[10px] uppercase tracking-[0.24em] text-ivory/50"
