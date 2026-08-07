@@ -14,6 +14,7 @@ import { videosHeroDataUrl } from "@/assets/videosHero";
 
 const ALL = "all";
 const VIDEO_BATCH_SIZE = 18;
+const ARTIST_VIDEO_LIMIT = 12;
 const sortOptions = ["Featured", "Random", "Newest", "Artist", "Title"] as const;
 
 
@@ -149,6 +150,8 @@ const Videos = () => {
   const [sort, setSort] = useState<(typeof sortOptions)[number]>("Featured");
   const [playerIndex, setPlayerIndex] = useState<number | null>(null);
   const [visibleCount, setVisibleCount] = useState<number>(VIDEO_BATCH_SIZE);
+  const [openArtists, setOpenArtists] = useState<Set<string>>(new Set());
+  const [expandedArtists, setExpandedArtists] = useState<Set<string>>(new Set());
   // Stable for the whole visit; refreshes on a new London calendar day.
   const [dayKey] = useState(() => londonDateKey());
 
@@ -217,6 +220,56 @@ const Videos = () => {
   }, [allVideos, artist, type, searchQuery, sort, dayKey]);
 
   const displayed = useMemo(() => visible.slice(0, visibleCount), [visible, visibleCount]);
+
+  const groupedByArtist = sort === "Artist";
+
+  // Artist groups (A–Z) preserving the existing within-artist ordering of `visible`.
+  const artistGroups = useMemo(() => {
+    if (!groupedByArtist) return [];
+    const map = new Map<string, { key: string; name: string; videos: VideoItem[] }>();
+    visible.forEach((v) => {
+      const entries = v.artists.length ? v.artists : [{ name: "Other", slug: "other" }];
+      entries.forEach((a) => {
+        const key = a.slug || a.name || "other";
+        const name = a.name || "Other";
+        if (!map.has(key)) map.set(key, { key, name, videos: [] });
+        const group = map.get(key)!;
+        if (!group.videos.some((existing) => existing.id === v.id)) group.videos.push(v);
+      });
+    });
+    return [...map.values()].sort((a, b) => a.name.localeCompare(b.name));
+  }, [visible, groupedByArtist]);
+
+  // Flat list backing the player so prev/next still works across open sections.
+  const groupedPlayerList = useMemo(
+    () =>
+      artistGroups.flatMap((g) =>
+        openArtists.has(g.key)
+          ? expandedArtists.has(g.key)
+            ? g.videos
+            : g.videos.slice(0, ARTIST_VIDEO_LIMIT)
+          : [],
+      ),
+    [artistGroups, openArtists, expandedArtists],
+  );
+
+  const playerList = groupedByArtist ? groupedPlayerList : displayed;
+
+  const toggleArtist = (key: string) =>
+    setOpenArtists((prev) => {
+      const next = new Set(prev);
+      if (next.has(key)) {
+        next.delete(key);
+        setExpandedArtists((exp) => {
+          const e = new Set(exp);
+          e.delete(key);
+          return e;
+        });
+      } else {
+        next.add(key);
+      }
+      return next;
+    });
 
   if (isError) return <PageError message="Couldn't load the videos." />;
 
@@ -336,6 +389,74 @@ const Videos = () => {
                 : "No videos match these filters."}
             </p>
           </div>
+        ) : groupedByArtist ? (
+          <div className="space-y-4">
+            {artistGroups.map((group) => {
+              const open = openArtists.has(group.key);
+              const showAll = expandedArtists.has(group.key);
+              const shown = showAll ? group.videos : group.videos.slice(0, ARTIST_VIDEO_LIMIT);
+              const panelId = `videos-artist-panel-${group.key}`;
+              return (
+                <section key={group.key} aria-label={group.name}>
+                  <h3>
+                    <button
+                      type="button"
+                      aria-expanded={open}
+                      aria-controls={panelId}
+                      onClick={() => toggleArtist(group.key)}
+                      className="group flex w-full items-center justify-between gap-6 border-b border-gold/25 py-6 text-left transition-colors hover:border-gold/50 focus:outline-none focus-visible:ring-1 focus-visible:ring-gold"
+                    >
+                      <span className="min-w-0">
+                        <span className="block break-words text-[13px] uppercase tracking-[0.3em] text-gold-soft transition-colors group-hover:text-gold md:text-[14px]">
+                          {group.name}
+                        </span>
+                        <span className="mt-2 block text-[11px] uppercase tracking-[0.24em] text-ivory/40">
+                          {group.videos.length} {group.videos.length === 1 ? "video" : "videos"}
+                        </span>
+                      </span>
+                      <ChevronDown
+                        aria-hidden="true"
+                        className={`h-4 w-4 flex-none text-ivory/50 transition-transform duration-300 ${open ? "rotate-180" : ""}`}
+                      />
+                    </button>
+                  </h3>
+                  <div id={panelId} hidden={!open} className="overflow-hidden animate-in fade-in-0 duration-300">
+                    <div className="grid grid-cols-1 gap-8 pt-8 sm:grid-cols-2 lg:grid-cols-3">
+                      {shown.map((video) => (
+                        <VideoCard
+                          key={`${group.key}-${video.id}`}
+                          video={video}
+                          onSelect={() =>
+                            setPlayerIndex(groupedPlayerList.findIndex((v) => v.id === video.id))
+                          }
+                        />
+                      ))}
+                    </div>
+                    {group.videos.length > ARTIST_VIDEO_LIMIT && (
+                      <div className="mt-10 flex justify-center">
+                        <button
+                          type="button"
+                          onClick={() =>
+                            setExpandedArtists((prev) => {
+                              const next = new Set(prev);
+                              next.has(group.key) ? next.delete(group.key) : next.add(group.key);
+                              return next;
+                            })
+                          }
+                          className="group inline-flex items-center gap-2 border border-ivory/24 bg-ink/40 px-8 py-3 text-[11px] uppercase tracking-[0.24em] text-ivory/80 transition-colors hover:border-gold/45 hover:text-gold-soft focus:outline-none focus-visible:ring-1 focus-visible:ring-gold"
+                        >
+                          {showAll ? "Show less" : "Show more"}
+                          <ChevronDown
+                            className={`h-4 w-4 transition-transform group-hover:translate-y-0.5 ${showAll ? "rotate-180" : ""}`}
+                          />
+                        </button>
+                      </div>
+                    )}
+                  </div>
+                </section>
+              );
+            })}
+          </div>
         ) : (
           <>
             <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-3">
@@ -359,9 +480,9 @@ const Videos = () => {
         )}
       </div>
 
-      {playerIndex !== null && displayed[playerIndex] && (
+      {playerIndex !== null && playerIndex >= 0 && playerList[playerIndex] && (
         <VideoPlayer
-          videos={displayed}
+          videos={playerList}
           index={playerIndex}
           onClose={() => setPlayerIndex(null)}
           onNavigate={setPlayerIndex}
