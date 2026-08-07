@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import { ChevronDown } from "lucide-react";
 import { SiSpotify, SiApplemusic } from "react-icons/si";
@@ -13,6 +13,7 @@ import { matchesSearch } from "@/lib/search";
 import { musicHeroDataUrl } from "@/assets/musicHero";
 import { AmazonMusicIcon, YouTubeMusicIcon } from "@/components/ReleaseLinks";
 import type { CatalogueTrack } from "@/lib/types";
+import { useHeaderHeight } from "@/hooks/use-header-height";
 
 type IconComponent = ComponentType<SVGProps<SVGSVGElement>>;
 
@@ -117,17 +118,36 @@ const TrackRow = ({
   expanded,
   onToggle,
   showArtist = true,
+  headerHeight = 0,
 }: {
   track: CatalogueTrack;
   expanded: boolean;
   onToggle: () => void;
   showArtist?: boolean;
+  headerHeight?: number;
 }) => {
   const panelId = `track-panel-${track.id}`;
   const artistName = track.artists.map((a) => a.name).join(", ");
+  const rowRef = useRef<HTMLLIElement>(null);
+  const wasExpanded = useRef(expanded);
+
+  useEffect(() => {
+    if (expanded && !wasExpanded.current) {
+      const raf = requestAnimationFrame(() => {
+        rowRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+      });
+      wasExpanded.current = expanded;
+      return () => cancelAnimationFrame(raf);
+    }
+    wasExpanded.current = expanded;
+  }, [expanded]);
 
   return (
-    <li className="border-b border-ivory/12">
+    <li
+      ref={rowRef}
+      style={{ scrollMarginTop: `${headerHeight + 16}px` }}
+      className="border-b border-ivory/12"
+    >
       <div
         role="button"
         tabIndex={0}
@@ -216,6 +236,7 @@ const TrackRow = ({
 
 const Music = () => {
   const { data: tracks = [], isLoading, isError } = useCatalogue();
+  const headerHeight = useHeaderHeight();
   const [searchQuery, setSearchQuery] = useState("");
   const [sort, setSort] = useState<(typeof sortOptions)[number]>("Artist");
   const [expandedId, setExpandedId] = useState<string | null>(null);
@@ -421,6 +442,7 @@ const Music = () => {
                           key={track.id}
                           track={track}
                           showArtist={isFlat}
+                          headerHeight={headerHeight}
                           expanded={expandedId === track.id}
                           onToggle={() => setExpandedId((id) => (id === track.id ? null : track.id))}
                         />
