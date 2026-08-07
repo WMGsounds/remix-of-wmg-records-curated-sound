@@ -1,4 +1,4 @@
-import type { Artist, HomepageData, Release, ReleasePageData, ArtistPageData, Track, StoreItem, GalleryImage } from "./types";
+import type { Artist, HomepageData, Release, ReleasePageData, ArtistPageData, Track, StoreItem, GalleryImage, CatalogueTrack } from "./types";
 
 const image = (name: string) => `/mock/${name}`;
 
@@ -282,6 +282,53 @@ export const mockVideos = [
   sortOrder: null,
 }));
 
+// DEV-ONLY mock music catalogue — never served in production.
+export const mockCatalogueTracks: CatalogueTrack[] = mockTracks.map((t, i) => {
+  const artist = mockArtists.find((a) => a.slug === t.artistSlug) ?? mockArtists[0];
+  const release = mockReleases.find((r) => r.id === t.releaseId);
+  return {
+    id: `mock-catalogue-${i + 1}`,
+    title: t.trackTitle,
+    artists: [
+      {
+        id: artist.id,
+        slug: artist.slug,
+        name: artist.name,
+        displayOrder: artist.displayOrder,
+        accentColour: artist.accentColour ?? null,
+      },
+    ],
+    duration: t.duration,
+    description:
+      i % 3 === 0
+        ? "A preview placeholder description of the track, its origins and the session it was written in."
+        : "",
+    lyrics:
+      i % 2 === 0
+        ? "First verse line one\nFirst verse line two\n\nChorus line one\nChorus line two"
+        : "",
+    isrc: i % 2 === 0 ? `GBMOCK25000${i + 1}` : "",
+    links: {
+      spotify: i % 2 === 0 ? "https://open.spotify.com/track/mock" : null,
+      appleMusic: "https://music.apple.com/track/mock",
+      amazonMusic: null,
+      youtubeMusic: i % 3 === 0 ? "https://music.youtube.com/watch?v=mock" : null,
+    },
+    appearsOn: release
+      ? [
+          {
+            id: release.id,
+            slug: release.slug,
+            title: release.title,
+            coverArt: release.coverArt,
+            releaseType: release.releaseType,
+            releaseDate: release.releaseDate,
+          },
+        ]
+      : [],
+  };
+});
+
 export function getMockDataForPath(path: string): unknown {
   if (path === "/api/notion/artists") return mockArtists;
   if (path === "/api/notion/releases") return mockReleases;
@@ -291,6 +338,7 @@ export function getMockDataForPath(path: string): unknown {
   if (path === "/api/notion/journal") return [];
   if (path === "/api/notion/gallery") return mockGalleryImages;
   if (path === "/api/notion/videos") return mockVideos;
+  if (path === "/api/notion/catalogue") return mockCatalogueTracks;
   const artistSlug = path.match(/^\/api\/notion\/artist\/([^/]+)$/)?.[1];
   if (artistSlug) return mockArtistPage(decodeURIComponent(artistSlug));
   const releaseSlug = path.match(/^\/api\/notion\/release\/([^/]+)$/)?.[1];
