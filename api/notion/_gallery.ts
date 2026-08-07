@@ -127,7 +127,7 @@ export function normalizeGalleryImage(
   const height = numberOrNull(findProp(props, "Height"));
   const title = text(findProp(props, "Image Title", "Title", "Name"));
   const caption = text(findProp(props, "Caption"));
-  const artistName = text(findProp(props, "Artist Name"));
+  const artistName = text(findProp(props, "🔄 Artist Name", "Artist Name"));
   const imageType = text(findProp(props, "Image Type"));
 
   const releaseId = relationIds(findProp(props, "Related Release"))[0] ?? "";
