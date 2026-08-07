@@ -3,19 +3,19 @@ import { useSearchParams } from "react-router-dom";
 import { ChevronDown, ChevronLeft, ChevronRight, Play, X } from "lucide-react";
 import { Seo } from "@/components/Seo";
 import { breadcrumbSchema } from "@/lib/seo";
-import { useTracks } from "@/lib/queries";
+import { useVideos } from "@/lib/queries";
 import { InlineSkeleton, PageError } from "@/components/UIStates";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { FilterField, SearchInput } from "@/components/FilterBar";
 import { matchesSearch } from "@/lib/search";
-import { buildVideoItems, embedUrl, thumbnailUrl, type VideoItem, type VideoType } from "@/lib/videos";
+import { artistNames, embedUrl, thumbnailUrl, type VideoItem } from "@/lib/videos";
 import { londonDateKey, seedFromString, seededShuffle } from "@/lib/galleryOrder";
 import { videosHeroDataUrl } from "@/assets/videosHero";
 
 const ALL = "all";
 const VIDEO_BATCH_SIZE = 24;
-const sortOptions = ["Random", "Newest", "Artist", "Title"] as const;
-const videoTypes: VideoType[] = ["Official Music Video", "Official Lyric Video", "Official Audio"];
+const sortOptions = ["Featured", "Random", "Newest", "Artist", "Title"] as const;
+
 
 const VideoPlayer = ({
   videos,
@@ -52,7 +52,7 @@ const VideoPlayer = ({
       className="fixed inset-0 z-[80] flex items-center justify-center bg-ink/95 p-4 md:p-10"
       role="dialog"
       aria-modal="true"
-      aria-label={`${video.trackTitle} — ${video.type}`}
+      aria-label={`${video.title} — ${video.videoType}`}
       onClick={onClose}
     >
       <button
@@ -88,9 +88,9 @@ const VideoPlayer = ({
       <div className="w-full max-w-5xl" onClick={(e) => e.stopPropagation()}>
         <div className="aspect-video w-full border border-ivory/14 bg-black">
           <iframe
-            key={video.videoId}
-            src={embedUrl(video.videoId)}
-            title={`${video.trackTitle} — ${video.type}`}
+            key={video.youtubeId}
+            src={embedUrl(video.youtubeId)}
+            title={`${video.title} — ${video.videoType}`}
             className="h-full w-full"
             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
             allowFullScreen
@@ -99,10 +99,10 @@ const VideoPlayer = ({
         </div>
         <div className="mt-4 flex flex-wrap items-baseline justify-between gap-x-6 gap-y-2">
           <div>
-            <p className="font-serif text-2xl text-ivory">{video.trackTitle}</p>
-            {video.artistName && <p className="text-sm text-ivory/60">{video.artistName}</p>}
+            <p className="font-serif text-2xl text-ivory">{video.title}</p>
+            {artistNames(video) && <p className="text-sm text-ivory/60">{artistNames(video)}</p>}
           </div>
-          <p className="text-[11px] uppercase tracking-[0.24em] text-gold-soft">{video.type}</p>
+          <p className="text-[11px] uppercase tracking-[0.24em] text-gold-soft">{video.videoType}</p>
         </div>
       </div>
     </div>
@@ -117,8 +117,8 @@ const VideoCard = ({ video, onSelect }: { video: VideoItem; onSelect: () => void
   >
     <div className="relative aspect-video w-full overflow-hidden bg-ink">
       <img
-        src={thumbnailUrl(video.videoId)}
-        alt={`${video.trackTitle}${video.artistName ? ` by ${video.artistName}` : ""} — ${video.type}`}
+        src={thumbnailUrl(video.youtubeId)}
+        alt={`${video.title}${artistNames(video) ? ` by ${artistNames(video)}` : ""} — ${video.videoType}`}
         loading="lazy"
         className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-[1.03]"
       />
@@ -131,36 +131,46 @@ const VideoCard = ({ video, onSelect }: { video: VideoItem; onSelect: () => void
       </span>
     </div>
     <div className="px-5 py-4">
-      <p className="font-serif text-xl leading-snug text-ivory">{video.trackTitle}</p>
-      {video.artistName && <p className="mt-1 text-sm text-ivory/60">{video.artistName}</p>}
-      <p className="mt-3 text-[10px] uppercase tracking-[0.24em] text-gold-soft">{video.type}</p>
+      <p className="font-serif text-xl leading-snug text-ivory">{video.title}</p>
+      {artistNames(video) && <p className="mt-1 text-sm text-ivory/60">{artistNames(video)}</p>}
+      {video.description && (
+        <p className="mt-2 text-sm leading-relaxed text-ivory/50 line-clamp-2">{video.description}</p>
+      )}
+      <p className="mt-3 text-[10px] uppercase tracking-[0.24em] text-gold-soft">{video.videoType}</p>
     </div>
   </button>
 );
 
 const Videos = () => {
-  const { data: tracks = [], isLoading, isError } = useTracks();
+  const { data: allVideos = [], isLoading, isError } = useVideos();
   const [searchParams, setSearchParams] = useSearchParams();
   const [type, setType] = useState<string>(ALL);
   const [searchQuery, setSearchQuery] = useState<string>("");
-  const [sort, setSort] = useState<(typeof sortOptions)[number]>("Random");
+  const [sort, setSort] = useState<(typeof sortOptions)[number]>("Featured");
   const [playerIndex, setPlayerIndex] = useState<number | null>(null);
   const [visibleCount, setVisibleCount] = useState<number>(VIDEO_BATCH_SIZE);
   // Stable for the whole visit; refreshes on a new London calendar day.
   const [dayKey] = useState(() => londonDateKey());
 
-  const allVideos = useMemo(() => buildVideoItems(tracks), [tracks]);
+
 
   const artistOptions = useMemo(() => {
     const map = new Map<string, string>();
     allVideos.forEach((v) => {
-      const key = v.artistSlug || v.artistName;
-      if (key && v.artistName && !map.has(key)) map.set(key, v.artistName);
+      v.artists.forEach((a) => {
+        const key = a.slug || a.name;
+        if (key && a.name && !map.has(key)) map.set(key, a.name);
+      });
     });
     return [...map.entries()]
       .map(([key, name]) => ({ key, name }))
       .sort((a, b) => a.name.localeCompare(b.name));
   }, [allVideos]);
+
+  const typeOptions = useMemo(
+    () => [...new Set(allVideos.map((v) => v.videoType).filter(Boolean))].sort((a, b) => a.localeCompare(b)),
+    [allVideos],
+  );
 
   const artistParam = searchParams.get("artist");
   const artist = artistParam && artistOptions.some((a) => a.key === artistParam) ? artistParam : ALL;
@@ -183,9 +193,9 @@ const Videos = () => {
 
   const visible = useMemo(() => {
     const list = allVideos.filter((v) => {
-      if (artist !== ALL && (v.artistSlug || v.artistName) !== artist) return false;
-      if (type !== ALL && v.type !== type) return false;
-      return matchesSearch(searchQuery, [v.trackTitle, v.artistName, v.releaseTitle, v.type]);
+      if (artist !== ALL && !v.artists.some((a) => (a.slug || a.name) === artist)) return false;
+      if (type !== ALL && v.videoType !== type) return false;
+      return matchesSearch(searchQuery, [v.title, artistNames(v), v.description, v.videoType]);
     });
     switch (sort) {
       case "Newest":
@@ -194,12 +204,15 @@ const Videos = () => {
         );
       case "Artist":
         return [...list].sort(
-          (a, b) => a.artistName.localeCompare(b.artistName) || a.trackTitle.localeCompare(b.trackTitle),
+          (a, b) => artistNames(a).localeCompare(artistNames(b)) || a.title.localeCompare(b.title),
         );
       case "Title":
-        return [...list].sort((a, b) => a.trackTitle.localeCompare(b.trackTitle));
-      default:
+        return [...list].sort((a, b) => a.title.localeCompare(b.title));
+      case "Random":
         return seededShuffle(list, seedFromString(`${dayKey}|${artist}|${type}`));
+      default:
+        // Server order: Featured, then Sort Order, then newest, then title.
+        return list;
     }
   }, [allVideos, artist, type, searchQuery, sort, dayKey]);
 
@@ -282,7 +295,7 @@ const Videos = () => {
                   <SelectItem value={ALL} className="text-[11px] uppercase tracking-[0.24em] focus:bg-ivory/10 focus:text-ivory">
                     All Videos
                   </SelectItem>
-                  {videoTypes.map((t) => (
+                  {typeOptions.map((t) => (
                     <SelectItem key={t} value={t} className="text-[11px] uppercase tracking-[0.24em] focus:bg-ivory/10 focus:text-ivory">
                       {t}
                     </SelectItem>
