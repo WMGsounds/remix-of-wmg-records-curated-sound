@@ -136,7 +136,7 @@ const TrackRow = ({ track, expanded, onToggle }: { track: CatalogueTrack; expand
           <h4 className="font-serif text-xl leading-snug text-ivory md:text-2xl">
             {track.title}
             {track.duration && (
-              <span className="ml-2 text-sm font-sans text-ivory/45 md:text-[15px]">({track.duration})</span>
+              <span className="ml-3 text-sm font-sans text-ivory/45 md:ml-4 md:text-[15px]">({track.duration})</span>
             )}
           </h4>
           {artistName && <p className="mt-1 text-sm text-ivory/50">{artistName}</p>}
