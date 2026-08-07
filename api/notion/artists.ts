@@ -1,18 +1,22 @@
-import { notion, DBS, CACHE_HEADERS, RELEASE_CACHE_HEADERS, logApiError, logApiFallback, logApiSuccess, validateNotionEnv, type ApiRequest, type ApiResponse } from "./_client.js";
+import { notion, DBS, CACHE_HEADERS, RELEASE_CACHE_HEADERS, GALLERY_CACHE_HEADERS, requireEnv, logApiError, logApiFallback, logApiSuccess, validateNotionEnv, type ApiRequest, type ApiResponse } from "./_client.js";
 import { FALLBACK_HEADERS, fallbackArtists, fallbackTracks } from "./_fallback.js";
 import { loadAll, normalizeArtist, normalizeRelease, normalizeReleaseTrack, isReleasePublished } from "./_normalize.js";
+import { normalizeGalleryImage, dedupeGalleryImages, sortGalleryImages } from "./_gallery.js";
 
 /**
  * Serves two datasets from a single serverless function (Vercel Hobby plan
  * limit of 12 functions):
  *   /api/notion/artists            -> artists  (default)
  *   /api/notion/tracks             -> tracks   (rewritten to ?dataset=tracks)
+ *   /api/notion/gallery            -> gallery  (rewritten to ?dataset=gallery)
  * Both public URLs and response shapes are unchanged.
  */
 export default async function handler(req: ApiRequest | undefined, res: ApiResponse) {
   const datasetParam = req?.query?.dataset;
   const dataset = Array.isArray(datasetParam) ? datasetParam[0] : datasetParam;
-  return dataset === "tracks" ? handleTracks(res) : handleArtists(res);
+  if (dataset === "tracks") return handleTracks(res);
+  if (dataset === "gallery") return handleGallery(res);
+  return handleArtists(res);
 }
 
 async function handleArtists(res: ApiResponse) {
@@ -94,5 +98,44 @@ async function handleTracks(res: ApiResponse) {
     logApiError(route, e);
     logApiFallback(route, e, { fallbackTrackCount: fallbackTracks.length });
     res.writeHead(200, FALLBACK_HEADERS).end(JSON.stringify(fallbackTracks));
+  }
+}
+
+async function handleGallery(res: ApiResponse) {
+  const route = "/api/notion/gallery";
+  try {
+    requireEnv(route, ["NOTION_TOKEN", "NOTION_GALLERY_DATABASE_ID"]);
+
+    const [galleryPages, artistPages, releasePages] = await Promise.all([
+      loadAll(notion, DBS.gallery),
+      loadAll(notion, DBS.artists),
+      loadAll(notion, DBS.releases),
+    ]);
+
+    const artistLookup = new Map(artistPages.map((p: any) => [p.id, normalizeArtist(p)]));
+    const releaseLookup = new Map(
+      releasePages.map((p: any) => {
+        const r = normalizeRelease(p, artistLookup);
+        return [p.id, { title: r.title, slug: r.slug, published: isReleasePublished(r) }] as const;
+      }),
+    );
+
+    const now = Date.now();
+    const images = sortGalleryImages(
+      dedupeGalleryImages(
+        galleryPages
+          .map((p: any) => normalizeGalleryImage(p, releaseLookup as any, now))
+          .filter((x): x is NonNullable<typeof x> => x !== null),
+      ),
+    );
+
+    logApiSuccess(route, { galleryPageCount: galleryPages.length, publishedCount: images.length });
+    res.writeHead(200, GALLERY_CACHE_HEADERS).end(JSON.stringify(images));
+  } catch (e: unknown) {
+    // Fail closed: never fall back to placeholder or hidden records.
+    logApiError(route, e);
+    res
+      .writeHead(500, { "Content-Type": "application/json", "Cache-Control": "no-store" })
+      .end(JSON.stringify({ error: "Gallery is temporarily unavailable." }));
   }
 }
