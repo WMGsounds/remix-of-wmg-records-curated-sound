@@ -1,6 +1,8 @@
 import { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import { ChevronDown } from "lucide-react";
+import { SiSpotify, SiApplemusic } from "react-icons/si";
+import type { ComponentType, SVGProps } from "react";
 import { Seo } from "@/components/Seo";
 import { breadcrumbSchema } from "@/lib/seo";
 import { useCatalogue } from "@/lib/queries";
@@ -9,15 +11,18 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { FilterField, SearchInput } from "@/components/FilterBar";
 import { matchesSearch } from "@/lib/search";
 import { musicHeroDataUrl } from "@/assets/musicHero";
+import { AmazonMusicIcon, YouTubeMusicIcon } from "@/components/ReleaseLinks";
 import type { CatalogueTrack } from "@/lib/types";
+
+type IconComponent = ComponentType<SVGProps<SVGSVGElement>>;
 
 const sortOptions = ["Artist", "Title (A-Z)"] as const;
 
 const SERVICES = [
-  { key: "spotify", label: "Spotify" },
-  { key: "appleMusic", label: "Apple Music" },
-  { key: "amazonMusic", label: "Amazon Music" },
-  { key: "youtubeMusic", label: "YouTube Music" },
+  { key: "spotify", label: "Spotify", Icon: SiSpotify as IconComponent, fill: true },
+  { key: "appleMusic", label: "Apple Music", Icon: SiApplemusic as IconComponent, fill: true },
+  { key: "amazonMusic", label: "Amazon Music", Icon: AmazonMusicIcon as IconComponent },
+  { key: "youtubeMusic", label: "YouTube Music", Icon: YouTubeMusicIcon as IconComponent },
 ] as const;
 
 const StreamingLinks = ({ track, size = "sm" }: { track: CatalogueTrack; size?: "sm" | "md" }) => {
@@ -33,11 +38,16 @@ const StreamingLinks = ({ track, size = "sm" }: { track: CatalogueTrack; size?: 
             rel="noopener noreferrer"
             onClick={(e) => e.stopPropagation()}
             aria-label={`Listen to ${track.title} on ${s.label} (opens in a new tab)`}
-            className={`inline-flex items-center border border-ivory/22 text-ivory/70 uppercase tracking-[0.22em] transition-colors hover:border-gold/50 hover:text-gold-soft focus:outline-none focus-visible:ring-1 focus-visible:ring-gold ${
+            className={`group inline-flex items-center gap-2 border border-ivory/22 text-ivory/70 uppercase tracking-[0.22em] transition-colors hover:border-gold/50 hover:text-gold-soft focus:outline-none focus-visible:ring-1 focus-visible:ring-gold ${
               size === "md" ? "px-4 py-2 text-[11px]" : "px-3 py-1.5 text-[10px]"
             }`}
           >
-            {s.label}
+            <s.Icon
+              className="h-4 w-4 text-gold-soft transition-colors duration-300 group-hover:text-gold"
+              aria-hidden="true"
+              {...(("fill" in s && s.fill) ? { fill: "currentColor" } : {})}
+            />
+            <span>{s.label}</span>
           </a>
         </li>
       ))}
