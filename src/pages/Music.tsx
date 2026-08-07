@@ -200,30 +200,28 @@ const TrackRow = ({ track, expanded, onToggle }: { track: CatalogueTrack; expand
 const Music = () => {
   const { data: tracks = [], isLoading, isError } = useCatalogue();
   const [searchQuery, setSearchQuery] = useState("");
-  const [artist, setArtist] = useState<string>(ALL);
+  const [sort, setSort] = useState<(typeof sortOptions)[number]>("Artist");
   const [expandedId, setExpandedId] = useState<string | null>(null);
-
-  const artistOptions = useMemo(() => {
-    const map = new Map<string, { key: string; name: string; displayOrder: number }>();
-    tracks.forEach((t) =>
-      t.artists.forEach((a) => {
-        const key = a.slug || a.name;
-        if (key && a.name && !map.has(key)) map.set(key, { key, name: a.name, displayOrder: a.displayOrder ?? 0 });
-      }),
-    );
-    return [...map.values()].sort((a, b) => a.displayOrder - b.displayOrder || a.name.localeCompare(b.name));
-  }, [tracks]);
 
   const visible = useMemo(
     () =>
-      tracks.filter((t) => {
-        if (artist !== ALL && !t.artists.some((a) => (a.slug || a.name) === artist)) return false;
-        return matchesSearch(searchQuery, [t.title, t.artists.map((a) => a.name).join(" "), t.description]);
-      }),
-    [tracks, artist, searchQuery],
+      tracks.filter((t) =>
+        matchesSearch(searchQuery, [t.title, t.artists.map((a) => a.name).join(" "), t.description]),
+      ),
+    [tracks, searchQuery],
   );
 
   const groups = useMemo(() => {
+    if (sort === "Title (A-Z)") {
+      return [
+        {
+          key: "all",
+          name: "",
+          displayOrder: 0,
+          tracks: [...visible].sort((a, b) => a.title.localeCompare(b.title)),
+        },
+      ];
+    }
     const byArtist = new Map<string, { name: string; displayOrder: number; tracks: CatalogueTrack[] }>();
     visible.forEach((t) => {
       const a = t.artists[0];
@@ -235,14 +233,14 @@ const Music = () => {
     return [...byArtist.entries()]
       .map(([key, g]) => ({ key, ...g, tracks: [...g.tracks].sort((x, y) => x.title.localeCompare(y.title)) }))
       .sort((a, b) => a.displayOrder - b.displayOrder || a.name.localeCompare(b.name));
-  }, [visible]);
+  }, [visible, sort]);
 
   useEffect(() => {
     setExpandedId(null);
-  }, [artist, searchQuery]);
+  }, [sort, searchQuery]);
 
-  const artistCount = groups.length;
-  const isFiltered = artist !== ALL || searchQuery.trim().length > 0;
+  const artistCount = groups.filter((g) => g.key !== "all").length;
+  const isFiltered = searchQuery.trim().length > 0;
 
   if (isError) return <PageError message="Couldn't load the catalogue." />;
 
