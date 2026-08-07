@@ -466,3 +466,80 @@ export function normalizeStoreItem(
   };
 }
 
+
+// ---------- Music catalogue (Tracks DB) ----------
+
+/**
+ * Normalise a Tracks DB page into the public Music-catalogue shape.
+ * - Artist is a relation to the Artists DB (resolved, never duplicated).
+ * - "Release Appearences" (existing Notion spelling) relates to Release Tracks
+ *   pivot rows, each of which relates to one Release.
+ */
+export function normalizeCatalogueTrack(
+  page: any,
+  lookups: {
+    artistLookup: Map<string, any>;
+    releaseTrackLookup: Map<string, any>;
+    releaseLookup: Map<string, any>;
+  },
+) {
+  const props = page.properties;
+  const { artistLookup, releaseTrackLookup, releaseLookup } = lookups;
+
+  const artistRelIds: string[] = (props["Artist"]?.relation ?? []).map((r: any) => r.id);
+  const artists = artistRelIds
+    .map((id) => artistLookup.get(id))
+    .filter(Boolean)
+    .filter((a: any) => a.showOnWebsite !== false)
+    .map((a: any) => ({
+      id: a.id,
+      slug: a.slug,
+      name: a.name,
+      displayOrder: a.displayOrder ?? 0,
+      accentColour: a.accentColour ?? null,
+    }));
+
+  const appearanceRelIds: string[] = (
+    findProp(props, "Release Appearences", "Release Appearances")?.relation ?? []
+  ).map((r: any) => r.id);
+
+  const seenReleases = new Set<string>();
+  const appearsOn = appearanceRelIds
+    .map((rtId) => releaseTrackLookup.get(rtId))
+    .filter(Boolean)
+    .map((rt: any) => rt.properties?.["Release"]?.relation?.[0]?.id ?? "")
+    .filter(Boolean)
+    .map((releaseId: string) => releaseLookup.get(releaseId))
+    .filter(Boolean)
+    .filter((rel: any) => isReleasePublished(rel))
+    .filter((rel: any) => {
+      if (seenReleases.has(rel.id)) return false;
+      seenReleases.add(rel.id);
+      return true;
+    })
+    .map((rel: any) => ({
+      id: rel.id,
+      slug: rel.slug,
+      title: rel.title,
+      coverArt: rel.coverArt ?? "",
+      releaseType: rel.releaseType ?? "",
+      releaseDate: rel.releaseDate ?? "",
+    }));
+
+  return {
+    id: page.id,
+    title: text(props["Track Title"]) || text(titleProp(props)),
+    artists,
+    duration: text(props["Duration"]) || "",
+    description: text(findProp(props, "Track Description", "Description")) || "",
+    lyrics: text(props["Lyrics"]) || "",
+    isrc: text(findProp(props, "ISRC", "Isrc")) || "",
+    links: {
+      spotify: url(props["Spotify URL"]) ?? null,
+      appleMusic: url(findProp(props, "Apple Music URL")) ?? null,
+      amazonMusic: url(findProp(props, "Amazon Music URL")) ?? null,
+      youtubeMusic: url(findProp(props, "YouTube Music URL")) ?? null,
+    },
+    appearsOn,
+  };
+}
