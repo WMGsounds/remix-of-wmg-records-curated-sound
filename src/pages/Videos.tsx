@@ -14,6 +14,7 @@ import { videosHeroDataUrl } from "@/assets/videosHero";
 
 const ALL = "all";
 const VIDEO_BATCH_SIZE = 18;
+const ARTIST_VIDEO_LIMIT = 12;
 const sortOptions = ["Featured", "Random", "Newest", "Artist", "Title"] as const;
 
 
