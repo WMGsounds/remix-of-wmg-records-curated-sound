@@ -127,6 +127,7 @@ export const ArtistGalleryPreview = ({ artist }: Props) => {
   const preview = useMemo(() => {
     const seen = new Set<string>();
     const matches = images.filter((i) => {
+      if ((i.imageType || "").trim() === "Release Artwork") return false;
       const isMatch = i.artistSlug ? i.artistSlug === artist.slug : i.artistName === artist.name;
       if (!isMatch || seen.has(i.id)) return false;
       seen.add(i.id);
