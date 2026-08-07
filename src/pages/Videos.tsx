@@ -220,6 +220,56 @@ const Videos = () => {
 
   const displayed = useMemo(() => visible.slice(0, visibleCount), [visible, visibleCount]);
 
+  const groupedByArtist = sort === "Artist";
+
+  // Artist groups (A–Z) preserving the existing within-artist ordering of `visible`.
+  const artistGroups = useMemo(() => {
+    if (!groupedByArtist) return [];
+    const map = new Map<string, { key: string; name: string; videos: VideoItem[] }>();
+    visible.forEach((v) => {
+      const entries = v.artists.length ? v.artists : [{ name: "Other", slug: "other" }];
+      entries.forEach((a) => {
+        const key = a.slug || a.name || "other";
+        const name = a.name || "Other";
+        if (!map.has(key)) map.set(key, { key, name, videos: [] });
+        const group = map.get(key)!;
+        if (!group.videos.some((existing) => existing.id === v.id)) group.videos.push(v);
+      });
+    });
+    return [...map.values()].sort((a, b) => a.name.localeCompare(b.name));
+  }, [visible, groupedByArtist]);
+
+  // Flat list backing the player so prev/next still works across open sections.
+  const groupedPlayerList = useMemo(
+    () =>
+      artistGroups.flatMap((g) =>
+        openArtists.has(g.key)
+          ? expandedArtists.has(g.key)
+            ? g.videos
+            : g.videos.slice(0, ARTIST_VIDEO_LIMIT)
+          : [],
+      ),
+    [artistGroups, openArtists, expandedArtists],
+  );
+
+  const playerList = groupedByArtist ? groupedPlayerList : displayed;
+
+  const toggleArtist = (key: string) =>
+    setOpenArtists((prev) => {
+      const next = new Set(prev);
+      if (next.has(key)) {
+        next.delete(key);
+        setExpandedArtists((exp) => {
+          const e = new Set(exp);
+          e.delete(key);
+          return e;
+        });
+      } else {
+        next.add(key);
+      }
+      return next;
+    });
+
   if (isError) return <PageError message="Couldn't load the videos." />;
 
   return (
