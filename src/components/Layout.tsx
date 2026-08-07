@@ -79,7 +79,7 @@ const MediaMenu = ({ item }: { item: NavItem }) => {
       {open && (
         <div
           id="media-menu"
-          className="absolute left-1/2 top-full z-20 min-w-[180px] -translate-x-1/2 border border-ivory/15 bg-ink/95 backdrop-blur-md py-2 shadow-soft"
+          className="absolute left-1/2 top-full z-[60] min-w-[180px] -translate-x-1/2 border border-ivory/15 bg-ink/95 backdrop-blur-md py-2 shadow-soft"
         >
           {children.map((child) => (
             <NavLink
@@ -114,7 +114,7 @@ export const SiteHeader = () => {
 
   return (
     <header
-      className="fixed top-0 left-0 right-0 z-50 overflow-hidden backdrop-blur-md border-b border-ivory/10 text-ivory shadow-sm"
+      className="fixed top-0 left-0 right-0 z-50 overflow-visible backdrop-blur-md border-b border-ivory/10 text-ivory shadow-sm"
     >
       <div className="pointer-events-none absolute inset-0 bg-ink/85 md:bg-ink/70" />
 
