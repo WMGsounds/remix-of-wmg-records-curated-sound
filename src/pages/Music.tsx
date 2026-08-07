@@ -373,30 +373,65 @@ const Music = () => {
             )}
           </div>
         ) : (
-          <div className="space-y-20">
-            {groups.map((group) => (
-              <section key={group.key} aria-label={group.name || "All tracks"}>
-                {group.name && (
-                  <h3
-                    id={`artist-${group.key}`}
-                    className="mb-6 border-b border-gold/25 pb-4 text-[12px] uppercase tracking-[0.3em] text-gold-soft"
+          <div className="space-y-4">
+            {groups.map((group) => {
+              const isFlat = group.key === "all";
+              const open = isFlat || isSearching || openArtists.has(group.key);
+              const listId = `artist-panel-${group.key}`;
+              return (
+                <section key={group.key} aria-label={group.name || "All tracks"}>
+                  {!isFlat && (
+                    <h3>
+                      <button
+                        type="button"
+                        aria-expanded={open}
+                        aria-controls={listId}
+                        onClick={() =>
+                          setOpenArtists((prev) => {
+                            const next = new Set(prev);
+                            next.has(group.key) ? next.delete(group.key) : next.add(group.key);
+                            return next;
+                          })
+                        }
+                        className="group flex w-full items-center justify-between gap-6 border-b border-gold/25 py-6 text-left transition-colors hover:border-gold/50 focus:outline-none focus-visible:ring-1 focus-visible:ring-gold"
+                      >
+                        <span className="min-w-0">
+                          <span className="block break-words text-[13px] uppercase tracking-[0.3em] text-gold-soft transition-colors group-hover:text-gold md:text-[14px]">
+                            {group.name}
+                          </span>
+                          <span className="mt-2 block text-[10px] uppercase tracking-[0.24em] text-ivory/40">
+                            {group.tracks.length} {group.tracks.length === 1 ? "track" : "tracks"}
+                          </span>
+                        </span>
+                        <ChevronDown
+                          aria-hidden="true"
+                          className={`h-4 w-4 flex-none text-ivory/50 transition-transform duration-300 ${open ? "rotate-180" : ""}`}
+                        />
+                      </button>
+                    </h3>
+                  )}
+                  <div
+                    id={listId}
+                    hidden={!open}
+                    className="overflow-hidden animate-in fade-in-0 duration-300"
                   >
-                    {group.name}
-                  </h3>
-                )}
-                <ul className="border-t border-ivory/12">
-                  {group.tracks.map((track) => (
-                    <TrackRow
-                      key={track.id}
-                      track={track}
-                      expanded={expandedId === track.id}
-                      onToggle={() => setExpandedId((id) => (id === track.id ? null : track.id))}
-                    />
-                  ))}
-                </ul>
-              </section>
-            ))}
+                    <ul className={isFlat ? "border-t border-ivory/12" : "pl-0 md:pl-6"}>
+                      {group.tracks.map((track) => (
+                        <TrackRow
+                          key={track.id}
+                          track={track}
+                          showArtist={isFlat}
+                          expanded={expandedId === track.id}
+                          onToggle={() => setExpandedId((id) => (id === track.id ? null : track.id))}
+                        />
+                      ))}
+                    </ul>
+                  </div>
+                </section>
+              );
+            })}
           </div>
+
         )}
       </div>
     </div>
