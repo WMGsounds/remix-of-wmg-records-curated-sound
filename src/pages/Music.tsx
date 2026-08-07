@@ -190,7 +190,7 @@ const TrackRow = ({
 
       {expanded && (
         <div id={panelId} className="border-t border-ivory/10 bg-ivory/[0.02] px-1 py-10 md:px-6 md:py-12">
-          <div className="grid gap-12 md:grid-cols-2 md:gap-16">
+          <div className="grid gap-12 md:grid-cols-2 md:gap-24">
             <div className="space-y-10">
               <div>
                 <h5 className="display-serif text-3xl md:text-4xl">{track.title}</h5>
