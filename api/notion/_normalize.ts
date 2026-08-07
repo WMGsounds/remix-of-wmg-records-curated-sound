@@ -212,7 +212,8 @@ export function normalizeReleaseTrack(page: any, trackPageLookup: Map<string, an
   const trackPage = trackPageLookup.get(trackRel);
   const trackProps = trackPage?.properties ?? {};
 
-  const displayTitle = text(props["Display Title"]);
+  const displayTitle =
+    text(findProp(props, "Name", "Display Title")) || text(titleProp(props));
   const relatedTrackTitle = text(trackProps["Track Title"]) || text(titleProp(trackProps));
   const relatedDuration = text(trackProps["Duration"]) || "";
 
