@@ -66,8 +66,15 @@ const relationIds = (p: any): string[] =>
 
 const uniqueId = (p: any): string => {
   const u = p?.unique_id;
-  if (!u) return "";
-  return u.prefix ? `${u.prefix}-${u.number}` : String(u.number ?? "");
+  if (u) return u.prefix ? `${u.prefix}-${u.number}` : String(u.number ?? "");
+  // Rollup/formula mirrors of a unique-id property.
+  if (Array.isArray(p?.rollup?.array)) {
+    for (const entry of p.rollup.array) {
+      const value = uniqueId(entry);
+      if (value) return value;
+    }
+  }
+  return text(p);
 };
 
 export type GalleryImage = {
@@ -127,7 +134,7 @@ export function normalizeGalleryImage(
   const height = numberOrNull(findProp(props, "Height"));
   const title = text(findProp(props, "Image Title", "Title", "Name"));
   const caption = text(findProp(props, "Caption"));
-  const artistName = text(findProp(props, "Artist Name"));
+  const artistName = text(findProp(props, "🔄 Artist Name", "Artist Name"));
   const imageType = text(findProp(props, "Image Type"));
 
   const releaseId = relationIds(findProp(props, "Related Release"))[0] ?? "";
@@ -141,14 +148,14 @@ export function normalizeGalleryImage(
 
   return {
     id: String(page.id),
-    galleryId: uniqueId(findProp(props, "Gallery ID")) || String(page.id),
+    galleryId: uniqueId(findProp(props, "🔄 Gallery ID", "Gallery ID")) || String(page.id),
     title,
     imageUrl: proxyImageIfNeeded(raw),
     width: width && width > 0 ? width : null,
     height: height && height > 0 ? height : null,
     aspectRatio: width && height && width > 0 && height > 0 ? width / height : null,
     artistName,
-    artistSlug: text(findProp(props, "Artist Slug")),
+    artistSlug: text(findProp(props, "🔄 Artist Slug", "Artist Slug")),
     imageType,
     caption,
     altText: text(findProp(props, "Alt Text")) || altFallback,
