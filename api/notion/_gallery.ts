@@ -148,7 +148,7 @@ export function normalizeGalleryImage(
     height: height && height > 0 ? height : null,
     aspectRatio: width && height && width > 0 && height > 0 ? width / height : null,
     artistName,
-    artistSlug: text(findProp(props, "Artist Slug")),
+    artistSlug: text(findProp(props, "🔄 Artist Slug", "Artist Slug")),
     imageType,
     caption,
     altText: text(findProp(props, "Alt Text")) || altFallback,
