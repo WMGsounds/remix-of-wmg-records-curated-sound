@@ -13,7 +13,7 @@ import { londonDateKey, seedFromString, seededShuffle } from "@/lib/galleryOrder
 import { videosHeroDataUrl } from "@/assets/videosHero";
 
 const ALL = "all";
-const VIDEO_BATCH_SIZE = 24;
+const VIDEO_BATCH_SIZE = 18;
 const sortOptions = ["Featured", "Random", "Newest", "Artist", "Title"] as const;
 
 
