@@ -11,7 +11,7 @@ import { matchesSearch } from "@/lib/search";
 import { musicHeroDataUrl } from "@/assets/musicHero";
 import type { CatalogueTrack } from "@/lib/types";
 
-const ALL = "all";
+const sortOptions = ["Artist", "Title (A-Z)"] as const;
 
 const SERVICES = [
   { key: "spotify", label: "Spotify" },
@@ -200,30 +200,28 @@ const TrackRow = ({ track, expanded, onToggle }: { track: CatalogueTrack; expand
 const Music = () => {
   const { data: tracks = [], isLoading, isError } = useCatalogue();
   const [searchQuery, setSearchQuery] = useState("");
-  const [artist, setArtist] = useState<string>(ALL);
+  const [sort, setSort] = useState<(typeof sortOptions)[number]>("Artist");
   const [expandedId, setExpandedId] = useState<string | null>(null);
-
-  const artistOptions = useMemo(() => {
-    const map = new Map<string, { key: string; name: string; displayOrder: number }>();
-    tracks.forEach((t) =>
-      t.artists.forEach((a) => {
-        const key = a.slug || a.name;
-        if (key && a.name && !map.has(key)) map.set(key, { key, name: a.name, displayOrder: a.displayOrder ?? 0 });
-      }),
-    );
-    return [...map.values()].sort((a, b) => a.displayOrder - b.displayOrder || a.name.localeCompare(b.name));
-  }, [tracks]);
 
   const visible = useMemo(
     () =>
-      tracks.filter((t) => {
-        if (artist !== ALL && !t.artists.some((a) => (a.slug || a.name) === artist)) return false;
-        return matchesSearch(searchQuery, [t.title, t.artists.map((a) => a.name).join(" "), t.description]);
-      }),
-    [tracks, artist, searchQuery],
+      tracks.filter((t) =>
+        matchesSearch(searchQuery, [t.title, t.artists.map((a) => a.name).join(" "), t.description]),
+      ),
+    [tracks, searchQuery],
   );
 
   const groups = useMemo(() => {
+    if (sort === "Title (A-Z)") {
+      return [
+        {
+          key: "all",
+          name: "",
+          displayOrder: 0,
+          tracks: [...visible].sort((a, b) => a.title.localeCompare(b.title)),
+        },
+      ];
+    }
     const byArtist = new Map<string, { name: string; displayOrder: number; tracks: CatalogueTrack[] }>();
     visible.forEach((t) => {
       const a = t.artists[0];
@@ -235,14 +233,14 @@ const Music = () => {
     return [...byArtist.entries()]
       .map(([key, g]) => ({ key, ...g, tracks: [...g.tracks].sort((x, y) => x.title.localeCompare(y.title)) }))
       .sort((a, b) => a.displayOrder - b.displayOrder || a.name.localeCompare(b.name));
-  }, [visible]);
+  }, [visible, sort]);
 
   useEffect(() => {
     setExpandedId(null);
-  }, [artist, searchQuery]);
+  }, [sort, searchQuery]);
 
-  const artistCount = groups.length;
-  const isFiltered = artist !== ALL || searchQuery.trim().length > 0;
+  const artistCount = groups.filter((g) => g.key !== "all").length;
+  const isFiltered = searchQuery.trim().length > 0;
 
   if (isError) return <PageError message="Couldn't load the catalogue." />;
 
@@ -310,21 +308,18 @@ const Music = () => {
             </FilterField>
           </div>
           <div className="flex flex-wrap items-end gap-x-8 gap-y-6">
-            <FilterField label="Artist">
-              <Select value={artist} onValueChange={setArtist}>
+            <FilterField label="Sort by">
+              <Select value={sort} onValueChange={(v) => setSort(v as (typeof sortOptions)[number])}>
                 <SelectTrigger
-                  aria-label="Filter by artist"
-                  className="w-[220px] bg-transparent border-ivory/24 text-[11px] uppercase tracking-[0.24em] text-ivory rounded-none focus:ring-ivory"
+                  aria-label="Sort tracks"
+                  className="w-[180px] bg-transparent border-ivory/24 text-[11px] uppercase tracking-[0.24em] text-ivory rounded-none focus:ring-ivory"
                 >
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent className="bg-ink text-ivory border-ivory/24">
-                  <SelectItem value={ALL} className="text-[11px] uppercase tracking-[0.24em] focus:bg-ivory/10 focus:text-ivory">
-                    All Artists
-                  </SelectItem>
-                  {artistOptions.map((a) => (
-                    <SelectItem key={a.key} value={a.key} className="text-[11px] uppercase tracking-[0.24em] focus:bg-ivory/10 focus:text-ivory">
-                      {a.name}
+                  {sortOptions.map((o) => (
+                    <SelectItem key={o} value={o} className="text-[11px] uppercase tracking-[0.24em] focus:bg-ivory/10 focus:text-ivory">
+                      {o}
                     </SelectItem>
                   ))}
                 </SelectContent>
@@ -347,26 +342,25 @@ const Music = () => {
             {isFiltered && (
               <button
                 type="button"
-                onClick={() => {
-                  setSearchQuery("");
-                  setArtist(ALL);
-                }}
+                onClick={() => setSearchQuery("")}
                 className="mt-8 inline-flex items-center border border-ivory/24 px-6 py-3 text-[11px] uppercase tracking-[0.24em] text-ivory/80 transition-colors hover:border-gold/45 hover:text-gold-soft focus:outline-none focus-visible:ring-1 focus-visible:ring-gold"
               >
-                Clear filters
+                Clear search
               </button>
             )}
           </div>
         ) : (
           <div className="space-y-20">
             {groups.map((group) => (
-              <section key={group.key} aria-labelledby={`artist-${group.key}`}>
-                <h3
-                  id={`artist-${group.key}`}
-                  className="mb-6 border-b border-gold/25 pb-4 text-[12px] uppercase tracking-[0.3em] text-gold-soft"
-                >
-                  {group.name}
-                </h3>
+              <section key={group.key} aria-label={group.name || "All tracks"}>
+                {group.name && (
+                  <h3
+                    id={`artist-${group.key}`}
+                    className="mb-6 border-b border-gold/25 pb-4 text-[12px] uppercase tracking-[0.3em] text-gold-soft"
+                  >
+                    {group.name}
+                  </h3>
+                )}
                 <ul className="border-t border-ivory/12">
                   {group.tracks.map((track) => (
                     <TrackRow
