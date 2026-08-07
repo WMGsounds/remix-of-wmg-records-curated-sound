@@ -420,7 +420,7 @@ const Music = () => {
                           <span className="block break-words text-[13px] uppercase tracking-[0.3em] text-gold-soft transition-colors group-hover:text-gold md:text-[14px]">
                             {group.name}
                           </span>
-                          <span className="mt-2 block text-[10px] uppercase tracking-[0.24em] text-ivory/40">
+                          <span className="mt-2 block text-[11px] uppercase tracking-[0.24em] text-ivory/40">
                             {group.tracks.length} {group.tracks.length === 1 ? "track" : "tracks"}
                           </span>
                         </span>
