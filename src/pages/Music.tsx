@@ -13,6 +13,7 @@ import { matchesSearch } from "@/lib/search";
 import { musicHeroDataUrl } from "@/assets/musicHero";
 import { AmazonMusicIcon, YouTubeMusicIcon } from "@/components/ReleaseLinks";
 import type { CatalogueTrack } from "@/lib/types";
+import { useHeaderHeight } from "@/hooks/use-header-height";
 
 type IconComponent = ComponentType<SVGProps<SVGSVGElement>>;
 
@@ -235,6 +236,7 @@ const TrackRow = ({
 
 const Music = () => {
   const { data: tracks = [], isLoading, isError } = useCatalogue();
+  const headerHeight = useHeaderHeight();
   const [searchQuery, setSearchQuery] = useState("");
   const [sort, setSort] = useState<(typeof sortOptions)[number]>("Artist");
   const [expandedId, setExpandedId] = useState<string | null>(null);
@@ -440,6 +442,7 @@ const Music = () => {
                           key={track.id}
                           track={track}
                           showArtist={isFlat}
+                          headerHeight={headerHeight}
                           expanded={expandedId === track.id}
                           onToggle={() => setExpandedId((id) => (id === track.id ? null : track.id))}
                         />
