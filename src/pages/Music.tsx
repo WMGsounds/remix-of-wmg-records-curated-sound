@@ -11,7 +11,7 @@ import { matchesSearch } from "@/lib/search";
 import { musicHeroDataUrl } from "@/assets/musicHero";
 import type { CatalogueTrack } from "@/lib/types";
 
-const ALL = "all";
+const sortOptions = ["Artist", "Title (A-Z)"] as const;
 
 const SERVICES = [
   { key: "spotify", label: "Spotify" },
