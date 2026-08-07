@@ -141,7 +141,7 @@ export function normalizeGalleryImage(
 
   return {
     id: String(page.id),
-    galleryId: uniqueId(findProp(props, "Gallery ID")) || String(page.id),
+    galleryId: uniqueId(findProp(props, "🔄 Gallery ID", "Gallery ID")) || String(page.id),
     title,
     imageUrl: proxyImageIfNeeded(raw),
     width: width && width > 0 ? width : null,
