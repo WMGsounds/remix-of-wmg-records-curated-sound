@@ -19,6 +19,7 @@ import type {
   StoreItem,
   GalleryImage,
 } from "./types";
+import type { VideoItem } from "./videos";
 import { getMockDataForPath } from "./mockData";
 
 const API_BASE = import.meta.env.VITE_API_BASE_URL ?? "";
@@ -105,4 +106,8 @@ export async function fetchStoreItems(): Promise<StoreItem[]> {
 
 export async function fetchGallery(): Promise<GalleryImage[]> {
   return fetchJson<GalleryImage[]>("/api/notion/gallery");
+}
+
+export async function fetchVideos(): Promise<VideoItem[]> {
+  return fetchJson<VideoItem[]>("/api/notion/videos");
 }
