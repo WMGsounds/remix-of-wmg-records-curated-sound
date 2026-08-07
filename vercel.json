@@ -9,6 +9,10 @@
       "destination": "/api/notion/artists?dataset=tracks"
     },
     {
+      "source": "/api/notion/catalogue",
+      "destination": "/api/notion/artists?dataset=catalogue"
+    },
+    {
       "source": "/api/notion/gallery",
       "destination": "/api/notion/artists?dataset=gallery"
     },

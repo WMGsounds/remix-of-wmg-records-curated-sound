@@ -1,6 +1,6 @@
 import { notion, DBS, CACHE_HEADERS, RELEASE_CACHE_HEADERS, GALLERY_CACHE_HEADERS, requireEnv, logApiError, logApiFallback, logApiSuccess, validateNotionEnv, type ApiRequest, type ApiResponse } from "./_client.js";
 import { FALLBACK_HEADERS, fallbackArtists, fallbackTracks } from "./_fallback.js";
-import { loadAll, normalizeArtist, normalizeRelease, normalizeReleaseTrack, isReleasePublished } from "./_normalize.js";
+import { loadAll, normalizeArtist, normalizeRelease, normalizeReleaseTrack, normalizeCatalogueTrack, isReleasePublished } from "./_normalize.js";
 import { normalizeGalleryImage, dedupeGalleryImages, sortGalleryImages } from "./_gallery.js";
 
 /**
@@ -16,6 +16,7 @@ export default async function handler(req: ApiRequest | undefined, res: ApiRespo
   const dataset = Array.isArray(datasetParam) ? datasetParam[0] : datasetParam;
   if (dataset === "tracks") return handleTracks(res);
   if (dataset === "gallery") return handleGallery(res);
+  if (dataset === "catalogue") return handleCatalogue(res);
   return handleArtists(res);
 }
 
@@ -137,5 +138,42 @@ async function handleGallery(res: ApiResponse) {
     res
       .writeHead(500, { "Content-Type": "application/json", "Cache-Control": "no-store" })
       .end(JSON.stringify({ error: "Gallery is temporarily unavailable." }));
+  }
+}
+
+async function handleCatalogue(res: ApiResponse) {
+  const route = "/api/notion/catalogue";
+  try {
+    validateNotionEnv(route);
+    const [artistPages, releasePages, trackPages, releaseTrackPages] = await Promise.all([
+      loadAll(notion, DBS.artists),
+      loadAll(notion, DBS.releases),
+      loadAll(notion, DBS.tracks),
+      loadAll(notion, DBS.releaseTracks),
+    ]);
+
+    const artistLookup = new Map(artistPages.map((p: any) => [p.id, normalizeArtist(p)]));
+    const releaseLookup = new Map(
+      releasePages.map((p: any) => [p.id, normalizeRelease(p, artistLookup)]),
+    );
+    const releaseTrackLookup = new Map(releaseTrackPages.map((p: any) => [p.id, p]));
+
+    const tracks = trackPages
+      .map((p: any) => normalizeCatalogueTrack(p, { artistLookup, releaseTrackLookup, releaseLookup }))
+      .filter((t) => Boolean(t.title))
+      .sort(
+        (a, b) =>
+          (a.artists[0]?.displayOrder ?? 9999) - (b.artists[0]?.displayOrder ?? 9999)
+          || (a.artists[0]?.name ?? "").localeCompare(b.artists[0]?.name ?? "")
+          || a.title.localeCompare(b.title),
+      );
+
+    logApiSuccess(route, { trackPageCount: trackPages.length, catalogueCount: tracks.length });
+    res.writeHead(200, RELEASE_CACHE_HEADERS).end(JSON.stringify(tracks));
+  } catch (e: unknown) {
+    logApiError(route, e);
+    res
+      .writeHead(500, { "Content-Type": "application/json", "Cache-Control": "no-store" })
+      .end(JSON.stringify({ error: "The catalogue is temporarily unavailable." }));
   }
 }
