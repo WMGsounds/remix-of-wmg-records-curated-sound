@@ -84,6 +84,7 @@ export const DBS = {
   journal: process.env.NOTION_JOURNAL_DB_ID!,
   storeItems: process.env.NOTION_STORE_DB_ID!,
   gallery: process.env.NOTION_GALLERY_DATABASE_ID!,
+  videos: process.env.NOTION_VIDEOS_DATABASE_ID!,
 };
 
 export function requireEnv(route: string, names: string[]) {
@@ -122,6 +123,13 @@ export const RELEASE_CACHE_HEADERS = {
 
 // Gallery supports scheduled publishing (Publish Date) — revalidate within ~5 min.
 export const GALLERY_CACHE_HEADERS = {
+  "Cache-Control": "public, max-age=60, s-maxage=300, stale-while-revalidate=60",
+  "Content-Type": "application/json",
+  "X-Data-Source": "notion",
+};
+
+// Videos support scheduled publishing (Release Date) — revalidate within ~5 min.
+export const VIDEO_CACHE_HEADERS = {
   "Cache-Control": "public, max-age=60, s-maxage=300, stale-while-revalidate=60",
   "Content-Type": "application/json",
   "X-Data-Source": "notion",
