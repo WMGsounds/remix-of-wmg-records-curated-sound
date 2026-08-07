@@ -342,13 +342,10 @@ const Music = () => {
             {isFiltered && (
               <button
                 type="button"
-                onClick={() => {
-                  setSearchQuery("");
-                  setArtist(ALL);
-                }}
+                onClick={() => setSearchQuery("")}
                 className="mt-8 inline-flex items-center border border-ivory/24 px-6 py-3 text-[11px] uppercase tracking-[0.24em] text-ivory/80 transition-colors hover:border-gold/45 hover:text-gold-soft focus:outline-none focus-visible:ring-1 focus-visible:ring-gold"
               >
-                Clear filters
+                Clear search
               </button>
             )}
           </div>
