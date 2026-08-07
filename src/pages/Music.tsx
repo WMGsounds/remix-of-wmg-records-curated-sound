@@ -250,12 +250,17 @@ const Music = () => {
     });
     return [...byArtist.entries()]
       .map(([key, g]) => ({ key, ...g, tracks: [...g.tracks].sort((x, y) => x.title.localeCompare(y.title)) }))
-      .sort((a, b) => a.displayOrder - b.displayOrder || a.name.localeCompare(b.name));
+      .sort((a, b) => a.name.localeCompare(b.name));
   }, [visible, sort]);
+
+  const [openArtists, setOpenArtists] = useState<Set<string>>(new Set());
+  const isSearching = searchQuery.trim().length > 0;
 
   useEffect(() => {
     setExpandedId(null);
+    setOpenArtists(new Set());
   }, [sort, searchQuery]);
+
 
   const artistCount = groups.filter((g) => g.key !== "all").length;
   const isFiltered = searchQuery.trim().length > 0;
