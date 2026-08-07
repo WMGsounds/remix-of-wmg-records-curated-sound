@@ -66,8 +66,15 @@ const relationIds = (p: any): string[] =>
 
 const uniqueId = (p: any): string => {
   const u = p?.unique_id;
-  if (!u) return "";
-  return u.prefix ? `${u.prefix}-${u.number}` : String(u.number ?? "");
+  if (u) return u.prefix ? `${u.prefix}-${u.number}` : String(u.number ?? "");
+  // Rollup/formula mirrors of a unique-id property.
+  if (Array.isArray(p?.rollup?.array)) {
+    for (const entry of p.rollup.array) {
+      const value = uniqueId(entry);
+      if (value) return value;
+    }
+  }
+  return text(p);
 };
 
 export type GalleryImage = {
