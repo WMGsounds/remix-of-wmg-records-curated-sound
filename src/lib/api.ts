@@ -18,6 +18,7 @@ import type {
   JournalArticleData,
   StoreItem,
   GalleryImage,
+  CatalogueTrack,
 } from "./types";
 import type { VideoItem } from "./videos";
 import { getMockDataForPath } from "./mockData";
@@ -110,4 +111,8 @@ export async function fetchGallery(): Promise<GalleryImage[]> {
 
 export async function fetchVideos(): Promise<VideoItem[]> {
   return fetchJson<VideoItem[]>("/api/notion/videos");
+}
+
+export async function fetchCatalogue(): Promise<CatalogueTrack[]> {
+  return fetchJson<CatalogueTrack[]>("/api/notion/catalogue");
 }

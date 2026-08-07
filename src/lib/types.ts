@@ -220,3 +220,40 @@ export type GalleryImage = {
   relatedReleaseUrl: string;
   fileHash: string;
 };
+
+// ---------------------------------------------------------------------------
+//  Music catalogue (Tracks database)
+// ---------------------------------------------------------------------------
+export type CatalogueArtistRef = {
+  id: string;
+  slug: string;
+  name: string;
+  displayOrder: number;
+  accentColour: string | null;
+};
+
+export type CatalogueAppearance = {
+  id: string;
+  slug: string;
+  title: string;
+  coverArt: string;
+  releaseType: string;
+  releaseDate: string;
+};
+
+export type CatalogueTrack = {
+  id: string;
+  title: string;
+  artists: CatalogueArtistRef[];
+  duration: string;
+  description: string;
+  lyrics: string;
+  isrc: string;
+  links: {
+    spotify: string | null;
+    appleMusic: string | null;
+    amazonMusic: string | null;
+    youtubeMusic: string | null;
+  };
+  appearsOn: CatalogueAppearance[];
+};
