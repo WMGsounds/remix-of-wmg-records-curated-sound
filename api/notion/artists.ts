@@ -160,7 +160,8 @@ async function handleCatalogue(res: ApiResponse) {
 
     const tracks = trackPages
       .map((p: any) => normalizeCatalogueTrack(p, { artistLookup, releaseTrackLookup, releaseLookup }))
-      .filter((t) => Boolean(t.title))
+      .filter((t) => Boolean(t.title) && Boolean((t as any).isrc?.trim()))
+
       .sort(
         (a, b) =>
           (a.artists[0]?.displayOrder ?? 9999) - (b.artists[0]?.displayOrder ?? 9999)
