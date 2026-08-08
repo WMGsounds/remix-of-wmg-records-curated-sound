@@ -121,7 +121,7 @@ export type ArticleBlock =
   | { type: "divider" }
   | { type: "bulleted_list"; items: RichText[][] }
   | { type: "numbered_list"; items: RichText[][] }
-  | { type: "image"; url: string; caption: string; alt: string; blockId?: string };
+  | { type: "image"; url: string; caption: string; alt: string; blockId?: string; blockVersion?: string };
 
 const richFrom = (rt: any[] = []): RichText[] =>
   rt.map((t: any) => ({
@@ -208,6 +208,7 @@ export async function fetchPageBlocks(
             caption: plainCaption(img?.caption ?? []),
             alt: plainCaption(img?.caption ?? []) || "Article image",
             blockId: String(b.id ?? ""),
+            blockVersion: String(b.last_edited_time ?? ""),
           });
         }
         break;
@@ -239,8 +240,11 @@ export function withPermanentImageUrls(
       caption: b.caption,
       articleTitle: article?.title,
       index: i,
+      version: b.blockVersion,
     });
-    return permanent ? { ...b, url: permanent } : b;
+    // blockVersion is server-only bookkeeping — never sent to the browser.
+    const { blockVersion: _v, ...rest } = b;
+    return permanent ? { ...rest, url: permanent } : rest;
   });
 }
 
