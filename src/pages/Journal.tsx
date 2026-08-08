@@ -101,7 +101,7 @@ const Journal = () => {
   return (
     <div className="bg-ink text-ivory pb-32 min-h-screen">
       <Seo
-        title="Journal"
+        fullTitle="WMG Journal: Release Stories and Artist Features"
         description="Read WMG Journal stories, including release stories, artist spotlights, album features and behind-the-scenes editorial from Wareham Music Group."
         canonicalPath="/journal"
         jsonLd={breadcrumbSchema([

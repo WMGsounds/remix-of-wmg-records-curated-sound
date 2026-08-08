@@ -4,7 +4,7 @@ import { ChevronDown, ChevronLeft, ChevronRight, ChevronUp, Play, ShoppingBag } 
 import { useReleaseBySlug, useStoreItems } from "@/lib/queries";
 import { LazyImage } from "@/components/LazyImage";
 import { Seo } from "@/components/Seo";
-import { breadcrumbSchema, absoluteUrl, truncate, imageObjectSchema } from "@/lib/seo";
+import { breadcrumbSchema, absoluteUrl, clampDescription, imageObjectSchema } from "@/lib/seo";
 import { PageLoading, PageError } from "@/components/UIStates";
 import { ReleaseLinks } from "@/components/ReleaseLinks";
 import type { Track, StoreItem } from "@/lib/types";
@@ -237,11 +237,11 @@ const ReleasePage = () => {
   return (
     <div>
       <Seo
-        title={`${release.title} by ${release.artistName || artist?.name || "WMG Artist"}`}
-        description={truncate(
+        title={`${release.title} by ${release.artistName || artist?.name || "Wareham Music Group"}`}
+        description={clampDescription(
           (release.shortDescription || release.fullDescription)
             ? `${release.shortDescription || release.fullDescription}`
-            : `Listen to ${release.title} by ${release.artistName || artist?.name || ""}, a ${release.releaseType} release from WMG.`,
+            : `Listen to ${release.title} by ${release.artistName || artist?.name || ""}, a ${release.releaseType} release from Wareham Music Group.`,
         )}
         canonicalPath={`/releases/${release.slug}`}
         image={release.coverArt}

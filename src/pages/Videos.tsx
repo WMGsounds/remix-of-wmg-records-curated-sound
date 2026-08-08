@@ -276,7 +276,7 @@ const Videos = () => {
   return (
     <div className="bg-ink text-ivory pb-32">
       <Seo
-        title="Videos"
+        fullTitle="Official Music Videos and Lyric Videos | WMG"
         description="Official music videos, lyric videos and official audio from across the Wareham Music Group roster."
         canonicalPath="/videos"
         jsonLd={breadcrumbSchema([

@@ -8,7 +8,7 @@ import { breadcrumbSchema } from "@/lib/seo";
 const About = () => (
   <div>
     <Seo
-      title="About"
+      fullTitle="About Wareham Music Group, London Independent Label"
       description="WMG (Wareham Music Group) is a London-based independent label building catalogue with patience, restraint and respect for the song."
       canonicalPath="/about"
       jsonLd={breadcrumbSchema([

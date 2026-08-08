@@ -41,7 +41,7 @@ const Artists = () => {
   return (
     <div className="bg-ink text-ivory pb-32">
       <Seo
-        title="Artists"
+        fullTitle="Our Artists: Soul, Blues, Country and Reggae | WMG"
         description="Explore the WMG artist roster, from classic soul and blues-soul to crooner, country-soul, Americana and cinematic music worlds."
         canonicalPath="/artists"
         jsonLd={breadcrumbSchema([

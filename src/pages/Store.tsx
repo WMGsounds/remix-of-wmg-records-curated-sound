@@ -115,7 +115,7 @@ const Store = () => {
   return (
     <div className="bg-ink text-ivory pb-32">
       <Seo
-        title="Store"
+        fullTitle="Buy Vinyl, CD and Digital | Wareham Music Group"
         description="Buy WMG releases on vinyl, CD and digital. Limited editions, bundles and signed copies from Wareham Music Group artists."
         canonicalPath="/store"
         jsonLd={[

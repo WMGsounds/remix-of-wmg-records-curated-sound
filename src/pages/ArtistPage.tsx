@@ -9,7 +9,7 @@ import { ArtistGalleryPreview } from "@/components/ArtistGalleryPreview";
 import { useHeaderHeight } from "@/hooks/use-header-height";
 
 import { Seo } from "@/components/Seo";
-import { breadcrumbSchema, absoluteUrl, truncate, imageObjectSchema } from "@/lib/seo";
+import { breadcrumbSchema, absoluteUrl, clampDescription, imageObjectSchema } from "@/lib/seo";
 import { PageLoading, PageError } from "@/components/UIStates";
 
 const ArtistPage = () => {
@@ -54,8 +54,8 @@ const ArtistPage = () => {
     )
     .slice(0, 3);
   const path = `/artists/${artist.slug}`;
-  const seoTitle = artist.name;
-  const seoDesc = truncate(
+  const seoTitle = artist.genre ? `${artist.name}, ${artist.genre} Artist` : `${artist.name}, Recording Artist`;
+  const seoDesc = clampDescription(
     artist.shortDescription
       ? `${artist.name} — ${artist.shortDescription} Explore releases, stories and music from ${artist.name} on WMG.`
       : `${artist.name} on WMG. Explore releases, stories and music from ${artist.name}.`,
