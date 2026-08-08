@@ -61,5 +61,18 @@ for (const route of routes) {
   }
 }
 
+// Static 404 document. Vercel serves dist/404.html with a real HTTP 404 status
+// for any path that does not match a file, rewrite or redirect.
+try {
+  const { html, head } = await server.render("/__not-found__");
+  let page = injectHead(template, head);
+  page = injectBody(page, html);
+  await fs.writeFile(path.join(distDir, "404.html"), page, "utf8");
+  console.log("[prerender] wrote 404.html");
+} catch (error) {
+  failed += 1;
+  console.error("[prerender] FAILED 404.html:", error?.message ?? error);
+}
+
 console.log(`[prerender] wrote ${ok} pages, ${failed} failed`);
 if (failed > 0) process.exitCode = 1;

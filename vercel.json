@@ -49,11 +49,20 @@
       "destination": "/api/image-proxy?releaseSlug=:slug"
     },
     {
-      "source": "/((?!api/.*|.*\\..*).*)",
+      "source": "/seo-diagnostics",
+      "destination": "/index.html"
+    },
+    {
+      "source": "/media-library",
       "destination": "/index.html"
     }
   ],
   "redirects": [
+    {
+      "source": "/artists/jack-rivers",
+      "destination": "/artists",
+      "permanent": true
+    },
     {
       "source": "/(.*)",
       "has": [
