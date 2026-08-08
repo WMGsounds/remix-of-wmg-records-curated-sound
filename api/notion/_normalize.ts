@@ -1,5 +1,6 @@
 // Convert Notion property objects into the clean shape src/lib/types.ts expects.
 import { resolvePublishInstant } from "./_schedule.js";
+import { artistImageUrl, releaseArtworkUrl, storeImageUrl } from "./_mediaUrls.js";
 
 const text = (p: any): string => {
   if (!p) return "";
@@ -74,16 +75,29 @@ export function normalizeArtist(page: any) {
   // before the column existed) so we don't hide artists unintentionally.
   const showOnWebsiteProp = props["Show On Website"];
   const showOnWebsite = showOnWebsiteProp === undefined ? true : bool(showOnWebsiteProp);
+  const artistSlug = text(props["Slug"]);
+  const artistName = text(props["Name"]);
+  const version = String(page.last_edited_time ?? "");
   return {
     id: page.id,
-    slug: text(props["Slug"]),
-    name: text(props["Name"]),
+    slug: artistSlug,
+    name: artistName,
     genre: multiSelect(props["Genre"]) || select(props["Genre"]) || text(props["Genre"]),
     shortDescription: text(props["Short Description"]),
     fullBio: paragraphs(props["Full Bio"]),
-    heroImage: firstFile(props["Hero Image"]),
-    heroImage2: firstFile(props["Hero Image 2"]),
-    gallery: files(props["Gallery"]),
+    // Permanent, descriptive same-domain URLs; the proxied Notion URL stays as
+    // a fallback only when the artist has no slug to key the media route with.
+    heroImage: firstFile(props["Hero Image"])
+      ? artistImageUrl({ artistSlug, artistName, role: "hero", version }) || firstFile(props["Hero Image"])
+      : "",
+    heroImage2: firstFile(props["Hero Image 2"])
+      ? artistImageUrl({ artistSlug, artistName, role: "secondary", version }) ||
+        firstFile(props["Hero Image 2"])
+      : "",
+    gallery: files(props["Gallery"]).map(
+      (fallback, index) =>
+        artistImageUrl({ artistSlug, artistName, role: "gallery", index, version }) || fallback,
+    ),
     featured: bool(props["Featured"]),
     showOnWebsite,
     displayOrder: num(props["Display Order"]),
@@ -162,7 +176,15 @@ export function normalizeRelease(page: any, artistLookup: Map<string, any>) {
     artistName: artist?.name ?? "",
     releaseDate: date(props["Release Date"]),
     releaseType: select(props["Release Type"]) || "Single",
-    coverArt: firstFile(props["Cover Art"]),
+    coverArt: firstFile(props["Cover Art"])
+      ? releaseArtworkUrl({
+          artistSlug: artist?.slug ?? "",
+          releaseSlug: text(props["Slug"]),
+          artistName: artist?.name ?? "",
+          releaseTitle: text(titleProp(props)),
+          version: String(page.last_edited_time ?? ""),
+        }) || firstFile(props["Cover Art"])
+      : "",
     shortDescription: text(props["Short Description"]),
     fullDescription: text(props["Full Description"]),
     featured: bool(props["Featured"]),
@@ -426,10 +448,17 @@ export function normalizeStoreItem(
   const displayPriceSummary = bool(props["Display Price Summary"]);
   const priceSummary = displayPriceSummary ? buildPriceSummary(formats, prices) : null;
 
-  const productImage =
-    firstFile(props["Product Image"]) ||
-    (releaseRaw?.coverArt ?? "") ||
-    "";
+  // Own Product Image gets a permanent store URL; when it's blank we reuse the
+  // release's permanent cover-art URL rather than minting a duplicate identity.
+  const ownProductImage = firstFile(props["Product Image"]);
+  const productImage = ownProductImage
+    ? storeImageUrl({
+        storeKey: slugText || String(page.id),
+        title,
+        artistName: artistRaw?.name ?? "",
+        version: String(page.last_edited_time ?? ""),
+      }) || ownProductImage
+    : (releaseRaw?.coverArt ?? "") || "";
 
   const availRaw = select(props["Availability"]);
   const availability = (STORE_AVAILABILITIES as readonly string[]).includes(availRaw)
