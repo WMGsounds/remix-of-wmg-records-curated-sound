@@ -185,9 +185,12 @@ export function normalizeGalleryImage(
     title ||
     (imageType ? `${imageType} photograph` : "WMG gallery photograph");
 
+  const galleryIdValue = uniqueId(findProp(props, "🔄 Gallery ID", "Gallery ID")) || String(page.id);
+  const fileHash = text(findProp(props, "File Hash"));
+
   return {
     id: String(page.id),
-    galleryId: uniqueId(findProp(props, "🔄 Gallery ID", "Gallery ID")) || String(page.id),
+    galleryId: galleryIdValue,
     title,
     imageUrl: galleryPublicPath(galleryIdValue, title, fileHash) || proxyImageIfNeeded(raw),
     publicUrl: galleryPublicPath(galleryIdValue, title, fileHash),
