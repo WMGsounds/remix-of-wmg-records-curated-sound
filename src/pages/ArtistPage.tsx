@@ -90,6 +90,18 @@ const ArtistPage = () => {
             { name: artist.name, path },
           ]),
           musicGroup,
+          ...[
+            imageObjectSchema({
+              url: artist.heroImage,
+              name: `${artist.name} — hero image`,
+              description: `${artist.name}, WMG artist portrait.`,
+            }),
+            imageObjectSchema({
+              url: artist.heroImage2,
+              name: `${artist.name} — secondary image`,
+              description: `${artist.name}, WMG artist photograph.`,
+            }),
+          ].filter(Boolean),
         ]}
       />
       {/* Header backdrop — matches the artist section background, header height only */}
