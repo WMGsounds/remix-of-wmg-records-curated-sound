@@ -21,8 +21,13 @@ await server.preloadAllPages();
 const routes = await server.collectRoutes();
 console.log(`[prerender] ${routes.length} routes`);
 
-const injectHead = (html, head) =>
-  html.replace("</head>", `  ${head}\n  </head>`);
+const injectHead = (html, head) => {
+  // Drop the template's fallback <title> so the per-page one is the only title.
+  const stripped = /<title[ >]/.test(head)
+    ? html.replace(/\n?\s*<title>[^<]*<\/title>/, "")
+    : html;
+  return stripped.replace("</head>", `  ${head}\n  </head>`);
+};
 
 const injectBody = (html, body) =>
   html.replace('<div id="root"></div>', `<div id="root">${body}</div>`);
