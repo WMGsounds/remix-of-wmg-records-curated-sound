@@ -68,7 +68,8 @@ const JournalCategory = () => {
   return (
     <div className="bg-ink text-ivory pb-32 min-h-screen">
       <Seo
-        title={title}
+        title={`${title} Stories`}
+        brand={JOURNAL_BRAND_SUFFIX}
         description={description}
         canonicalPath={path}
         jsonLd={breadcrumbSchema([
