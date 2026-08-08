@@ -1,69 +1,39 @@
-import { lazy, Suspense } from "react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Route, Routes } from "react-router-dom";
+import { BrowserRouter } from "react-router-dom";
+import { HelmetProvider } from "react-helmet-async";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { SiteHeader, SiteFooter } from "@/components/Layout";
 import { ScrollToTop } from "@/components/ScrollToTop";
-import Index from "./pages/Index.tsx";
-import ArtistPage from "./pages/ArtistPage.tsx";
-import ReleasePage from "./pages/ReleasePage.tsx";
-import About from "./pages/About.tsx";
-import Contact from "./pages/Contact.tsx";
-import Newsletter from "./pages/Newsletter.tsx";
-import Legal from "./pages/Legal.tsx";
-import NotFound from "./pages/NotFound.tsx";
+import { AppRoutes } from "./routes";
 
-const Artists = lazy(() => import("./pages/Artists.tsx"));
-const Releases = lazy(() => import("./pages/Releases.tsx"));
-const Gallery = lazy(() => import("./pages/Gallery.tsx"));
-const Videos = lazy(() => import("./pages/Videos.tsx"));
-const Music = lazy(() => import("./pages/Music.tsx"));
-const Journal = lazy(() => import("./pages/Journal.tsx"));
-const JournalArticlePage = lazy(() => import("./pages/JournalArticlePage.tsx"));
-const JournalCategory = lazy(() => import("./pages/JournalCategory.tsx"));
-const Store = lazy(() => import("./pages/Store.tsx"));
-const SeoDiagnostics = lazy(() => import("./pages/SeoDiagnostics.tsx"));
-const MediaLibrary = lazy(() => import("./pages/MediaLibrary.tsx"));
+/** Everything inside the router — shared by the browser app and the pre-renderer. */
+export const AppShell = () => (
+  <>
+    <ScrollToTop />
+    <SiteHeader />
+    <main>
+      <AppRoutes />
+    </main>
+    <SiteFooter />
+  </>
+);
 
 const queryClient = new QueryClient();
 
 const App = () => (
-  <QueryClientProvider client={queryClient}>
-    <TooltipProvider>
-      <Toaster />
-      <Sonner />
-      <BrowserRouter>
-        <ScrollToTop />
-        <SiteHeader />
-        <main>
-          <Routes>
-            <Route path="/" element={<Index />} />
-            <Route path="/artists" element={<Suspense fallback={null}><Artists /></Suspense>} />
-            <Route path="/artists/:slug" element={<ArtistPage />} />
-            <Route path="/releases" element={<Suspense fallback={null}><Releases /></Suspense>} />
-            <Route path="/releases/:slug" element={<ReleasePage />} />
-            <Route path="/gallery" element={<Suspense fallback={null}><Gallery /></Suspense>} />
-            <Route path="/videos" element={<Suspense fallback={null}><Videos /></Suspense>} />
-            <Route path="/music" element={<Suspense fallback={null}><Music /></Suspense>} />
-            <Route path="/journal" element={<Suspense fallback={null}><Journal /></Suspense>} />
-            <Route path="/journal/category/:slug" element={<Suspense fallback={null}><JournalCategory /></Suspense>} />
-            <Route path="/journal/:slug" element={<Suspense fallback={null}><JournalArticlePage /></Suspense>} />
-            <Route path="/store" element={<Suspense fallback={null}><Store /></Suspense>} />
-            <Route path="/about" element={<About />} />
-            <Route path="/contact" element={<Contact />} />
-            <Route path="/newsletter" element={<Newsletter />} />
-            <Route path="/legal/:doc" element={<Legal />} />
-            <Route path="/seo-diagnostics" element={<Suspense fallback={null}><SeoDiagnostics /></Suspense>} />
-            <Route path="/media-library" element={<Suspense fallback={null}><MediaLibrary /></Suspense>} />
-            <Route path="*" element={<NotFound />} />
-          </Routes>
-        </main>
-        <SiteFooter />
-      </BrowserRouter>
-    </TooltipProvider>
-  </QueryClientProvider>
+  <HelmetProvider>
+    <QueryClientProvider client={queryClient}>
+      <TooltipProvider>
+        <Toaster />
+        <Sonner />
+        <BrowserRouter>
+          <AppShell />
+        </BrowserRouter>
+      </TooltipProvider>
+    </QueryClientProvider>
+  </HelmetProvider>
 );
 
 export default App;
