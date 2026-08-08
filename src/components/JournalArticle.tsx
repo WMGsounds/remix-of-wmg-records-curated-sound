@@ -62,8 +62,10 @@ export const ArticleBody = ({ blocks }: { blocks: JournalBlock[] }) => (
             </ol>
           );
         case "image": {
-          const isProxied = b.url.startsWith("/api/image-proxy?");
-          const widthFor = (w: number) => (isProxied ? `${b.url}&w=${w}` : b.url);
+          // Legacy proxy URLs and permanent /media/* URLs both accept ?w=.
+          const isProxied = b.url.startsWith("/api/image-proxy?") || b.url.startsWith("/media/");
+          const widthFor = (w: number) =>
+            isProxied ? `${b.url}${b.url.includes("?") ? "&" : "?"}w=${w}` : b.url;
           const srcSet = isProxied
             ? [480, 720, 960, 1280, 1600].map((w) => `${widthFor(w)} ${w}w`).join(", ")
             : undefined;
