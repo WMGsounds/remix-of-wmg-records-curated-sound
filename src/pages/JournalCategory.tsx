@@ -1,7 +1,7 @@
 import { useMemo } from "react";
 import { Link, useParams, Navigate } from "react-router-dom";
 import { Seo } from "@/components/Seo";
-import { breadcrumbSchema } from "@/lib/seo";
+import { breadcrumbSchema, JOURNAL_BRAND_SUFFIX } from "@/lib/seo";
 import { useJournal } from "@/lib/queries";
 import { InlineSkeleton, PageError, PageEmpty } from "@/components/UIStates";
 import { LazyImage } from "@/components/LazyImage";
