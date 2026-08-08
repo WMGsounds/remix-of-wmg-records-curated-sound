@@ -1,6 +1,6 @@
 import { useMemo, useState } from "react";
 import { Seo } from "@/components/Seo";
-import { breadcrumbSchema } from "@/lib/seo";
+import { breadcrumbSchema, imageObjectSchema } from "@/lib/seo";
 import { useStoreItems } from "@/lib/queries";
 import { InlineSkeleton, PageError } from "@/components/UIStates";
 import { StoreCard } from "@/components/StoreCard";
@@ -102,10 +102,13 @@ const Store = () => {
         title="Store"
         description="Buy WMG releases on vinyl, CD and digital. Limited editions, bundles and signed copies from Wareham Music Group artists."
         canonicalPath="/store"
-        jsonLd={breadcrumbSchema([
-          { name: "Home", path: "/" },
-          { name: "Store", path: "/store" },
-        ])}
+        jsonLd={[
+          breadcrumbSchema([
+            { name: "Home", path: "/" },
+            { name: "Store", path: "/store" },
+          ]),
+          ...productImageSchema,
+        ]}
       />
 
       <section className="relative overflow-hidden bg-ink pt-40 pb-24 md:pb-28">

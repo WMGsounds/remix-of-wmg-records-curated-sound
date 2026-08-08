@@ -9,7 +9,7 @@ import { ArtistGalleryPreview } from "@/components/ArtistGalleryPreview";
 import { useHeaderHeight } from "@/hooks/use-header-height";
 
 import { Seo } from "@/components/Seo";
-import { breadcrumbSchema, absoluteUrl, truncate } from "@/lib/seo";
+import { breadcrumbSchema, absoluteUrl, truncate, imageObjectSchema } from "@/lib/seo";
 import { PageLoading, PageError } from "@/components/UIStates";
 
 const ArtistPage = () => {
