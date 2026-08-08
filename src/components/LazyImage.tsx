@@ -4,17 +4,25 @@ import { cn } from "@/lib/utils";
 const PROXY_PREFIX = "/api/image-proxy";
 const RESPONSIVE_WIDTHS = [320, 480, 640, 960, 1280, 1600, 1920];
 
-const isProxiedNotionImage = (src: string) => src.startsWith(`${PROXY_PREFIX}?`);
+const GALLERY_PREFIX = "/media/gallery/";
+
+// Both the legacy proxy URL and the permanent gallery URL are served by
+// /api/image-proxy, so both support the ?w= and ?blur= variants.
+const isProxiedNotionImage = (src: string) =>
+  src.startsWith(`${PROXY_PREFIX}?`) || src.startsWith(GALLERY_PREFIX);
+
+const withParam = (src: string, param: string) =>
+  `${src}${src.includes("?") ? "&" : "?"}${param}`;
 
 const buildResizedUrl = (src: string, width: number): string => {
   if (!isProxiedNotionImage(src)) return src;
-  const sep = src.includes("&w=") || /[?&]w=/.test(src) ? "" : `&w=${width}`;
-  return sep ? `${src}${sep}` : src;
+  if (/[?&]w=/.test(src)) return src;
+  return withParam(src, `w=${width}`);
 };
 
 const buildBlurUrl = (src: string): string | null => {
   if (!isProxiedNotionImage(src)) return null;
-  return `${src}&blur=1`;
+  return withParam(src, "blur=1");
 };
 
 const buildSrcSet = (src: string, maxWidth: number): string => {

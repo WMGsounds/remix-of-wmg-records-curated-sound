@@ -202,6 +202,9 @@ export type GalleryImage = {
   galleryId: string;
   title: string;
   imageUrl: string;
+  /** Permanent descriptive public URL (/media/gallery/<id>/<slug>.webp). */
+  publicUrl?: string;
+  imageSlug?: string;
   width: number | null;
   height: number | null;
   aspectRatio: number | null;

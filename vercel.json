@@ -17,6 +17,10 @@
       "destination": "/api/notion/artists?dataset=gallery"
     },
     {
+      "source": "/media/gallery/:galleryId/:filename",
+      "destination": "/api/image-proxy?galleryId=:galleryId"
+    },
+    {
       "source": "/api/media/release/:slug",
       "destination": "/api/image-proxy?releaseSlug=:slug"
     },

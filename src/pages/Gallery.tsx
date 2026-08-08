@@ -2,7 +2,7 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import { ChevronDown } from "lucide-react";
 import { Seo } from "@/components/Seo";
-import { breadcrumbSchema } from "@/lib/seo";
+import { breadcrumbSchema, absoluteUrl } from "@/lib/seo";
 import { useGallery } from "@/lib/queries";
 import { InlineSkeleton, PageError } from "@/components/UIStates";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -88,6 +88,21 @@ const Gallery = () => {
 
   const displayed = useMemo(() => visible.slice(0, visibleCount), [visible, visibleCount]);
 
+  // ImageObject structured data for the published images currently listed.
+  const imageSchema = useMemo(
+    () =>
+      visible.slice(0, 30).map((i) => ({
+        "@context": "https://schema.org",
+        "@type": "ImageObject",
+        contentUrl: absoluteUrl((i.publicUrl || i.imageUrl).split("?")[0]),
+        ...(i.title ? { name: i.title } : {}),
+        ...(i.altText ? { description: i.altText } : {}),
+        ...(i.caption ? { caption: i.caption } : {}),
+        ...(i.credit ? { creditText: i.credit } : {}),
+      })),
+    [visible],
+  );
+
   if (isError) return <PageError message="Couldn't load the gallery." />;
 
   return (
@@ -96,10 +111,13 @@ const Gallery = () => {
         title="Gallery"
         description="The WMG visual archive: portraits, live performance, studio sessions and behind-the-scenes photography from across the Wareham Music Group roster."
         canonicalPath="/gallery"
-        jsonLd={breadcrumbSchema([
-          { name: "Home", path: "/" },
-          { name: "Gallery", path: "/gallery" },
-        ])}
+        jsonLd={[
+          breadcrumbSchema([
+            { name: "Home", path: "/" },
+            { name: "Gallery", path: "/gallery" },
+          ]),
+          ...imageSchema,
+        ]}
       />
 
       <section className="relative overflow-hidden bg-ink pt-40 pb-24 md:pb-28">
