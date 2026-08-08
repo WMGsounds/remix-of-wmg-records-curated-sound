@@ -2,6 +2,13 @@ import sharp from "sharp";
 import { notion, DBS, logApiError, logApiSuccess, requireEnv, type ApiRequest, type ApiResponse } from "./notion/_client.js";
 import { loadAll } from "./notion/_normalize.js";
 import {
+  normalizeGalleryImage,
+  galleryRawFileUrl,
+  galleryPageId,
+  galleryIdSegment,
+  slugifyImageTitle,
+} from "./notion/_gallery.js";
+import {
   artistSlugMap,
   findProp,
   firstFileUrl,
@@ -233,9 +240,94 @@ async function handleReleaseArtwork(req: ImageProxyRequest, res: ImageProxyRespo
 }
 
 
+// ---------------------------------------------------------------------------
+// Gallery mode: /media/gallery/<gallery-id>/<image-title>.webp
+// Rewritten to /api/image-proxy?galleryId=<gallery-id> so no extra serverless
+// function slot is used. The Gallery ID is the key; the slug is descriptive.
+// ---------------------------------------------------------------------------
+
+async function handleGalleryImage(req: ImageProxyRequest, res: ImageProxyResponse, rawId: string) {
+  const route = "/api/image-proxy?galleryId";
+  const method = (req.method ?? "GET").toUpperCase();
+  if (method !== "GET" && method !== "HEAD") return sendMediaError(res, 405, "Method not allowed.");
+
+  const wanted = galleryIdSegment(decodeURIComponent(rawId ?? ""));
+  if (!wanted) return sendMediaError(res, 404, "Not found.");
+
+  try {
+    requireEnv(route, ["NOTION_TOKEN", "NOTION_GALLERY_DATABASE_ID"]);
+
+    const pages = await loadAll(notion, DBS.gallery);
+    const page = pages.find((p: any) => galleryIdSegment(galleryPageId(p)) === wanted);
+    if (!page) return sendMediaError(res, 404, "Not found.");
+
+    // Same publication rules as the Gallery API (fails closed).
+    const image = normalizeGalleryImage(page, new Map(), Date.now());
+    if (!image) return sendMediaError(res, 404, "Not found.");
+
+    const sourceUrl = galleryRawFileUrl(page);
+    if (!sourceUrl || !isAllowedImageUrl(sourceUrl)) return sendMediaError(res, 404, "Not found.");
+
+    const width = pickWidth(getQueryValue(req.query.w));
+    const wantBlur = getQueryValue(req.query.blur) === "1";
+
+    let source: Response;
+    try {
+      source = await fetch(sourceUrl, { headers: { Accept: "image/avif,image/webp,image/*,*/*;q=0.8" } });
+    } catch (fetchError) {
+      logApiError(route, fetchError, { galleryId: wanted, stage: "source-fetch" });
+      return sendMediaError(res, 502, "Could not load image.");
+    }
+    if (!source.ok || !(source.headers.get("content-type") || "").toLowerCase().startsWith("image/")) {
+      return sendMediaError(res, 502, "Could not load image.");
+    }
+
+    const input = Buffer.from(await source.arrayBuffer());
+    let output: Buffer;
+    try {
+      let pipeline = sharp(input, { failOn: "none" }).rotate();
+      if (wantBlur) {
+        pipeline = pipeline.resize({ width: 24, withoutEnlargement: true }).blur(2).webp({ quality: 30 });
+      } else {
+        pipeline = pipeline
+          .resize({ width: width ?? 1600, withoutEnlargement: true })
+          .webp({ quality: DEFAULT_QUALITY });
+      }
+      output = await pipeline.toBuffer();
+    } catch (sharpError) {
+      logApiError(route, sharpError, { galleryId: wanted, stage: "sharp-conversion" });
+      return sendMediaError(res, 502, "Could not process image.");
+    }
+
+    const filename = `${slugifyImageTitle(image.title)}.webp`;
+    const headers: Record<string, string> = {
+      "Content-Type": "image/webp",
+      "Content-Disposition": `inline; filename="${filename}"`,
+      "Cache-Control": CACHE_CONTROL,
+      "Access-Control-Allow-Origin": "*",
+      "X-Content-Type-Options": "nosniff",
+      "Link": WMG_FAVICON_LINK,
+      "Content-Length": String(output.length),
+    };
+    logApiSuccess(route, { galleryId: wanted, bytes: output.length });
+    if (method === "HEAD") {
+      res.writeHead(200, headers).end("");
+      return;
+    }
+    res.writeHead(200, headers).end(output as unknown as string);
+  } catch (error) {
+    logApiError(route, error, { galleryId: wanted, stage: "handler" });
+    return sendMediaError(res, 500, "Image request failed.");
+  }
+}
+
+
 export default async function handler(req: ImageProxyRequest, res: ImageProxyResponse) {
   const releaseSlug = getQueryValue(req.query.releaseSlug);
   if (releaseSlug) return handleReleaseArtwork(req, res, releaseSlug);
+
+  const galleryId = getQueryValue(req.query.galleryId);
+  if (galleryId) return handleGalleryImage(req, res, galleryId);
 
   const rawUrl = getQueryValue(req.query.url);
   const width = pickWidth(getQueryValue(req.query.w));
