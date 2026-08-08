@@ -12,6 +12,36 @@ export const GALLERY_IMAGE_TYPES = [
   "Other",
 ] as const;
 
+/** SEO slug for a Gallery image title (lowercase, hyphenated, ASCII-safe). */
+export function slugifyImageTitle(raw: string): string {
+  const slug = (raw ?? "")
+    .normalize("NFKD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/[''\u2019]/g, "")
+    .replace(/&/g, " and ")
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/-+/g, "-")
+    .replace(/^-|-$/g, "");
+  return slug || "wmg-gallery-image";
+}
+
+/** Gallery ID normalised for use as a URL path segment (the real database key). */
+export const galleryIdSegment = (galleryId: string): string =>
+  (galleryId ?? "").trim().toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
+
+/**
+ * Permanent, descriptive public path for a Gallery image.
+ * `/media/gallery/<gallery-id>/<image-title-slug>.webp` — the Gallery ID is the
+ * key; the slug is purely descriptive, so retitled images keep resolving.
+ */
+export function galleryPublicPath(galleryId: string, title: string, fileHash = ""): string {
+  const id = galleryIdSegment(galleryId);
+  if (!id) return "";
+  const version = (fileHash ?? "").trim().slice(0, 12).replace(/[^a-zA-Z0-9]/g, "");
+  return `/media/gallery/${id}/${slugifyImageTitle(title)}.webp${version ? `?v=${version}` : ""}`;
+}
+
 const findProp = (props: Record<string, any>, ...names: string[]): any => {
   for (const n of names) if (props[n] !== undefined) return props[n];
   const norm = (s: string) => s.normalize("NFKC").replace(/\s+/g, "").toLowerCase();
@@ -77,11 +107,20 @@ const uniqueId = (p: any): string => {
   return text(p);
 };
 
+/** Raw (unproxied) Notion file URL for a Gallery page. */
+export const galleryRawFileUrl = (page: any): string => rawFileUrl(findProp(page?.properties ?? {}, "Image"));
+
+/** Gallery ID as stored on a Gallery page (before URL normalisation). */
+export const galleryPageId = (page: any): string =>
+  uniqueId(findProp(page?.properties ?? {}, "\u{1F504} Gallery ID", "Gallery ID")) || String(page?.id ?? "");
+
 export type GalleryImage = {
   id: string;
   galleryId: string;
   title: string;
   imageUrl: string;
+  publicUrl: string;
+  imageSlug: string;
   width: number | null;
   height: number | null;
   aspectRatio: number | null;
@@ -150,7 +189,9 @@ export function normalizeGalleryImage(
     id: String(page.id),
     galleryId: uniqueId(findProp(props, "🔄 Gallery ID", "Gallery ID")) || String(page.id),
     title,
-    imageUrl: proxyImageIfNeeded(raw),
+    imageUrl: galleryPublicPath(galleryIdValue, title, fileHash) || proxyImageIfNeeded(raw),
+    publicUrl: galleryPublicPath(galleryIdValue, title, fileHash),
+    imageSlug: slugifyImageTitle(title),
     width: width && width > 0 ? width : null,
     height: height && height > 0 ? height : null,
     aspectRatio: width && height && width > 0 && height > 0 ? width / height : null,
@@ -167,7 +208,7 @@ export function normalizeGalleryImage(
     focalPoint: text(findProp(props, "Focal Point")) || "Centre",
     relatedRelease: release?.title ?? "",
     relatedReleaseUrl: release?.published && release.slug ? `/releases/${release.slug}` : "",
-    fileHash: text(findProp(props, "File Hash")),
+    fileHash,
   };
 }
 
