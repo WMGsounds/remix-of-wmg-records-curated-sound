@@ -5,12 +5,29 @@ import {
   DEFAULT_TITLE,
   DEFAULT_DESCRIPTION,
   DEFAULT_OG_IMAGE,
+  BRAND_SUFFIX,
   absoluteUrl,
-  truncate,
+  buildTitle,
+  clampDescription,
 } from "@/lib/seo";
 
+/**
+ * Site-wide head tags.
+ *
+ * TITLE STANDARD: pass `title` as the DESCRIPTIVE part only — this component
+ * appends the brand, producing "<descriptive part> | Wareham Music Group"
+ * within 60 characters. Override the suffix with `brand` (Journal posts use
+ * "WMG Journal"), or pass `fullTitle` when a page needs an exact string.
+ * Never hand-write "WMG | ..." prefixes.
+ *
+ * DESCRIPTION STANDARD: pass a complete sentence of ~150–155 characters.
+ * `clampDescription` is a safety net only; it cuts at a sentence end or whole
+ * word and never appends an ellipsis.
+ */
 type SeoProps = {
   title?: string;
+  fullTitle?: string;
+  brand?: string;
   description?: string;
   canonicalPath?: string;
   canonicalUrl?: string;
@@ -24,6 +41,8 @@ type SeoProps = {
 
 export const Seo = ({
   title,
+  fullTitle,
+  brand = BRAND_SUFFIX,
   description,
   canonicalPath,
   canonicalUrl,
@@ -35,12 +54,13 @@ export const Seo = ({
   modifiedTime,
 }: SeoProps) => {
   const location = useLocation();
-  const pageTitle = title ? `${SITE_NAME} | ${title}` : DEFAULT_TITLE;
-  const pageDesc = truncate(description || DEFAULT_DESCRIPTION);
+  const pageTitle = fullTitle || (title ? buildTitle(title, brand) : DEFAULT_TITLE);
+  const pageDesc = clampDescription(description || DEFAULT_DESCRIPTION);
   const pagePath = canonicalPath ?? location.pathname;
   const canonical = canonicalUrl || absoluteUrl(pagePath);
   const ogImage = image ? absoluteUrl(image) : DEFAULT_OG_IMAGE;
   const schemas = jsonLd ? (Array.isArray(jsonLd) ? jsonLd : [jsonLd]) : [];
+
 
   return (
     <Helmet prioritizeSeoTags>
