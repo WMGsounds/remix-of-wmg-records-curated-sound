@@ -133,7 +133,7 @@ export default async function handler(req: any, res: any) {
           [
             { publicUrl: a.heroImage, title: `${a.name} — hero image`, caption: "" },
             { publicUrl: a.heroImage2, title: `${a.name} — photograph`, caption: "" },
-            ...((a.galleryImages || []) as string[]).map((u, i) => ({
+            ...((a.gallery || []) as string[]).map((u, i) => ({
               publicUrl: u,
               title: `${a.name} — gallery ${i + 1}`,
               caption: "",
