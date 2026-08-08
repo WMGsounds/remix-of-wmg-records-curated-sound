@@ -1,5 +1,11 @@
 import { notion, DBS, requireEnv } from "./notion/_client.js";
-import { loadAll, normalizeArtist, normalizeRelease, isReleasePublished } from "./notion/_normalize.js";
+import {
+  loadAll,
+  normalizeArtist,
+  normalizeRelease,
+  isReleasePublished,
+  normalizeStoreItem,
+} from "./notion/_normalize.js";
 import { normalizeJournal, isJournalPublished } from "./notion/_journal.js";
 import { normalizeGalleryImage, dedupeGalleryImages, sortGalleryImages } from "./notion/_gallery.js";
 
@@ -31,13 +37,14 @@ function escapeXml(s: string): string {
 }
 
 function imageEntries(
-  images: { publicUrl?: string; imageUrl: string; title: string; caption: string }[],
+  images: { publicUrl?: string; imageUrl?: string; title?: string; caption?: string }[],
   base: string,
 ): string {
   return images
     .map((img) => {
       const loc = (img.publicUrl || img.imageUrl || "").split("?")[0];
-      if (!loc.startsWith("/media/gallery/")) return "";
+      // Only permanent, public /media/* URLs belong in the sitemap.
+      if (!loc.startsWith("/media/")) return "";
       return `\n    <image:image>\n      <image:loc>${escapeXml(`${base}${loc}`)}</image:loc>${
         img.title ? `\n      <image:title>${escapeXml(img.title)}</image:title>` : ""
       }${img.caption ? `\n      <image:caption>${escapeXml(img.caption)}</image:caption>` : ""}\n    </image:image>`;
@@ -56,6 +63,7 @@ export default async function handler(req: any, res: any) {
   const urls: string[] = [];
 
   const galleryImageXml = { value: "" };
+  const storeImageXml = { value: "" };
   const staticEntries: (() => string)[] = STATIC_PATHS.map(
     (s) => () =>
       urlEntry(
@@ -63,17 +71,18 @@ export default async function handler(req: any, res: any) {
         undefined,
         s.changefreq,
         s.priority,
-        s.path === "/gallery" ? galleryImageXml.value : "",
+        s.path === "/gallery" ? galleryImageXml.value : s.path === "/store" ? storeImageXml.value : "",
       ),
   );
 
   try {
     requireEnv("/api/sitemap", ["NOTION_TOKEN", "NOTION_ARTISTS_DB_ID", "NOTION_RELEASES_DB_ID", "NOTION_JOURNAL_DB_ID"]);
-    const [artistPages, releasePages, journalPages, galleryPages] = await Promise.all([
+    const [artistPages, releasePages, journalPages, galleryPages, storePages] = await Promise.all([
       loadAll(notion, DBS.artists),
       loadAll(notion, DBS.releases),
       loadAll(notion, DBS.journal),
       DBS.gallery ? loadAll(notion, DBS.gallery).catch(() => []) : Promise.resolve([]),
+      DBS.storeItems ? loadAll(notion, DBS.storeItems).catch(() => []) : Promise.resolve([]),
     ]);
 
     // Published gallery images, listed once beneath /gallery.
@@ -102,16 +111,56 @@ export default async function handler(req: any, res: any) {
       if (slug) urls.push(urlEntry(`${base}/journal/category/${slug}`, undefined, "weekly", "0.6"));
     }
 
-    for (const a of artists) {
-      if (a.slug && a.showOnWebsite !== false) urls.push(urlEntry(`${base}/artists/${a.slug}`, undefined, "monthly", "0.7"));
+    // Store product images, listed once beneath /store.
+    const releaseLookup = new Map((releases as any[]).map((r) => [r.id, r]));
+    const storeItems = (storePages as any[]).map((p) =>
+      normalizeStoreItem(p, { artistLookup: artistMap, releaseLookup, trackLookup: new Map() }),
+    );
+    storeImageXml.value = imageEntries(
+      storeItems
+        .filter((i: any) => i && i.availability !== "Hidden" && i.productImage)
+        .map((i: any) => ({
+          publicUrl: i.productImage,
+          title: [i.artist?.name, i.title].filter(Boolean).join(" — ") || i.title,
+          caption: i.description || "",
+        })),
+      base,
+    );
+
+    for (const a of artists as any[]) {
+      if (a.slug && a.showOnWebsite !== false) {
+        const images = imageEntries(
+          [
+            { publicUrl: a.heroImage, title: `${a.name} — hero image`, caption: "" },
+            { publicUrl: a.heroImage2, title: `${a.name} — photograph`, caption: "" },
+            ...((a.galleryImages || []) as string[]).map((u, i) => ({
+              publicUrl: u,
+              title: `${a.name} — gallery ${i + 1}`,
+              caption: "",
+            })),
+          ],
+          base,
+        );
+        urls.push(urlEntry(`${base}/artists/${a.slug}`, undefined, "monthly", "0.7", images));
+      }
     }
     for (const r of releases as any[]) {
-      if (r.slug && isReleasePublished(r)) urls.push(urlEntry(`${base}/releases/${r.slug}`, r.releaseDate, "monthly", "0.8"));
+      if (r.slug && isReleasePublished(r)) {
+        const images = imageEntries(
+          [{ publicUrl: r.coverArt, title: `${r.title} — cover art`, caption: r.artistName || "" }],
+          base,
+        );
+        urls.push(urlEntry(`${base}/releases/${r.slug}`, r.releaseDate, "monthly", "0.8", images));
+      }
     }
     for (const j of journal as any[]) {
       if (j.slug) {
         const lastmod = j.lastEditedTime || j.publishedDate || j.createdTime;
-        urls.push(urlEntry(`${base}/journal/${j.slug}`, lastmod, "monthly", "0.7"));
+        const images = imageEntries(
+          [{ publicUrl: j.coverImage, title: j.title || "", caption: j.imageAlt || j.excerpt || "" }],
+          base,
+        );
+        urls.push(urlEntry(`${base}/journal/${j.slug}`, lastmod, "monthly", "0.7", images));
       }
     }
   } catch (e) {
