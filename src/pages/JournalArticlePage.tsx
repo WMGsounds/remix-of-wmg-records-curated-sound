@@ -1,7 +1,7 @@
 import { Link, useParams, Navigate } from "react-router-dom";
 import { ArrowLeft, ArrowRight } from "lucide-react";
 import { Seo } from "@/components/Seo";
-import { absoluteUrl, breadcrumbSchema, truncate, SITE_NAME } from "@/lib/seo";
+import { absoluteUrl, breadcrumbSchema, truncate, SITE_NAME, imageObjectSchema } from "@/lib/seo";
 import { PageLoading, PageError } from "@/components/UIStates";
 import { LazyImage } from "@/components/LazyImage";
 import { useJournalArticle } from "@/lib/queries";
@@ -62,6 +62,13 @@ const JournalArticlePage = () => {
             { name: a.title, path },
           ]),
           articleSchema,
+          ...[
+            imageObjectSchema({
+              url: a.coverImage,
+              name: a.title,
+              description: a.imageAlt || a.excerpt || undefined,
+            }),
+          ].filter(Boolean),
         ]}
       />
 

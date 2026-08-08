@@ -9,7 +9,7 @@ import { ArtistGalleryPreview } from "@/components/ArtistGalleryPreview";
 import { useHeaderHeight } from "@/hooks/use-header-height";
 
 import { Seo } from "@/components/Seo";
-import { breadcrumbSchema, absoluteUrl, truncate } from "@/lib/seo";
+import { breadcrumbSchema, absoluteUrl, truncate, imageObjectSchema } from "@/lib/seo";
 import { PageLoading, PageError } from "@/components/UIStates";
 
 const ArtistPage = () => {
@@ -90,6 +90,18 @@ const ArtistPage = () => {
             { name: artist.name, path },
           ]),
           musicGroup,
+          ...[
+            imageObjectSchema({
+              url: artist.heroImage,
+              name: `${artist.name} — hero image`,
+              description: `${artist.name}, WMG artist portrait.`,
+            }),
+            imageObjectSchema({
+              url: artist.heroImage2,
+              name: `${artist.name} — secondary image`,
+              description: `${artist.name}, WMG artist photograph.`,
+            }),
+          ].filter(Boolean),
         ]}
       />
       {/* Header backdrop — matches the artist section background, header height only */}

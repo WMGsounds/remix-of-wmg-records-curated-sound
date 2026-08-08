@@ -53,3 +53,27 @@ export const breadcrumbSchema = (
     item: absoluteUrl(t.path),
   })),
 });
+
+/**
+ * ImageObject node for a permanent WMG media URL (relative paths are made
+ * absolute). Returns null when there's no image, so callers can filter.
+ */
+export const imageObjectSchema = (opts: {
+  url?: string | null;
+  name?: string | null;
+  description?: string | null;
+  caption?: string | null;
+  credit?: string | null;
+}) => {
+  const url = (opts.url ?? "").trim();
+  if (!url) return null;
+  return {
+    "@context": "https://schema.org",
+    "@type": "ImageObject",
+    contentUrl: absoluteUrl(url),
+    ...(opts.name ? { name: opts.name } : {}),
+    ...(opts.description ? { description: opts.description } : {}),
+    ...(opts.caption ? { caption: opts.caption } : {}),
+    ...(opts.credit ? { creditText: opts.credit } : {}),
+  };
+};

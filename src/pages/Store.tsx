@@ -1,6 +1,6 @@
 import { useMemo, useState } from "react";
 import { Seo } from "@/components/Seo";
-import { breadcrumbSchema } from "@/lib/seo";
+import { breadcrumbSchema, imageObjectSchema } from "@/lib/seo";
 import { useStoreItems } from "@/lib/queries";
 import { InlineSkeleton, PageError } from "@/components/UIStates";
 import { StoreCard } from "@/components/StoreCard";
@@ -92,6 +92,22 @@ const Store = () => {
 
   const rest = useMemo(() => sortItems(filtered, sort), [filtered, sort]);
 
+  // ImageObject data for the products actually displayed (capped for size).
+  const productImageSchema = useMemo(
+    () =>
+      [...featured, ...rest]
+        .slice(0, 30)
+        .map((i) =>
+          imageObjectSchema({
+            url: i.productImage,
+            name: [i.artist?.name, i.title].filter(Boolean).join(" — ") || i.title,
+            description: i.description || undefined,
+          }),
+        )
+        .filter(Boolean) as Record<string, unknown>[],
+    [featured, rest],
+  );
+
   const hasAnyVisible = featured.length + items.filter((i) => i.availability !== "Hidden" && !i.featured).length > 0;
 
   if (isError) return <PageError message="Couldn't load the store." />;
@@ -102,10 +118,13 @@ const Store = () => {
         title="Store"
         description="Buy WMG releases on vinyl, CD and digital. Limited editions, bundles and signed copies from Wareham Music Group artists."
         canonicalPath="/store"
-        jsonLd={breadcrumbSchema([
-          { name: "Home", path: "/" },
-          { name: "Store", path: "/store" },
-        ])}
+        jsonLd={[
+          breadcrumbSchema([
+            { name: "Home", path: "/" },
+            { name: "Store", path: "/store" },
+          ]),
+          ...productImageSchema,
+        ]}
       />
 
       <section className="relative overflow-hidden bg-ink pt-40 pb-24 md:pb-28">

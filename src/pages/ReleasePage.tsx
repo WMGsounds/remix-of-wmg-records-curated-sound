@@ -4,7 +4,7 @@ import { ChevronDown, ChevronLeft, ChevronRight, ChevronUp, Play, ShoppingBag } 
 import { useReleaseBySlug, useStoreItems } from "@/lib/queries";
 import { LazyImage } from "@/components/LazyImage";
 import { Seo } from "@/components/Seo";
-import { breadcrumbSchema, absoluteUrl, truncate } from "@/lib/seo";
+import { breadcrumbSchema, absoluteUrl, truncate, imageObjectSchema } from "@/lib/seo";
 import { PageLoading, PageError } from "@/components/UIStates";
 import { ReleaseLinks } from "@/components/ReleaseLinks";
 import type { Track, StoreItem } from "@/lib/types";
@@ -274,6 +274,13 @@ const ReleasePage = () => {
               duration: t.duration ? `PT${t.duration.split(":")[0]}M${t.duration.split(":")[1] || "0"}S` : undefined,
             })),
           },
+          ...[
+            imageObjectSchema({
+              url: release.coverArt,
+              name: `${release.title} — cover art`,
+              description: `Cover art for ${release.title} by ${release.artistName || artist?.name || "WMG"}.`,
+            }),
+          ].filter(Boolean),
         ]}
       />
       {/* Hero + Tracklist (unified blurred-cover background) */}

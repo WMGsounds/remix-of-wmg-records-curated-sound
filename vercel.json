@@ -21,6 +21,30 @@
       "destination": "/api/image-proxy?galleryId=:galleryId"
     },
     {
+      "source": "/media/artists/:artistSlug/gallery/:index/:filename",
+      "destination": "/api/image-proxy?artistSlug=:artistSlug&role=gallery&index=:index"
+    },
+    {
+      "source": "/media/artists/:artistSlug/:role/:filename",
+      "destination": "/api/image-proxy?artistSlug=:artistSlug&role=:role"
+    },
+    {
+      "source": "/media/releases/:releaseKey/:filename",
+      "destination": "/api/image-proxy?releaseKey=:releaseKey"
+    },
+    {
+      "source": "/media/store/:storeKey/:filename",
+      "destination": "/api/image-proxy?storeKey=:storeKey"
+    },
+    {
+      "source": "/media/journal/:journalSlug/cover/:filename",
+      "destination": "/api/image-proxy?journalSlug=:journalSlug"
+    },
+    {
+      "source": "/media/journal/:journalSlug/images/:blockId/:filename",
+      "destination": "/api/image-proxy?journalSlug=:journalSlug&blockId=:blockId"
+    },
+    {
       "source": "/api/media/release/:slug",
       "destination": "/api/image-proxy?releaseSlug=:slug"
     },

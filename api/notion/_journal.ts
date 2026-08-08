@@ -1,6 +1,7 @@
 // Journal: normalization for the Journal database + page body block fetching.
 import { proxyImageIfNeeded } from "./_imageHelper.js";
 import { resolvePublishInstant } from "./_schedule.js";
+import { journalCoverUrl, journalBlockImageUrl } from "./_mediaUrls.js";
 
 const text = (p: any): string =>
   (p?.rich_text ?? p?.title ?? []).map((t: any) => t.plain_text).join("").trim();
@@ -60,7 +61,13 @@ export function normalizeJournal(page: any): JournalArticle {
     album: text(props["Album"]),
     publishedDate: publishDate ?? "",
     publishDate,
-    coverImage: firstFile(props["Cover Image"]),
+    coverImage: firstFile(props["Cover Image"])
+      ? journalCoverUrl({
+          articleSlug: text(props["Slug"]) || page.id,
+          title: text(titleProp) || "Untitled",
+          version: String(page.last_edited_time ?? ""),
+        }) || firstFile(props["Cover Image"])
+      : "",
     excerpt: text(props["Excerpt"]),
     summary: text(props["Summary"]),
     readingTime: num(props["Reading Time"]),
@@ -114,7 +121,7 @@ export type ArticleBlock =
   | { type: "divider" }
   | { type: "bulleted_list"; items: RichText[][] }
   | { type: "numbered_list"; items: RichText[][] }
-  | { type: "image"; url: string; caption: string; alt: string };
+  | { type: "image"; url: string; caption: string; alt: string; blockId?: string; blockVersion?: string };
 
 const richFrom = (rt: any[] = []): RichText[] =>
   rt.map((t: any) => ({
@@ -139,7 +146,11 @@ async function listChildren(notion: any, blockId: string): Promise<any[]> {
   return out;
 }
 
-export async function fetchPageBlocks(notion: any, pageId: string): Promise<ArticleBlock[]> {
+export async function fetchPageBlocks(
+  notion: any,
+  pageId: string,
+  article?: { slug?: string; title?: string },
+): Promise<ArticleBlock[]> {
   const raw = await listChildren(notion, pageId);
   const blocks: ArticleBlock[] = [];
 
@@ -191,9 +202,13 @@ export async function fetchPageBlocks(notion: any, pageId: string): Promise<Arti
         if (raw) {
           blocks.push({
             type: "image",
+            // Replaced below with the permanent /media/journal/... URL once
+            // bracket captions have been resolved (they feed the filename).
             url: proxyImageIfNeeded(raw),
             caption: plainCaption(img?.caption ?? []),
             alt: plainCaption(img?.caption ?? []) || "Article image",
+            blockId: String(b.id ?? ""),
+            blockVersion: String(b.last_edited_time ?? ""),
           });
         }
         break;
@@ -203,7 +218,34 @@ export async function fetchPageBlocks(notion: any, pageId: string): Promise<Arti
     }
   }
   flushList();
-  return applyBracketCaptions(blocks);
+  return withPermanentImageUrls(applyBracketCaptions(blocks), article, pageId);
+}
+
+/**
+ * Swap every article image block onto its permanent, descriptive public URL.
+ * Runs after caption resolution so a caption can drive the filename.
+ */
+export function withPermanentImageUrls(
+  blocks: ArticleBlock[],
+  article: { slug?: string; title?: string } | undefined,
+  pageId: string,
+): ArticleBlock[] {
+  let index = 0;
+  return blocks.map((b) => {
+    if (b.type !== "image") return b;
+    const i = index++;
+    const permanent = journalBlockImageUrl({
+      articleSlug: article?.slug || pageId,
+      blockId: b.blockId ?? "",
+      caption: b.caption,
+      articleTitle: article?.title,
+      index: i,
+      version: b.blockVersion,
+    });
+    // blockVersion is server-only bookkeeping — never sent to the browser.
+    const { blockVersion: _v, ...rest } = b;
+    return permanent ? { ...rest, url: permanent } : rest;
+  });
 }
 
 // Paragraphs shaped like "[Caption: ...]" directly after an image become that image's caption.

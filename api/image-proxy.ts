@@ -1,6 +1,8 @@
 import sharp from "sharp";
 import { notion, DBS, logApiError, logApiSuccess, requireEnv, type ApiRequest, type ApiResponse } from "./notion/_client.js";
-import { loadAll } from "./notion/_normalize.js";
+import { loadAll, normalizeArtist, normalizeRelease, isReleasePublished } from "./notion/_normalize.js";
+import { normalizeJournal, isJournalPublished } from "./notion/_journal.js";
+import { compactId, keySegment, slugifyName } from "./notion/_mediaUrls.js";
 import {
   normalizeGalleryImage,
   galleryRawFileUrl,
@@ -14,6 +16,7 @@ import {
   firstFileUrl,
   matchReleaseByCompositeKey,
   normalizeCompositeKey,
+  propertyText,
   sanitizeFilename,
 } from "./notion/_media.js";
 
@@ -134,7 +137,10 @@ async function findReleasePage(compositeKey: string) {
     loadAll(notion, DBS.artists),
     loadAll(notion, DBS.releases),
   ]);
-  return matchReleaseByCompositeKey(releasePages, artistSlugMap(artistPages), compositeKey);
+  return {
+    ...matchReleaseByCompositeKey(releasePages, artistSlugMap(artistPages), compositeKey),
+    artistPages,
+  };
 }
 
 
@@ -166,14 +172,11 @@ async function handleReleaseArtwork(req: ImageProxyRequest, res: ImageProxyRespo
     }
 
     const props = page.properties ?? {};
-    const showProp = findProp(props, "Show on website", "Show on Website", "Show On Website");
-    const visible = showProp?.type === "checkbox" ? showProp.checkbox === true : false;
-    if (!visible) {
-      console.warn("[media-api] Release hidden or missing Show on website checkbox", {
-        route,
-        slug,
-        propertyType: showProp?.type ?? "missing",
-      });
+    // Full public eligibility: Show on website AND the Release Date has
+    // arrived in Europe/London — a future or hidden release can't be guessed.
+    const artistLookup = new Map(match.artistPages.map((p: any) => [p.id, normalizeArtist(p)]));
+    if (!isReleasePublished(normalizeRelease(page, artistLookup))) {
+      console.warn("[media-api] Release not publicly eligible", { route, slug });
       return sendMediaError(res, 404, "Not found.");
     }
 
@@ -322,12 +325,313 @@ async function handleGalleryImage(req: ImageProxyRequest, res: ImageProxyRespons
 }
 
 
+// ---------------------------------------------------------------------------
+// Shared WebP renderer for every permanent /media/* route.
+// Fetches the (approved-host) Notion file, honours ?w= and ?blur=1, and sends
+// it as WebP with a descriptive Content-Disposition filename.
+// ---------------------------------------------------------------------------
+
+async function serveNotionImage(
+  req: ImageProxyRequest,
+  res: ImageProxyResponse,
+  opts: { route: string; sourceUrl: string; filenameSlug: string; context: Record<string, unknown> },
+) {
+  const { route, sourceUrl, filenameSlug, context } = opts;
+  const method = (req.method ?? "GET").toUpperCase();
+  if (!sourceUrl || !isAllowedImageUrl(sourceUrl)) return sendMediaError(res, 404, "Not found.");
+
+  const width = pickWidth(getQueryValue(req.query.w));
+  const wantBlur = getQueryValue(req.query.blur) === "1";
+
+  let source: Response;
+  try {
+    source = await fetch(sourceUrl, { headers: { Accept: "image/avif,image/webp,image/*,*/*;q=0.8" } });
+  } catch (fetchError) {
+    logApiError(route, fetchError, { ...context, stage: "source-fetch" });
+    return sendMediaError(res, 502, "Could not load image.");
+  }
+  if (!source.ok || !(source.headers.get("content-type") || "").toLowerCase().startsWith("image/")) {
+    return sendMediaError(res, 502, "Could not load image.");
+  }
+
+  const input = Buffer.from(await source.arrayBuffer());
+  let output: Buffer;
+  try {
+    let pipeline = sharp(input, { failOn: "none" }).rotate();
+    if (wantBlur) {
+      pipeline = pipeline.resize({ width: 24, withoutEnlargement: true }).blur(2).webp({ quality: 30 });
+    } else {
+      pipeline = pipeline
+        .resize({ width: width ?? 1600, withoutEnlargement: true })
+        .webp({ quality: DEFAULT_QUALITY });
+    }
+    output = await pipeline.toBuffer();
+  } catch (sharpError) {
+    logApiError(route, sharpError, { ...context, stage: "sharp-conversion" });
+    return sendMediaError(res, 502, "Could not process image.");
+  }
+
+  const headers: Record<string, string> = {
+    "Content-Type": "image/webp",
+    "Content-Disposition": `inline; filename="${slugifyName(filenameSlug)}.webp"`,
+    "Cache-Control": CACHE_CONTROL,
+    "Access-Control-Allow-Origin": "*",
+    "X-Content-Type-Options": "nosniff",
+    "Link": WMG_FAVICON_LINK,
+    "Content-Length": String(output.length),
+  };
+  logApiSuccess(route, { ...context, bytes: output.length });
+  if (method === "HEAD") {
+    res.writeHead(200, headers).end("");
+    return;
+  }
+  res.writeHead(200, headers).end(output as unknown as string);
+}
+
+const isReadMethod = (req: ImageProxyRequest) => {
+  const m = (req.method ?? "GET").toUpperCase();
+  return m === "GET" || m === "HEAD";
+};
+
+// ---------------------------------------------------------------------------
+// Artist images: /media/artists/<slug>/{hero|secondary}/<name>.webp
+//                /media/artists/<slug>/gallery/<index>/<name>.webp
+// ---------------------------------------------------------------------------
+
+async function handleArtistImage(
+  req: ImageProxyRequest,
+  res: ImageProxyResponse,
+  rawSlug: string,
+  rawRole: string,
+  rawIndex: string | undefined,
+) {
+  const route = "/api/image-proxy?artistSlug";
+  if (!isReadMethod(req)) return sendMediaError(res, 405, "Method not allowed.");
+  const slug = keySegment(decodeURIComponent(rawSlug ?? ""));
+  const role = (rawRole ?? "hero").toLowerCase();
+  if (!slug || !["hero", "secondary", "gallery"].includes(role)) return sendMediaError(res, 404, "Not found.");
+
+  try {
+    requireEnv(route, ["NOTION_TOKEN", "NOTION_ARTISTS_DB_ID"]);
+    const pages = await loadAll(notion, DBS.artists);
+    const page = pages.find((p: any) => keySegment(propertyTextOf(p, "Slug")) === slug);
+    if (!page) return sendMediaError(res, 404, "Not found.");
+
+    // Same eligibility rule as /api/notion/artist/[slug].
+    const artist = normalizeArtist(page);
+    if (artist.showOnWebsite === false) return sendMediaError(res, 404, "Not found.");
+
+    const props = page.properties ?? {};
+    let sourceUrl = "";
+    let filenameSlug = artist.name || slug;
+    if (role === "hero") {
+      sourceUrl = firstFileUrl(findProp(props, "Hero Image"));
+      filenameSlug = `${artist.name || slug} hero`;
+    } else if (role === "secondary") {
+      sourceUrl = firstFileUrl(findProp(props, "Hero Image 2"));
+      filenameSlug = `${artist.name || slug} secondary image`;
+    } else {
+      const index = Number(rawIndex ?? "0");
+      const galleryFiles = (findProp(props, "Gallery")?.files ?? []) as any[];
+      const file = Number.isInteger(index) && index >= 0 ? galleryFiles[index] : undefined;
+      sourceUrl = file ? (file.type === "external" ? file.external?.url ?? "" : file.file?.url ?? "") : "";
+      filenameSlug = `${artist.name || slug} gallery image ${String(index + 1).padStart(2, "0")}`;
+    }
+    if (!sourceUrl) return sendMediaError(res, 404, "Not found.");
+
+    return serveNotionImage(req, res, { route, sourceUrl, filenameSlug, context: { slug, role } });
+  } catch (error) {
+    logApiError(route, error, { slug, role, stage: "handler" });
+    return sendMediaError(res, 500, "Image request failed.");
+  }
+}
+
+const propertyTextOf = (page: any, ...names: string[]) =>
+  propertyText(findProp(page?.properties ?? {}, ...names));
+
+// ---------------------------------------------------------------------------
+// Release cover art (canonical WebP): /media/releases/<artist>-<release>/...webp
+// ---------------------------------------------------------------------------
+
+async function handleReleaseCoverArt(req: ImageProxyRequest, res: ImageProxyResponse, rawKey: string) {
+  const route = "/api/image-proxy?releaseKey";
+  if (!isReadMethod(req)) return sendMediaError(res, 405, "Method not allowed.");
+  const key = normalizeCompositeKey(rawKey);
+  if (!key) return sendMediaError(res, 404, "Not found.");
+
+  try {
+    requireEnv(route, ["NOTION_TOKEN", "NOTION_RELEASES_DB_ID", "NOTION_ARTISTS_DB_ID"]);
+    const [artistPages, releasePages] = await Promise.all([
+      loadAll(notion, DBS.artists),
+      loadAll(notion, DBS.releases),
+    ]);
+    const match = matchReleaseByCompositeKey(releasePages, artistSlugMap(artistPages), key);
+    const page = match.page;
+    if (!page) return sendMediaError(res, 404, "Not found.");
+
+    // Show on website + Release Date (Europe/London) — the API's own rules.
+    const artistLookup = new Map(artistPages.map((p: any) => [p.id, normalizeArtist(p)]));
+    const release = normalizeRelease(page, artistLookup);
+    if (!isReleasePublished(release)) return sendMediaError(res, 404, "Not found.");
+
+    const sourceUrl = firstFileUrl(findProp(page.properties ?? {}, "Cover Art"));
+    if (!sourceUrl) return sendMediaError(res, 404, "Not found.");
+
+    return serveNotionImage(req, res, {
+      route,
+      sourceUrl,
+      filenameSlug: `${[release.artistName, release.title].filter(Boolean).join(" ")} cover art`,
+      context: { key },
+    });
+  } catch (error) {
+    logApiError(route, error, { key, stage: "handler" });
+    return sendMediaError(res, 500, "Image request failed.");
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Store product images: /media/store/<store-key>/<product>.webp
+// ---------------------------------------------------------------------------
+
+async function handleStoreImage(req: ImageProxyRequest, res: ImageProxyResponse, rawKey: string) {
+  const route = "/api/image-proxy?storeKey";
+  if (!isReadMethod(req)) return sendMediaError(res, 405, "Method not allowed.");
+  const key = keySegment(decodeURIComponent(rawKey ?? "")) || compactId(rawKey ?? "");
+  if (!key) return sendMediaError(res, 404, "Not found.");
+
+  try {
+    requireEnv(route, ["NOTION_TOKEN", "NOTION_STORE_DB_ID"]);
+    const pages = await loadAll(notion, DBS.storeItems);
+    const page = pages.find((p: any) => {
+      const slug = keySegment(propertyTextOf(p, "Store Slug", "Slug"));
+      return (slug && slug === key) || compactId(String(p.id)) === compactId(key);
+    });
+    if (!page) return sendMediaError(res, 404, "Not found.");
+
+    // Same public visibility rules as /api/notion/store (fails closed).
+    const props = page.properties ?? {};
+    const publishedProp = findProp(props, "Published");
+    const published = publishedProp?.type === "checkbox" ? publishedProp.checkbox === true : false;
+    const availability = findProp(props, "Availability")?.select?.name ?? "";
+    if (!published || availability === "Hidden") return sendMediaError(res, 404, "Not found.");
+
+    // No own Product Image => nothing to serve here; the normaliser points such
+    // items at the release's permanent cover-art URL instead.
+    const sourceUrl = firstFileUrl(findProp(props, "Product Image"));
+    if (!sourceUrl) return sendMediaError(res, 404, "Not found.");
+
+    const titleProp = Object.values(props).find((p: any) => p?.type === "title");
+    const title = propertyText(titleProp);
+    return serveNotionImage(req, res, { route, sourceUrl, filenameSlug: title || key, context: { key } });
+  } catch (error) {
+    logApiError(route, error, { key, stage: "handler" });
+    return sendMediaError(res, 500, "Image request failed.");
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Journal images: /media/journal/<slug>/cover/<title>.webp
+//                 /media/journal/<slug>/images/<block-id>/<name>.webp
+// ---------------------------------------------------------------------------
+
+/** Restore dashes in a compacted Notion UUID so the API accepts it. */
+const uuidFromCompact = (raw: string): string => {
+  const c = compactId(raw);
+  if (c.length !== 32) return "";
+  return `${c.slice(0, 8)}-${c.slice(8, 12)}-${c.slice(12, 16)}-${c.slice(16, 20)}-${c.slice(20)}`;
+};
+
+async function handleJournalImage(
+  req: ImageProxyRequest,
+  res: ImageProxyResponse,
+  rawSlug: string,
+  rawBlockId: string | undefined,
+) {
+  const route = "/api/image-proxy?journalSlug";
+  if (!isReadMethod(req)) return sendMediaError(res, 405, "Method not allowed.");
+  const slug = keySegment(decodeURIComponent(rawSlug ?? ""));
+  if (!slug) return sendMediaError(res, 404, "Not found.");
+
+  try {
+    requireEnv(route, ["NOTION_TOKEN", "NOTION_JOURNAL_DB_ID"]);
+    const pages = await loadAll(notion, DBS.journal);
+    const match = pages
+      .map((p: any) => ({ page: p, article: normalizeJournal(p) }))
+      .find((x: any) => keySegment(x.article.slug) === slug || compactId(x.page.id) === compactId(slug));
+    if (!match) return sendMediaError(res, 404, "Not found.");
+
+    // Published + Publish Date arrived — drafts and future articles 404.
+    if (!isJournalPublished(match.article)) return sendMediaError(res, 404, "Not found.");
+
+    if (!rawBlockId) {
+      const sourceUrl = firstFileUrl(findProp(match.page.properties ?? {}, "Cover Image"));
+      if (!sourceUrl) return sendMediaError(res, 404, "Not found.");
+      return serveNotionImage(req, res, {
+        route,
+        sourceUrl,
+        filenameSlug: match.article.title || slug,
+        context: { slug, role: "cover" },
+      });
+    }
+
+    const blockId = uuidFromCompact(rawBlockId);
+    if (!blockId) return sendMediaError(res, 404, "Not found.");
+
+    let block: any;
+    try {
+      block = await notion.blocks.retrieve({ block_id: blockId });
+    } catch {
+      return sendMediaError(res, 404, "Not found.");
+    }
+    // The block must genuinely belong to this article.
+    const parentPage = String(block?.parent?.page_id ?? "");
+    if (block?.type !== "image" || compactId(parentPage) !== compactId(match.page.id)) {
+      return sendMediaError(res, 404, "Not found.");
+    }
+    const img = block.image;
+    const sourceUrl = (img?.type === "external" ? img.external?.url : img?.file?.url) ?? "";
+    if (!sourceUrl) return sendMediaError(res, 404, "Not found.");
+
+    const caption = (img?.caption ?? []).map((t: any) => t?.plain_text ?? "").join("").trim();
+    return serveNotionImage(req, res, {
+      route,
+      sourceUrl,
+      filenameSlug: caption || match.article.title || slug,
+      context: { slug, blockId },
+    });
+  } catch (error) {
+    logApiError(route, error, { slug, stage: "handler" });
+    return sendMediaError(res, 500, "Image request failed.");
+  }
+}
+
+
 export default async function handler(req: ImageProxyRequest, res: ImageProxyResponse) {
   const releaseSlug = getQueryValue(req.query.releaseSlug);
   if (releaseSlug) return handleReleaseArtwork(req, res, releaseSlug);
 
   const galleryId = getQueryValue(req.query.galleryId);
   if (galleryId) return handleGalleryImage(req, res, galleryId);
+
+  const artistSlug = getQueryValue(req.query.artistSlug);
+  if (artistSlug) {
+    return handleArtistImage(
+      req,
+      res,
+      artistSlug,
+      getQueryValue(req.query.role) ?? "hero",
+      getQueryValue(req.query.index),
+    );
+  }
+
+  const releaseKeyParam = getQueryValue(req.query.releaseKey);
+  if (releaseKeyParam) return handleReleaseCoverArt(req, res, releaseKeyParam);
+
+  const storeKey = getQueryValue(req.query.storeKey);
+  if (storeKey) return handleStoreImage(req, res, storeKey);
+
+  const journalSlug = getQueryValue(req.query.journalSlug);
+  if (journalSlug) return handleJournalImage(req, res, journalSlug, getQueryValue(req.query.blockId));
 
   const rawUrl = getQueryValue(req.query.url);
   const width = pickWidth(getQueryValue(req.query.w));

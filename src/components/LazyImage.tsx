@@ -4,12 +4,12 @@ import { cn } from "@/lib/utils";
 const PROXY_PREFIX = "/api/image-proxy";
 const RESPONSIVE_WIDTHS = [320, 480, 640, 960, 1280, 1600, 1920];
 
-const GALLERY_PREFIX = "/media/gallery/";
+const MEDIA_PREFIX = "/media/";
 
-// Both the legacy proxy URL and the permanent gallery URL are served by
+// Both the legacy proxy URL and every permanent /media/* URL are served by
 // /api/image-proxy, so both support the ?w= and ?blur= variants.
 const isProxiedNotionImage = (src: string) =>
-  src.startsWith(`${PROXY_PREFIX}?`) || src.startsWith(GALLERY_PREFIX);
+  src.startsWith(`${PROXY_PREFIX}?`) || src.startsWith(MEDIA_PREFIX);
 
 const withParam = (src: string, param: string) =>
   `${src}${src.includes("?") ? "&" : "?"}${param}`;
