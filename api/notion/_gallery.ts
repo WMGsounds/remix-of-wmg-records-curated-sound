@@ -1,6 +1,7 @@
 // Gallery Images normalisation + publication rules (server-side only).
 import { resolvePublishInstant } from "./_schedule.js";
 import { proxyImageIfNeeded } from "./_imageHelper.js";
+import { slugifyName, keySegment, versionToken } from "./_mediaUrls.js";
 
 export const GALLERY_IMAGE_TYPES = [
   "Portrait",
@@ -13,33 +14,22 @@ export const GALLERY_IMAGE_TYPES = [
 ] as const;
 
 /** SEO slug for a Gallery image title (lowercase, hyphenated, ASCII-safe). */
-export function slugifyImageTitle(raw: string): string {
-  const slug = (raw ?? "")
-    .normalize("NFKD")
-    .replace(/[\u0300-\u036f]/g, "")
-    .replace(/[''\u2019]/g, "")
-    .replace(/&/g, " and ")
-    .toLowerCase()
-    .replace(/[^a-z0-9]+/g, "-")
-    .replace(/-+/g, "-")
-    .replace(/^-|-$/g, "");
-  return slug || "wmg-gallery-image";
-}
+export const slugifyImageTitle = (raw: string): string => slugifyName(raw, "wmg-gallery-image");
 
 /** Gallery ID normalised for use as a URL path segment (the real database key). */
-export const galleryIdSegment = (galleryId: string): string =>
-  (galleryId ?? "").trim().toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
+export const galleryIdSegment = (galleryId: string): string => keySegment(galleryId);
 
 /**
  * Permanent, descriptive public path for a Gallery image.
  * `/media/gallery/<gallery-id>/<image-title-slug>.webp` — the Gallery ID is the
  * key; the slug is purely descriptive, so retitled images keep resolving.
+ * Version comes from File Hash, falling back to the page's last_edited_time.
  */
-export function galleryPublicPath(galleryId: string, title: string, fileHash = ""): string {
+export function galleryPublicPath(galleryId: string, title: string, version = ""): string {
   const id = galleryIdSegment(galleryId);
   if (!id) return "";
-  const version = (fileHash ?? "").trim().slice(0, 12).replace(/[^a-zA-Z0-9]/g, "");
-  return `/media/gallery/${id}/${slugifyImageTitle(title)}.webp${version ? `?v=${version}` : ""}`;
+  const v = versionToken(version);
+  return `/media/gallery/${id}/${slugifyImageTitle(title)}.webp${v ? `?v=${v}` : ""}`;
 }
 
 const findProp = (props: Record<string, any>, ...names: string[]): any => {
@@ -187,13 +177,16 @@ export function normalizeGalleryImage(
 
   const galleryIdValue = uniqueId(findProp(props, "🔄 Gallery ID", "Gallery ID")) || String(page.id);
   const fileHash = text(findProp(props, "File Hash"));
+  // File Hash is the preferred version token; last_edited_time keeps
+  // cache-busting working for rows that don't populate it.
+  const version = fileHash || String(page?.last_edited_time ?? "");
 
   return {
     id: String(page.id),
     galleryId: galleryIdValue,
     title,
-    imageUrl: galleryPublicPath(galleryIdValue, title, fileHash) || proxyImageIfNeeded(raw),
-    publicUrl: galleryPublicPath(galleryIdValue, title, fileHash),
+    imageUrl: galleryPublicPath(galleryIdValue, title, version) || proxyImageIfNeeded(raw),
+    publicUrl: galleryPublicPath(galleryIdValue, title, version),
     imageSlug: slugifyImageTitle(title),
     width: width && width > 0 ? width : null,
     height: height && height > 0 ? height : null,
