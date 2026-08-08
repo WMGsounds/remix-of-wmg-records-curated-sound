@@ -1,6 +1,7 @@
 import { notion, DBS, requireEnv } from "./notion/_client.js";
 import { loadAll, normalizeArtist, normalizeRelease, isReleasePublished } from "./notion/_normalize.js";
 import { normalizeJournal, isJournalPublished } from "./notion/_journal.js";
+import { normalizeGalleryImage, dedupeGalleryImages, sortGalleryImages } from "./notion/_gallery.js";
 
 const STATIC_PATHS = [
   { path: "/", priority: "1.0", changefreq: "weekly" },
@@ -29,9 +30,24 @@ function escapeXml(s: string): string {
   );
 }
 
-function urlEntry(loc: string, lastmod?: string, changefreq?: string, priority?: string): string {
+function imageEntries(
+  images: { publicUrl?: string; imageUrl: string; title: string; caption: string }[],
+  base: string,
+): string {
+  return images
+    .map((img) => {
+      const loc = (img.publicUrl || img.imageUrl || "").split("?")[0];
+      if (!loc.startsWith("/media/gallery/")) return "";
+      return `\n    <image:image>\n      <image:loc>${escapeXml(`${base}${loc}`)}</image:loc>${
+        img.title ? `\n      <image:title>${escapeXml(img.title)}</image:title>` : ""
+      }${img.caption ? `\n      <image:caption>${escapeXml(img.caption)}</image:caption>` : ""}\n    </image:image>`;
+    })
+    .join("");
+}
+
+function urlEntry(loc: string, lastmod?: string, changefreq?: string, priority?: string, images = ""): string {
   return `  <url>
-    <loc>${escapeXml(loc)}</loc>${lastmod ? `\n    <lastmod>${lastmod.split("T")[0]}</lastmod>` : ""}${changefreq ? `\n    <changefreq>${changefreq}</changefreq>` : ""}${priority ? `\n    <priority>${priority}</priority>` : ""}
+    <loc>${escapeXml(loc)}</loc>${lastmod ? `\n    <lastmod>${lastmod.split("T")[0]}</lastmod>` : ""}${changefreq ? `\n    <changefreq>${changefreq}</changefreq>` : ""}${priority ? `\n    <priority>${priority}</priority>` : ""}${images}
   </url>`;
 }
 
@@ -39,17 +55,37 @@ export default async function handler(req: any, res: any) {
   const base = getBaseUrl(req);
   const urls: string[] = [];
 
-  for (const s of STATIC_PATHS) {
-    urls.push(urlEntry(`${base}${s.path}`, undefined, s.changefreq, s.priority));
-  }
+  const galleryImageXml = { value: "" };
+  const staticEntries: (() => string)[] = STATIC_PATHS.map(
+    (s) => () =>
+      urlEntry(
+        `${base}${s.path}`,
+        undefined,
+        s.changefreq,
+        s.priority,
+        s.path === "/gallery" ? galleryImageXml.value : "",
+      ),
+  );
 
   try {
     requireEnv("/api/sitemap", ["NOTION_TOKEN", "NOTION_ARTISTS_DB_ID", "NOTION_RELEASES_DB_ID", "NOTION_JOURNAL_DB_ID"]);
-    const [artistPages, releasePages, journalPages] = await Promise.all([
+    const [artistPages, releasePages, journalPages, galleryPages] = await Promise.all([
       loadAll(notion, DBS.artists),
       loadAll(notion, DBS.releases),
       loadAll(notion, DBS.journal),
+      DBS.gallery ? loadAll(notion, DBS.gallery).catch(() => []) : Promise.resolve([]),
     ]);
+
+    // Published gallery images, listed once beneath /gallery.
+    const now = Date.now();
+    const galleryImages = sortGalleryImages(
+      dedupeGalleryImages(
+        (galleryPages as any[])
+          .map((p) => normalizeGalleryImage(p, new Map(), now))
+          .filter((x): x is NonNullable<typeof x> => x !== null),
+      ),
+    );
+    galleryImageXml.value = imageEntries(galleryImages, base);
 
     const artists = artistPages.map(normalizeArtist);
     const artistMap = new Map(artists.map((a) => [a.id, a]));
@@ -83,8 +119,8 @@ export default async function handler(req: any, res: any) {
   }
 
   const xml = `<?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-${urls.join("\n")}
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">
+${[...staticEntries.map((fn) => fn()), ...urls].join("\n")}
 </urlset>`;
 
   res.writeHead(200, {
