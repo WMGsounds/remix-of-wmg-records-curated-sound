@@ -124,7 +124,7 @@ export async function render(url: string): Promise<RenderResult> {
   const helmetContext: { helmet?: Record<string, { toString(): string }> } = {};
 
   const html = renderToString(
-    <HelmetProvider context={helmetContext}>
+    <HelmetProvider context={helmetContext as never}>
       <QueryClientProvider client={queryClient}>
         <TooltipProvider>
           <StaticRouter location={url}>
