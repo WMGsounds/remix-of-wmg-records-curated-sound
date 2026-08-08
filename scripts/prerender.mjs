@@ -15,6 +15,12 @@ const ssrEntry = path.join(root, "dist-ssr", "entry-server.js");
 
 const template = await fs.readFile(path.join(distDir, "index.html"), "utf8");
 
+if (template.includes('data-rh="true"') || !template.includes('<div id="root"></div>')) {
+  throw new Error(
+    "[prerender] dist/index.html is already pre-rendered. Run `vite build` first so the template is clean.",
+  );
+}
+
 const server = await import(pathToFileURL(ssrEntry).href);
 await server.preloadAllPages();
 
