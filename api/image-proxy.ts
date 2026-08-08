@@ -137,7 +137,10 @@ async function findReleasePage(compositeKey: string) {
     loadAll(notion, DBS.artists),
     loadAll(notion, DBS.releases),
   ]);
-  return matchReleaseByCompositeKey(releasePages, artistSlugMap(artistPages), compositeKey);
+  return {
+    ...matchReleaseByCompositeKey(releasePages, artistSlugMap(artistPages), compositeKey),
+    artistPages,
+  };
 }
 
 
@@ -169,14 +172,11 @@ async function handleReleaseArtwork(req: ImageProxyRequest, res: ImageProxyRespo
     }
 
     const props = page.properties ?? {};
-    const showProp = findProp(props, "Show on website", "Show on Website", "Show On Website");
-    const visible = showProp?.type === "checkbox" ? showProp.checkbox === true : false;
-    if (!visible) {
-      console.warn("[media-api] Release hidden or missing Show on website checkbox", {
-        route,
-        slug,
-        propertyType: showProp?.type ?? "missing",
-      });
+    // Full public eligibility: Show on website AND the Release Date has
+    // arrived in Europe/London — a future or hidden release can't be guessed.
+    const artistLookup = new Map(match.artistPages.map((p: any) => [p.id, normalizeArtist(p)]));
+    if (!isReleasePublished(normalizeRelease(page, artistLookup))) {
+      console.warn("[media-api] Release not publicly eligible", { route, slug });
       return sendMediaError(res, 404, "Not found.");
     }
 
