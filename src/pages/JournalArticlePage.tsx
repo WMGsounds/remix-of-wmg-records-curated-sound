@@ -1,7 +1,14 @@
 import { Link, useParams, Navigate } from "react-router-dom";
 import { ArrowLeft, ArrowRight } from "lucide-react";
 import { Seo } from "@/components/Seo";
-import { absoluteUrl, breadcrumbSchema, truncate, SITE_NAME, imageObjectSchema } from "@/lib/seo";
+import {
+  absoluteUrl,
+  breadcrumbSchema,
+  clampDescription,
+  SITE_NAME,
+  JOURNAL_BRAND_SUFFIX,
+  imageObjectSchema,
+} from "@/lib/seo";
 import { PageLoading, PageError } from "@/components/UIStates";
 import { LazyImage } from "@/components/LazyImage";
 import { useJournalArticle } from "@/lib/queries";
@@ -20,7 +27,8 @@ const JournalArticlePage = () => {
   const heroRelease = relatedReleases[0];
   const path = `/journal/${a.slug}`;
   const seoTitle = a.seoTitle || a.title;
-  const seoDesc = truncate(a.seoDescription || a.excerpt || a.summary || "");
+  // Single clean description reused by the meta tag and the BlogPosting schema.
+  const seoDesc = clampDescription(a.seoDescription || a.excerpt || a.summary || "");
 
   const articleSchema: Record<string, unknown> = {
     "@context": "https://schema.org",
@@ -47,6 +55,7 @@ const JournalArticlePage = () => {
     <article className="bg-ink text-ivory pb-24">
       <Seo
         title={seoTitle.replace(/\s*\|\s*WMG.*$/, "")}
+        brand={JOURNAL_BRAND_SUFFIX}
         description={seoDesc}
         canonicalPath={path}
         canonicalUrl={a.canonicalUrl || undefined}

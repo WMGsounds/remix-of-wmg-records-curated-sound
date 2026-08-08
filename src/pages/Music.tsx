@@ -296,7 +296,7 @@ const Music = () => {
   return (
     <div className="bg-ink text-ivory pb-32">
       <Seo
-        title="Music"
+        fullTitle="Listen to the WMG Catalogue | Soul, Blues, Reggae"
         description="Explore the Wareham Music Group catalogue. Discover tracks by WMG artists, stream on major platforms, read song stories and explore the full lyrics."
         canonicalPath="/music"
         jsonLd={breadcrumbSchema([

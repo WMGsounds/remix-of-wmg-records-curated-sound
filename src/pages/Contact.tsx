@@ -87,7 +87,7 @@ const Contact = () => {
   return (
     <main className="bg-ink text-ivory">
       <Seo
-        title="Contact"
+        fullTitle="Contact WMG: Press, Sync and Demo Submissions"
         description="Get in touch with WMG — for press, sync and licensing, artist demos, or general enquiries."
         canonicalPath="/contact"
         jsonLd={breadcrumbSchema([

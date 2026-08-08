@@ -108,7 +108,7 @@ const Gallery = () => {
   return (
     <div className="bg-ink text-ivory pb-32">
       <Seo
-        title="Gallery"
+        fullTitle="Artist Photography and Artwork | Wareham Music Group"
         description="The WMG visual archive: portraits, live performance, studio sessions and behind-the-scenes photography from across the Wareham Music Group roster."
         canonicalPath="/gallery"
         jsonLd={[

@@ -5,7 +5,7 @@ import { NewsletterForm } from "@/components/NewsletterForm";
 const Newsletter = () => (
   <div className="bg-ink text-ivory pt-32 pb-16">
     <Seo
-      title="Newsletter"
+      title="Newsletter: New Releases and First Access"
       description="Join the WMG list for new releases, limited editions and first access — sent rarely, only when there's something worth saying."
       canonicalPath="/newsletter"
       jsonLd={breadcrumbSchema([
