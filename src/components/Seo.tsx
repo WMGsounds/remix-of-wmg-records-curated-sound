@@ -50,7 +50,9 @@ export const Seo = ({
         name="robots"
         content={noindex ? "noindex, nofollow" : "index, follow, max-image-preview:large"}
       />
-      <link rel="canonical" href={canonical} />
+      {/* No canonical on noindex pages (e.g. 404) — a self-reference to a
+          non-existent URL contradicts the noindex directive. */}
+      {noindex ? null : <link rel="canonical" href={canonical} />}
 
       <meta property="og:site_name" content={SITE_NAME} />
       <meta property="og:locale" content="en_GB" />
