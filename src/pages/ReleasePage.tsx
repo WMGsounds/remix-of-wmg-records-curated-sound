@@ -274,6 +274,13 @@ const ReleasePage = () => {
               duration: t.duration ? `PT${t.duration.split(":")[0]}M${t.duration.split(":")[1] || "0"}S` : undefined,
             })),
           },
+          ...[
+            imageObjectSchema({
+              url: release.coverArt,
+              name: `${release.title} — cover art`,
+              description: `Cover art for ${release.title} by ${release.artistName || artist?.name || "WMG"}.`,
+            }),
+          ].filter(Boolean),
         ]}
       />
       {/* Hero + Tracklist (unified blurred-cover background) */}
