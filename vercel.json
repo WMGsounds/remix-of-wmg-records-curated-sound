@@ -59,6 +59,11 @@
   ],
   "redirects": [
     {
+      "source": "/spotify",
+      "destination": "https://open.spotify.com/user/315vlgpfq47hf6pebgugkm6rbgxq",
+      "permanent": true
+    },
+    {
       "source": "/artists/jack-rivers",
       "destination": "/artists",
       "permanent": true

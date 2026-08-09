@@ -2,6 +2,8 @@ import hero from "@/assets/hero-cinematic.jpg";
 import artist1 from "@/assets/artist-1.jpg";
 import aboutSoundBg from "@/assets/about-sound-bg.png";
 import wmgTeam from "@/assets/wmg-team.png";
+import { Link } from "react-router-dom";
+import { FaSpotify } from "react-icons/fa";
 import { Seo } from "@/components/Seo";
 import { breadcrumbSchema } from "@/lib/seo";
 
@@ -169,6 +171,28 @@ const About = () => (
         </blockquote>
         <div className="lg:col-span-4 text-ivory/76 text-lg leading-relaxed reveal-on-scroll">
           Each signing is treated as a world to build: sound, image, patience, and the long arc of a catalogue.
+        </div>
+      </div>
+    </section>
+
+    <section className="bg-ink text-ivory py-24 md:py-32 border-t border-gold/30">
+      <div className="container-editorial max-w-5xl reveal-on-scroll">
+        <p className="eyebrow text-gold mb-5">Connect</p>
+        <div className="gold-rule mb-10" />
+        <h2 className="display-serif text-4xl md:text-6xl leading-[1.02] mb-8">
+          Stay Connected
+        </h2>
+        <p className="text-lg md:text-xl leading-relaxed font-light text-ivory/88 max-w-3xl mb-12">
+          Follow Wareham Music Group across the platforms where we share our artists, releases, playlists and more.
+        </p>
+        <div className="flex flex-wrap gap-4">
+          <Link
+            to="/spotify"
+            className="inline-flex items-center gap-2 border border-gold px-5 py-3 text-[12px] uppercase tracking-[0.24em] transition-colors duration-300 text-gold font-medium hover:bg-gold hover:text-ink"
+          >
+            <FaSpotify className="h-4 w-4" aria-hidden="true" />
+            Spotify
+          </Link>
         </div>
       </div>
     </section>
