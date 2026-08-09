@@ -14,13 +14,18 @@ export type StreamingLinks = {
 };
 
 export type ArtistLinks = {
+  /** Storefront — never included in schema sameAs. */
   store?: string;
   youtube?: string;
   youtubeMusic?: string;
   spotify?: string;
   appleMusic?: string;
   amazonMusic?: string;
+  instagram?: string;
+  facebook?: string;
+  tiktok?: string;
 };
+
 
 export type Artist = {
   id: string;
