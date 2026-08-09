@@ -125,6 +125,7 @@ export const routeRegistry: RouteEntry[] = [
       journalCategories(c).map((slug) => ({
         path: `/journal/category/${slug}`,
         seo: "journalCategory" as SeoKey,
+        lastmod: journalCategoryLastmod(c, slug),
       })),
   },
   {
