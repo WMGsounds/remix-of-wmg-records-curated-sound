@@ -110,13 +110,24 @@ const Store = () => {
   // render the visible prices, so schema and page cannot drift. Built from all
   // visible items (not the filtered view) so client-side filtering never
   // changes the markup. parsePrice throws at build time on an unusable price.
-  const productSchema = useMemo(
-    () =>
-      items
-        .filter((i) => i.availability !== "Hidden")
-        .map((i) => storeProduct(i as StoreItemLike)),
-    [items],
-  );
+  const productSchema = useMemo(() => {
+    const visible = items.filter((i) => i.availability !== "Hidden");
+    return [
+      itemList({
+        path: "/store",
+        name: "WMG Store",
+        // Derived from the same array the page renders. Items have no page of
+        // their own, so an entry points at its release page where one exists.
+        items: visible.map((i) => ({
+          path: i.release?.slug ? `/releases/${i.release.slug}` : "/store",
+          name: i.artist?.name ? `${i.title} — ${i.artist.name}` : i.title,
+          image: i.productImage || undefined,
+        })),
+      }),
+      ...visible.map((i) => storeProduct(i as StoreItemLike)),
+    ];
+  }, [items]);
+
 
 
   const hasAnyVisible = featured.length + items.filter((i) => i.availability !== "Hidden" && !i.featured).length > 0;
