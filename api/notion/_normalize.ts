@@ -526,10 +526,12 @@ export function normalizeCatalogueTrack(
     artistLookup: Map<string, any>;
     releaseTrackLookup: Map<string, any>;
     releaseLookup: Map<string, any>;
+    /** Track page ID → YouTube watch URL chosen from the Videos database. */
+    youtubeByTrackId?: Map<string, string>;
   },
 ) {
   const props = page.properties;
-  const { artistLookup, releaseTrackLookup, releaseLookup } = lookups;
+  const { artistLookup, releaseTrackLookup, releaseLookup, youtubeByTrackId } = lookups;
 
   const artistRelIds: string[] = (props["Artist"]?.relation ?? []).map((r: any) => r.id);
   const artists = artistRelIds
@@ -579,6 +581,8 @@ export function normalizeCatalogueTrack(
     description: text(findProp(props, "Track Description", "Description")) || "",
     lyrics: text(props["Lyrics"]) || "",
     isrc: text(findProp(props, "ISRC", "Isrc")) || "",
+    // Optional; absent when no eligible Videos record relates to this track.
+    youtubeUrl: youtubeByTrackId?.get(page.id),
     links: {
       spotify: url(props["Spotify URL"]) ?? null,
       appleMusic: url(findProp(props, "Apple Music URL")) ?? null,

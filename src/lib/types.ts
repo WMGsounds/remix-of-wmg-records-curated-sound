@@ -100,6 +100,8 @@ export type Track = {
   duration: string; // mm:ss
   lyrics?: string | null;
   spotifyUrl?: string | null;
+  /** Chosen from the Videos database (Official Music Video > Audio > Lyric). */
+  youtubeUrl?: string;
   youtubeOfficialAudio?: string | null;
   youtubeLyricVideo?: string | null;
   youtubeMusicVideo?: string | null;
@@ -280,6 +282,8 @@ export type CatalogueTrack = {
   description: string;
   lyrics: string;
   isrc: string;
+  /** Chosen from the Videos database; absent when no eligible video exists. */
+  youtubeUrl?: string;
   links: {
     spotify: string | null;
     appleMusic: string | null;

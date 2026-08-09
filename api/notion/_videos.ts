@@ -136,3 +136,82 @@ export function sortVideos(videos: VideoItem[]): VideoItem[] {
     return a.title.localeCompare(b.title);
   });
 }
+
+// ---------------------------------------------------------------------------
+//  Track → YouTube button selection (Media → Music page)
+// ---------------------------------------------------------------------------
+
+/** Only these Video Types may power a track's YouTube button, best first. */
+export const TRACK_VIDEO_TYPE_PRIORITY = [
+  "Official Music Video",
+  "Official Audio",
+  "Official Lyric Video",
+] as const;
+
+const normalizeType = (value: string) => value.normalize("NFKC").replace(/\s+/g, " ").trim().toLowerCase();
+const TYPE_RANK = new Map(
+  TRACK_VIDEO_TYPE_PRIORITY.map((t, i) => [normalizeType(t), i] as const),
+);
+
+type Candidate = {
+  rank: number;
+  sortOrder: number;
+  releaseInstant: number;
+  id: string;
+  url: string;
+};
+
+/**
+ * Build a Map of Track page ID → canonical YouTube watch URL.
+ *
+ * Eligibility: Show on Website checked, valid YouTube URL, Release Date today
+ * or earlier (Europe/London), and a supported Video Type. Selection is by type
+ * priority, then lowest Sort Order, then most recent Release Date, then page ID
+ * — fully deterministic for identical input.
+ */
+export function selectTrackYouTubeUrls(videoPages: any[], now: number): Map<string, string> {
+  const best = new Map<string, Candidate>();
+
+  for (const page of videoPages ?? []) {
+    try {
+      const props = page?.properties ?? {};
+      if (findProp(props, "Show on Website", "Show On Website")?.checkbox !== true) continue;
+
+      const youtubeId = extractYouTubeId(notionText(findProp(props, "YouTube URL")));
+      if (!youtubeId) continue;
+
+      const rank = TYPE_RANK.get(normalizeType(notionText(findProp(props, "Video Type"))));
+      if (rank === undefined) continue;
+
+      const releaseDate = findProp(props, "Release Date")?.date?.start ?? "";
+      const instant = resolvePublishInstant(releaseDate);
+      if (instant === null || instant > now) continue;
+
+      const sortOrderProp = findProp(props, "Sort Order");
+      const candidate: Candidate = {
+        rank,
+        sortOrder:
+          typeof sortOrderProp?.number === "number" ? sortOrderProp.number : Number.POSITIVE_INFINITY,
+        releaseInstant: instant,
+        id: String(page?.id ?? ""),
+        url: `https://www.youtube.com/watch?v=${youtubeId}`,
+      };
+
+      for (const trackId of relationIds(findProp(props, "Related Tracks"))) {
+        const current = best.get(trackId);
+        if (!current || isBetterCandidate(candidate, current)) best.set(trackId, candidate);
+      }
+    } catch {
+      // A single malformed row must never break the lookup.
+    }
+  }
+
+  return new Map([...best].map(([trackId, c]) => [trackId, c.url] as const));
+}
+
+function isBetterCandidate(a: Candidate, b: Candidate): boolean {
+  if (a.rank !== b.rank) return a.rank < b.rank;
+  if (a.sortOrder !== b.sortOrder) return a.sortOrder < b.sortOrder;
+  if (a.releaseInstant !== b.releaseInstant) return a.releaseInstant > b.releaseInstant;
+  return a.id < b.id;
+}

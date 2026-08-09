@@ -2,6 +2,25 @@ import { notion, DBS, CACHE_HEADERS, RELEASE_CACHE_HEADERS, GALLERY_CACHE_HEADER
 import { FALLBACK_HEADERS, fallbackArtists, fallbackTracks } from "./_fallback.js";
 import { loadAll, normalizeArtist, normalizeRelease, normalizeReleaseTrack, normalizeCatalogueTrack, isReleasePublished } from "./_normalize.js";
 import { normalizeGalleryImage, dedupeGalleryImages, sortGalleryImages } from "./_gallery.js";
+import { selectTrackYouTubeUrls } from "./_videos.js";
+
+/**
+ * Videos are an enhancement only: any failure (missing env, Notion error) must
+ * leave the catalogue and its other streaming links completely intact.
+ */
+async function loadTrackYouTubeUrls(route: string): Promise<Map<string, string>> {
+  try {
+    if (!process.env.NOTION_VIDEOS_DATABASE_ID) return new Map();
+    const pages = await loadAll(notion, DBS.videos);
+    return selectTrackYouTubeUrls(pages, Date.now());
+  } catch (e) {
+    console.warn("[notion-api] Videos lookup failed; tracks render without YouTube buttons", {
+      route,
+      error: (e as Error)?.message ?? String(e),
+    });
+    return new Map();
+  }
+}
 
 /**
  * Serves two datasets from a single serverless function (Vercel Hobby plan
@@ -145,12 +164,14 @@ async function handleCatalogue(res: ApiResponse) {
   const route = "/api/notion/catalogue";
   try {
     validateNotionEnv(route);
-    const [artistPages, releasePages, trackPages, releaseTrackPages] = await Promise.all([
-      loadAll(notion, DBS.artists),
-      loadAll(notion, DBS.releases),
-      loadAll(notion, DBS.tracks),
-      loadAll(notion, DBS.releaseTracks),
-    ]);
+    const [artistPages, releasePages, trackPages, releaseTrackPages, youtubeByTrackId] =
+      await Promise.all([
+        loadAll(notion, DBS.artists),
+        loadAll(notion, DBS.releases),
+        loadAll(notion, DBS.tracks),
+        loadAll(notion, DBS.releaseTracks),
+        loadTrackYouTubeUrls(route),
+      ]);
 
     const artistLookup = new Map(artistPages.map((p: any) => [p.id, normalizeArtist(p)]));
     const releaseLookup = new Map(
@@ -159,7 +180,9 @@ async function handleCatalogue(res: ApiResponse) {
     const releaseTrackLookup = new Map(releaseTrackPages.map((p: any) => [p.id, p]));
 
     const tracks = trackPages
-      .map((p: any) => normalizeCatalogueTrack(p, { artistLookup, releaseTrackLookup, releaseLookup }))
+      .map((p: any) =>
+        normalizeCatalogueTrack(p, { artistLookup, releaseTrackLookup, releaseLookup, youtubeByTrackId }),
+      )
       .filter((t) => Boolean(t.title) && Boolean((t as any).isrc?.trim()))
 
       .sort(
@@ -169,7 +192,11 @@ async function handleCatalogue(res: ApiResponse) {
           || a.title.localeCompare(b.title),
       );
 
-    logApiSuccess(route, { trackPageCount: trackPages.length, catalogueCount: tracks.length });
+    logApiSuccess(route, {
+      trackPageCount: trackPages.length,
+      catalogueCount: tracks.length,
+      tracksWithYouTube: youtubeByTrackId.size,
+    });
     res.writeHead(200, RELEASE_CACHE_HEADERS).end(JSON.stringify(tracks));
   } catch (e: unknown) {
     logApiError(route, e);
