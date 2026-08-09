@@ -24,6 +24,8 @@ export type BreadcrumbTrail = { name: string; path: string }[];
 export type SeoMeta = {
   /** Descriptive part only; the brand suffix is appended. */
   title?: string;
+  /** Shorter, still-grammatical variant used only if the full title >60 chars. */
+  titleFallback?: string;
   /** Exact title string, used as-is. */
   fullTitle?: string;
   brand?: string;
