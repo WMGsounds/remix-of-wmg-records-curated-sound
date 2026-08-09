@@ -598,6 +598,144 @@ export const product = (p: ProductInput): Node => ({
 });
 
 /* ------------------------------------------------------------------ *
+ * STORE PRODUCTS
+ *
+ * Built from the SAME store item objects that render the visible price on
+ * /store, so schema and page can never drift. Any new store item in the data
+ * produces Product markup automatically.
+ *
+ * Prices are authored as display strings ("£27.90"). They are parsed, never
+ * invented: an item with no price at all gets a Product with NO offers (a
+ * Product without an Offer is valid; an Offer without a price is not). A
+ * price string that cannot be resolved to a number AND a currency THROWS,
+ * failing the pre-render build rather than shipping incomplete price markup.
+ * ------------------------------------------------------------------ */
+
+const CURRENCY_SYMBOLS: Record<string, string> = {
+  "£": "GBP",
+  "$": "USD",
+  "€": "EUR",
+  "¥": "JPY",
+};
+
+export type ParsedPrice = { price: string; priceCurrency: string };
+
+/** "£27.90" → { price: "27.90", priceCurrency: "GBP" }. Throws if incomplete. */
+export const parsePrice = (raw: string, context: string): ParsedPrice | null => {
+  const value = (raw ?? "").trim();
+  if (!value) return null;
+
+  const amount = value.replace(/[^0-9.,]/g, "").replace(/,/g, "");
+  const currency =
+    Object.entries(CURRENCY_SYMBOLS).find(([sym]) => value.includes(sym))?.[1] ??
+    value.match(/\b(GBP|USD|EUR|JPY|AUD|CAD)\b/i)?.[1]?.toUpperCase();
+
+  if (!amount || !/^\d+(\.\d+)?$/.test(amount) || !currency) {
+    throw new Error(
+      `[schema] Store item ${context}: price "${value}" is missing a parseable amount or a currency. ` +
+        `Fix the price in the store data (e.g. "£27.90") — incomplete Offer markup is never emitted.`,
+    );
+  }
+  return { price: Number(amount).toFixed(2), priceCurrency: currency };
+};
+
+export type StoreItemLike = {
+  id: string;
+  slug?: string | null;
+  title: string;
+  description?: string | null;
+  productImage?: string | null;
+  purchaseLink?: string | null;
+  availability?: string | null;
+  preOrder?: boolean;
+  formats: string[];
+  prices: Record<string, string | undefined>;
+  artist?: { name: string; slug?: string | null } | null;
+};
+
+/**
+ * Availability is DERIVED from the item's own state, never from a typed label
+ * alone: an unrecognised availability value degrades to the conservative
+ * OutOfStock rather than silently claiming stock.
+ */
+const availabilityUrl = (item: StoreItemLike): string => {
+  if (item.preOrder && item.purchaseLink) return "https://schema.org/PreOrder";
+  switch (item.availability) {
+    case "Available Now":
+      return "https://schema.org/InStock";
+    case "Sold Out":
+      return "https://schema.org/SoldOut";
+    case "Coming Soon":
+      return "https://schema.org/PreOrder";
+    default:
+      return "https://schema.org/OutOfStock";
+  }
+};
+
+export const storeProduct = (item: StoreItemLike): Node => {
+  const context = `"${item.title}" (${item.slug || item.id})`;
+  const offerUrl = absoluteUrl(item.purchaseLink || "/store");
+  const availability = availabilityUrl(item);
+
+  const priced = item.formats
+    .map((format) => ({ format, parsed: parsePrice(item.prices[format] ?? "", context) }))
+    .filter((p): p is { format: string; parsed: ParsedPrice } => p.parsed !== null);
+
+  const offers = priced.map(({ format, parsed }) => ({
+    "@type": "Offer",
+    name: format,
+    price: parsed.price,
+    priceCurrency: parsed.priceCurrency,
+    availability,
+    itemCondition: "https://schema.org/NewCondition",
+    url: offerUrl,
+    seller: { "@type": "Organization", name: SITE_NAME, url: absoluteUrl("/") },
+  }));
+
+  const amounts = priced.map((p) => Number(p.parsed.price));
+  const currency = priced[0]?.parsed.priceCurrency;
+
+  const offersNode =
+    offers.length > 1
+      ? {
+          "@type": "AggregateOffer",
+          lowPrice: Math.min(...amounts).toFixed(2),
+          highPrice: Math.max(...amounts).toFixed(2),
+          priceCurrency: currency,
+          offerCount: offers.length,
+          availability,
+          itemCondition: "https://schema.org/NewCondition",
+          url: offerUrl,
+          offers,
+        }
+      : offers[0];
+
+  return {
+    ...ctx,
+    "@type": "Product",
+    name: item.artist?.name ? `${item.title} — ${item.artist.name}` : item.title,
+    ...(item.description ? { description: item.description } : {}),
+    ...(url(item.productImage) ? { image: url(item.productImage) } : {}),
+    ...(item.slug ? { sku: item.slug } : {}),
+    ...(item.formats.length ? { material: item.formats.join(", ") } : {}),
+    brand: { "@type": "Brand", name: SITE_LEGAL_NAME },
+    ...(item.artist?.name
+      ? {
+          author: {
+            "@type": "MusicGroup",
+            name: item.artist.name,
+            ...(item.artist.slug
+              ? { url: absoluteUrl(`/artists/${item.artist.slug}`) }
+              : {}),
+          },
+        }
+      : {}),
+    url: absoluteUrl("/store"),
+    ...(offersNode ? { offers: offersNode } : {}),
+  };
+};
+
+/* ------------------------------------------------------------------ *
  * The dispatcher. An unknown content type THROWS — the pre-render build
  * fails loudly rather than shipping a page with no structured data.
  * ------------------------------------------------------------------ */
