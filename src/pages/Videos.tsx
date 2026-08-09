@@ -475,9 +475,30 @@ const Videos = () => {
           </div>
         ) : (
           <>
-            <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-3">
-              {displayed.map((video, i) => (
-                <VideoCard key={video.id} video={video} onSelect={() => setPlayerIndex(i)} />
+            <div className="space-y-20">
+              {typeSections.map((section) => (
+                <section key={section.type} aria-labelledby={`videos-${videoTypeSlug(section.type)}`}>
+                  <h2
+                    id={`videos-${videoTypeSlug(section.type)}`}
+                    className="mb-8 border-b border-gold/25 pb-4 font-serif text-2xl text-ivory md:text-3xl"
+                  >
+                    {section.label}
+                    <span className="ml-4 align-middle text-[11px] uppercase tracking-[0.24em] text-ivory/40">
+                      {section.videos.length} {section.videos.length === 1 ? "video" : "videos"}
+                    </span>
+                  </h2>
+                  <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-3">
+                    {section.videos.map((video) => (
+                      <VideoCard
+                        key={video.id}
+                        video={video}
+                        onSelect={() =>
+                          setPlayerIndex(sectionedList.findIndex((v) => v.id === video.id))
+                        }
+                      />
+                    ))}
+                  </div>
+                </section>
               ))}
             </div>
             {visible.length > displayed.length && (
@@ -494,6 +515,7 @@ const Videos = () => {
             )}
           </>
         )}
+
       </div>
 
       {playerIndex !== null && playerIndex >= 0 && playerList[playerIndex] && (
