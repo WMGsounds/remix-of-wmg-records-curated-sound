@@ -22,7 +22,9 @@ const JournalArticlePage = () => {
   const path = `/journal/${a.slug}`;
   const seoTitle = a.seoTitle || a.title;
   // Single clean description reused by the meta tag and the BlogPosting schema.
-  const seoDesc = clampDescription(a.seoDescription || a.excerpt || a.summary || "");
+  // Authored (Notion SEO Description) copy is used verbatim; only derived copy is clamped.
+  const seoDesc = (a.seoDescription || "").trim() || clampDescription(a.excerpt || a.summary || "");
+
 
   const articleSchema: Record<string, unknown> = {
     "@context": "https://schema.org",
