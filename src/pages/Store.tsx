@@ -105,6 +105,19 @@ const Store = () => {
     [featured, rest],
   );
 
+  // Product/Offer JSON-LD generated from the SAME store item objects that
+  // render the visible prices, so schema and page cannot drift. Built from all
+  // visible items (not the filtered view) so client-side filtering never
+  // changes the markup. parsePrice throws at build time on an unusable price.
+  const productSchema = useMemo(
+    () =>
+      items
+        .filter((i) => i.availability !== "Hidden")
+        .map((i) => storeProduct(i as StoreItemLike)),
+    [items],
+  );
+
+
   const hasAnyVisible = featured.length + items.filter((i) => i.availability !== "Hidden" && !i.featured).length > 0;
 
   if (isError) return <PageError message="Couldn't load the store." />;
