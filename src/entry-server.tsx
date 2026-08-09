@@ -4,8 +4,9 @@ import { HelmetProvider } from "react-helmet-async";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { AppShell } from "./App";
-import { preloadAllPages } from "./routes";
-import { resolveRoutes, resolveSitemapRoutes, type RouteContent } from "@/lib/routeRegistry";
+import { preloadAllPages, pageNames } from "./routes";
+import { resolveRoutes, resolveSitemapRoutes, routeRegistry, type RouteContent } from "@/lib/routeRegistry";
+import { seoKeys } from "@/lib/seoConfig";
 import { SITE_URL } from "@/lib/seo";
 import {
   fetchArtists,
@@ -23,6 +24,9 @@ import {
 } from "@/lib/api";
 
 export { preloadAllPages };
+
+/** Consistency inputs consumed by the build assertions in scripts/prerender.mjs. */
+export const registry = { routeRegistry, seoKeys, pageNames };
 
 /* ------------------------------------------------------------------ *
  * Route + sitemap discovery.

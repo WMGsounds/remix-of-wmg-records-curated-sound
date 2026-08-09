@@ -38,20 +38,22 @@ const problems = [];
 const fail = (msg) => problems.push(msg);
 
 /* ---------------- Assertion 1 + 2: registry <-> config integrity --------- */
-const { routeRegistry } = await import(pathToFileURL(ssrEntry).href).then((m) => m.registry ?? m);
-const registry = server.registry ?? {};
+const problemsHeader = "[prerender]";
 {
-  const entries = registry.routeRegistry ?? [];
-  const keys = new Set(registry.seoKeys ?? []);
-  for (const entry of entries) {
+  const { routeRegistry, seoKeys, pageNames } = server.registry;
+  const keys = new Set(seoKeys);
+  const pages = new Set(pageNames);
+  for (const entry of routeRegistry) {
     if (!entry.path) fail(`registry entry for page "${entry.page}" has no path`);
+    if (!pages.has(entry.page))
+      fail(`registry entry "${entry.path}" has no page component in routes.tsx`);
     if (!entry.seo) fail(`registry entry "${entry.path}" has no seo key`);
     else if (!keys.has(entry.seo))
       fail(`registry entry "${entry.path}" points at unknown seoConfig key "${entry.seo}"`);
   }
-  for (const p of registry.routerPaths ?? []) {
-    if (!entries.some((e) => e.path === p))
-      fail(`router path "${p}" has no entry in routeRegistry`);
+  for (const p of pageNames) {
+    if (!routeRegistry.some((e) => e.page === p))
+      fail(`page "${p}" is routed in routes.tsx but has no entry in routeRegistry`);
   }
 }
 

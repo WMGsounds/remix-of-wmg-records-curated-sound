@@ -59,6 +59,9 @@ const Page = ({ name }: { name: PageName }) => {
   );
 };
 
+/** Page component names actually wired into the router (build assertions). */
+export const pageNames = Object.keys(loaders) as PageName[];
+
 export const AppRoutes = () => (
   <Routes>
     {routeRegistry.map((entry) => (
