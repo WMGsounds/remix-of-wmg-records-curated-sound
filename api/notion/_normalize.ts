@@ -82,6 +82,10 @@ export function normalizeArtist(page: any) {
     showOnWebsite,
     displayOrder: num(props["Display Order"]),
     accentColour: text(props["Accent Colour"]) || null,
+    // Notion formula properties — read through the shared reader (formula.string).
+    seoTitle: text(props["SEO Title"]),
+    seoDescription: text(props["SEO Description"]),
+
     artistLinks: {
       store: url(findProp(props, "Store - Artist URL", "Store Artist URL", "Artist Store URL")),
       youtube: url(findProp(props, "Artist YouTube URL", "YouTube URL")),
