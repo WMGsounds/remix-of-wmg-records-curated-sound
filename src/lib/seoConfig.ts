@@ -124,12 +124,6 @@ const staticPages = {
     canonicalPath: "/newsletter",
     breadcrumb: trail({ name: "Newsletter", path: "/newsletter" }),
   },
-  spotify: {
-    fullTitle: "Spotify | Wareham Music Group",
-    description: "Follow Wareham Music Group on Spotify.",
-    canonicalPath: "/spotify",
-    noindex: true,
-  },
   seoDiagnostics: {
     title: "SEO Diagnostics",
     description: "Internal SEO diagnostics for WMG public routes.",

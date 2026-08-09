@@ -2,6 +2,8 @@
 import { proxyImageIfNeeded } from "./_imageHelper.js";
 import { resolvePublishInstant } from "./_schedule.js";
 import { journalCoverUrl, journalBlockImageUrl } from "./_mediaUrls.js";
+import { truncateAtWord } from "../../src/lib/truncate.js";
+
 
 const text = (p: any): string =>
   (p?.rich_text ?? p?.title ?? []).map((t: any) => t.plain_text).join("").trim();
@@ -284,27 +286,18 @@ export function estimateReadingTime(blocks: ArticleBlock[]): number {
 }
 
 /**
- * First paragraph as a clean excerpt: a complete sentence within `len`
- * characters. Cuts at a sentence end, or failing that at the last whole word.
- * Never appends an ellipsis — this string is reused as the meta description
- * and the BlogPosting schema description.
+ * First paragraph as a clean excerpt, cut at the last whole word within `len`
+ * characters and never with an ellipsis. Uses the project's single truncation
+ * implementation (src/lib/truncate.ts) — do not inline another copy here.
  */
 export function deriveExcerpt(blocks: ArticleBlock[], len = 155): string {
   for (const b of blocks) {
     if (b.type === "paragraph") {
       const txt = b.rich.map((r) => r.text).join("").replace(/\s+/g, " ").trim();
       if (!txt) continue;
-      if (txt.length <= len) return txt;
-      const window = txt.slice(0, len);
-      const sentenceEnd = Math.max(
-        window.lastIndexOf(". "),
-        window.lastIndexOf("! "),
-        window.lastIndexOf("? "),
-      );
-      if (sentenceEnd > len * 0.5) return window.slice(0, sentenceEnd + 1).trim();
-      const lastSpace = window.lastIndexOf(" ");
-      return (lastSpace > 0 ? window.slice(0, lastSpace) : window).replace(/[\s,;:–—-]+$/, "");
+      return truncateAtWord(txt, len);
     }
   }
   return "";
 }
+
