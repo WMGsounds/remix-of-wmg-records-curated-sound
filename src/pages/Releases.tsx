@@ -3,6 +3,7 @@ import { useSearchParams } from "react-router-dom";
 import { ReleaseCard } from "@/components/Cards";
 import { Seo } from "@/components/Seo";
 import { staticSeo } from "@/lib/seoConfig";
+import { schemaFor } from "@/lib/schema";
 
 import { useReleases } from "@/lib/queries";
 import { InlineSkeleton, PageError } from "@/components/UIStates";

@@ -2,6 +2,7 @@ import { useMemo, useState } from "react";
 import { ArtistCard } from "@/components/Cards";
 import { Seo } from "@/components/Seo";
 import { staticSeo } from "@/lib/seoConfig";
+import { schemaFor } from "@/lib/schema";
 
 import { useArtists } from "@/lib/queries";
 import { InlineSkeleton, PageError } from "@/components/UIStates";

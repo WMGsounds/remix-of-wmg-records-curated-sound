@@ -2,6 +2,7 @@ import { useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import { Seo } from "@/components/Seo";
 import { staticSeo } from "@/lib/seoConfig";
+import { schemaFor } from "@/lib/schema";
 
 import { useJournal } from "@/lib/queries";
 import { InlineSkeleton, PageError, PageEmpty } from "@/components/UIStates";
