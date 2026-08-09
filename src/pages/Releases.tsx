@@ -69,7 +69,10 @@ const Releases = () => {
   const visible = useMemo(() => {
     const byArtist =
       artistSlug === ALL_ARTISTS ? releases : releases.filter((r) => r.artistSlug === artistSlug);
-    const base = filter === "All" ? [...byArtist] : byArtist.filter((r) => r.releaseType === filter);
+    const base =
+      activeFilter === ALL_TYPES
+        ? [...byArtist]
+        : byArtist.filter((r) => r.releaseType === activeFilter);
     const list = base.filter((r) => matchesSearch(searchQuery, [r.title, r.artistName, r.releaseType]));
     switch (sort) {
       case "Artist Name":
