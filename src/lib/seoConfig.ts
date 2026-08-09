@@ -38,9 +38,8 @@ export type SeoMeta = {
   publishedTime?: string;
   modifiedTime?: string;
   breadcrumb?: BreadcrumbTrail;
-  /** Organization + WebSite nodes (homepage only). */
-  siteSchemas?: boolean;
 };
+
 
 const HOME: BreadcrumbTrail = [{ name: "Home", path: "/" }];
 const trail = (...rest: BreadcrumbTrail): BreadcrumbTrail => [...HOME, ...rest];
@@ -54,7 +53,7 @@ const staticPages = {
     fullTitle: DEFAULT_TITLE,
     description: DEFAULT_DESCRIPTION,
     canonicalPath: "/",
-    siteSchemas: true,
+    
   },
   artists: {
     fullTitle: "Our Artists: Soul, Blues, Country and Reggae | WMG",

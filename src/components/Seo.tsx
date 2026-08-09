@@ -9,12 +9,10 @@ import {
   absoluteUrl,
   buildTitle,
   clampDescription,
-  organizationSchema,
-  websiteSchema,
-  breadcrumbSchema,
-  imageObjectSchema,
 } from "@/lib/seo";
+import { breadcrumbList, imageObject } from "@/lib/schema";
 import type { SeoMeta } from "@/lib/seoConfig";
+
 
 /**
  * THE ONLY PLACE HEAD TAGS ARE WRITTEN.
@@ -41,7 +39,23 @@ type SeoProps = Partial<SeoMeta> & {
   /** Content-type schema only (MusicGroup, MusicAlbum, BlogPosting, …). */
   jsonLd?: Record<string, unknown> | Record<string, unknown>[];
   /** ImageObject inputs — this component builds the nodes. */
-  images?: Parameters<typeof imageObjectSchema>[0][];
+  images?: Parameters<typeof imageObject>[0][];
+};
+
+/** Fallback trail for any non-home route that didn't supply one. */
+const trailFromPath = (path: string) => {
+  const segs = path.split("/").filter(Boolean);
+  let acc = "";
+  return [
+    { name: "Home", path: "/" },
+    ...segs.map((s) => {
+      acc += `/${s}`;
+      return {
+        name: s.replace(/-/g, " ").replace(/\b\w/g, (c) => c.toUpperCase()),
+        path: acc,
+      };
+    }),
+  ];
 };
 
 export const Seo = ({
@@ -59,7 +73,6 @@ export const Seo = ({
   jsonLd,
   images,
   breadcrumb,
-  siteSchemas,
   publishedTime,
   modifiedTime,
 }: SeoProps) => {
@@ -74,14 +87,24 @@ export const Seo = ({
   const canonical = canonicalUrl || absoluteUrl(pagePath);
   const ogImage = image ? absoluteUrl(image) : DEFAULT_OG_IMAGE;
 
+  /* BreadcrumbList is attached automatically to every route except the
+     homepage (and error pages), so no page has to opt in. Organization and
+     WebSite are emitted by the root layout only — never here. */
+  const trail =
+    noindex || pagePath === "/"
+      ? []
+      : breadcrumb && breadcrumb.length > 1
+        ? breadcrumb
+        : trailFromPath(pagePath);
+
   const schemas: Record<string, unknown>[] = [
-    ...(siteSchemas ? [organizationSchema(), websiteSchema()] : []),
-    ...(breadcrumb && breadcrumb.length > 1 ? [breadcrumbSchema(breadcrumb)] : []),
+    ...(trail.length > 1 ? [breadcrumbList(trail)] : []),
     ...(jsonLd ? (Array.isArray(jsonLd) ? jsonLd : [jsonLd]) : []),
     ...((images || [])
-      .map((i) => imageObjectSchema(i))
+      .map((i) => imageObject(i))
       .filter(Boolean) as Record<string, unknown>[]),
   ];
+
 
   return (
     <Helmet prioritizeSeoTags>

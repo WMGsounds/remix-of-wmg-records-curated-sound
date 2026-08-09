@@ -4,7 +4,7 @@ import { ChevronDown, ChevronLeft, ChevronRight, ChevronUp, Play, ShoppingBag } 
 import { useReleaseBySlug, useStoreItems } from "@/lib/queries";
 import { LazyImage } from "@/components/LazyImage";
 import { Seo } from "@/components/Seo";
-import { absoluteUrl } from "@/lib/seo";
+import { schemaFor } from "@/lib/schema";
 import { seoFor } from "@/lib/seoConfig";
 import { PageLoading, PageError } from "@/components/UIStates";
 import { ReleaseLinks } from "@/components/ReleaseLinks";
@@ -239,30 +239,8 @@ const ReleasePage = () => {
     <div>
       <Seo
         {...seoFor.release({ ...release, artistName: release.artistName || artist?.name })}
-        jsonLd={[
-          {
-            "@context": "https://schema.org",
-            "@type": release.releaseType === "Single" ? "MusicRecording" : "MusicAlbum",
-            name: release.title,
-            url: absoluteUrl(`/releases/${release.slug}`),
-            image: release.coverArt || undefined,
-            datePublished: release.releaseDate || undefined,
-            description: release.shortDescription || release.fullDescription || undefined,
-            byArtist: artist
-              ? {
-                  "@type": "MusicGroup",
-                  name: artist.name,
-                  url: absoluteUrl(`/artists/${artist.slug}`),
-                }
-              : undefined,
-            track: tracks.map((t, i) => ({
-              "@type": "MusicRecording",
-              name: t.trackTitle,
-              position: t.trackNumber || i + 1,
-              duration: t.duration ? `PT${t.duration.split(":")[0]}M${t.duration.split(":")[1] || "0"}S` : undefined,
-            })),
-          },
-        ]}
+        jsonLd={[schemaFor("release", { release, artist, tracks })]}
+
         images={[
           {
             url: release.coverArt,

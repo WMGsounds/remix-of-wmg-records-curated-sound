@@ -9,7 +9,8 @@ import { ArtistGalleryPreview } from "@/components/ArtistGalleryPreview";
 import { useHeaderHeight } from "@/hooks/use-header-height";
 
 import { Seo } from "@/components/Seo";
-import { absoluteUrl } from "@/lib/seo";
+import { artistSameAs, schemaFor } from "@/lib/schema";
+import { SocialLinks } from "@/components/SocialLinks";
 import { seoFor } from "@/lib/seoConfig";
 import { PageLoading, PageError } from "@/components/UIStates";
 
@@ -55,27 +56,12 @@ const ArtistPage = () => {
     )
     .slice(0, 3);
   const path = `/artists/${artist.slug}`;
-  const musicGroup = {
-    "@context": "https://schema.org",
-    "@type": "MusicGroup",
-    name: artist.name,
-    url: absoluteUrl(path),
-    image: artist.heroImage || undefined,
-    genre: artist.genre || undefined,
-    description: artist.shortDescription || undefined,
-    album: discography.map((r) => ({
-      "@type": "MusicAlbum",
-      name: r.title,
-      url: absoluteUrl(`/releases/${r.slug}`),
-      image: r.coverArt || undefined,
-      datePublished: r.releaseDate || undefined,
-    })),
-  };
   return (
     <div>
       <Seo
         {...seoFor.artist(artist)}
-        jsonLd={[musicGroup]}
+        jsonLd={[schemaFor("musicGroup", { artist, discography })]}
+
         images={[
           {
             url: artist.heroImage,
@@ -127,7 +113,10 @@ const ArtistPage = () => {
               {artist.shortDescription}
             </p>
           )}
+          {/* Visible, crawlable profile links — same URLs as schema sameAs. */}
+          <SocialLinks urls={artistSameAs(artist)} owner={artist.name} className="mt-7" />
         </div>
+
       </section>
 
       {/* Listen & Watch */}

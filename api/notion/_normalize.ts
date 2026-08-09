@@ -87,13 +87,18 @@ export function normalizeArtist(page: any) {
     seoDescription: text(props["SEO Description"]),
 
     artistLinks: {
+      // Storefront, not an identity profile — deliberately excluded from sameAs.
       store: url(findProp(props, "Store - Artist URL", "Store Artist URL", "Artist Store URL")),
       youtube: url(findProp(props, "Artist YouTube URL", "YouTube URL")),
       youtubeMusic: url(findProp(props, "Artist YouTube Music URL", "YouTube Music URL")),
       spotify: url(findProp(props, "Artist Spotify URL", "Spotify URL")),
       appleMusic: url(findProp(props, "Artist Apple Music URL", "Apple Music URL")),
       amazonMusic: url(findProp(props, "Artist Amazon Music URL", "Amazon Music URL")),
+      instagram: url(findProp(props, "Instagram URL", "Artist Instagram URL")),
+      facebook: url(findProp(props, "Facebook URL", "Artist Facebook URL")),
+      tiktok: url(findProp(props, "TikTok URL", "Artist TikTok URL")),
     },
+
   };
 }
 

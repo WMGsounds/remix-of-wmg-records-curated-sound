@@ -5,12 +5,15 @@ import { Toaster as Sonner } from "@/components/ui/sonner";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { SiteHeader, SiteFooter } from "@/components/Layout";
+import { SiteSchema } from "@/components/SiteSchema";
 import { ScrollToTop } from "@/components/ScrollToTop";
 import { AppRoutes } from "./routes";
 
 /** Everything inside the router — shared by the browser app and the pre-renderer. */
 export const AppShell = () => (
   <>
+    {/* Organization + WebSite JSON-LD, root layout only. */}
+    <SiteSchema />
     <ScrollToTop />
     <SiteHeader />
     <main>
@@ -19,6 +22,7 @@ export const AppShell = () => (
     <SiteFooter />
   </>
 );
+
 
 const queryClient = new QueryClient();
 

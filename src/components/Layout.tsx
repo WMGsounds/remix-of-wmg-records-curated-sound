@@ -3,6 +3,8 @@ import { useEffect, useRef, useState } from "react";
 import { Menu, X, ChevronDown } from "lucide-react";
 import logo from "@/assets/wmg-logo-stacked.png";
 import footerLogo from "@/assets/wmg-logo-full.png";
+import { SocialLinks } from "@/components/SocialLinks";
+
 
 
 type NavItem = { to: string; label: string; children?: { to: string; label: string }[] };
@@ -283,6 +285,9 @@ export const SiteFooter = () => (
             <a href="https://www.wmgsounds.com" className="link-underline hover:text-ivory">www.wmgsounds.com</a>
           </p>
         </address>
+        {/* Visible, crawlable profile links — same URLs as Organization sameAs. */}
+        <SocialLinks className="mt-5" />
+
       </div>
 
       <div className="md:text-center">
