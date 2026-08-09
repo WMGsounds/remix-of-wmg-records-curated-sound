@@ -751,6 +751,7 @@ export const storeProduct = (item: StoreItemLike): Node => {
           itemCondition: "https://schema.org/NewCondition",
           priceValidUntil: validUntil,
           url: offerUrl,
+          seller,
           offers,
         }
       : offers[0];
@@ -765,15 +766,26 @@ export const storeProduct = (item: StoreItemLike): Node => {
     // then the linked release's, and only then the slug as a last resort.
     ...(sku ? { sku } : {}),
     ...gtin,
-    ...(item.formats.length ? { material: item.formats.join(", ") } : {}),
     brand: { "@type": "Brand", name: SITE_LEGAL_NAME },
-    ...(item.artist?.name
+    /* isRelatedTo (a valid Product property; `author` is CreativeWork-only)
+       points at the album this item packages. Emitted only when the release
+       actually has a published page — the store API blanks the slug until then. */
+    ...(item.release?.slug
       ? {
-          author: {
-            "@type": "MusicGroup",
-            name: item.artist.name,
-            ...(item.artist.slug
-              ? { url: absoluteUrl(`/artists/${item.artist.slug}`) }
+          isRelatedTo: {
+            "@type": "MusicAlbum",
+            name: item.release.title,
+            url: absoluteUrl(`/releases/${item.release.slug}`),
+            ...(item.artist?.name
+              ? {
+                  byArtist: {
+                    "@type": "MusicGroup",
+                    name: item.artist.name,
+                    ...(item.artist.slug
+                      ? { url: absoluteUrl(`/artists/${item.artist.slug}`) }
+                      : {}),
+                  },
+                }
               : {}),
           },
         }
@@ -781,6 +793,7 @@ export const storeProduct = (item: StoreItemLike): Node => {
     url: absoluteUrl("/store"),
     ...(offersNode ? { offers: offersNode } : {}),
   };
+
 };
 
 /* ------------------------------------------------------------------ *
