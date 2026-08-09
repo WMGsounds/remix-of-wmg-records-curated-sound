@@ -201,12 +201,7 @@ const SeoDiagnostics = () => {
 
   return (
     <div className="min-h-screen bg-background px-6 py-16 text-foreground">
-      <Seo
-        title="SEO Diagnostics"
-        description="Internal SEO diagnostics for WMG public routes."
-        noindex
-        canonicalPath="/seo-diagnostics"
-      />
+      <Seo {...staticSeo("seoDiagnostics")} />
       <div className="mx-auto max-w-6xl">
         <h1 className="font-serif text-4xl mb-2">SEO Diagnostics</h1>
         <p className="text-muted-foreground mb-6 text-sm">

@@ -11,12 +11,7 @@ const SpotifyRedirect = () => {
 
   return (
     <>
-      <Seo
-        fullTitle="Spotify | Wareham Music Group"
-        description="Follow Wareham Music Group on Spotify."
-        canonicalPath="/spotify"
-        noindex
-      />
+      <Seo {...staticSeo("spotify")} />
       <Helmet>
         <meta httpEquiv="refresh" content={`0;url=${SPOTIFY_URL}`} />
       </Helmet>

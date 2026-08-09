@@ -138,7 +138,7 @@ const Index = () => {
 
   return (
     <div className="pt-20">
-      <Seo canonicalPath="/" jsonLd={[organizationSchema(), websiteSchema()]} />
+      <Seo {...staticSeo("home")} />
       {/* HERO */}
       <section className="relative h-[92vh] min-h-[640px] w-full overflow-hidden -mt-20 bg-ink text-ivory">
         <img

@@ -107,18 +107,7 @@ const Gallery = () => {
 
   return (
     <div className="bg-ink text-ivory pb-32">
-      <Seo
-        fullTitle="Artist Photography and Artwork | Wareham Music Group"
-        description="The WMG visual archive: portraits, live performance, studio sessions and behind-the-scenes photography from across the Wareham Music Group roster."
-        canonicalPath="/gallery"
-        jsonLd={[
-          breadcrumbSchema([
-            { name: "Home", path: "/" },
-            { name: "Gallery", path: "/gallery" },
-          ]),
-          ...imageSchema,
-        ]}
-      />
+      <Seo {...staticSeo("gallery")} images={galleryImages} />
 
       <section className="relative overflow-hidden bg-ink pt-40 pb-24 md:pb-28">
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_74%_38%,hsl(var(--golden-brown)/0.38),transparent_34%),radial-gradient(circle_at_18%_78%,hsl(var(--gold)/0.16),transparent_28%)]" aria-hidden="true" />

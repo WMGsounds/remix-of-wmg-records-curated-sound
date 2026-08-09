@@ -4,15 +4,7 @@ import { NewsletterForm } from "@/components/NewsletterForm";
 
 const Newsletter = () => (
   <div className="bg-ink text-ivory pt-32 pb-16">
-    <Seo
-      title="Newsletter: New Releases and First Access"
-      description="Join the WMG list for new releases, limited editions and first access — sent rarely, only when there's something worth saying."
-      canonicalPath="/newsletter"
-      jsonLd={breadcrumbSchema([
-        { name: "Home", path: "/" },
-        { name: "Newsletter", path: "/newsletter" },
-      ])}
-    />
+    <Seo {...staticSeo("newsletter")} />
     <div className="container-editorial max-w-3xl text-center">
       <p className="eyebrow mb-8 text-gold-soft">The List</p>
       <h1 className="display-serif text-6xl md:text-8xl lg:text-9xl leading-[0.95]">

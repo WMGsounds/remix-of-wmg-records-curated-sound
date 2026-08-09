@@ -36,7 +36,7 @@ const MediaLibrary = () => {
 
   return (
     <>
-      <Seo title="Media Library" description="Internal WMG artwork URL tool." noindex canonicalPath="/media-library" />
+      <Seo {...staticSeo("mediaLibrary")} />
 
       <div className="mx-auto max-w-6xl px-6 pb-24 pt-28 md:pt-32">
         <h1 className="font-display text-3xl md:text-4xl text-ivory">Media Library</h1>
