@@ -43,7 +43,7 @@ Spotify, Apple Music, YouTube, YouTube Music, Amazon Music, Instagram, Facebook,
 
 **BreadcrumbList** — the shared SEO component attaches it automatically on every route except the homepage, instead of each page opting in.
 
-**ItemList** — `/artists`, `/releases`, `/journal` and `/videos` each get an ItemList whose entries derive from the same content array the page renders, so new items appear automatically.
+**ItemList** — `/artists`, `/releases` and `/journal` each get an ItemList whose entries derive from the same content array the page renders, so new items appear automatically. `/videos` is excluded until per-video URLs exist in a later prompt.
 
 ## 3. Visible social links
 
