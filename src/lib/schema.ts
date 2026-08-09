@@ -384,6 +384,9 @@ export const musicAlbum = (input: ReleaseSchemaInput): Node => {
     albumProductionType: "https://schema.org/StudioAlbum",
     numTracks: tracks.length,
     ...(secondsToIso(total) ? { duration: secondsToIso(total) } : {}),
+    // A multi-track release (e.g. a double A-side) can itself sit on an album.
+    // MusicAlbum has no inAlbum, so the same fact is asserted with isPartOf.
+    ...(inAlbumNode(input.release) ? { isPartOf: inAlbumNode(input.release) } : {}),
     track: tracks.map((t, i) => trackNode(t, i, input)),
   };
 };
