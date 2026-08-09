@@ -9,7 +9,8 @@ import { ArtistGalleryPreview } from "@/components/ArtistGalleryPreview";
 import { useHeaderHeight } from "@/hooks/use-header-height";
 
 import { Seo } from "@/components/Seo";
-import { absoluteUrl } from "@/lib/seo";
+import { artistSameAs, schemaFor } from "@/lib/schema";
+import { SocialLinks } from "@/components/SocialLinks";
 import { seoFor } from "@/lib/seoConfig";
 import { PageLoading, PageError } from "@/components/UIStates";
 
