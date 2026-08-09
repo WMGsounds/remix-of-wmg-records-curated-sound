@@ -1,22 +1,10 @@
 // Pure helpers for the permanent release-artwork URL mode of /api/image-proxy.
 // Kept underscore-prefixed so Vercel never deploys it as a serverless function.
 
-// Mirrors the shared normaliser's text extraction (rich_text, title, formula,
-// rollup, number, url, select) so slug lookups behave like the rest of the app.
-export const propertyText = (p: any): string => {
-  if (!p) return "";
-  if (typeof p === "string") return p.trim();
-  if (Array.isArray(p?.rich_text)) return p.rich_text.map((t: any) => t?.plain_text ?? "").join("").trim();
-  if (Array.isArray(p?.title)) return p.title.map((t: any) => t?.plain_text ?? "").join("").trim();
-  if (typeof p?.formula?.string === "string") return p.formula.string.trim();
-  if (typeof p?.formula?.number === "number") return String(p.formula.number);
-  if (typeof p?.rollup?.string === "string") return p.rollup.string.trim();
-  if (typeof p?.rollup?.number === "number") return String(p.rollup.number);
-  if (typeof p?.number === "number") return String(p.number);
-  if (typeof p?.url === "string") return p.url.trim();
-  if (p?.select?.name) return String(p.select.name).trim();
-  return "";
-};
+// Delegates to the shared Notion property reader (./_notionText.ts) so slug
+// lookups behave exactly like the rest of the app — including formula values.
+export const propertyText = (p: any): string => notionText(p);
+
 
 export const findProp = (props: Record<string, any>, ...names: string[]): any => {
   for (const n of names) if (props?.[n] !== undefined) return props[n];

@@ -68,18 +68,9 @@ const findProp = (props: Record<string, any>, ...names: string[]): any => {
   return undefined;
 };
 
-const plain = (items: any): string =>
-  Array.isArray(items) ? items.map((t: any) => t?.plain_text ?? "").join("").trim() : "";
+// Property → string reading lives in ./_notionText.ts (formulas are not rich text).
+const text = notionText;
 
-const text = (p: any): string => {
-  if (!p) return "";
-  if (Array.isArray(p.title)) return plain(p.title);
-  if (Array.isArray(p.rich_text)) return plain(p.rich_text);
-  if (p.select?.name) return String(p.select.name).trim();
-  if (typeof p.url === "string") return p.url.trim();
-  if (typeof p.formula?.string === "string") return p.formula.string.trim();
-  return "";
-};
 
 const relationIds = (p: any): string[] =>
   Array.isArray(p?.relation) ? p.relation.map((r: any) => r?.id).filter(Boolean) : [];

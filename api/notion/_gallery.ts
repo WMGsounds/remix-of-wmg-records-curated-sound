@@ -42,28 +42,9 @@ const findProp = (props: Record<string, any>, ...names: string[]): any => {
   return undefined;
 };
 
-const plain = (items: any): string =>
-  Array.isArray(items) ? items.map((t: any) => t?.plain_text ?? "").join("").trim() : "";
+// Property → string reading lives in ./_notionText.ts (formulas are not rich text).
+const text = notionText;
 
-/** Text from title, rich_text, select, formula or rollup (including array rollups). */
-const text = (p: any): string => {
-  if (!p) return "";
-  if (Array.isArray(p.title)) return plain(p.title);
-  if (Array.isArray(p.rich_text)) return plain(p.rich_text);
-  if (p.select?.name) return String(p.select.name).trim();
-  if (typeof p.url === "string") return p.url.trim();
-  if (typeof p.formula?.string === "string") return p.formula.string.trim();
-  if (typeof p.rollup?.string === "string") return p.rollup.string.trim();
-  if (typeof p.rollup?.number === "number") return String(p.rollup.number);
-  if (Array.isArray(p.rollup?.array)) {
-    for (const entry of p.rollup.array) {
-      const value = text(entry);
-      if (value) return value;
-    }
-  }
-  if (typeof p.number === "number") return String(p.number);
-  return "";
-};
 
 const bool = (p: any): boolean => p?.type === "checkbox" && p.checkbox === true;
 const date = (p: any): string => p?.date?.start ?? "";
