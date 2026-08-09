@@ -1,14 +1,8 @@
 import { Link, useParams, Navigate } from "react-router-dom";
 import { ArrowLeft, ArrowRight } from "lucide-react";
 import { Seo } from "@/components/Seo";
-import {
-  absoluteUrl,
-  breadcrumbSchema,
-  clampDescription,
-  SITE_NAME,
-  JOURNAL_BRAND_SUFFIX,
-  imageObjectSchema,
-} from "@/lib/seo";
+import { absoluteUrl, clampDescription, SITE_NAME } from "@/lib/seo";
+import { seoFor } from "@/lib/seoConfig";
 import { PageLoading, PageError } from "@/components/UIStates";
 import { LazyImage } from "@/components/LazyImage";
 import { useJournalArticle } from "@/lib/queries";
@@ -54,30 +48,14 @@ const JournalArticlePage = () => {
   return (
     <article className="bg-ink text-ivory pb-24">
       <Seo
-        title={seoTitle.replace(/\s*\|\s*WMG.*$/, "")}
-        brand={JOURNAL_BRAND_SUFFIX}
-        description={seoDesc}
-        canonicalPath={path}
-        canonicalUrl={a.canonicalUrl || undefined}
-        image={a.coverImage}
-        type="article"
-        noindex={a.noindex || !a.published}
-        publishedTime={a.publishedDate || undefined}
-        modifiedTime={a.lastEditedTime || undefined}
-        jsonLd={[
-          breadcrumbSchema([
-            { name: "Home", path: "/" },
-            { name: "Journal", path: "/journal" },
-            { name: a.title, path },
-          ]),
-          articleSchema,
-          ...[
-            imageObjectSchema({
-              url: a.coverImage,
-              name: a.title,
-              description: a.imageAlt || a.excerpt || undefined,
-            }),
-          ].filter(Boolean),
+        {...seoFor.journalArticle(a)}
+        jsonLd={[articleSchema]}
+        images={[
+          {
+            url: a.coverImage,
+            name: a.title,
+            description: a.imageAlt || a.excerpt || undefined,
+          },
         ]}
       />
 

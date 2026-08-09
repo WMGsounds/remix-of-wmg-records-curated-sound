@@ -9,7 +9,8 @@ import { ArtistGalleryPreview } from "@/components/ArtistGalleryPreview";
 import { useHeaderHeight } from "@/hooks/use-header-height";
 
 import { Seo } from "@/components/Seo";
-import { breadcrumbSchema, absoluteUrl, clampDescription, imageObjectSchema } from "@/lib/seo";
+import { absoluteUrl } from "@/lib/seo";
+import { seoFor } from "@/lib/seoConfig";
 import { PageLoading, PageError } from "@/components/UIStates";
 
 const ArtistPage = () => {
@@ -54,12 +55,6 @@ const ArtistPage = () => {
     )
     .slice(0, 3);
   const path = `/artists/${artist.slug}`;
-  const seoTitle = artist.genre ? `${artist.name}, ${artist.genre} Artist` : `${artist.name}, Recording Artist`;
-  const seoDesc = clampDescription(
-    artist.shortDescription
-      ? `${artist.name} — ${artist.shortDescription} Explore releases, stories and music from ${artist.name} on WMG.`
-      : `${artist.name} on WMG. Explore releases, stories and music from ${artist.name}.`,
-  );
   const musicGroup = {
     "@context": "https://schema.org",
     "@type": "MusicGroup",
@@ -79,29 +74,19 @@ const ArtistPage = () => {
   return (
     <div>
       <Seo
-        title={seoTitle}
-        description={seoDesc}
-        canonicalPath={path}
-        image={artist.heroImage}
-        jsonLd={[
-          breadcrumbSchema([
-            { name: "Home", path: "/" },
-            { name: "Artists", path: "/artists" },
-            { name: artist.name, path },
-          ]),
-          musicGroup,
-          ...[
-            imageObjectSchema({
-              url: artist.heroImage,
-              name: `${artist.name} — hero image`,
-              description: `${artist.name}, WMG artist portrait.`,
-            }),
-            imageObjectSchema({
-              url: artist.heroImage2,
-              name: `${artist.name} — secondary image`,
-              description: `${artist.name}, WMG artist photograph.`,
-            }),
-          ].filter(Boolean),
+        {...seoFor.artist(artist)}
+        jsonLd={[musicGroup]}
+        images={[
+          {
+            url: artist.heroImage,
+            name: `${artist.name} — hero image`,
+            description: `${artist.name}, WMG artist portrait.`,
+          },
+          {
+            url: artist.heroImage2,
+            name: `${artist.name} — secondary image`,
+            description: `${artist.name}, WMG artist photograph.`,
+          },
         ]}
       />
       {/* Header backdrop — matches the artist section background, header height only */}
