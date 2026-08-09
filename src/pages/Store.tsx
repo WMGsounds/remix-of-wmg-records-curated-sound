@@ -1,6 +1,7 @@
 import { useMemo, useState } from "react";
 import { Seo } from "@/components/Seo";
 import { staticSeo } from "@/lib/seoConfig";
+import { storeProduct, type StoreItemLike } from "@/lib/schema";
 
 import { useStoreItems } from "@/lib/queries";
 import { InlineSkeleton, PageError } from "@/components/UIStates";
@@ -124,7 +125,7 @@ const Store = () => {
 
   return (
     <div className="bg-ink text-ivory pb-32">
-      <Seo {...staticSeo("store")} images={productImages} />
+      <Seo {...staticSeo("store")} images={productImages} jsonLd={productSchema} />
 
       <section className="relative overflow-hidden bg-ink pt-40 pb-24 md:pb-28">
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_74%_38%,hsl(var(--golden-brown)/0.38),transparent_34%),radial-gradient(circle_at_18%_78%,hsl(var(--gold)/0.16),transparent_28%)]" aria-hidden="true" />
