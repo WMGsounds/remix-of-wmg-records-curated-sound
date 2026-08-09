@@ -1,13 +1,17 @@
 import { Instagram, Youtube, Music2, Facebook } from "lucide-react";
+import { SiSpotify } from "react-icons/si";
+import type { ComponentType, SVGProps } from "react";
 import { ORG_SAME_AS } from "@/lib/schema";
 
-type SocialLink = { href: string; label: string; Icon: typeof Instagram };
+type IconComponent = ComponentType<SVGProps<SVGSVGElement>>;
 
-const ICONS: { match: RegExp; label: string; Icon: typeof Instagram }[] = [
+type SocialLink = { href: string; label: string; Icon: IconComponent };
+
+const ICONS: { match: RegExp; label: string; Icon: IconComponent }[] = [
   { match: /instagram\.com/i, label: "Instagram", Icon: Instagram },
   { match: /facebook\.com/i, label: "Facebook", Icon: Facebook },
   { match: /youtube\.com|youtu\.be/i, label: "YouTube", Icon: Youtube },
-  { match: /spotify\.com/i, label: "Spotify", Icon: Music2 },
+  { match: /spotify\.com/i, label: "Spotify", Icon: SiSpotify },
   { match: /music\.apple\.com/i, label: "Apple Music", Icon: Music2 },
   { match: /music\.amazon/i, label: "Amazon Music", Icon: Music2 },
   { match: /tiktok\.com/i, label: "TikTok", Icon: Music2 },
