@@ -1,5 +1,5 @@
 import { Seo } from "@/components/Seo";
-import { breadcrumbSchema } from "@/lib/seo";
+
 import { NewsletterForm } from "@/components/NewsletterForm";
 
 const Newsletter = () => (

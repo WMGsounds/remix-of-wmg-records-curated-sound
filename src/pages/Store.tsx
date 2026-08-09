@@ -1,6 +1,6 @@
 import { useMemo, useState } from "react";
 import { Seo } from "@/components/Seo";
-import { breadcrumbSchema, imageObjectSchema } from "@/lib/seo";
+
 import { useStoreItems } from "@/lib/queries";
 import { InlineSkeleton, PageError } from "@/components/UIStates";
 import { StoreCard } from "@/components/StoreCard";

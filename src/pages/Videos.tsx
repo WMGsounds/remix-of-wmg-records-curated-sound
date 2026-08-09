@@ -2,7 +2,7 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import { ChevronDown, ChevronLeft, ChevronRight, Play, X } from "lucide-react";
 import { Seo } from "@/components/Seo";
-import { breadcrumbSchema } from "@/lib/seo";
+
 import { useVideos } from "@/lib/queries";
 import { InlineSkeleton, PageError } from "@/components/UIStates";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -16,7 +16,6 @@ const ALL = "all";
 const VIDEO_BATCH_SIZE = 18;
 const ARTIST_VIDEO_LIMIT = 12;
 const sortOptions = ["Featured", "Random", "Newest", "Artist", "Title"] as const;
-
 
 const VideoPlayer = ({
   videos,
@@ -154,8 +153,6 @@ const Videos = () => {
   const [expandedArtists, setExpandedArtists] = useState<Set<string>>(new Set());
   // Stable for the whole visit; refreshes on a new London calendar day.
   const [dayKey] = useState(() => londonDateKey());
-
-
 
   const artistOptions = useMemo(() => {
     const map = new Map<string, string>();
@@ -309,7 +306,6 @@ const Videos = () => {
         <div className="absolute inset-x-0 bottom-0 h-20 bg-gradient-to-b from-transparent to-ink" aria-hidden="true" />
         <div className="absolute inset-x-0 bottom-0 h-px bg-gold/35" aria-hidden="true" />
       </section>
-
 
       <div className="container-editorial pt-16">
         <div className="flex flex-wrap items-end justify-between gap-y-6 mb-16 border-y border-ivory/18 py-6">

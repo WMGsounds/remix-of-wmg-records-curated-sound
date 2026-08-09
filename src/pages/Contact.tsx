@@ -2,7 +2,7 @@ import { useState } from "react";
 import { ArrowRight, X, CheckCircle2 } from "lucide-react";
 import contactImage from "@/assets/contact-editorial.jpg";
 import { Seo } from "@/components/Seo";
-import { breadcrumbSchema } from "@/lib/seo";
+
 import { FileUploaderRegular } from "@uploadcare/react-uploader";
 import "@uploadcare/react-uploader/core.css";
 

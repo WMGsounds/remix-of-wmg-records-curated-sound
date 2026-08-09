@@ -2,7 +2,7 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import { ChevronDown } from "lucide-react";
 import { Seo } from "@/components/Seo";
-import { breadcrumbSchema, absoluteUrl } from "@/lib/seo";
+import { absoluteUrl } from "@/lib/seo";
 import { useGallery } from "@/lib/queries";
 import { InlineSkeleton, PageError } from "@/components/UIStates";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";

@@ -1,7 +1,7 @@
 import { useMemo, useState } from "react";
 import { ArtistCard } from "@/components/Cards";
 import { Seo } from "@/components/Seo";
-import { breadcrumbSchema } from "@/lib/seo";
+
 import { useArtists } from "@/lib/queries";
 import { InlineSkeleton, PageError } from "@/components/UIStates";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
