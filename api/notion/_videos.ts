@@ -13,6 +13,8 @@ export type VideoItem = {
   relatedReleaseIds: string[];
   releaseDate: string;
   description: string;
+  /** mm:ss / hh:mm:ss. Empty when Notion has no duration for the video. */
+  duration: string;
   featured: boolean;
   sortOrder: number | null;
 };
