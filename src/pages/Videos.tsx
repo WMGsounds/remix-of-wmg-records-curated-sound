@@ -278,7 +278,62 @@ const Videos = () => {
     [artistGroups, openArtists, expandedArtists],
   );
 
-  const playerList = groupedByArtist ? groupedPlayerList : displayed;
+  /* H2 sections come from the Video Type values present in the data, so a new
+     Notion Video Type creates its own section with no code change. */
+  const typeSections = useMemo(
+    () => (groupedByArtist ? [] : groupVideosByType(displayed)),
+    [displayed, groupedByArtist],
+  );
+  const sectionedList = useMemo(() => typeSections.flatMap((s) => s.videos), [typeSections]);
+
+  const playerList = groupedByArtist ? groupedPlayerList : sectionedList;
+
+  /* VideoObject requires uploadDate and duration for rich results — any video
+     missing either is skipped rather than marked up incompletely. */
+  const videoSchemas = useMemo(() => {
+    const eligible: Record<string, unknown>[] = [];
+    const skipped: string[] = [];
+    visible.forEach((v) => {
+      if (!v.releaseDate || !v.duration) {
+        skipped.push(`${v.title} (${!v.releaseDate ? "no uploadDate" : "no duration"})`);
+        return;
+      }
+      eligible.push(
+        videoObject({
+          name: v.title,
+          description: v.description || undefined,
+          thumbnailUrl: thumbnailUrl(v.youtubeId),
+          uploadDate: v.releaseDate,
+          embedUrl: `https://www.youtube.com/embed/${v.youtubeId}`,
+          contentUrl: watchUrl(v.youtubeId),
+          duration: v.duration,
+          artistName: v.artists[0]?.name,
+          artistSlug: v.artists[0]?.slug,
+        }),
+      );
+    });
+    if (skipped.length) {
+      console.warn(
+        `[videos] VideoObject omitted for ${skipped.length} video(s) missing uploadDate/duration: ${skipped.join("; ")}`,
+      );
+    }
+    return eligible;
+  }, [visible]);
+
+  /* Per-video pages deliberately do not exist, so the ItemList identifies each
+     video by its YouTube watch URL. */
+  const videosItemList = useMemo(
+    () =>
+      visible.length
+        ? itemList({
+            path: "/videos",
+            name: "WMG Videos",
+            items: visible.map((v) => ({ name: v.title, path: watchUrl(v.youtubeId) })),
+          })
+        : null,
+    [visible],
+  );
+
 
   const toggleArtist = (key: string) =>
     setOpenArtists((prev) => {
