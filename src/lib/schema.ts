@@ -358,9 +358,9 @@ export const musicAlbum = (input: ReleaseSchemaInput): Node => {
   return {
     ...releaseCommon(input),
     "@type": "MusicAlbum",
-    ...(input.release.releaseType === "EP" || input.release.releaseType === "Album"
-      ? { albumProductionType: "https://schema.org/StudioAlbum" }
-      : {}),
+    // Anything that qualifies as a MusicAlbum is a studio album; keyed off the
+    // same track-count decision, not the release-type label.
+    albumProductionType: "https://schema.org/StudioAlbum",
     numTracks: tracks.length,
     ...(secondsToIso(total) ? { duration: secondsToIso(total) } : {}),
     track: tracks.map((t, i) => trackNode(t, i, input)),
