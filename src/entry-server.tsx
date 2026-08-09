@@ -120,13 +120,17 @@ export async function collectSite(): Promise<SiteRoutes> {
     routes: resolveRoutes(content).map((r) => r.path),
     sitemap: resolveSitemapRoutes(content).map((r) => ({
       path: r.path,
-      // lastmod is a real content timestamp where one exists; static pages
-      // fall back to the build date. No priority/changefreq: Google ignores both.
-      lastmod: (r.lastmod || buildDate).split("T")[0],
+      // lastmod only where a real content timestamp exists. Static pages get
+      // theirs from the source file's last git commit date in
+      // scripts/prerender.mjs — never the build date, which would falsely
+      // re-date every page on every deploy. No priority/changefreq: Google
+      // ignores both.
+      lastmod: r.lastmod ? r.lastmod.split("T")[0] : undefined,
       images: imagesByPath.get(r.path) || [],
     })),
   };
 }
+
 
 /** Kept for callers that only need the pre-render list. */
 export async function collectRoutes(): Promise<string[]> {
