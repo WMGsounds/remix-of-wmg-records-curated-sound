@@ -147,6 +147,41 @@ for (const route of routes) {
     if (title && title.length > 60 && !NO_TITLE_WARNING.has(seoKeyFor(route)))
       warnings.push(`title is ${title.length} chars on "${route}": ${title}`);
 
+    /* -------- Assertion 5: structured data integrity -------------------- *
+     * Counts TOP-LEVEL @type values in each JSON-LD block only. Nested
+     * objects (BlogPosting.publisher is an Organization, MusicAlbum.byArtist
+     * is a MusicGroup) are deliberately ignored — counting them would fail
+     * every article. */
+    const blocks = [...head.matchAll(/<script[^>]*application\/ld\+json[^>]*>([\s\S]*?)<\/script>/g)]
+      .map((m) => m[1])
+      .map((raw) => {
+        try {
+          return JSON.parse(raw.replace(/&quot;/g, '"').replace(/&amp;/g, "&").replace(/&#x27;/g, "'"));
+        } catch {
+          fail(`route "${route}" emitted invalid JSON-LD`);
+          return null;
+        }
+      })
+      .filter(Boolean);
+
+    const topTypes = blocks.flatMap((b) => (Array.isArray(b) ? b : [b])).map((b) => b?.["@type"]);
+    const count = (t) => topTypes.filter((x) => x === t).length;
+    if (count("Organization") !== 1)
+      fail(`route "${route}" has ${count("Organization")} top-level Organization blocks (expected exactly 1)`);
+    if (count("WebSite") !== 1)
+      fail(`route "${route}" has ${count("WebSite")} top-level WebSite blocks (expected exactly 1)`);
+    if (route !== "/" && route !== "/__not-found__" && count("BreadcrumbList") !== 1)
+      fail(`route "${route}" has ${count("BreadcrumbList")} BreadcrumbList blocks (expected exactly 1)`);
+
+    // Every URL inside JSON-LD must be absolute and free of cache-busters.
+    const serialized = JSON.stringify(blocks);
+    for (const m of serialized.matchAll(/"(?:url|contentUrl|logo|image|item|thumbnailUrl|embedUrl|mainEntityOfPage|sameAs)":"([^"]+)"/g)) {
+      if (!/^https?:\/\//i.test(m[1]))
+        fail(`route "${route}" has a non-absolute URL in JSON-LD: ${m[1]}`);
+      if (m[1].includes("?"))
+        fail(`route "${route}" has a query string in a JSON-LD URL: ${m[1]}`);
+    }
+
 
     let page = injectHead(template, head);
     page = injectBody(page, html);
