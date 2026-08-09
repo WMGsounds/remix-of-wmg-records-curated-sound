@@ -10,7 +10,13 @@
 // is applied ONLY where a description is derived from body copy (artist bios,
 // release blurbs, article excerpts) — never to an authored string.
 
-import { BRAND_SUFFIX, JOURNAL_BRAND_SUFFIX, clampDescription } from "./seo";
+import {
+  BRAND_SUFFIX,
+  JOURNAL_BRAND_SUFFIX,
+  DEFAULT_TITLE,
+  DEFAULT_DESCRIPTION,
+  clampDescription,
+} from "./seo";
 
 export type BreadcrumbTrail = { name: string; path: string }[];
 
@@ -43,8 +49,9 @@ const trail = (...rest: BreadcrumbTrail): BreadcrumbTrail => [...HOME, ...rest];
 
 const staticPages = {
   home: {
+    fullTitle: DEFAULT_TITLE,
+    description: DEFAULT_DESCRIPTION,
     canonicalPath: "/",
-    description: "",
     siteSchemas: true,
   },
   artists: {
