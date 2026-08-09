@@ -53,7 +53,7 @@ const staticPages = {
     fullTitle: DEFAULT_TITLE,
     description: DEFAULT_DESCRIPTION,
     canonicalPath: "/",
-    siteSchemas: true,
+    
   },
   artists: {
     fullTitle: "Our Artists: Soul, Blues, Country and Reggae | WMG",
