@@ -433,7 +433,12 @@ export function normalizeStoreItem(
   const releaseRelId = props["Release"]?.relation?.[0]?.id ?? "";
   const releaseRaw = releaseRelId ? releaseLookup.get(releaseRelId) : null;
   const release = releaseRaw
-    ? { id: releaseRaw.id, slug: releaseRaw.slug, title: releaseRaw.title }
+    ? {
+        id: releaseRaw.id,
+        slug: releaseRaw.slug,
+        title: releaseRaw.title,
+        upc: releaseRaw.upc ?? null,
+      }
     : null;
 
   const relatedTrackRelIds: string[] = (props["Related Tracks"]?.relation ?? []).map((r: any) => r.id);
@@ -497,6 +502,9 @@ export function normalizeStoreItem(
     buttonText: buttonTextRaw || null,
     comments: commentsRaw || null,
     productType: select(props["Type"]) || null,
+    catalogueNumber:
+      text(findProp(props, "Catalogue Number", "Catalogue No", "Catalogue ID", "Cat No", "Catalogue")) ||
+      null,
     preOrder: bool(findProp(props, "Pre-order?", "Pre-order", "Preorder", "Pre Order")),
     createdTime: page.created_time ?? "",
   };
