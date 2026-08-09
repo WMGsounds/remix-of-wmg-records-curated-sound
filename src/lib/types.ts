@@ -79,6 +79,8 @@ export type Release = {
   upc?: string | null;
   parentAlbumId?: string | null;
   parentAlbum?: { id: string; title: string; slug: string | null } | null;
+  /** Releases whose parent-album relation points at THIS release (singles lifted off it). */
+  childSingles?: { id: string; title: string; slug: string | null }[];
   // Authored CMS metadata (Notion formula properties) — used verbatim when set.
   seoTitle?: string;
   seoDescription?: string;

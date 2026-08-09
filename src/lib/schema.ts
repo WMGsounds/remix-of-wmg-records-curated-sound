@@ -280,6 +280,8 @@ type ReleaseLike = {
   fullDescription?: string | null;
   artistName?: string | null;
   artistSlug?: string | null;
+  parentAlbum?: { title: string; slug?: string | null } | null;
+  childSingles?: { title: string; slug?: string | null }[];
   streamingLinks?: {
     spotify?: string;
     appleMusic?: string;
@@ -322,10 +324,29 @@ const byArtistNode = (input: ReleaseSchemaInput): Node | undefined => {
   };
 };
 
+/** Loose title match so "Ocean Breeze (Single)" still resolves to its track. */
+const titleKey = (v: string) => v.toLowerCase().replace(/[^a-z0-9]+/g, " ").trim();
+
+/**
+ * The reverse of inAlbum: when a track on this album was also issued as its own
+ * release, point the track entry at that release URL so the same recording is
+ * one entity across both pages instead of two unlinked strings. Derived from
+ * the parent-album relation (childSingles), never from a naming convention.
+ */
+const trackUrl = (t: TrackLike, release: ReleaseLike): string | undefined => {
+  const key = titleKey(t.trackTitle || "");
+  if (!key) return undefined;
+  const match = (release.childSingles || []).find(
+    (c) => c.slug && titleKey(c.title || "") === key,
+  );
+  return match?.slug ? absoluteUrl(`/releases/${match.slug}`) : undefined;
+};
+
 const trackNode = (t: TrackLike, i: number, input: ReleaseSchemaInput): Node => ({
   "@type": "MusicRecording",
   name: t.trackTitle,
   position: t.trackNumber || i + 1,
+  ...(trackUrl(t, input.release) ? { url: trackUrl(t, input.release) } : {}),
   ...(isoDuration(t.duration) ? { duration: isoDuration(t.duration) } : {}),
   ...(t.isrc ? { isrcCode: t.isrc } : {}),
   ...(byArtistNode(input) ? { byArtist: byArtistNode(input) } : {}),
@@ -367,15 +388,35 @@ export const musicAlbum = (input: ReleaseSchemaInput): Node => {
   };
 };
 
+/**
+ * inAlbum node for a single that also appears on an album. Derived from the
+ * parentAlbum relation actually present in the data — omitted entirely when the
+ * relation is empty, and omitted when the parent has no title (nothing to
+ * assert), same blank-handling rule as sameAs.
+ */
+const inAlbumNode = (release: ReleaseLike): Node | undefined => {
+  const parent = release.parentAlbum;
+  const name = (parent?.title ?? "").trim();
+  if (!name) return undefined;
+  const slug = (parent?.slug ?? "").trim();
+  return {
+    "@type": "MusicAlbum",
+    name,
+    ...(slug ? { url: absoluteUrl(`/releases/${slug}`) } : {}),
+  };
+};
+
 /** Genuine single-track release: a bare MusicRecording, no "track" array. */
 export const musicRecording = (input: ReleaseSchemaInput): Node => {
   const t = (input.tracks || [])[0];
   const duration = isoDuration(t?.duration);
+  const inAlbum = inAlbumNode(input.release);
   return {
     ...releaseCommon(input),
     "@type": "MusicRecording",
     ...(duration ? { duration } : {}),
     ...(t?.isrc ? { isrcCode: t.isrc } : {}),
+    ...(inAlbum ? { inAlbum } : {}),
   };
 };
 

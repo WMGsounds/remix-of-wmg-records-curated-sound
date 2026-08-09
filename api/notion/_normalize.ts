@@ -150,12 +150,14 @@ export function normalizeRelease(page: any, artistLookup: Map<string, any>) {
   if (showOnWebsiteProp?.type !== "checkbox") {
     warnMissingShowOnWebsite(page.id, text(titleProp(props)));
   }
+  // Derived, not hardcoded: any relation property whose name mentions "album"
+  // is the parent-album relation, so renaming or emoji-prefixing it in Notion
+  // ("Album", "🔄 Parent Album", "From Album") keeps working.
   const parentAlbumRel =
-    props["Album"]?.relation?.[0]?.id ??
-    props["Parent Album"]?.relation?.[0]?.id ??
-    props["Related Album"]?.relation?.[0]?.id ??
-    props["From Album"]?.relation?.[0]?.id ??
-    null;
+    Object.entries(props as Record<string, any>)
+      .filter(([name, p]) => p?.type === "relation" && /album/i.test(name))
+      .map(([, p]) => p.relation?.[0]?.id)
+      .find(Boolean) ?? null;
   return {
     id: page.id,
     slug: text(props["Slug"]),
