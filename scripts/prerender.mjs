@@ -181,6 +181,10 @@ for (const route of routes) {
       if (m[1].includes("?"))
         fail(`route "${route}" has a query string in a JSON-LD URL: ${m[1]}`);
     }
+    for (const m of serialized.matchAll(/"(\/[^"]*)"/g))
+      fail(`route "${route}" has a root-relative URL in JSON-LD: ${m[1]}`);
+    for (const m of serialized.matchAll(/"(https?:\/\/[^"]*\?[^"]*)"/g))
+      fail(`route "${route}" has a query string in a JSON-LD URL: ${m[1]}`);
 
 
     let page = injectHead(template, head);
