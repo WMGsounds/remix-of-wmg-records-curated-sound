@@ -74,6 +74,24 @@ export const journalCategories = (content: RouteContent): string[] => {
   return [...set].filter(Boolean);
 };
 
+/**
+ * Most recent article date within a journal category, used as the category
+ * page's lastmod. Category listings genuinely change whenever a new article
+ * lands in them, so this is an accurate signal (unlike a build date).
+ */
+export const journalCategoryLastmod = (
+  content: RouteContent,
+  categorySlug: string,
+): string | undefined => {
+  const dates = content.journal
+    .filter((a) => a.category && slugify(a.category) === categorySlug)
+    .map((a) => a.lastEditedTime || a.publishedDate)
+    .filter((d): d is string => Boolean(d))
+    .sort();
+  return dates.length ? dates[dates.length - 1] : undefined;
+};
+
+
 export const routeRegistry: RouteEntry[] = [
   { path: "/", page: "Index", seo: "home" },
   { path: "/artists", page: "Artists", seo: "artists" },
