@@ -186,12 +186,24 @@ export const LEGAL_DOCS: Record<
  * Dynamic page metadata builders.
  * ------------------------------------------------------------------ */
 
+/**
+ * AUTHORED vs DERIVED metadata.
+ * `seoTitle` / `seoDescription` come from Notion SEO Title / SEO Description
+ * formula properties. They are AUTHORED CMS metadata: used verbatim, never
+ * clamped or ellipsised. `clampDescription` applies only to fallback copy
+ * derived from body text. A blank formula is treated as absent.
+ * The brand suffix is appended once by <Seo>, never in the API normalisers.
+ */
+const authored = (v?: string): string => (v ?? "").trim();
+
 type ArtistLike = {
   name: string;
   slug: string;
   genre?: string;
   shortDescription?: string;
   heroImage?: string;
+  seoTitle?: string;
+  seoDescription?: string;
 };
 
 type ReleaseLike = {
@@ -202,6 +214,8 @@ type ReleaseLike = {
   shortDescription?: string;
   fullDescription?: string;
   coverArt?: string;
+  seoTitle?: string;
+  seoDescription?: string;
 };
 
 type JournalLike = {
@@ -222,14 +236,13 @@ type JournalLike = {
 const dynamicPages = {
   artist: (a: ArtistLike): SeoMeta => {
     const path = `/artists/${a.slug}`;
+    const generatedTitle = a.genre ? `${a.name}, ${a.genre} Artist` : `${a.name}, Recording Artist`;
+    const derivedDescription = a.shortDescription
+      ? `${a.name} — ${a.shortDescription} Explore releases, stories and music from ${a.name} on WMG.`
+      : `${a.name} on WMG. Explore releases, stories and music from ${a.name}.`;
     return {
-      title: a.genre ? `${a.name}, ${a.genre} Artist` : `${a.name}, Recording Artist`,
-      // Derived from the artist bio → clamped.
-      description: clampDescription(
-        a.shortDescription
-          ? `${a.name} — ${a.shortDescription} Explore releases, stories and music from ${a.name} on WMG.`
-          : `${a.name} on WMG. Explore releases, stories and music from ${a.name}.`,
-      ),
+      title: authored(a.seoTitle) || generatedTitle || a.name,
+      description: authored(a.seoDescription) || clampDescription(derivedDescription),
       canonicalPath: path,
       image: a.heroImage,
       breadcrumb: trail({ name: "Artists", path: "/artists" }, { name: a.name, path }),
@@ -239,14 +252,13 @@ const dynamicPages = {
   release: (r: ReleaseLike): SeoMeta => {
     const path = `/releases/${r.slug}`;
     const artistName = r.artistName || "Wareham Music Group";
+    const derivedDescription =
+      r.shortDescription || r.fullDescription
+        ? `${r.shortDescription || r.fullDescription}`
+        : `Listen to ${r.title} by ${r.artistName || ""}, a ${r.releaseType} release from Wareham Music Group.`;
     return {
-      title: `${r.title} by ${artistName}`,
-      // Derived from release body copy → clamped.
-      description: clampDescription(
-        r.shortDescription || r.fullDescription
-          ? `${r.shortDescription || r.fullDescription}`
-          : `Listen to ${r.title} by ${r.artistName || ""}, a ${r.releaseType} release from Wareham Music Group.`,
-      ),
+      title: authored(r.seoTitle) || `${r.title} by ${artistName}` || r.title,
+      description: authored(r.seoDescription) || clampDescription(derivedDescription),
       canonicalPath: path,
       image: r.coverArt,
       type: "music.album",
@@ -257,10 +269,11 @@ const dynamicPages = {
   journalArticle: (a: JournalLike): SeoMeta => {
     const path = `/journal/${a.slug}`;
     return {
-      title: (a.seoTitle || a.title).replace(/\s*\|\s*WMG.*$/, ""),
+      title: (authored(a.seoTitle) || a.title).replace(/\s*\|\s*WMG.*$/, ""),
       brand: JOURNAL_BRAND_SUFFIX,
-      // Derived from the article body/excerpt → clamped.
-      description: clampDescription(a.seoDescription || a.excerpt || a.summary || ""),
+      description:
+        authored(a.seoDescription) ||
+        clampDescription(a.excerpt || a.summary || ""),
       canonicalPath: path,
       canonicalUrl: a.canonicalUrl || undefined,
       image: a.coverImage,
@@ -274,6 +287,7 @@ const dynamicPages = {
       ),
     };
   },
+
 
   journalCategory: (c: { name: string; slug: string }): SeoMeta => {
     const path = `/journal/category/${c.slug}`;
