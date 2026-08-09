@@ -233,7 +233,31 @@ const Gallery = () => {
           </div>
         ) : (
           <>
-            <GalleryGrid images={displayed} onSelect={setLightboxIndex} />
+            <div className="space-y-20">
+              {typeSections.map((section, si) => {
+                const offset = typeSections
+                  .slice(0, si)
+                  .reduce((sum, s) => sum + s.images.length, 0);
+                return (
+                  <section key={section.type} aria-labelledby={`gallery-${sectionSlug(section.type)}`}>
+                    <h2
+                      id={`gallery-${sectionSlug(section.type)}`}
+                      className="mb-8 border-b border-gold/25 pb-4 font-serif text-2xl text-ivory md:text-3xl"
+                    >
+                      {section.label}
+                      <span className="ml-4 align-middle text-[11px] uppercase tracking-[0.24em] text-ivory/40">
+                        {section.images.length} {section.images.length === 1 ? "image" : "images"}
+                      </span>
+                    </h2>
+                    <GalleryGrid
+                      images={section.images}
+                      indexOffset={offset}
+                      onSelect={setLightboxIndex}
+                    />
+                  </section>
+                );
+              })}
+            </div>
             {visible.length > displayed.length && (
               <div className="mt-12 flex justify-center">
                 <button
@@ -250,14 +274,15 @@ const Gallery = () => {
         )}
       </div>
 
-      {lightboxIndex !== null && displayed[lightboxIndex] && (
+      {lightboxIndex !== null && sectionedImages[lightboxIndex] && (
         <GalleryLightbox
-          images={displayed}
+          images={sectionedImages}
           index={lightboxIndex}
           onClose={() => setLightboxIndex(null)}
           onNavigate={setLightboxIndex}
         />
       )}
+
     </div>
   );
 };
