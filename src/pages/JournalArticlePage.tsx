@@ -25,28 +25,13 @@ const JournalArticlePage = () => {
   // Single clean description reused by the meta tag and the BlogPosting schema.
   // Authored (Notion SEO Description) copy is used verbatim; only derived copy is clamped.
   const seoDesc = (a.seoDescription || "").trim() || clampDescription(a.excerpt || a.summary || "");
+  const articleSchema = schemaFor("blogPosting", {
+    article: a,
+    description: seoDesc,
+    relatedArtists,
+    relatedReleases,
+  });
 
-
-  const articleSchema: Record<string, unknown> = {
-    "@context": "https://schema.org",
-    "@type": "BlogPosting",
-    headline: a.title,
-    description: seoDesc || undefined,
-    image: a.coverImage || undefined,
-    datePublished: a.publishedDate || a.createdTime || undefined,
-    dateModified: a.lastEditedTime || a.publishedDate || undefined,
-    mainEntityOfPage: absoluteUrl(path),
-    author: { "@type": "Organization", name: SITE_NAME, url: absoluteUrl("/") },
-    publisher: {
-      "@type": "Organization",
-      name: SITE_NAME,
-      logo: { "@type": "ImageObject", url: absoluteUrl("/wmg-logo.png") },
-    },
-    about: [
-      ...relatedArtists.map((art) => ({ "@type": "MusicGroup", name: art.name, url: absoluteUrl(`/artists/${art.slug}`) })),
-      ...relatedReleases.map((rel) => ({ "@type": "MusicAlbum", name: rel.title, url: absoluteUrl(`/releases/${rel.slug}`) })),
-    ],
-  };
 
   return (
     <article className="bg-ink text-ivory pb-24">
