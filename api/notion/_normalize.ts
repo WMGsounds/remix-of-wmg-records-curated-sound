@@ -150,14 +150,19 @@ export function normalizeRelease(page: any, artistLookup: Map<string, any>) {
   if (showOnWebsiteProp?.type !== "checkbox") {
     warnMissingShowOnWebsite(page.id, text(titleProp(props)));
   }
-  // Derived, not hardcoded: any relation property whose name mentions "album"
-  // is the parent-album relation, so renaming or emoji-prefixing it in Notion
-  // ("Album", "🔄 Parent Album", "From Album") keeps working.
-  const parentAlbumRel =
-    Object.entries(props as Record<string, any>)
-      .filter(([name, p]) => p?.type === "relation" && /album/i.test(name))
-      .map(([, p]) => p.relation?.[0]?.id)
-      .find(Boolean) ?? null;
+  // Exact property name, one constant, no fuzzy matching. If Notion stops
+  // returning it (renamed or removed), THROW: a silent null here is
+  // indistinguishable from "no album linked", which is the exact ambiguity that
+  // hid this relation for every release.
+  const parentAlbumProp = (props as Record<string, any>)[RELEASE_PARENT_ALBUM_PROP];
+  if (!parentAlbumProp) {
+    throw new Error(
+      `[notion] Releases database is missing the relation property "${RELEASE_PARENT_ALBUM_PROP}" ` +
+        `(page ${page.id}). It was renamed or removed in Notion — restore the name or update ` +
+        `RELEASE_PARENT_ALBUM_PROP in api/notion/_normalize.ts.`,
+    );
+  }
+  const parentAlbumRel = parentAlbumProp.relation?.[0]?.id ?? null;
   return {
     id: page.id,
     slug: text(props["Slug"]),
