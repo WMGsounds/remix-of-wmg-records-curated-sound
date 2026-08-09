@@ -89,6 +89,24 @@ const Gallery = () => {
 
   const displayed = useMemo(() => visible.slice(0, visibleCount), [visible, visibleCount]);
 
+  /* H2 sections are derived from the Image Type values present in the data, so
+     a new Notion image type creates its own section automatically. */
+  const typeSections = useMemo(() => {
+    const map = new Map<string, { type: string; label: string; images: typeof displayed }>();
+    displayed.forEach((image) => {
+      const key = (image.imageType || "Other").trim() || "Other";
+      const label = /^other$/i.test(key) ? "Other Photography" : key;
+      if (!map.has(key)) map.set(key, { type: key, label, images: [] });
+      map.get(key)!.images.push(image);
+    });
+    return [...map.values()];
+  }, [displayed]);
+
+  const sectionedImages = useMemo(() => typeSections.flatMap((s) => s.images), [typeSections]);
+  const sectionSlug = (value: string) =>
+    value.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "") || "other";
+
+
   // ImageObject inputs for the published images currently listed; <Seo>
   // builds the schema nodes.
   const galleryImages = useMemo(
