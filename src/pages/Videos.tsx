@@ -288,25 +288,32 @@ const Videos = () => {
 
   const playerList = groupedByArtist ? groupedPlayerList : sectionedList;
 
-  /* VideoObject requires uploadDate and duration for rich results — any video
-     missing either is skipped rather than marked up incompletely. */
+  /* VideoObject requires only name, thumbnailUrl and uploadDate. duration is
+     recommended: emit it when present, warn when absent, never suppress markup.
+     contentUrl is deliberately omitted — we have no underlying media file for
+     YouTube-hosted video, and a watch page URL is not a contentUrl. */
   const videoSchemas = useMemo(() => {
     const eligible: Record<string, unknown>[] = [];
     const skipped: string[] = [];
+    const noDuration: string[] = [];
     visible.forEach((v) => {
-      if (!v.releaseDate || !v.duration) {
-        skipped.push(`${v.title} (${!v.releaseDate ? "no uploadDate" : "no duration"})`);
+      const thumb = v.youtubeId ? thumbnailUrl(v.youtubeId) : "";
+      if (!v.title || !thumb || !v.releaseDate) {
+        const missing = [!v.title && "name", !thumb && "thumbnailUrl", !v.releaseDate && "uploadDate"]
+          .filter(Boolean)
+          .join(", ");
+        skipped.push(`${v.title || v.id} (no ${missing})`);
         return;
       }
+      if (!v.duration) noDuration.push(v.title);
       eligible.push(
         videoObject({
           name: v.title,
           description: v.description || undefined,
-          thumbnailUrl: thumbnailUrl(v.youtubeId),
+          thumbnailUrl: thumb,
           uploadDate: v.releaseDate,
           embedUrl: `https://www.youtube.com/embed/${v.youtubeId}`,
-          contentUrl: watchUrl(v.youtubeId),
-          duration: v.duration,
+          duration: v.duration || undefined,
           artistName: v.artists[0]?.name,
           artistSlug: v.artists[0]?.slug,
         }),
@@ -314,11 +321,17 @@ const Videos = () => {
     });
     if (skipped.length) {
       console.warn(
-        `[videos] VideoObject omitted for ${skipped.length} video(s) missing uploadDate/duration: ${skipped.join("; ")}`,
+        `[videos] VideoObject omitted for ${skipped.length} video(s) missing required properties: ${skipped.join("; ")}`,
+      );
+    }
+    if (noDuration.length) {
+      console.warn(
+        `[videos] VideoObject emitted without duration (recommended) for ${noDuration.length} video(s): ${noDuration.join("; ")}`,
       );
     }
     return eligible;
   }, [visible]);
+
 
   /* Per-video pages deliberately do not exist, so the ItemList identifies each
      video by its YouTube watch URL. */
