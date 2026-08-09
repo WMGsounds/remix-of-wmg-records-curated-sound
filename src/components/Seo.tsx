@@ -47,6 +47,7 @@ type SeoProps = Partial<SeoMeta> & {
 export const Seo = ({
   title,
   fullTitle,
+  titleFallback,
   brand = BRAND_SUFFIX,
   description,
   descriptionFallback,
