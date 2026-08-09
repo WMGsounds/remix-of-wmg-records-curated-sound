@@ -6,13 +6,15 @@
 //      "<Descriptive part> | Wareham Music Group"
 //    Use the full brand name (not the "WMG" abbreviation, which is dominated
 //    in search by Warner Music Group) unless the page has its own agreed
-//    pattern (Journal posts use "| WMG Journal"). Target 50–60 characters;
-//    `buildTitle()` trims the descriptive part at a word boundary to stay
-//    within TITLE_MAX.
-//  • Descriptions are complete sentences of roughly 150–155 characters.
-//    Never ship an auto-truncated, ellipsis-terminated description:
-//    `clampDescription()` cuts at a sentence end, or failing that at the last
-//    whole word, and never appends an ellipsis.
+//    pattern (Journal posts use "| WMG Journal"). Target 50–60 characters.
+//  • Descriptions are complete sentences of roughly 150–155 characters,
+//    authored to length and used verbatim.
+//
+// All length-limiting goes through the single implementation in
+// src/lib/truncate.ts (`truncateAtWord`), which is a fallback for bad input,
+// not a content strategy. Do not add another truncation helper here.
+import { truncateAtWord } from "./truncate";
+
 export const SITE_URL = "https://www.wmgsounds.com";
 export const SITE_NAME = "WMG";
 export const SITE_LEGAL_NAME = "Wareham Music Group";
@@ -34,48 +36,29 @@ export const absoluteUrl = (path = "/"): string => {
   return `${SITE_URL}${path.startsWith("/") ? path : `/${path}`}`;
 };
 
-const normalise = (s?: string | null): string =>
-  (s || "").replace(/\s+/g, " ").replace(/[\s.…]*…\s*$/, "").trim();
-
-/** Cut at the last whole word within `n` characters. Never appends an ellipsis. */
-export const truncateWords = (s: string, n: number): string => {
-  const t = normalise(s);
-  if (t.length <= n) return t;
-  const cut = t.slice(0, n);
-  const lastSpace = cut.lastIndexOf(" ");
-  return (lastSpace > 0 ? cut.slice(0, lastSpace) : cut).replace(/[\s,;:–—-]+$/, "");
-};
+/** Whole-word cut. Thin alias of the one shared implementation. */
+export const truncateWords = (s: string, n: number): string => truncateAtWord(s, n);
 
 /**
- * Meta/schema description: a complete sentence within `max` characters.
- * Prefers ending on sentence punctuation; otherwise falls back to the last
- * whole word. Never appends an ellipsis.
+ * Meta/schema description fallback: never mid-word, never an ellipsis.
+ * Authored descriptions are already within DESCRIPTION_MAX and pass through
+ * untouched.
  */
-export const clampDescription = (s?: string | null, max = DESCRIPTION_MAX): string => {
-  const t = normalise(s);
-  if (t.length <= max) return t;
-  const window = t.slice(0, max);
-  const sentenceEnd = Math.max(
-    window.lastIndexOf(". "),
-    window.lastIndexOf("! "),
-    window.lastIndexOf("? "),
-  );
-  if (sentenceEnd > max * 0.5) return window.slice(0, sentenceEnd + 1).trim();
-  if (/[.!?]$/.test(window)) return window.trim();
-  return truncateWords(t, max);
-};
+export const clampDescription = (s?: string | null, max = DESCRIPTION_MAX): string =>
+  truncateAtWord(s, max);
 
 /**
  * Compose a page title as "<descriptive part> | <brand>", trimming the
  * descriptive part at a word boundary so the whole title fits TITLE_MAX.
  */
 export const buildTitle = (descriptive?: string | null, brand = BRAND_SUFFIX): string => {
-  const head = normalise(descriptive);
+  const head = truncateAtWord(descriptive, 500);
   if (!head) return DEFAULT_TITLE;
-  if (!brand) return truncateWords(head, TITLE_MAX);
+  if (!brand) return truncateAtWord(head, TITLE_MAX);
   const room = TITLE_MAX - brand.length - 3; // " | "
-  return `${truncateWords(head, Math.max(room, 20))} | ${brand}`;
+  return `${truncateAtWord(head, Math.max(room, 20))} | ${brand}`;
 };
+
 
 
 export const organizationSchema = () => ({
