@@ -110,10 +110,20 @@ const VideoPlayer = ({
   );
 };
 
+/**
+ * Click-to-load facade: the card is a real anchor to the YouTube watch URL, so
+ * the pre-rendered HTML always contains a crawlable, playable link. JavaScript
+ * intercepts the click to open the in-page player instead.
+ */
 const VideoCard = ({ video, onSelect }: { video: VideoItem; onSelect: () => void }) => (
-  <button
-    type="button"
-    onClick={onSelect}
+  <a
+    href={watchUrl(video.youtubeId)}
+    rel="noopener"
+    onClick={(e) => {
+      if (e.metaKey || e.ctrlKey || e.shiftKey || e.button !== 0) return;
+      e.preventDefault();
+      onSelect();
+    }}
     className="group block w-full border border-ivory/12 bg-ink/40 text-left transition-colors hover:border-gold/45 focus:outline-none focus-visible:ring-1 focus-visible:ring-gold"
   >
     <div className="relative aspect-video w-full overflow-hidden bg-ink">
@@ -121,6 +131,8 @@ const VideoCard = ({ video, onSelect }: { video: VideoItem; onSelect: () => void
         src={thumbnailUrl(video.youtubeId)}
         alt={`${video.title}${artistNames(video) ? ` by ${artistNames(video)}` : ""} — ${video.videoType}`}
         loading="lazy"
+        width={480}
+        height={360}
         className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-[1.03]"
       />
       <span className="absolute inset-0 bg-ink/20 transition-colors group-hover:bg-ink/10" aria-hidden="true" />
@@ -132,15 +144,21 @@ const VideoCard = ({ video, onSelect }: { video: VideoItem; onSelect: () => void
       </span>
     </div>
     <div className="px-5 py-4">
-      <p className="font-serif text-xl leading-snug text-ivory">{video.title}</p>
+      <h3 className="font-serif text-xl leading-snug text-ivory">
+        {video.title}
+        {video.duration ? (
+          <span className="ml-3 align-middle text-sm text-ivory/45">({video.duration})</span>
+        ) : null}
+      </h3>
       {artistNames(video) && <p className="mt-1 text-sm text-ivory/60">{artistNames(video)}</p>}
       {video.description && (
         <p className="mt-2 text-sm leading-relaxed text-ivory/50 line-clamp-2">{video.description}</p>
       )}
       <p className="mt-3 text-[10px] uppercase tracking-[0.24em] text-gold-soft">{video.videoType}</p>
     </div>
-  </button>
+  </a>
 );
+
 
 const Videos = () => {
   const { data: allVideos = [], isLoading, isError } = useVideos();
