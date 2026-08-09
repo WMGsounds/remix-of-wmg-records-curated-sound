@@ -1,7 +1,7 @@
 import { useMemo, useState } from "react";
 import { Seo } from "@/components/Seo";
 import { staticSeo } from "@/lib/seoConfig";
-import { storeProduct, type StoreItemLike } from "@/lib/schema";
+import { storeProduct, itemList, type StoreItemLike } from "@/lib/schema";
 
 import { useStoreItems } from "@/lib/queries";
 import { InlineSkeleton, PageError } from "@/components/UIStates";
