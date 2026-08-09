@@ -9,7 +9,16 @@ import { InlineSkeleton, PageError } from "@/components/UIStates";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { FilterField, SearchInput } from "@/components/FilterBar";
 import { matchesSearch } from "@/lib/search";
-import { artistNames, embedUrl, thumbnailUrl, type VideoItem } from "@/lib/videos";
+import {
+  artistNames,
+  embedUrl,
+  groupVideosByType,
+  thumbnailUrl,
+  videoTypeSlug,
+  watchUrl,
+  type VideoItem,
+} from "@/lib/videos";
+import { itemList, videoObject } from "@/lib/schema";
 import { londonDateKey, seedFromString, seededShuffle } from "@/lib/galleryOrder";
 import { videosHeroDataUrl } from "@/assets/videosHero";
 
@@ -110,10 +119,20 @@ const VideoPlayer = ({
   );
 };
 
+/**
+ * Click-to-load facade: the card is a real anchor to the YouTube watch URL, so
+ * the pre-rendered HTML always contains a crawlable, playable link. JavaScript
+ * intercepts the click to open the in-page player instead.
+ */
 const VideoCard = ({ video, onSelect }: { video: VideoItem; onSelect: () => void }) => (
-  <button
-    type="button"
-    onClick={onSelect}
+  <a
+    href={watchUrl(video.youtubeId)}
+    rel="noopener"
+    onClick={(e) => {
+      if (e.metaKey || e.ctrlKey || e.shiftKey || e.button !== 0) return;
+      e.preventDefault();
+      onSelect();
+    }}
     className="group block w-full border border-ivory/12 bg-ink/40 text-left transition-colors hover:border-gold/45 focus:outline-none focus-visible:ring-1 focus-visible:ring-gold"
   >
     <div className="relative aspect-video w-full overflow-hidden bg-ink">
@@ -121,6 +140,8 @@ const VideoCard = ({ video, onSelect }: { video: VideoItem; onSelect: () => void
         src={thumbnailUrl(video.youtubeId)}
         alt={`${video.title}${artistNames(video) ? ` by ${artistNames(video)}` : ""} — ${video.videoType}`}
         loading="lazy"
+        width={480}
+        height={360}
         className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-[1.03]"
       />
       <span className="absolute inset-0 bg-ink/20 transition-colors group-hover:bg-ink/10" aria-hidden="true" />
@@ -132,15 +153,21 @@ const VideoCard = ({ video, onSelect }: { video: VideoItem; onSelect: () => void
       </span>
     </div>
     <div className="px-5 py-4">
-      <p className="font-serif text-xl leading-snug text-ivory">{video.title}</p>
+      <h3 className="font-serif text-xl leading-snug text-ivory">
+        {video.title}
+        {video.duration ? (
+          <span className="ml-3 align-middle text-sm text-ivory/45">({video.duration})</span>
+        ) : null}
+      </h3>
       {artistNames(video) && <p className="mt-1 text-sm text-ivory/60">{artistNames(video)}</p>}
       {video.description && (
         <p className="mt-2 text-sm leading-relaxed text-ivory/50 line-clamp-2">{video.description}</p>
       )}
       <p className="mt-3 text-[10px] uppercase tracking-[0.24em] text-gold-soft">{video.videoType}</p>
     </div>
-  </button>
+  </a>
 );
+
 
 const Videos = () => {
   const { data: allVideos = [], isLoading, isError } = useVideos();
@@ -251,7 +278,62 @@ const Videos = () => {
     [artistGroups, openArtists, expandedArtists],
   );
 
-  const playerList = groupedByArtist ? groupedPlayerList : displayed;
+  /* H2 sections come from the Video Type values present in the data, so a new
+     Notion Video Type creates its own section with no code change. */
+  const typeSections = useMemo(
+    () => (groupedByArtist ? [] : groupVideosByType(displayed)),
+    [displayed, groupedByArtist],
+  );
+  const sectionedList = useMemo(() => typeSections.flatMap((s) => s.videos), [typeSections]);
+
+  const playerList = groupedByArtist ? groupedPlayerList : sectionedList;
+
+  /* VideoObject requires uploadDate and duration for rich results — any video
+     missing either is skipped rather than marked up incompletely. */
+  const videoSchemas = useMemo(() => {
+    const eligible: Record<string, unknown>[] = [];
+    const skipped: string[] = [];
+    visible.forEach((v) => {
+      if (!v.releaseDate || !v.duration) {
+        skipped.push(`${v.title} (${!v.releaseDate ? "no uploadDate" : "no duration"})`);
+        return;
+      }
+      eligible.push(
+        videoObject({
+          name: v.title,
+          description: v.description || undefined,
+          thumbnailUrl: thumbnailUrl(v.youtubeId),
+          uploadDate: v.releaseDate,
+          embedUrl: `https://www.youtube.com/embed/${v.youtubeId}`,
+          contentUrl: watchUrl(v.youtubeId),
+          duration: v.duration,
+          artistName: v.artists[0]?.name,
+          artistSlug: v.artists[0]?.slug,
+        }),
+      );
+    });
+    if (skipped.length) {
+      console.warn(
+        `[videos] VideoObject omitted for ${skipped.length} video(s) missing uploadDate/duration: ${skipped.join("; ")}`,
+      );
+    }
+    return eligible;
+  }, [visible]);
+
+  /* Per-video pages deliberately do not exist, so the ItemList identifies each
+     video by its YouTube watch URL. */
+  const videosItemList = useMemo(
+    () =>
+      visible.length
+        ? itemList({
+            path: "/videos",
+            name: "WMG Videos",
+            items: visible.map((v) => ({ name: v.title, path: watchUrl(v.youtubeId) })),
+          })
+        : null,
+    [visible],
+  );
+
 
   const toggleArtist = (key: string) =>
     setOpenArtists((prev) => {
@@ -273,7 +355,10 @@ const Videos = () => {
 
   return (
     <div className="bg-ink text-ivory pb-32">
-      <Seo {...staticSeo("videos")} />
+      <Seo
+        {...staticSeo("videos")}
+        jsonLd={[...(videosItemList ? [videosItemList] : []), ...videoSchemas]}
+      />
 
       <section className="relative overflow-hidden bg-ink pt-40 pb-24 md:pb-28">
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_74%_38%,hsl(var(--golden-brown)/0.38),transparent_34%),radial-gradient(circle_at_18%_78%,hsl(var(--gold)/0.16),transparent_28%)]" aria-hidden="true" />
@@ -387,7 +472,7 @@ const Videos = () => {
               const panelId = `videos-artist-panel-${group.key}`;
               return (
                 <section key={group.key} aria-label={group.name}>
-                  <h3>
+                  <h2>
                     <button
                       type="button"
                       aria-expanded={open}
@@ -408,7 +493,8 @@ const Videos = () => {
                         className={`h-4 w-4 flex-none text-ivory/50 transition-transform duration-300 ${open ? "rotate-180" : ""}`}
                       />
                     </button>
-                  </h3>
+                  </h2>
+
                   <div id={panelId} hidden={!open} className="overflow-hidden animate-in fade-in-0 duration-300">
                     <div className="grid grid-cols-1 gap-8 pt-8 sm:grid-cols-2 lg:grid-cols-3">
                       {shown.map((video) => (
@@ -448,9 +534,30 @@ const Videos = () => {
           </div>
         ) : (
           <>
-            <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-3">
-              {displayed.map((video, i) => (
-                <VideoCard key={video.id} video={video} onSelect={() => setPlayerIndex(i)} />
+            <div className="space-y-20">
+              {typeSections.map((section) => (
+                <section key={section.type} aria-labelledby={`videos-${videoTypeSlug(section.type)}`}>
+                  <h2
+                    id={`videos-${videoTypeSlug(section.type)}`}
+                    className="mb-8 border-b border-gold/25 pb-4 font-serif text-2xl text-ivory md:text-3xl"
+                  >
+                    {section.label}
+                    <span className="ml-4 align-middle text-[11px] uppercase tracking-[0.24em] text-ivory/40">
+                      {section.videos.length} {section.videos.length === 1 ? "video" : "videos"}
+                    </span>
+                  </h2>
+                  <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-3">
+                    {section.videos.map((video) => (
+                      <VideoCard
+                        key={video.id}
+                        video={video}
+                        onSelect={() =>
+                          setPlayerIndex(sectionedList.findIndex((v) => v.id === video.id))
+                        }
+                      />
+                    ))}
+                  </div>
+                </section>
               ))}
             </div>
             {visible.length > displayed.length && (
@@ -467,6 +574,7 @@ const Videos = () => {
             )}
           </>
         )}
+
       </div>
 
       {playerIndex !== null && playerIndex >= 0 && playerList[playerIndex] && (
