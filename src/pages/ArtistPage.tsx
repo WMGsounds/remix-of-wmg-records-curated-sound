@@ -113,7 +113,10 @@ const ArtistPage = () => {
               {artist.shortDescription}
             </p>
           )}
+          {/* Visible, crawlable profile links — same URLs as schema sameAs. */}
+          <SocialLinks urls={artistSameAs(artist)} owner={artist.name} className="mt-7" />
         </div>
+
       </section>
 
       {/* Listen & Watch */}
