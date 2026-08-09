@@ -32,6 +32,7 @@ const STATIC_ROUTES = [
   "/videos",
   "/music",
   "/about",
+  "/spotify",
   "/contact",
   "/newsletter",
   "/legal/privacy",

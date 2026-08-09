@@ -28,6 +28,7 @@ const loaders: Record<string, Loader> = {
   JournalArticlePage: () => import("./pages/JournalArticlePage.tsx"),
   JournalCategory: () => import("./pages/JournalCategory.tsx"),
   Store: () => import("./pages/Store.tsx"),
+  SpotifyRedirect: () => import("./pages/SpotifyRedirect.tsx"),
   SeoDiagnostics: () => import("./pages/SeoDiagnostics.tsx"),
   MediaLibrary: () => import("./pages/MediaLibrary.tsx"),
 };
@@ -70,6 +71,7 @@ export const AppRoutes = () => (
     <Route path="/journal/category/:slug" element={<Page name="JournalCategory" />} />
     <Route path="/journal/:slug" element={<Page name="JournalArticlePage" />} />
     <Route path="/store" element={<Page name="Store" />} />
+    <Route path="/spotify" element={<Page name="SpotifyRedirect" />} />
     <Route path="/about" element={<Page name="About" />} />
     <Route path="/contact" element={<Page name="Contact" />} />
     <Route path="/newsletter" element={<Page name="Newsletter" />} />
