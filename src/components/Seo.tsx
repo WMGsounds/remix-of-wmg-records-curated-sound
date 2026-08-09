@@ -9,12 +9,10 @@ import {
   absoluteUrl,
   buildTitle,
   clampDescription,
-  organizationSchema,
-  websiteSchema,
-  breadcrumbSchema,
-  imageObjectSchema,
 } from "@/lib/seo";
+import { breadcrumbList, imageObject } from "@/lib/schema";
 import type { SeoMeta } from "@/lib/seoConfig";
+
 
 /**
  * THE ONLY PLACE HEAD TAGS ARE WRITTEN.
