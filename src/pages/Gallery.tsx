@@ -88,17 +88,16 @@ const Gallery = () => {
 
   const displayed = useMemo(() => visible.slice(0, visibleCount), [visible, visibleCount]);
 
-  // ImageObject structured data for the published images currently listed.
-  const imageSchema = useMemo(
+  // ImageObject inputs for the published images currently listed; <Seo>
+  // builds the schema nodes.
+  const galleryImages = useMemo(
     () =>
       visible.slice(0, 30).map((i) => ({
-        "@context": "https://schema.org",
-        "@type": "ImageObject",
-        contentUrl: absoluteUrl((i.publicUrl || i.imageUrl).split("?")[0]),
-        ...(i.title ? { name: i.title } : {}),
-        ...(i.altText ? { description: i.altText } : {}),
-        ...(i.caption ? { caption: i.caption } : {}),
-        ...(i.credit ? { creditText: i.credit } : {}),
+        url: absoluteUrl((i.publicUrl || i.imageUrl).split("?")[0]),
+        name: i.title || undefined,
+        description: i.altText || undefined,
+        caption: i.caption || undefined,
+        credit: i.credit || undefined,
       })),
     [visible],
   );

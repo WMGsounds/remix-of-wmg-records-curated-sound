@@ -92,19 +92,15 @@ const Store = () => {
 
   const rest = useMemo(() => sortItems(filtered, sort), [filtered, sort]);
 
-  // ImageObject data for the products actually displayed (capped for size).
-  const productImageSchema = useMemo(
+  // ImageObject inputs for the products actually displayed (capped for size);
+  // <Seo> builds the schema nodes.
+  const productImages = useMemo(
     () =>
-      [...featured, ...rest]
-        .slice(0, 30)
-        .map((i) =>
-          imageObjectSchema({
-            url: i.productImage,
-            name: [i.artist?.name, i.title].filter(Boolean).join(" — ") || i.title,
-            description: i.description || undefined,
-          }),
-        )
-        .filter(Boolean) as Record<string, unknown>[],
+      [...featured, ...rest].slice(0, 30).map((i) => ({
+        url: i.productImage,
+        name: [i.artist?.name, i.title].filter(Boolean).join(" — ") || i.title,
+        description: i.description || undefined,
+      })),
     [featured, rest],
   );
 
