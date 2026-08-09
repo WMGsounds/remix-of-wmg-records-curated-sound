@@ -139,6 +139,13 @@ export function isReleasePublished(
   return instant <= now;
 }
 
+/**
+ * Exact Notion property name for the Releases -> Releases relation that links a
+ * single to the album it appears on. Single source of truth; nothing matches on
+ * substrings or casing.
+ */
+export const RELEASE_PARENT_ALBUM_PROP = "parentAlbum";
+
 export function normalizeRelease(page: any, artistLookup: Map<string, any>) {
   const props = page.properties;
   const artistRel = props["Artist"]?.relation?.[0]?.id ?? "";
