@@ -17,7 +17,9 @@
  */
 import fs from "node:fs/promises";
 import path from "node:path";
+import { execFileSync } from "node:child_process";
 import { pathToFileURL } from "node:url";
+
 
 const root = process.cwd();
 const distDir = path.join(root, "dist");
@@ -59,6 +61,42 @@ const problemsHeader = "[prerender]";
 
 const { routes, sitemap } = await server.collectSite();
 console.log(`[prerender] ${routes.length} routes`);
+
+/* ---------------- lastmod for static routes, from git ------------------- *
+ * CMS-backed routes carry a real content timestamp. Static pages take the
+ * last commit date of their source file, never the build date: dating every
+ * page "today" on each deploy is a false signal Google learns to ignore.
+ * If git history is unavailable (shallow or missing checkout), the entry
+ * simply ships without a <lastmod>. */
+const gitDate = (file) => {
+  try {
+    const out = execFileSync("git", ["log", "-1", "--format=%cs", "--", file], {
+      encoding: "utf8",
+      stdio: ["ignore", "pipe", "ignore"],
+    }).trim();
+    return /^\d{4}-\d{2}-\d{2}$/.test(out) ? out : undefined;
+  } catch {
+    return undefined;
+  }
+};
+
+{
+  const staticPageByPath = new Map(
+    server.registry.routeRegistry
+      .filter((e) => !e.expand && !e.path.includes(":") && e.path !== "*")
+      .map((e) => [e.path, `src/pages/${e.page}.tsx`]),
+  );
+  const dateCache = new Map();
+  for (const entry of sitemap) {
+    if (entry.lastmod) continue;
+    const file = staticPageByPath.get(entry.path);
+    if (!file) continue;
+    if (!dateCache.has(file)) dateCache.set(file, gitDate(file));
+    const d = dateCache.get(file);
+    if (d) entry.lastmod = d;
+  }
+}
+
 
 const injectHead = (html, head) => {
   // Drop the template's fallback <title> so the per-page one is the only title.

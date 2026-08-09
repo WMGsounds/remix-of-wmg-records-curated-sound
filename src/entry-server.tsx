@@ -65,7 +65,7 @@ export async function collectSite(): Promise<SiteRoutes> {
     journal: journal as RouteContent["journal"],
   };
 
-  const buildDate = new Date().toISOString();
+  
   const imagesByPath = new Map<string, SitemapImage[]>();
 
   imagesByPath.set(
