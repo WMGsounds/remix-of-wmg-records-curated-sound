@@ -1,6 +1,7 @@
 import { notion, DBS, CACHE_HEADERS, logApiError, logApiFallback, logApiSuccess, requireEnv, type ApiResponse } from "./_client.js";
 import { FALLBACK_HEADERS, fallbackStoreItems } from "./_fallback.js";
 import { loadAll, normalizeArtist, normalizeRelease, normalizeStoreItem, isReleasePublished } from "./_normalize.js";
+import { notionText } from "./_notionText.js";
 
 export default async function handler(_req: unknown, res: ApiResponse) {
   const route = "/api/notion/store";
@@ -23,16 +24,8 @@ export default async function handler(_req: unknown, res: ApiResponse) {
       const titleField =
         props["Track Title"] ??
         Object.values(props).find((p: any) => p?.type === "title");
-      const title = (() => {
-        if (!titleField) return "";
-        if (Array.isArray(titleField?.rich_text)) {
-          return titleField.rich_text.map((x: any) => x.plain_text).join("").trim();
-        }
-        if (Array.isArray(titleField?.title)) {
-          return titleField.title.map((x: any) => x.plain_text).join("").trim();
-        }
-        return "";
-      })();
+      const title = notionText(titleField);
+
       trackLookup.set(t.id, { id: t.id, title });
     }
 

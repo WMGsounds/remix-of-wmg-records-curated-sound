@@ -3,15 +3,17 @@ import { proxyImageIfNeeded } from "./_imageHelper.js";
 import { resolvePublishInstant } from "./_schedule.js";
 import { journalCoverUrl, journalBlockImageUrl } from "./_mediaUrls.js";
 import { truncateAtWord } from "../../src/lib/truncate.js";
+import { notionText } from "./_notionText.js";
 
 
-const text = (p: any): string =>
-  (p?.rich_text ?? p?.title ?? []).map((t: any) => t.plain_text).join("").trim();
+// Property → string reading lives in ./_notionText.ts (formulas are not rich text).
+const text = notionText;
 
 const num = (p: any): number => p?.number ?? 0;
 const bool = (p: any): boolean => p?.type === "checkbox" && p.checkbox === true;
 const select = (p: any): string => p?.select?.name ?? "";
 const date = (p: any): string => p?.date?.start ?? "";
+
 
 const fileUrl = (f: any): string => {
   const raw = f?.type === "external" ? f.external.url : f?.file?.url ?? "";
