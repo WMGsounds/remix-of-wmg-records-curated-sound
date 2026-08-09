@@ -1,6 +1,7 @@
 import { useEffect } from "react";
 import { Helmet } from "react-helmet-async";
 import { Seo } from "@/components/Seo";
+import { staticSeo } from "@/lib/seoConfig";
 
 const SPOTIFY_URL = "https://open.spotify.com/user/315vlgpfq47hf6pebgugkm6rbgxq";
 

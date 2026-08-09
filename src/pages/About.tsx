@@ -5,6 +5,7 @@ import wmgTeam from "@/assets/wmg-team.png";
 import { Link } from "react-router-dom";
 import { FaSpotify } from "react-icons/fa";
 import { Seo } from "@/components/Seo";
+import { staticSeo } from "@/lib/seoConfig";
 
 const About = () => (
   <div>

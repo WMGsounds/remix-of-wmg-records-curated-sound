@@ -4,6 +4,7 @@ import { ArrowRight, ShoppingBag } from "lucide-react";
 import hero from "@/assets/hero-cinematic.jpg";
 import { ArtistCard, ReleaseCard } from "@/components/Cards";
 import { Seo } from "@/components/Seo";
+import { staticSeo } from "@/lib/seoConfig";
 
 import { LazyImage } from "@/components/LazyImage";
 import { useHomepageData, useJournal, useTracks, useStoreItems } from "@/lib/queries";

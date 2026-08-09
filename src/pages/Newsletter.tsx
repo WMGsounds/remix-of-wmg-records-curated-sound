@@ -1,4 +1,5 @@
 import { Seo } from "@/components/Seo";
+import { staticSeo } from "@/lib/seoConfig";
 
 import { NewsletterForm } from "@/components/NewsletterForm";
 

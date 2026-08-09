@@ -1,6 +1,7 @@
 import { useMemo, useState } from "react";
 import { Copy, Check, ExternalLink } from "lucide-react";
 import { Seo } from "@/components/Seo";
+import { staticSeo } from "@/lib/seoConfig";
 import { useReleases } from "@/lib/queries";
 import { InlineSkeleton, PageError } from "@/components/UIStates";
 import { LazyImage } from "@/components/LazyImage";

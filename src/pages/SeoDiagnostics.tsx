@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Seo } from "@/components/Seo";
+import { staticSeo } from "@/lib/seoConfig";
 import { SITE_URL } from "@/lib/seo";
 import { useArtists, useReleases, useJournal } from "@/lib/queries";
 

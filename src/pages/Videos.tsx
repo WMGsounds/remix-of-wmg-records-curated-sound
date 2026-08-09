@@ -2,6 +2,7 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import { ChevronDown, ChevronLeft, ChevronRight, Play, X } from "lucide-react";
 import { Seo } from "@/components/Seo";
+import { staticSeo } from "@/lib/seoConfig";
 
 import { useVideos } from "@/lib/queries";
 import { InlineSkeleton, PageError } from "@/components/UIStates";
