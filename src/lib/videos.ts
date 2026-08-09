@@ -9,6 +9,8 @@ export type VideoItem = {
   relatedReleaseIds: string[];
   releaseDate: string;
   description: string;
+  /** mm:ss / hh:mm:ss; "" when Notion has no duration for this video. */
+  duration?: string;
   featured: boolean;
   sortOrder: number | null;
 };
