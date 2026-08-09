@@ -190,6 +190,10 @@ export function normalizeRelease(page: any, artistLookup: Map<string, any>) {
     upc: text(findProp(props, "UPC", "Upc", "upc")) || null,
     parentAlbumId: parentAlbumRel,
     parentAlbum: null as null | { id: string; title: string; slug: string | null },
+    // Notion formula properties — read through the shared reader (formula.string).
+    seoTitle: text(props["SEO Title"]),
+    seoDescription: text(props["SEO Description"]),
+
   };
 }
 
