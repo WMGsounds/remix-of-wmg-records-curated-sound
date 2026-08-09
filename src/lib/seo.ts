@@ -48,16 +48,35 @@ export const clampDescription = (s?: string | null, max = DESCRIPTION_MAX): stri
   truncateAtWord(s, max);
 
 /**
- * Compose a page title as "<descriptive part> | <brand>", trimming the
- * descriptive part at a word boundary so the whole title fits TITLE_MAX.
+ * Compose "<descriptive part> | <brand>".
+ *
+ * NO TRUNCATION. A title longer than TITLE_MAX is not an error: Google reads
+ * the whole tag and only truncates the display. Clipping in code is what turns
+ * a usable title into a broken one ("… Do Not Publish by | Wareham Music
+ * Group"), so we never cut mid-phrase and never leave a trailing connective.
+ *
+ * `fallbackDescriptive` is an optional shorter, still-grammatical variant
+ * (e.g. the release title without " by <artist>"). It is used only when the
+ * full title exceeds TITLE_MAX.
  */
-export const buildTitle = (descriptive?: string | null, brand = BRAND_SUFFIX): string => {
-  const head = truncateAtWord(descriptive, 500);
+export const buildTitle = (
+  descriptive?: string | null,
+  brand = BRAND_SUFFIX,
+  fallbackDescriptive?: string | null,
+): string => {
+  const head = (descriptive || "").replace(/\s+/g, " ").trim();
   if (!head) return DEFAULT_TITLE;
-  if (!brand) return truncateAtWord(head, TITLE_MAX);
-  const room = TITLE_MAX - brand.length - 3; // " | "
-  return `${truncateAtWord(head, Math.max(room, 20))} | ${brand}`;
+  const compose = (d: string) => (brand ? `${d} | ${brand}` : d);
+  const full = compose(head);
+  if (full.length <= TITLE_MAX) return full;
+  const alt = (fallbackDescriptive || "").replace(/\s+/g, " ").trim();
+  if (alt && alt !== head) {
+    const shorter = compose(alt);
+    if (shorter.length < full.length) return shorter;
+  }
+  return full;
 };
+
 
 
 
