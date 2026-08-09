@@ -79,6 +79,40 @@ const relationIds = (p: any): string[] =>
   Array.isArray(p?.relation) ? p.relation.map((r: any) => r?.id).filter(Boolean) : [];
 
 /**
+ * Read a video duration as "m:ss" / "h:mm:ss". Accepts a Notion text/formula
+ * value ("3:47", "PT3M47S") or a number of seconds. Returns "" when absent or
+ * unparseable — VideoObject markup is then omitted rather than guessed.
+ */
+export function readDuration(prop: any): string {
+  const fromNumber = typeof prop?.number === "number" ? prop.number : null;
+  const raw = fromNumber !== null ? String(fromNumber) : notionText(prop).trim();
+  if (!raw) return "";
+
+  let seconds: number | null = null;
+  if (/^\d+(\.\d+)?$/.test(raw)) {
+    seconds = Math.round(Number(raw));
+  } else if (/^PT/i.test(raw)) {
+    const m = raw.match(/^PT(?:(\d+)H)?(?:(\d+)M)?(?:(\d+)S)?$/i);
+    if (m && (m[1] || m[2] || m[3])) {
+      seconds = Number(m[1] || 0) * 3600 + Number(m[2] || 0) * 60 + Number(m[3] || 0);
+    }
+  } else if (/^\d{1,2}(:\d{1,2}){1,2}$/.test(raw)) {
+    const parts = raw.split(":").map((p) => Number.parseInt(p, 10));
+    seconds = parts.length === 3
+      ? parts[0] * 3600 + parts[1] * 60 + parts[2]
+      : parts[0] * 60 + parts[1];
+  }
+  if (seconds === null || !Number.isFinite(seconds) || seconds <= 0) return "";
+
+  const h = Math.floor(seconds / 3600);
+  const m = Math.floor((seconds % 3600) / 60);
+  const s = seconds % 60;
+  const pad = (n: number) => String(n).padStart(2, "0");
+  return h ? `${h}:${pad(m)}:${pad(s)}` : `${m}:${pad(s)}`;
+}
+
+
+/**
  * Normalise one Videos row. Returns null when the record must stay unpublished
  * (hidden, invalid/missing YouTube URL, or missing / future Release Date).
  */
