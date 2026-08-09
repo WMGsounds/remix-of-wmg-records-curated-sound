@@ -31,7 +31,7 @@ Supporting pieces in the same module:
 - more than one track → `MusicAlbum` with a `track` array of `MusicRecording` items
 - exactly one track → bare `MusicRecording`, no `track` array
 
-Both carry `byArtist`, `genre`, `datePublished`, `duration` and `"inLanguage": "en"`, plus a `sameAs` array built from the release's existing platform URLs (Spotify, Apple Music, YouTube Music, Amazon Music) so new releases inherit it.
+Both carry `byArtist`, `genre`, `datePublished`, `duration` and `"inLanguage": "en-GB"`, plus a `sameAs` array built from the release's existing platform URLs (Spotify, Apple Music, YouTube Music, Amazon Music) so new releases inherit it. The `<html lang>` attribute changes from `en` to `en-GB` at the same time, so schema, `og:locale` and `lang` all agree.
 
 **Artists (`MusicGroup`)** — `sameAs` built from the eight artist URL fields in this order, blanks skipped silently, `sameAs` omitted entirely when all eight are blank, never an empty string, never a label-level fallback:
 
