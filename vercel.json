@@ -1,5 +1,12 @@
 {
+  "crons": [
+    {
+      "path": "/api/cron/rebuild",
+      "schedule": "10 5 * * *"
+    }
+  ],
   "rewrites": [
+
     {
       "source": "/api/notion/tracks",
       "destination": "/api/notion/artists?dataset=tracks"
