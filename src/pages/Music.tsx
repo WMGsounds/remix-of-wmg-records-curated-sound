@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Link } from "react-router-dom";
-import { ChevronDown } from "lucide-react";
+import { ChevronDown, Youtube } from "lucide-react";
 import { SiSpotify, SiApplemusic } from "react-icons/si";
 import type { ComponentType, SVGProps } from "react";
 import { Seo } from "@/components/Seo";
@@ -27,12 +27,34 @@ const SERVICES = [
   { key: "youtubeMusic", label: "YouTube Music", Icon: YouTubeMusicIcon as IconComponent },
 ] as const;
 
-const StreamingLinks = ({ track, size = "sm" }: { track: CatalogueTrack; size?: "sm" | "md" }) => {
+export const StreamingLinks = ({ track, size = "sm" }: { track: CatalogueTrack; size?: "sm" | "md" }) => {
   const available = SERVICES.filter((s) => Boolean(track.links[s.key]));
-  if (available.length === 0) return null;
+  const youtubeUrl = track.youtubeUrl?.trim();
+  if (available.length === 0 && !youtubeUrl) return null;
+  const linkClass = `group inline-flex items-center gap-2 border border-ivory/22 text-ivory/70 uppercase tracking-[0.22em] transition-colors hover:border-gold/50 hover:text-gold-soft focus:outline-none focus-visible:ring-1 focus-visible:ring-gold ${
+    size === "md" ? "px-4 py-2 text-[11px]" : "px-3 py-1.5 text-[10px]"
+  }`;
   return (
     <div className="space-y-2">
       <ul className="flex flex-wrap items-center gap-2">
+        {youtubeUrl && (
+          <li key="youtube">
+            <a
+              href={youtubeUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              onClick={(e) => e.stopPropagation()}
+              aria-label={`Watch ${track.title} on YouTube (opens in a new tab)`}
+              className={linkClass}
+            >
+              <Youtube
+                className="h-4 w-4 text-gold-soft transition-colors duration-300 group-hover:text-gold"
+                aria-hidden="true"
+              />
+              <span>YouTube</span>
+            </a>
+          </li>
+        )}
         {available.map((s) => (
           <li key={s.key}>
             <a
@@ -41,9 +63,7 @@ const StreamingLinks = ({ track, size = "sm" }: { track: CatalogueTrack; size?: 
               rel="noopener noreferrer"
               onClick={(e) => e.stopPropagation()}
               aria-label={`Listen to ${track.title} on ${s.label} (opens in a new tab)`}
-              className={`group inline-flex items-center gap-2 border border-ivory/22 text-ivory/70 uppercase tracking-[0.22em] transition-colors hover:border-gold/50 hover:text-gold-soft focus:outline-none focus-visible:ring-1 focus-visible:ring-gold ${
-                size === "md" ? "px-4 py-2 text-[11px]" : "px-3 py-1.5 text-[10px]"
-              }`}
+              className={linkClass}
             >
               <s.Icon
                 className="h-4 w-4 text-gold-soft transition-colors duration-300 group-hover:text-gold"
