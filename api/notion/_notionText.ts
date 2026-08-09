@@ -24,8 +24,8 @@ const plain = (items: unknown): string =>
  * Read any Notion property as a plain string.
  * Supports: title, rich_text, formula (string/number/boolean/date),
  * rollup (string/number/date/array — recursive), select, status,
- * multi_select, url, email, phone_number, number, unique_id, date,
- * checkbox, and bare strings passed by internal helpers.
+ * multi_select, url, email, phone_number, number, unique_id, date
+ * and bare strings passed by internal helpers.
  * Returns "" for missing, null, empty or unsupported values.
  */
 export function notionText(p: any): string {
@@ -77,7 +77,8 @@ export function notionText(p: any): string {
     return u.prefix ? `${u.prefix}-${u.number}` : String(u.number ?? "");
   }
   if (p.date && typeof p.date.start === "string") return p.date.start.trim();
-  if (typeof p.checkbox === "boolean") return p.checkbox ? "true" : "false";
+  // Checkboxes are deliberately NOT stringified — use a boolean reader instead,
+  // so `text(prop) || fallback` never resolves to the string "false".
 
   return "";
 }
