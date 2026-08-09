@@ -1,6 +1,7 @@
 import { useMemo, useState } from "react";
 import { Seo } from "@/components/Seo";
-import { breadcrumbSchema, imageObjectSchema } from "@/lib/seo";
+import { staticSeo } from "@/lib/seoConfig";
+
 import { useStoreItems } from "@/lib/queries";
 import { InlineSkeleton, PageError } from "@/components/UIStates";
 import { StoreCard } from "@/components/StoreCard";
@@ -92,19 +93,15 @@ const Store = () => {
 
   const rest = useMemo(() => sortItems(filtered, sort), [filtered, sort]);
 
-  // ImageObject data for the products actually displayed (capped for size).
-  const productImageSchema = useMemo(
+  // ImageObject inputs for the products actually displayed (capped for size);
+  // <Seo> builds the schema nodes.
+  const productImages = useMemo(
     () =>
-      [...featured, ...rest]
-        .slice(0, 30)
-        .map((i) =>
-          imageObjectSchema({
-            url: i.productImage,
-            name: [i.artist?.name, i.title].filter(Boolean).join(" — ") || i.title,
-            description: i.description || undefined,
-          }),
-        )
-        .filter(Boolean) as Record<string, unknown>[],
+      [...featured, ...rest].slice(0, 30).map((i) => ({
+        url: i.productImage,
+        name: [i.artist?.name, i.title].filter(Boolean).join(" — ") || i.title,
+        description: i.description || undefined,
+      })),
     [featured, rest],
   );
 
@@ -114,18 +111,7 @@ const Store = () => {
 
   return (
     <div className="bg-ink text-ivory pb-32">
-      <Seo
-        fullTitle="Buy Vinyl, CD and Digital | Wareham Music Group"
-        description="Buy WMG releases on vinyl, CD and digital. Limited editions, bundles and signed copies from Wareham Music Group artists."
-        canonicalPath="/store"
-        jsonLd={[
-          breadcrumbSchema([
-            { name: "Home", path: "/" },
-            { name: "Store", path: "/store" },
-          ]),
-          ...productImageSchema,
-        ]}
-      />
+      <Seo {...staticSeo("store")} images={productImages} />
 
       <section className="relative overflow-hidden bg-ink pt-40 pb-24 md:pb-28">
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_74%_38%,hsl(var(--golden-brown)/0.38),transparent_34%),radial-gradient(circle_at_18%_78%,hsl(var(--gold)/0.16),transparent_28%)]" aria-hidden="true" />

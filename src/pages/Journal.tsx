@@ -1,7 +1,8 @@
 import { useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import { Seo } from "@/components/Seo";
-import { breadcrumbSchema } from "@/lib/seo";
+import { staticSeo } from "@/lib/seoConfig";
+
 import { useJournal } from "@/lib/queries";
 import { InlineSkeleton, PageError, PageEmpty } from "@/components/UIStates";
 import { LazyImage } from "@/components/LazyImage";
@@ -100,15 +101,7 @@ const Journal = () => {
 
   return (
     <div className="bg-ink text-ivory pb-32 min-h-screen">
-      <Seo
-        fullTitle="WMG Journal: Release Stories and Artist Features"
-        description="Read WMG Journal stories, including release stories, artist spotlights, album features and behind-the-scenes editorial from Wareham Music Group."
-        canonicalPath="/journal"
-        jsonLd={breadcrumbSchema([
-          { name: "Home", path: "/" },
-          { name: "Journal", path: "/journal" },
-        ])}
-      />
+      <Seo {...staticSeo("journal")} />
       <section className="relative overflow-hidden bg-ink pt-40 pb-24 md:pb-28">
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_74%_38%,hsl(var(--golden-brown)/0.38),transparent_34%),radial-gradient(circle_at_18%_78%,hsl(var(--gold)/0.16),transparent_28%)]" aria-hidden="true" />
         <div className="absolute inset-0 opacity-[0.08] [background-image:linear-gradient(90deg,hsl(var(--ivory)/0.8)_1px,transparent_1px),linear-gradient(0deg,hsl(var(--ivory)/0.8)_1px,transparent_1px)] [background-size:3px_3px]" aria-hidden="true" />

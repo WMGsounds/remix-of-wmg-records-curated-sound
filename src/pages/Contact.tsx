@@ -2,7 +2,8 @@ import { useState } from "react";
 import { ArrowRight, X, CheckCircle2 } from "lucide-react";
 import contactImage from "@/assets/contact-editorial.jpg";
 import { Seo } from "@/components/Seo";
-import { breadcrumbSchema } from "@/lib/seo";
+import { staticSeo } from "@/lib/seoConfig";
+
 import { FileUploaderRegular } from "@uploadcare/react-uploader";
 import "@uploadcare/react-uploader/core.css";
 
@@ -86,15 +87,7 @@ const Contact = () => {
 
   return (
     <main className="bg-ink text-ivory">
-      <Seo
-        fullTitle="Contact WMG: Press, Sync and Demo Submissions"
-        description="Get in touch with WMG — for press, sync and licensing, artist demos, or general enquiries."
-        canonicalPath="/contact"
-        jsonLd={breadcrumbSchema([
-          { name: "Home", path: "/" },
-          { name: "Contact", path: "/contact" },
-        ])}
-      />
+      <Seo {...staticSeo("contact")} />
       <section className="grid min-h-screen grid-cols-1 lg:grid-cols-[30%_70%]">
         <div className="relative min-h-[40vh] overflow-hidden bg-ink lg:min-h-screen">
           <img

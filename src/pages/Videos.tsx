@@ -2,7 +2,8 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import { ChevronDown, ChevronLeft, ChevronRight, Play, X } from "lucide-react";
 import { Seo } from "@/components/Seo";
-import { breadcrumbSchema } from "@/lib/seo";
+import { staticSeo } from "@/lib/seoConfig";
+
 import { useVideos } from "@/lib/queries";
 import { InlineSkeleton, PageError } from "@/components/UIStates";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -16,7 +17,6 @@ const ALL = "all";
 const VIDEO_BATCH_SIZE = 18;
 const ARTIST_VIDEO_LIMIT = 12;
 const sortOptions = ["Featured", "Random", "Newest", "Artist", "Title"] as const;
-
 
 const VideoPlayer = ({
   videos,
@@ -155,8 +155,6 @@ const Videos = () => {
   // Stable for the whole visit; refreshes on a new London calendar day.
   const [dayKey] = useState(() => londonDateKey());
 
-
-
   const artistOptions = useMemo(() => {
     const map = new Map<string, string>();
     allVideos.forEach((v) => {
@@ -275,15 +273,7 @@ const Videos = () => {
 
   return (
     <div className="bg-ink text-ivory pb-32">
-      <Seo
-        fullTitle="Official Music Videos and Lyric Videos | WMG"
-        description="Official music videos, lyric videos and official audio from across the Wareham Music Group roster."
-        canonicalPath="/videos"
-        jsonLd={breadcrumbSchema([
-          { name: "Home", path: "/" },
-          { name: "Videos", path: "/videos" },
-        ])}
-      />
+      <Seo {...staticSeo("videos")} />
 
       <section className="relative overflow-hidden bg-ink pt-40 pb-24 md:pb-28">
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_74%_38%,hsl(var(--golden-brown)/0.38),transparent_34%),radial-gradient(circle_at_18%_78%,hsl(var(--gold)/0.16),transparent_28%)]" aria-hidden="true" />
@@ -317,7 +307,6 @@ const Videos = () => {
         <div className="absolute inset-x-0 bottom-0 h-20 bg-gradient-to-b from-transparent to-ink" aria-hidden="true" />
         <div className="absolute inset-x-0 bottom-0 h-px bg-gold/35" aria-hidden="true" />
       </section>
-
 
       <div className="container-editorial pt-16">
         <div className="flex flex-wrap items-end justify-between gap-y-6 mb-16 border-y border-ivory/18 py-6">

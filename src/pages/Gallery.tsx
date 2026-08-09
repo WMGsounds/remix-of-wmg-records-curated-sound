@@ -2,7 +2,8 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import { ChevronDown } from "lucide-react";
 import { Seo } from "@/components/Seo";
-import { breadcrumbSchema, absoluteUrl } from "@/lib/seo";
+import { staticSeo } from "@/lib/seoConfig";
+import { absoluteUrl } from "@/lib/seo";
 import { useGallery } from "@/lib/queries";
 import { InlineSkeleton, PageError } from "@/components/UIStates";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -88,17 +89,16 @@ const Gallery = () => {
 
   const displayed = useMemo(() => visible.slice(0, visibleCount), [visible, visibleCount]);
 
-  // ImageObject structured data for the published images currently listed.
-  const imageSchema = useMemo(
+  // ImageObject inputs for the published images currently listed; <Seo>
+  // builds the schema nodes.
+  const galleryImages = useMemo(
     () =>
       visible.slice(0, 30).map((i) => ({
-        "@context": "https://schema.org",
-        "@type": "ImageObject",
-        contentUrl: absoluteUrl((i.publicUrl || i.imageUrl).split("?")[0]),
-        ...(i.title ? { name: i.title } : {}),
-        ...(i.altText ? { description: i.altText } : {}),
-        ...(i.caption ? { caption: i.caption } : {}),
-        ...(i.credit ? { creditText: i.credit } : {}),
+        url: absoluteUrl((i.publicUrl || i.imageUrl).split("?")[0]),
+        name: i.title || undefined,
+        description: i.altText || undefined,
+        caption: i.caption || undefined,
+        credit: i.credit || undefined,
       })),
     [visible],
   );
@@ -107,18 +107,7 @@ const Gallery = () => {
 
   return (
     <div className="bg-ink text-ivory pb-32">
-      <Seo
-        fullTitle="Artist Photography and Artwork | Wareham Music Group"
-        description="The WMG visual archive: portraits, live performance, studio sessions and behind-the-scenes photography from across the Wareham Music Group roster."
-        canonicalPath="/gallery"
-        jsonLd={[
-          breadcrumbSchema([
-            { name: "Home", path: "/" },
-            { name: "Gallery", path: "/gallery" },
-          ]),
-          ...imageSchema,
-        ]}
-      />
+      <Seo {...staticSeo("gallery")} images={galleryImages} />
 
       <section className="relative overflow-hidden bg-ink pt-40 pb-24 md:pb-28">
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_74%_38%,hsl(var(--golden-brown)/0.38),transparent_34%),radial-gradient(circle_at_18%_78%,hsl(var(--gold)/0.16),transparent_28%)]" aria-hidden="true" />

@@ -4,7 +4,8 @@ import { ChevronDown } from "lucide-react";
 import { SiSpotify, SiApplemusic } from "react-icons/si";
 import type { ComponentType, SVGProps } from "react";
 import { Seo } from "@/components/Seo";
-import { breadcrumbSchema } from "@/lib/seo";
+import { staticSeo } from "@/lib/seoConfig";
+
 import { useCatalogue } from "@/lib/queries";
 import { InlineSkeleton, PageError } from "@/components/UIStates";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -177,7 +178,6 @@ const TrackRow = ({
           {showArtist && artistName && <p className="mt-1 text-sm text-ivory/50">{artistName}</p>}
         </div>
 
-
         <span
           className="inline-flex flex-none items-center gap-2 self-center text-[10px] uppercase tracking-[0.24em] text-ivory/50"
           aria-hidden="true"
@@ -186,7 +186,6 @@ const TrackRow = ({
           <ChevronDown className={`h-4 w-4 transition-transform duration-300 ${expanded ? "rotate-180" : ""}`} />
         </span>
       </div>
-
 
       {expanded && (
         <div id={panelId} className="border-t border-ivory/10 bg-ivory/[0.02] px-1 py-10 md:px-6 md:py-12">
@@ -287,7 +286,6 @@ const Music = () => {
     setOpenArtists(new Set());
   }, [sort, searchQuery]);
 
-
   const artistCount = groups.filter((g) => g.key !== "all").length;
   const isFiltered = searchQuery.trim().length > 0;
 
@@ -295,15 +293,7 @@ const Music = () => {
 
   return (
     <div className="bg-ink text-ivory pb-32">
-      <Seo
-        fullTitle="Listen to the WMG Catalogue | Soul, Blues, Reggae"
-        description="Explore the Wareham Music Group catalogue. Discover tracks by WMG artists, stream on major platforms, read song stories and explore the full lyrics."
-        canonicalPath="/music"
-        jsonLd={breadcrumbSchema([
-          { name: "Home", path: "/" },
-          { name: "Music", path: "/music" },
-        ])}
-      />
+      <Seo {...staticSeo("music")} />
 
       <section className="relative overflow-hidden bg-ink pt-40 pb-24 md:pb-28">
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_74%_38%,hsl(var(--golden-brown)/0.38),transparent_34%),radial-gradient(circle_at_18%_78%,hsl(var(--gold)/0.16),transparent_28%)]" aria-hidden="true" />

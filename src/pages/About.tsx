@@ -5,19 +5,11 @@ import wmgTeam from "@/assets/wmg-team.png";
 import { Link } from "react-router-dom";
 import { FaSpotify } from "react-icons/fa";
 import { Seo } from "@/components/Seo";
-import { breadcrumbSchema } from "@/lib/seo";
+import { staticSeo } from "@/lib/seoConfig";
 
 const About = () => (
   <div>
-    <Seo
-      fullTitle="About Wareham Music Group, London Independent Label"
-      description="WMG (Wareham Music Group) is a London-based independent label building catalogue with patience, restraint and respect for the song."
-      canonicalPath="/about"
-      jsonLd={breadcrumbSchema([
-        { name: "Home", path: "/" },
-        { name: "About", path: "/about" },
-      ])}
-    />
+    <Seo {...staticSeo("about")} />
     <section className="relative h-[82vh] min-h-[620px] bg-ink text-ivory overflow-hidden">
       <img src={hero} alt="Low-lit studio atmosphere" loading="eager" fetchPriority="high" width={1920} height={1080} className="absolute inset-0 h-[112%] w-full object-cover opacity-55 motion-safe:scale-105" />
       <div className="absolute inset-0 bg-gradient-to-t from-ink via-ink/35 to-ink/10" />

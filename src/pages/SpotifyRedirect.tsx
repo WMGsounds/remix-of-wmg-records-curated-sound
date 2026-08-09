@@ -1,6 +1,7 @@
 import { useEffect } from "react";
 import { Helmet } from "react-helmet-async";
 import { Seo } from "@/components/Seo";
+import { staticSeo } from "@/lib/seoConfig";
 
 const SPOTIFY_URL = "https://open.spotify.com/user/315vlgpfq47hf6pebgugkm6rbgxq";
 
@@ -11,12 +12,7 @@ const SpotifyRedirect = () => {
 
   return (
     <>
-      <Seo
-        fullTitle="Spotify | Wareham Music Group"
-        description="Follow Wareham Music Group on Spotify."
-        canonicalPath="/spotify"
-        noindex
-      />
+      <Seo {...staticSeo("spotify")} />
       <Helmet>
         <meta httpEquiv="refresh" content={`0;url=${SPOTIFY_URL}`} />
       </Helmet>

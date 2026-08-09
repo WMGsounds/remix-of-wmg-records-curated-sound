@@ -1,7 +1,7 @@
 import { useMemo } from "react";
 import { Link, useParams, Navigate } from "react-router-dom";
 import { Seo } from "@/components/Seo";
-import { breadcrumbSchema, JOURNAL_BRAND_SUFFIX } from "@/lib/seo";
+import { seoFor } from "@/lib/seoConfig";
 import { useJournal } from "@/lib/queries";
 import { InlineSkeleton, PageError, PageEmpty } from "@/components/UIStates";
 import { LazyImage } from "@/components/LazyImage";
@@ -61,23 +61,11 @@ const JournalCategory = () => {
     return <Navigate to="/journal" replace />;
   }
 
-  const path = `/journal/category/${slug}`;
-  const title = categoryName || "Category";
   const description = `${categoryName} stories from WMG — release notes, artist features and label editorial from Wareham Music Group.`;
 
   return (
     <div className="bg-ink text-ivory pb-32 min-h-screen">
-      <Seo
-        title={`${title} Stories`}
-        brand={JOURNAL_BRAND_SUFFIX}
-        description={description}
-        canonicalPath={path}
-        jsonLd={breadcrumbSchema([
-          { name: "Home", path: "/" },
-          { name: "Journal", path: "/journal" },
-          { name: categoryName || "Category", path },
-        ])}
-      />
+      <Seo {...seoFor.journalCategory({ name: categoryName, slug })} />
       <section className="container-editorial pt-40 pb-16">
         <p className="eyebrow text-gold-soft mb-6">
           <Link to="/journal" className="link-underline hover:text-gold">The Journal</Link>

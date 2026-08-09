@@ -4,7 +4,8 @@ import { ChevronDown, ChevronLeft, ChevronRight, ChevronUp, Play, ShoppingBag } 
 import { useReleaseBySlug, useStoreItems } from "@/lib/queries";
 import { LazyImage } from "@/components/LazyImage";
 import { Seo } from "@/components/Seo";
-import { breadcrumbSchema, absoluteUrl, clampDescription, imageObjectSchema } from "@/lib/seo";
+import { absoluteUrl } from "@/lib/seo";
+import { seoFor } from "@/lib/seoConfig";
 import { PageLoading, PageError } from "@/components/UIStates";
 import { ReleaseLinks } from "@/components/ReleaseLinks";
 import type { Track, StoreItem } from "@/lib/types";
@@ -237,21 +238,8 @@ const ReleasePage = () => {
   return (
     <div>
       <Seo
-        title={`${release.title} by ${release.artistName || artist?.name || "Wareham Music Group"}`}
-        description={clampDescription(
-          (release.shortDescription || release.fullDescription)
-            ? `${release.shortDescription || release.fullDescription}`
-            : `Listen to ${release.title} by ${release.artistName || artist?.name || ""}, a ${release.releaseType} release from Wareham Music Group.`,
-        )}
-        canonicalPath={`/releases/${release.slug}`}
-        image={release.coverArt}
-        type="music.album"
+        {...seoFor.release({ ...release, artistName: release.artistName || artist?.name })}
         jsonLd={[
-          breadcrumbSchema([
-            { name: "Home", path: "/" },
-            { name: "Releases", path: "/releases" },
-            { name: release.title, path: `/releases/${release.slug}` },
-          ]),
           {
             "@context": "https://schema.org",
             "@type": release.releaseType === "Single" ? "MusicRecording" : "MusicAlbum",
@@ -274,13 +262,13 @@ const ReleasePage = () => {
               duration: t.duration ? `PT${t.duration.split(":")[0]}M${t.duration.split(":")[1] || "0"}S` : undefined,
             })),
           },
-          ...[
-            imageObjectSchema({
-              url: release.coverArt,
-              name: `${release.title} — cover art`,
-              description: `Cover art for ${release.title} by ${release.artistName || artist?.name || "WMG"}.`,
-            }),
-          ].filter(Boolean),
+        ]}
+        images={[
+          {
+            url: release.coverArt,
+            name: `${release.title} — cover art`,
+            description: `Cover art for ${release.title} by ${release.artistName || artist?.name || "WMG"}.`,
+          },
         ]}
       />
       {/* Hero + Tracklist (unified blurred-cover background) */}
