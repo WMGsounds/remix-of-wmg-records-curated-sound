@@ -1,5 +1,7 @@
 // Pure helpers for the permanent release-artwork URL mode of /api/image-proxy.
 // Kept underscore-prefixed so Vercel never deploys it as a serverless function.
+import { notionText } from "./_notionText.js";
+
 
 // Delegates to the shared Notion property reader (./_notionText.ts) so slug
 // lookups behave exactly like the rest of the app — including formula values.

@@ -1,5 +1,6 @@
 // Videos database normalisation + publication rules (server-side only).
 import { resolvePublishInstant } from "./_schedule.js";
+import { notionText } from "./_notionText.js";
 
 export type VideoItem = {
   id: string;

@@ -2,6 +2,7 @@
 import { resolvePublishInstant } from "./_schedule.js";
 import { proxyImageIfNeeded } from "./_imageHelper.js";
 import { slugifyName, keySegment, versionToken } from "./_mediaUrls.js";
+import { notionText } from "./_notionText.js";
 
 export const GALLERY_IMAGE_TYPES = [
   "Portrait",

@@ -1,6 +1,7 @@
 import { notion, DBS, CACHE_HEADERS, logApiError, logApiFallback, logApiSuccess, requireEnv, type ApiResponse } from "./_client.js";
 import { FALLBACK_HEADERS, fallbackStoreItems } from "./_fallback.js";
 import { loadAll, normalizeArtist, normalizeRelease, normalizeStoreItem, isReleasePublished } from "./_normalize.js";
+import { notionText } from "./_notionText.js";
 
 export default async function handler(_req: unknown, res: ApiResponse) {
   const route = "/api/notion/store";
