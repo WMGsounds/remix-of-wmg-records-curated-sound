@@ -9,34 +9,39 @@ import {
   absoluteUrl,
   buildTitle,
   clampDescription,
+  organizationSchema,
+  websiteSchema,
+  breadcrumbSchema,
+  imageObjectSchema,
 } from "@/lib/seo";
+import type { SeoMeta } from "@/lib/seoConfig";
 
 /**
- * Site-wide head tags.
+ * THE ONLY PLACE HEAD TAGS ARE WRITTEN.
  *
- * TITLE STANDARD: pass `title` as the DESCRIPTIVE part only — this component
- * appends the brand, producing "<descriptive part> | Wareham Music Group"
- * within 60 characters. Override the suffix with `brand` (Journal posts use
- * "WMG Journal"), or pass `fullTitle` when a page needs an exact string.
- * Never hand-write "WMG | ..." prefixes.
+ * Pages never hand-write meta tags, canonicals, OG/Twitter tags,
+ * Organization, WebSite, BreadcrumbList or ImageObject JSON-LD. They pass a
+ * metadata object from `src/lib/seoConfig.ts` (via `staticSeo()` / `seoFor.*`)
+ * plus any content-type schema (MusicAlbum, BlogPosting…) in `jsonLd`.
  *
- * DESCRIPTION STANDARD: pass a complete sentence of ~150–155 characters.
- * `clampDescription` is a safety net only; it cuts at a sentence end or whole
- * word and never appends an ellipsis.
+ * TITLE STANDARD: `title` is the DESCRIPTIVE part only — the brand is appended,
+ * producing "<descriptive part> | Wareham Music Group" within 60 characters.
+ * `brand` overrides the suffix (Journal posts use "WMG Journal"); `fullTitle`
+ * sets an exact string. Never lead with "WMG | ".
+ *
+ * DESCRIPTION STANDARD: authored descriptions are used VERBATIM. Clamping to
+ * 155 characters happens in seoConfig only where a description is derived from
+ * body copy, and `descriptionFallback` (derived copy passed at render time) is
+ * the one input this component clamps itself. Never auto-truncate an authored
+ * string, and never append an ellipsis.
  */
-type SeoProps = {
-  title?: string;
-  fullTitle?: string;
-  brand?: string;
-  description?: string;
-  canonicalPath?: string;
-  canonicalUrl?: string;
-  image?: string;
-  type?: "website" | "article" | "music.album";
-  noindex?: boolean;
+type SeoProps = Partial<SeoMeta> & {
+  /** Derived-from-body-copy fallback; clamped, used only when no description. */
+  descriptionFallback?: string;
+  /** Content-type schema only (MusicGroup, MusicAlbum, BlogPosting, …). */
   jsonLd?: Record<string, unknown> | Record<string, unknown>[];
-  publishedTime?: string;
-  modifiedTime?: string;
+  /** ImageObject inputs — this component builds the nodes. */
+  images?: Parameters<typeof imageObjectSchema>[0][];
 };
 
 export const Seo = ({
@@ -44,23 +49,37 @@ export const Seo = ({
   fullTitle,
   brand = BRAND_SUFFIX,
   description,
+  descriptionFallback,
   canonicalPath,
   canonicalUrl,
   image,
   type = "website",
   noindex,
   jsonLd,
+  images,
+  breadcrumb,
+  siteSchemas,
   publishedTime,
   modifiedTime,
 }: SeoProps) => {
   const location = useLocation();
   const pageTitle = fullTitle || (title ? buildTitle(title, brand) : DEFAULT_TITLE);
-  const pageDesc = clampDescription(description || DEFAULT_DESCRIPTION);
+  // Authored descriptions pass through untouched; only derived copy is clamped.
+  const pageDesc = description?.trim()
+    ? description.trim()
+    : clampDescription(descriptionFallback || DEFAULT_DESCRIPTION);
   const pagePath = canonicalPath ?? location.pathname;
   const canonical = canonicalUrl || absoluteUrl(pagePath);
   const ogImage = image ? absoluteUrl(image) : DEFAULT_OG_IMAGE;
-  const schemas = jsonLd ? (Array.isArray(jsonLd) ? jsonLd : [jsonLd]) : [];
 
+  const schemas: Record<string, unknown>[] = [
+    ...(siteSchemas ? [organizationSchema(), websiteSchema()] : []),
+    ...(breadcrumb && breadcrumb.length > 1 ? [breadcrumbSchema(breadcrumb)] : []),
+    ...(jsonLd ? (Array.isArray(jsonLd) ? jsonLd : [jsonLd]) : []),
+    ...((images || [])
+      .map((i) => imageObjectSchema(i))
+      .filter(Boolean) as Record<string, unknown>[]),
+  ];
 
   return (
     <Helmet prioritizeSeoTags>
