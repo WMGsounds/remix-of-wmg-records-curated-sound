@@ -137,12 +137,12 @@ const Releases = () => {
         <div className="flex flex-wrap items-end justify-between gap-y-6 mb-16 border-y border-ivory/18 py-6">
           <div className="flex flex-wrap items-end gap-x-8 gap-y-6">
             <FilterField label="Type">
-              <Select value={filter} onValueChange={(v) => setFilter(v as (typeof filters)[number])}>
+              <Select value={activeFilter} onValueChange={setFilter}>
                 <SelectTrigger className="w-[160px] bg-transparent border-ivory/24 text-[11px] uppercase tracking-[0.24em] text-ivory rounded-none focus:ring-ivory">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent className="bg-ink text-ivory border-ivory/24">
-                  {filters.map((f) => (
+                  {typeOptions.map((f) => (
                     <SelectItem key={f} value={f} className="text-[11px] uppercase tracking-[0.24em] focus:bg-ivory/10 focus:text-ivory">
                       {f}
                     </SelectItem>
