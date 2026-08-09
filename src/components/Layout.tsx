@@ -3,6 +3,8 @@ import { useEffect, useRef, useState } from "react";
 import { Menu, X, ChevronDown } from "lucide-react";
 import logo from "@/assets/wmg-logo-stacked.png";
 import footerLogo from "@/assets/wmg-logo-full.png";
+import { SocialLinks } from "@/components/SocialLinks";
+
 
 
 type NavItem = { to: string; label: string; children?: { to: string; label: string }[] };
