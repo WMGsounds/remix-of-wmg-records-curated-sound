@@ -1,7 +1,12 @@
 // Shared CMS types — shape mirrors what the Vercel /api/notion/* routes will return.
 // The frontend never imports from Notion directly; it consumes only this normalized shape.
 
-export type ReleaseType = "Single" | "EP" | "Album";
+/**
+ * Free-form: the value comes from an unvalidated Notion select, so any new
+ * option must type-check without an edit here. The named values are hints for
+ * autocomplete only — never branch on them, derive the fact from the data.
+ */
+export type ReleaseType = "Single" | "EP" | "Album" | (string & {});
 
 export type StreamingLinks = {
   spotify?: string;
