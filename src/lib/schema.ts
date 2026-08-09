@@ -715,6 +715,13 @@ export const storeProduct = (item: StoreItemLike): Node => {
     .map((format) => ({ format, parsed: parsePrice(item.prices[format] ?? "", context) }))
     .filter((p): p is { format: string; parsed: ParsedPrice } => p.parsed !== null);
 
+  // We are not the merchant: elasticStage manufactures and sells these items.
+  const seller = {
+    "@type": "Organization",
+    name: "elasticStage",
+    url: "https://elasticstage.com",
+  };
+
   const offers = priced.map(({ format, parsed }) => ({
     "@type": "Offer",
     name: format,
@@ -725,8 +732,9 @@ export const storeProduct = (item: StoreItemLike): Node => {
     priceValidUntil: validUntil,
     url: offerUrl,
     ...gtin,
-    seller: { "@type": "Organization", name: SITE_NAME, url: absoluteUrl("/") },
+    seller,
   }));
+
 
   const amounts = priced.map((p) => Number(p.parsed.price));
   const currency = priced[0]?.parsed.priceCurrency;
