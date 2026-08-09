@@ -1,10 +1,6 @@
 {
   "rewrites": [
     {
-      "source": "/sitemap.xml",
-      "destination": "/api/sitemap"
-    },
-    {
       "source": "/api/notion/tracks",
       "destination": "/api/notion/artists?dataset=tracks"
     },
