@@ -63,7 +63,8 @@ export const Seo = ({
   modifiedTime,
 }: SeoProps) => {
   const location = useLocation();
-  const pageTitle = fullTitle || (title ? buildTitle(title, brand) : DEFAULT_TITLE);
+  const pageTitle =
+    fullTitle || (title ? buildTitle(title, brand, titleFallback) : DEFAULT_TITLE);
   // Authored descriptions pass through untouched; only derived copy is clamped.
   const pageDesc = description?.trim()
     ? description.trim()
