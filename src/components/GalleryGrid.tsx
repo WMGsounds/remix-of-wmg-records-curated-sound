@@ -4,6 +4,8 @@ import type { GalleryImage } from "@/lib/types";
 type Props = {
   images: GalleryImage[];
   onSelect: (index: number) => void;
+  /** Added to the local index so sectioned grids share one lightbox list. */
+  indexOffset?: number;
 };
 
 const objectPosition = (focalPoint: string) => {
@@ -49,7 +51,7 @@ const GalleryTile = ({ image, onSelect }: { image: GalleryImage; onSelect: () =>
       </div>
       {(image.title || image.artistName) && (
         <div className="space-y-1 px-4 py-4">
-          {image.title && <p className="text-sm text-ivory/85">{image.title}</p>}
+          {image.title && <h3 className="text-sm text-ivory/85">{image.title}</h3>}
           <p className="text-[10px] uppercase tracking-[0.28em] text-ivory/45">
             {[image.artistName, image.imageType].filter(Boolean).join(" · ")}
           </p>
@@ -75,7 +77,7 @@ const useColumnCount = () => {
   return count;
 };
 
-export const GalleryGrid = ({ images, onSelect }: Props) => {
+export const GalleryGrid = ({ images, onSelect, indexOffset = 0 }: Props) => {
   const columnCount = useColumnCount();
 
   // Round-robin distribution keeps the left-to-right reading order of the
@@ -93,7 +95,7 @@ export const GalleryGrid = ({ images, onSelect }: Props) => {
       {columns.map((column, ci) => (
         <div key={ci} className="flex-1 min-w-0">
           {column.map(({ image, index }) => (
-            <GalleryTile key={image.id} image={image} onSelect={() => onSelect(index)} />
+            <GalleryTile key={image.id} image={image} onSelect={() => onSelect(indexOffset + index)} />
           ))}
         </div>
       ))}
