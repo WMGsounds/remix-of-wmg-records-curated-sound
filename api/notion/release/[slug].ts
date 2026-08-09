@@ -35,6 +35,13 @@ export default async function handler(req: ApiRequest, res: ApiResponse) {
       release.parentAlbum = null;
     }
 
+    // Reverse of the same relation: releases that point AT this one, i.e. the
+    // singles lifted off this album. Used to give album track entries their own
+    // standalone release URL in JSON-LD.
+    release.childSingles = releases
+      .filter((r) => r.parentAlbumId === release.id && r.id !== release.id && isReleasePublished(r))
+      .map((r) => ({ id: r.id, title: r.title, slug: r.slug || null }));
+
     // Build a lookup of raw Track pages so we can read related Track title + duration.
     const trackPageLookup = new Map(trackPages.map((p: any) => [p.id, p]));
 
