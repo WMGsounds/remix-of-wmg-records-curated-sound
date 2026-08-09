@@ -154,6 +154,7 @@ export function normalizeVideo(
     relatedReleaseIds: relationIds(findProp(props, "Related Release", "Related Releases")),
     releaseDate: releaseDate.slice(0, 10),
     description: text(findProp(props, "Description")),
+    duration: readDuration(findProp(props, "Duration", "Length", "Video Duration", "Runtime")),
     featured: findProp(props, "Featured")?.checkbox === true,
     sortOrder,
   };
