@@ -1,4 +1,5 @@
 import { Instagram, Youtube, Music2, Facebook } from "lucide-react";
+import { SiSpotify } from "react-icons/si";
 import { ORG_SAME_AS } from "@/lib/schema";
 
 type SocialLink = { href: string; label: string; Icon: typeof Instagram };
