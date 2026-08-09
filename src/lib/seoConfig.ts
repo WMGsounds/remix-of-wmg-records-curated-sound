@@ -24,6 +24,8 @@ export type BreadcrumbTrail = { name: string; path: string }[];
 export type SeoMeta = {
   /** Descriptive part only; the brand suffix is appended. */
   title?: string;
+  /** Shorter, still-grammatical variant used only if the full title >60 chars. */
+  titleFallback?: string;
   /** Exact title string, used as-is. */
   fullTitle?: string;
   brand?: string;
@@ -257,7 +259,11 @@ const dynamicPages = {
         ? `${r.shortDescription || r.fullDescription}`
         : `Listen to ${r.title} by ${r.artistName || ""}, a ${r.releaseType} release from Wareham Music Group.`;
     return {
-      title: authored(r.seoTitle) || `${r.title} by ${artistName}` || r.title,
+      title: authored(r.seoTitle) || `${r.title} by ${artistName}`,
+      // If "<title> by <artist> | brand" runs past 60 chars, <Seo> falls back
+      // to "<title> | brand" — never a mid-phrase cut.
+      titleFallback: r.title,
+
       description: authored(r.seoDescription) || clampDescription(derivedDescription),
       canonicalPath: path,
       image: r.coverArt,
