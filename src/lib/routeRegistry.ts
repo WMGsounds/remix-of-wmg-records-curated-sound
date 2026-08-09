@@ -24,7 +24,7 @@ export type PageName =
   | "JournalCategory"
   | "JournalArticlePage"
   | "Store"
-  | "SpotifyRedirect"
+  
   | "About"
   | "Contact"
   | "Newsletter"
@@ -121,8 +121,8 @@ export const routeRegistry: RouteEntry[] = [
       })),
   },
   { path: "/store", page: "Store", seo: "store" },
-  // Redirected at the edge (vercel.json); pre-rendered only as a JS fallback.
-  { path: "/spotify", page: "SpotifyRedirect", seo: "spotify", sitemap: false },
+  // /spotify is a pure edge 301 (vercel.json). No route, no component.
+
   { path: "/about", page: "About", seo: "about" },
   { path: "/contact", page: "Contact", seo: "contact" },
   { path: "/newsletter", page: "Newsletter", seo: "newsletter" },

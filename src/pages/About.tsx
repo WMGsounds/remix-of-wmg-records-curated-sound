@@ -178,13 +178,16 @@ const About = () => (
           Follow Wareham Music Group across the platforms where we share our artists, releases, playlists and more.
         </p>
         <div className="flex flex-wrap gap-4">
-          <Link
-            to="/spotify"
+          {/* Plain anchor, not <Link>: /spotify is a server-side 301 with no
+              client route, so navigation must leave the SPA. */}
+          <a
+            href="/spotify"
             className="inline-flex items-center gap-2 border border-gold px-5 py-3 text-[12px] uppercase tracking-[0.24em] transition-colors duration-300 text-gold font-medium hover:bg-gold hover:text-ink"
           >
             <FaSpotify className="h-4 w-4" aria-hidden="true" />
             Spotify
-          </Link>
+          </a>
+
         </div>
       </div>
     </section>

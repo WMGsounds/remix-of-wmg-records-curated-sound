@@ -29,7 +29,7 @@ const loaders: Record<PageName, Loader> = {
   JournalArticlePage: () => import("./pages/JournalArticlePage.tsx"),
   JournalCategory: () => import("./pages/JournalCategory.tsx"),
   Store: () => import("./pages/Store.tsx"),
-  SpotifyRedirect: () => import("./pages/SpotifyRedirect.tsx"),
+  
   SeoDiagnostics: () => import("./pages/SeoDiagnostics.tsx"),
   MediaLibrary: () => import("./pages/MediaLibrary.tsx"),
 };
