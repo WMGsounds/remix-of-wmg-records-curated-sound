@@ -9,7 +9,16 @@ import { InlineSkeleton, PageError } from "@/components/UIStates";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { FilterField, SearchInput } from "@/components/FilterBar";
 import { matchesSearch } from "@/lib/search";
-import { artistNames, embedUrl, thumbnailUrl, type VideoItem } from "@/lib/videos";
+import {
+  artistNames,
+  embedUrl,
+  groupVideosByType,
+  thumbnailUrl,
+  videoTypeSlug,
+  watchUrl,
+  type VideoItem,
+} from "@/lib/videos";
+import { itemList, videoObject } from "@/lib/schema";
 import { londonDateKey, seedFromString, seededShuffle } from "@/lib/galleryOrder";
 import { videosHeroDataUrl } from "@/assets/videosHero";
 
