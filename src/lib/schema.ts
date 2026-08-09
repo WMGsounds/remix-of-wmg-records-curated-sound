@@ -654,7 +654,12 @@ export type StoreItemLike = {
   /** Catalogue Number (WMG001 …) — the product sku. */
   catalogueNumber?: string | null;
   /** Linked release; its UPC becomes gtin12/gtin13. */
-  release?: { title?: string; slug?: string | null; upc?: string | null } | null;
+  release?: {
+    title?: string;
+    slug?: string | null;
+    upc?: string | null;
+    catalogueId?: string | null;
+  } | null;
 };
 
 /**
@@ -704,6 +709,7 @@ export const storeProduct = (item: StoreItemLike): Node => {
   const availability = availabilityUrl(item, context);
   const validUntil = priceValidUntil();
   const gtin = gtinFor(item.release?.upc);
+  const sku = item.catalogueNumber || item.release?.catalogueId || item.slug || "";
 
   const priced = item.formats
     .map((format) => ({ format, parsed: parsePrice(item.prices[format] ?? "", context) }))
@@ -747,7 +753,9 @@ export const storeProduct = (item: StoreItemLike): Node => {
     name: item.artist?.name ? `${item.title} — ${item.artist.name}` : item.title,
     ...(item.description ? { description: item.description } : {}),
     ...(url(item.productImage) ? { image: url(item.productImage) } : {}),
-    ...(item.catalogueNumber ? { sku: item.catalogueNumber } : item.slug ? { sku: item.slug } : {}),
+    // sku is the catalogue number (WMG001 …); the store item's own value wins,
+    // then the linked release's, and only then the slug as a last resort.
+    ...(sku ? { sku } : {}),
     ...gtin,
     ...(item.formats.length ? { material: item.formats.join(", ") } : {}),
     brand: { "@type": "Brand", name: SITE_LEGAL_NAME },

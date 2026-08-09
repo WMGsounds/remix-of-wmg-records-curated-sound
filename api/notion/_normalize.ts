@@ -438,6 +438,7 @@ export function normalizeStoreItem(
         slug: releaseRaw.slug,
         title: releaseRaw.title,
         upc: releaseRaw.upc ?? null,
+        catalogueId: releaseRaw.catalogueId ?? null,
       }
     : null;
 

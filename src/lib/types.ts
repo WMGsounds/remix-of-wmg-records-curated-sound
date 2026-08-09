@@ -195,7 +195,13 @@ export type StoreItem = {
   slug: string | null;
   title: string;
   artist: { id: string; slug: string; name: string } | null;
-  release: { id: string; slug: string; title: string; upc?: string | null } | null;
+  release: {
+    id: string;
+    slug: string;
+    title: string;
+    upc?: string | null;
+    catalogueId?: string | null;
+  } | null;
   relatedTracks: { id: string; title: string }[];
   formats: StoreFormat[];
   prices: Partial<Record<StoreFormat, string>>;
