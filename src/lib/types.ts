@@ -195,7 +195,13 @@ export type StoreItem = {
   slug: string | null;
   title: string;
   artist: { id: string; slug: string; name: string } | null;
-  release: { id: string; slug: string; title: string } | null;
+  release: {
+    id: string;
+    slug: string;
+    title: string;
+    upc?: string | null;
+    catalogueId?: string | null;
+  } | null;
   relatedTracks: { id: string; title: string }[];
   formats: StoreFormat[];
   prices: Partial<Record<StoreFormat, string>>;
@@ -209,6 +215,8 @@ export type StoreItem = {
   buttonText: string | null;
   comments: string | null;
   productType: string | null;
+  /** Catalogue Number from Notion (e.g. WMG001) — used as the Product sku. */
+  catalogueNumber?: string | null;
   preOrder: boolean;
   createdTime: string;
 };
