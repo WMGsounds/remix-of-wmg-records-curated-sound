@@ -38,8 +38,13 @@ export const ORG_SAME_AS = [
  * URL helper — the single gate every schema URL passes through.
  * ------------------------------------------------------------------ */
 
-/** Query params that are tracking noise and never part of an identity URL. */
-const TRACKING_PARAMS = /^(utm_[a-z_]+|si|igshid|fbclid|gclid|mc_cid|mc_eid|ref|ref_src|_branch_match_id|app|nd)$/i;
+/**
+ * Query params that are noise in an identity URL: tracking parameters, plus
+ * Amazon's marketplaceId/musicTerritory locale hints (the .co.uk domain
+ * already carries the territory, so a bare URL is the cleaner claim).
+ * Resource identifiers such as YouTube Music's list/v are never stripped.
+ */
+const TRACKING_PARAMS = /^(utm_[a-z_]+|si|igshid|fbclid|gclid|mc_cid|mc_eid|ref|ref_src|_branch_match_id|app|nd|marketplaceId|musicTerritory)$/i;
 
 /**
  * Absolute, cleaned URL. Relative paths are resolved against SITE_URL.
