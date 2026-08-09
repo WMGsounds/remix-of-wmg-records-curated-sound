@@ -1,7 +1,8 @@
 import { Link, useParams, Navigate } from "react-router-dom";
 import { ArrowLeft, ArrowRight } from "lucide-react";
 import { Seo } from "@/components/Seo";
-import { absoluteUrl, clampDescription, SITE_NAME } from "@/lib/seo";
+import { clampDescription } from "@/lib/seo";
+import { schemaFor } from "@/lib/schema";
 import { seoFor } from "@/lib/seoConfig";
 import { PageLoading, PageError } from "@/components/UIStates";
 import { LazyImage } from "@/components/LazyImage";
