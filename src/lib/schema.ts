@@ -323,10 +323,29 @@ const byArtistNode = (input: ReleaseSchemaInput): Node | undefined => {
   };
 };
 
+/** Loose title match so "Ocean Breeze (Single)" still resolves to its track. */
+const titleKey = (v: string) => v.toLowerCase().replace(/[^a-z0-9]+/g, " ").trim();
+
+/**
+ * The reverse of inAlbum: when a track on this album was also issued as its own
+ * release, point the track entry at that release URL so the same recording is
+ * one entity across both pages instead of two unlinked strings. Derived from
+ * the parent-album relation (childSingles), never from a naming convention.
+ */
+const trackUrl = (t: TrackLike, release: ReleaseLike): string | undefined => {
+  const key = titleKey(t.trackTitle || "");
+  if (!key) return undefined;
+  const match = (release.childSingles || []).find(
+    (c) => c.slug && titleKey(c.title || "") === key,
+  );
+  return match?.slug ? absoluteUrl(`/releases/${match.slug}`) : undefined;
+};
+
 const trackNode = (t: TrackLike, i: number, input: ReleaseSchemaInput): Node => ({
   "@type": "MusicRecording",
   name: t.trackTitle,
   position: t.trackNumber || i + 1,
+  ...(trackUrl(t, input.release) ? { url: trackUrl(t, input.release) } : {}),
   ...(isoDuration(t.duration) ? { duration: isoDuration(t.duration) } : {}),
   ...(t.isrc ? { isrcCode: t.isrc } : {}),
   ...(byArtistNode(input) ? { byArtist: byArtistNode(input) } : {}),
