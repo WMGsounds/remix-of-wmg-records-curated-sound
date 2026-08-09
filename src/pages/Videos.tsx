@@ -472,7 +472,7 @@ const Videos = () => {
               const panelId = `videos-artist-panel-${group.key}`;
               return (
                 <section key={group.key} aria-label={group.name}>
-                  <h3>
+                  <h2>
                     <button
                       type="button"
                       aria-expanded={open}
