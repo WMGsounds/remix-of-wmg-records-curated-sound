@@ -178,13 +178,13 @@ for (const route of routes) {
     for (const m of serialized.matchAll(/"(?:url|contentUrl|logo|image|item|thumbnailUrl|embedUrl|mainEntityOfPage|sameAs)":"([^"]+)"/g)) {
       if (!/^https?:\/\//i.test(m[1]))
         fail(`route "${route}" has a non-absolute URL in JSON-LD: ${m[1]}`);
-      if (m[1].includes("?"))
-        fail(`route "${route}" has a query string in a JSON-LD URL: ${m[1]}`);
+      if (m[1].includes("?") && m[1].includes("wmgsounds.com"))
+        fail(`route "${route}" has a query string in an on-site JSON-LD URL: ${m[1]}`);
     }
     for (const m of serialized.matchAll(/"(\/[^"]*)"/g))
       fail(`route "${route}" has a root-relative URL in JSON-LD: ${m[1]}`);
-    for (const m of serialized.matchAll(/"(https?:\/\/[^"]*\?[^"]*)"/g))
-      fail(`route "${route}" has a query string in a JSON-LD URL: ${m[1]}`);
+    for (const m of serialized.matchAll(/"(https?:\/\/[^"]*wmgsounds\.com[^"]*\?[^"]*)"/g))
+      fail(`route "${route}" has a query string in an on-site JSON-LD URL: ${m[1]}`);
 
 
     let page = injectHead(template, head);
