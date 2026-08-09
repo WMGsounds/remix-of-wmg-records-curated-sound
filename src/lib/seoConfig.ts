@@ -38,9 +38,8 @@ export type SeoMeta = {
   publishedTime?: string;
   modifiedTime?: string;
   breadcrumb?: BreadcrumbTrail;
-  /** Organization + WebSite nodes (homepage only). */
-  siteSchemas?: boolean;
 };
+
 
 const HOME: BreadcrumbTrail = [{ name: "Home", path: "/" }];
 const trail = (...rest: BreadcrumbTrail): BreadcrumbTrail => [...HOME, ...rest];
