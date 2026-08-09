@@ -106,6 +106,8 @@ describe("normalisers read SEO formula properties", () => {
           "SEO Title": formula("Heaven In Your Arms by Betty Blane"),
           "SEO Description": formula("A slow-burning soul ballad from Betty Blane."),
           "Show on website": checkbox(true),
+          // Present in the live Releases schema; normalizeRelease requires it.
+          parentAlbum: { type: "relation", relation: [] },
         },
       },
       new Map(),
