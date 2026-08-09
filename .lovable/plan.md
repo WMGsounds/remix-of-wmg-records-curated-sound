@@ -23,7 +23,7 @@ Supporting pieces in the same module:
 - `genre: ["Soul","R&B","Blues","Reggae","Country"]`
 - No `foundingDate` (none supplied).
 
-**WebSite** — gains a `potentialAction` SearchAction targeting `https://www.wmgsounds.com/search?q={search_term_string}`.
+**WebSite** — name and url only. No `potentialAction` SearchAction: Google retired the Sitelinks Search Box on 21 November 2024, so it produces no rich result.
 
 **Duplicate homepage blocks** — Organization and WebSite move out of `<Seo>`/`seoConfig` into the root layout, so no page can emit them. The current homepage emits four blocks; the cause is not yet confirmed (a single emitter exists in `Seo.tsx`, so it is likely pre-rendered HTML plus a client-side re-injection). First step of the work is to reproduce and confirm the cause in the built output, then verify the layout-only change reduces the homepage to exactly one Organization and one WebSite.
 
@@ -31,7 +31,7 @@ Supporting pieces in the same module:
 - more than one track → `MusicAlbum` with a `track` array of `MusicRecording` items
 - exactly one track → bare `MusicRecording`, no `track` array
 
-Both carry `byArtist`, `genre`, `datePublished`, `duration` and `"inLanguage": "en"`, plus a `sameAs` array built from the release's existing platform URLs (Spotify, Apple Music, YouTube Music, Amazon Music) so new releases inherit it.
+Both carry `byArtist`, `genre`, `datePublished`, `duration` and `"inLanguage": "en-GB"`, plus a `sameAs` array built from the release's existing platform URLs (Spotify, Apple Music, YouTube Music, Amazon Music) so new releases inherit it. The `<html lang>` attribute changes from `en` to `en-GB` at the same time, so schema, `og:locale` and `lang` all agree.
 
 **Artists (`MusicGroup`)** — `sameAs` built from the eight artist URL fields in this order, blanks skipped silently, `sameAs` omitted entirely when all eight are blank, never an empty string, never a label-level fallback:
 
@@ -43,21 +43,19 @@ Spotify, Apple Music, YouTube, YouTube Music, Amazon Music, Instagram, Facebook,
 
 **BreadcrumbList** — the shared SEO component attaches it automatically on every route except the homepage, instead of each page opting in.
 
-**ItemList** — `/artists`, `/releases`, `/journal` and `/videos` each get an ItemList whose entries derive from the same content array the page renders, so new items appear automatically.
+**ItemList** — `/artists`, `/releases` and `/journal` each get an ItemList whose entries derive from the same content array the page renders, so new items appear automatically. `/videos` is excluded until per-video URLs exist in a later prompt.
 
 ## 3. Visible social links
 
 - **Footer**: Instagram, YouTube and Spotify links using the same three URLs, with accessible labels and matching the existing footer styling.
 - **Artist pages**: a link row rendering the same non-blank artist URLs used in `sameAs`, with accessible labels. This extends the existing "Listen & Watch" row (`ArtistLinks.tsx`) with Instagram, Facebook and TikTok.
 
-## 4. New `/search` page
-
-A real site-wide search at `/search?q=…` covering artists, releases, journal articles, videos and store items, built on the existing shared search helpers. It is URL-addressable (the query lives in the URL), gets metadata from the central SEO config, is pre-rendered and appears in the sitemap through the existing automatic route discovery.
-
 ## Technical notes
 
 - `src/lib/seo.ts` keeps constants and title/description helpers; all JSON-LD construction leaves it for `src/lib/schema.ts`.
 - `src/components/Seo.tsx` calls only `schemaFor` and the automatic breadcrumb; it no longer accepts hand-built JSON-LD objects from pages.
 - Inline JSON-LD is removed from `ArtistPage.tsx`, `ReleasePage.tsx` and `JournalArticlePage.tsx`.
-- A pre-render build assertion checks each rendered page for: exactly one Organization and one WebSite site-wide (homepage only), a BreadcrumbList on every non-home route, and no relative or query-string URL anywhere inside JSON-LD. The build fails if any is violated.
-- Verification: full local build, then a scan of the rendered HTML reporting per-route schema types and any assertion failures.
+- A pre-render build assertion inspects each JSON-LD block and reads only its **top-level** `@type`, ignoring nested objects, so the Organization nested inside a BlogPosting `publisher` (or inside a MusicAlbum) never counts. It checks: exactly one top-level Organization and one top-level WebSite site-wide, both on the homepage only; a BreadcrumbList on every non-home route; and no relative or query-string URL anywhere inside JSON-LD. The build fails if any is violated.
+- Duplicate homepage blocks: reproduce in the built output and report the confirmed cause before applying the fix, since a hydration-related cause could affect other head tags too.
+- Verification: full local build, then a before-and-after diff of the rendered JSON-LD on the homepage, one artist page, one release page and one journal article, reported before calling the work done.
+
