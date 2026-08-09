@@ -55,27 +55,12 @@ const ArtistPage = () => {
     )
     .slice(0, 3);
   const path = `/artists/${artist.slug}`;
-  const musicGroup = {
-    "@context": "https://schema.org",
-    "@type": "MusicGroup",
-    name: artist.name,
-    url: absoluteUrl(path),
-    image: artist.heroImage || undefined,
-    genre: artist.genre || undefined,
-    description: artist.shortDescription || undefined,
-    album: discography.map((r) => ({
-      "@type": "MusicAlbum",
-      name: r.title,
-      url: absoluteUrl(`/releases/${r.slug}`),
-      image: r.coverArt || undefined,
-      datePublished: r.releaseDate || undefined,
-    })),
-  };
   return (
     <div>
       <Seo
         {...seoFor.artist(artist)}
-        jsonLd={[musicGroup]}
+        jsonLd={[schemaFor("musicGroup", { artist, discography })]}
+
         images={[
           {
             url: artist.heroImage,
