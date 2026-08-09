@@ -493,7 +493,8 @@ const Videos = () => {
                         className={`h-4 w-4 flex-none text-ivory/50 transition-transform duration-300 ${open ? "rotate-180" : ""}`}
                       />
                     </button>
-                  </h3>
+                  </h2>
+
                   <div id={panelId} hidden={!open} className="overflow-hidden animate-in fade-in-0 duration-300">
                     <div className="grid grid-cols-1 gap-8 pt-8 sm:grid-cols-2 lg:grid-cols-3">
                       {shown.map((video) => (
