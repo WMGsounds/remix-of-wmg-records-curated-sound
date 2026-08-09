@@ -85,7 +85,7 @@ const Releases = () => {
           (a, b) => new Date(b.releaseDate).getTime() - new Date(a.releaseDate).getTime(),
         );
     }
-  }, [filter, sort, releases, searchQuery, artistSlug]);
+  }, [activeFilter, sort, releases, searchQuery, artistSlug]);
 
   if (isError) return <PageError message="Couldn't load the catalogue." />;
 
