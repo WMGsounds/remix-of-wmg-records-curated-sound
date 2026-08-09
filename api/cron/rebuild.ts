@@ -11,17 +11,19 @@
  * Required environment variables (Vercel project settings):
  *   VERCEL_DEPLOY_HOOK_URL  the deploy hook created under
  *                           Settings -> Git -> Deploy Hooks (production branch)
- *   CRON_SECRET             optional; when set, Vercel sends it automatically
- *                           as `Authorization: Bearer <CRON_SECRET>` and this
- *                           handler rejects anything else.
+ *   CRON_SECRET             REQUIRED. Vercel sends it automatically on cron
+ *                           invocations as `Authorization: Bearer <CRON_SECRET>`.
+ *                           If it is absent the endpoint refuses every request:
+ *                           it must never be publicly triggerable.
  *
- * Manual verification: GET /api/cron/rebuild?token=<CRON_SECRET>
+ * Manual verification:
+ *   curl -X POST -H "Authorization: Bearer $CRON_SECRET" \
+ *     https://www.wmgsounds.com/api/cron/rebuild
  */
 
 type CronRequest = {
   method?: string;
   headers?: Record<string, string | string[] | undefined>;
-  query?: Record<string, string | string[] | undefined>;
   url?: string;
 };
 
@@ -36,15 +38,20 @@ export default async function handler(req: CronRequest, res: CronResponse) {
   const secret = process.env.CRON_SECRET;
   const hookUrl = process.env.VERCEL_DEPLOY_HOOK_URL;
 
-  if (secret) {
-    const auth = first(req.headers?.authorization) ?? "";
-    const token = first(req.query?.token) ?? "";
-    if (auth !== `Bearer ${secret}` && token !== secret) {
-      console.warn("[cron] Unauthorized rebuild attempt", { route });
-      res.status(401).json({ ok: false, error: "unauthorized" });
-      return;
-    }
+  // Fail closed: no secret configured means no rebuilds, for anyone.
+  if (!secret) {
+    console.error("[cron] CRON_SECRET is not configured; refusing all requests", { route });
+    res.status(503).json({ ok: false, error: "CRON_SECRET is not configured" });
+    return;
   }
+
+  const auth = first(req.headers?.authorization) ?? "";
+  if (auth !== `Bearer ${secret}`) {
+    console.warn("[cron] Unauthorized rebuild attempt", { route });
+    res.status(401).json({ ok: false, error: "unauthorized" });
+    return;
+  }
+
 
   if (!hookUrl) {
     console.error("[cron] VERCEL_DEPLOY_HOOK_URL is not set", { route });
