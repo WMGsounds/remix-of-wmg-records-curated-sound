@@ -1,35 +1,15 @@
 // Convert Notion property objects into the clean shape src/lib/types.ts expects.
 import { resolvePublishInstant } from "./_schedule.js";
 import { artistImageUrl, releaseArtworkUrl, storeImageUrl } from "./_mediaUrls.js";
+import { notionText, findNotionProp } from "./_notionText.js";
 
-const text = (p: any): string => {
-  if (!p) return "";
-  if (Array.isArray(p?.rich_text)) return p.rich_text.map((t: any) => t.plain_text).join("").trim();
-  if (Array.isArray(p?.title)) return p.title.map((t: any) => t.plain_text).join("").trim();
-  if (typeof p?.formula?.string === "string") return p.formula.string.trim();
-  if (typeof p?.formula?.number === "number") return String(p.formula.number);
-  if (typeof p?.rollup?.string === "string") return p.rollup.string.trim();
-  if (typeof p?.rollup?.number === "number") return String(p.rollup.number);
-  if (typeof p?.number === "number") return String(p.number);
-  if (typeof p?.email === "string") return p.email.trim();
-  if (typeof p?.phone_number === "string") return p.phone_number.trim();
-  if (typeof p?.url === "string") return p.url.trim();
-  if (p?.select?.name) return String(p.select.name).trim();
-  return "";
-};
+// Property → string reading lives in ./_notionText.ts (handles formulas, which
+// are NOT rich text). Never re-implement it locally.
+const text = notionText;
 
 // Look up a Notion property by name, tolerant to unicode variants/whitespace.
-const findProp = (props: Record<string, any>, ...names: string[]): any => {
-  for (const n of names) {
-    if (props[n] !== undefined) return props[n];
-  }
-  const norm = (s: string) => s.normalize("NFKC").replace(/\s+/g, "").toLowerCase();
-  const targets = names.map(norm);
-  for (const key of Object.keys(props)) {
-    if (targets.includes(norm(key))) return props[key];
-  }
-  return undefined;
-};
+const findProp = findNotionProp;
+
 
 const paragraphs = (p: any): string[] =>
   text(p).split(/\n\s*\n/).map((s) => s.trim()).filter(Boolean);
