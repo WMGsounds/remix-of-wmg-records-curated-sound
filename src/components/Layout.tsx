@@ -285,6 +285,9 @@ export const SiteFooter = () => (
             <a href="https://www.wmgsounds.com" className="link-underline hover:text-ivory">www.wmgsounds.com</a>
           </p>
         </address>
+        {/* Visible, crawlable profile links — same URLs as Organization sameAs. */}
+        <SocialLinks className="mt-5" />
+
       </div>
 
       <div className="md:text-center">
