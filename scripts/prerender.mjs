@@ -86,7 +86,7 @@ for (const route of routes) {
 
     /* -------- Assertion 4: no route may render empty metadata ---------- */
     const title = /<title[^>]*>([^<]*)<\/title>/.exec(head)?.[1]?.trim();
-    const description = /<meta name="description" content="([^"]*)"/.exec(head)?.[1]?.trim();
+    const description = /<meta[^>]*name="description"[^>]*content="([^"]*)"/.exec(head)?.[1]?.trim();
     if (!title) fail(`route "${route}" rendered an empty <title>`);
     if (!description) fail(`route "${route}" rendered an empty meta description`);
 
