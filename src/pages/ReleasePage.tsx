@@ -4,7 +4,7 @@ import { ChevronDown, ChevronLeft, ChevronRight, ChevronUp, Play, ShoppingBag } 
 import { useReleaseBySlug, useStoreItems } from "@/lib/queries";
 import { LazyImage } from "@/components/LazyImage";
 import { Seo } from "@/components/Seo";
-import { absoluteUrl } from "@/lib/seo";
+import { schemaFor } from "@/lib/schema";
 import { seoFor } from "@/lib/seoConfig";
 import { PageLoading, PageError } from "@/components/UIStates";
 import { ReleaseLinks } from "@/components/ReleaseLinks";
