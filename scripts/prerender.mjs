@@ -117,6 +117,23 @@ const outFileFor = (route) =>
 let ok = 0;
 let failed = 0;
 const written = new Set();
+const warnings = [];
+
+/* Which routes may raise a title-length WARNING (never an error).
+ * Only pages whose descriptive wording is authored and editable: artist pages
+ * and static hub pages. Release and journal titles are fixed facts, so a
+ * length warning there is noise nobody can act on. */
+const seoKeyFor = (route) => {
+  const segs = route.split("/").filter(Boolean);
+  for (const e of server.registry.routeRegistry) {
+    if (e.path === "*") continue;
+    const p = e.path.split("/").filter(Boolean);
+    if (p.length !== segs.length) continue;
+    if (p.every((s, i) => s.startsWith(":") || s === segs[i])) return e.seo;
+  }
+  return undefined;
+};
+const NO_TITLE_WARNING = new Set(["release", "journalArticle"]);
 
 for (const route of routes) {
   try {
@@ -127,6 +144,9 @@ for (const route of routes) {
     const description = /<meta[^>]*name="description"[^>]*content="([^"]*)"/.exec(head)?.[1]?.trim();
     if (!title) fail(`route "${route}" rendered an empty <title>`);
     if (!description) fail(`route "${route}" rendered an empty meta description`);
+    if (title && title.length > 60 && !NO_TITLE_WARNING.has(seoKeyFor(route)))
+      warnings.push(`title is ${title.length} chars on "${route}": ${title}`);
+
 
     let page = injectHead(template, head);
     page = injectBody(page, html);
