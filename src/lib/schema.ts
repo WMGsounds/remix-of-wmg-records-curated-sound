@@ -280,6 +280,7 @@ type ReleaseLike = {
   fullDescription?: string | null;
   artistName?: string | null;
   artistSlug?: string | null;
+  parentAlbum?: { title: string; slug?: string | null } | null;
   streamingLinks?: {
     spotify?: string;
     appleMusic?: string;
@@ -367,15 +368,35 @@ export const musicAlbum = (input: ReleaseSchemaInput): Node => {
   };
 };
 
+/**
+ * inAlbum node for a single that also appears on an album. Derived from the
+ * parentAlbum relation actually present in the data — omitted entirely when the
+ * relation is empty, and omitted when the parent has no title (nothing to
+ * assert), same blank-handling rule as sameAs.
+ */
+const inAlbumNode = (release: ReleaseLike): Node | undefined => {
+  const parent = release.parentAlbum;
+  const name = (parent?.title ?? "").trim();
+  if (!name) return undefined;
+  const slug = (parent?.slug ?? "").trim();
+  return {
+    "@type": "MusicAlbum",
+    name,
+    ...(slug ? { url: absoluteUrl(`/releases/${slug}`) } : {}),
+  };
+};
+
 /** Genuine single-track release: a bare MusicRecording, no "track" array. */
 export const musicRecording = (input: ReleaseSchemaInput): Node => {
   const t = (input.tracks || [])[0];
   const duration = isoDuration(t?.duration);
+  const inAlbum = inAlbumNode(input.release);
   return {
     ...releaseCommon(input),
     "@type": "MusicRecording",
     ...(duration ? { duration } : {}),
     ...(t?.isrc ? { isrcCode: t.isrc } : {}),
+    ...(inAlbum ? { inAlbum } : {}),
   };
 };
 
