@@ -259,7 +259,11 @@ const dynamicPages = {
         ? `${r.shortDescription || r.fullDescription}`
         : `Listen to ${r.title} by ${r.artistName || ""}, a ${r.releaseType} release from Wareham Music Group.`;
     return {
-      title: authored(r.seoTitle) || `${r.title} by ${artistName}` || r.title,
+      title: authored(r.seoTitle) || `${r.title} by ${artistName}`,
+      // If "<title> by <artist> | brand" runs past 60 chars, <Seo> falls back
+      // to "<title> | brand" — never a mid-phrase cut.
+      titleFallback: r.title,
+
       description: authored(r.seoDescription) || clampDescription(derivedDescription),
       canonicalPath: path,
       image: r.coverArt,
