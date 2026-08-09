@@ -281,6 +281,7 @@ type ReleaseLike = {
   artistName?: string | null;
   artistSlug?: string | null;
   parentAlbum?: { title: string; slug?: string | null } | null;
+  childSingles?: { title: string; slug?: string | null }[];
   streamingLinks?: {
     spotify?: string;
     appleMusic?: string;
