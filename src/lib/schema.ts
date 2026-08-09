@@ -753,6 +753,7 @@ const GENERATORS = {
   blogPosting,
   videoObject,
   product,
+  storeProduct,
 } as const;
 
 export type SchemaType = keyof typeof GENERATORS;
