@@ -38,15 +38,40 @@ export const ORG_SAME_AS = [
  * URL helper — the single gate every schema URL passes through.
  * ------------------------------------------------------------------ */
 
-/** Absolute, query-free URL. Relative paths are resolved against SITE_URL. */
+/** Query params that are tracking noise and never part of an identity URL. */
+const TRACKING_PARAMS = /^(utm_[a-z_]+|si|igshid|fbclid|gclid|mc_cid|mc_eid|ref|ref_src|_branch_match_id|app|nd)$/i;
+
+/**
+ * Absolute, cleaned URL. Relative paths are resolved against SITE_URL.
+ * On-site URLs lose their query entirely (that is where ?v= cache-busters
+ * live). External URLs keep only functional params — YouTube Music playlists
+ * and Apple Music links would break if the whole query were stripped — with
+ * tracking parameters removed.
+ */
 export const absoluteUrl = (path?: string | null): string => {
   const raw = (path ?? "").trim();
   if (!raw) return SITE_URL;
-  const noQuery = raw.split("?")[0].split("#")[0];
-  if (!noQuery) return SITE_URL;
-  if (/^https?:\/\//i.test(noQuery)) return noQuery;
-  return `${SITE_URL}${noQuery.startsWith("/") ? noQuery : `/${noQuery}`}`;
+  if (!/^https?:\/\//i.test(raw)) {
+    const clean = raw.split("?")[0].split("#")[0];
+    if (!clean) return SITE_URL;
+    return `${SITE_URL}${clean.startsWith("/") ? clean : `/${clean}`}`;
+  }
+  try {
+    const u = new URL(raw);
+    u.hash = "";
+    if (u.hostname.endsWith("wmgsounds.com")) {
+      u.search = "";
+    } else {
+      for (const key of [...u.searchParams.keys()]) {
+        if (TRACKING_PARAMS.test(key)) u.searchParams.delete(key);
+      }
+    }
+    return u.toString().replace(/\?$/, "");
+  } catch {
+    return raw.split("#")[0];
+  }
 };
+
 
 /** Absolute URL or undefined — for optional properties. */
 const url = (v?: string | null): string | undefined => {
