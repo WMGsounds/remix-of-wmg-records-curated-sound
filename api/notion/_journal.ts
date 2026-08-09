@@ -2,6 +2,8 @@
 import { proxyImageIfNeeded } from "./_imageHelper.js";
 import { resolvePublishInstant } from "./_schedule.js";
 import { journalCoverUrl, journalBlockImageUrl } from "./_mediaUrls.js";
+import { truncateAtWord } from "../../src/lib/truncate.js";
+
 
 const text = (p: any): string =>
   (p?.rich_text ?? p?.title ?? []).map((t: any) => t.plain_text).join("").trim();
