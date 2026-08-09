@@ -651,31 +651,59 @@ export type StoreItemLike = {
   formats: string[];
   prices: Record<string, string | undefined>;
   artist?: { name: string; slug?: string | null } | null;
+  /** Catalogue Number (WMG001 …) — the product sku. */
+  catalogueNumber?: string | null;
+  /** Linked release; its UPC becomes gtin12/gtin13. */
+  release?: { title?: string; slug?: string | null; upc?: string | null } | null;
 };
 
 /**
- * Availability is DERIVED from the item's own state, never from a typed label
- * alone: an unrecognised availability value degrades to the conservative
- * OutOfStock rather than silently claiming stock.
+ * Availability is DERIVED from the item's own state, never guessed. A value we
+ * do not recognise THROWS at pre-render: inaccurate availability markup is a
+ * manual-action risk, so the build fails rather than shipping a guess.
  */
-const availabilityUrl = (item: StoreItemLike): string => {
-  if (item.preOrder && item.purchaseLink) return "https://schema.org/PreOrder";
-  switch (item.availability) {
+const availabilityUrl = (item: StoreItemLike, context: string): string => {
+  const raw = (item.availability ?? "").trim();
+  if (item.preOrder) return "https://schema.org/PreOrder";
+  switch (raw) {
     case "Available Now":
       return "https://schema.org/InStock";
-    case "Sold Out":
-      return "https://schema.org/SoldOut";
     case "Coming Soon":
       return "https://schema.org/PreOrder";
+    case "Sold Out":
+      return "https://schema.org/SoldOut";
     default:
-      return "https://schema.org/OutOfStock";
+      throw new Error(
+        `[schema] Store item ${context}: availability "${raw || "(blank)"}" has no schema.org mapping. ` +
+          `Set Availability to "Available Now", "Coming Soon" or "Sold Out" in Notion, ` +
+          `or add an explicit mapping in src/lib/schema.ts — availability is never guessed.`,
+      );
   }
+};
+
+/** UPC → gtin12 / gtin13. Blank or wrong-length values are omitted entirely. */
+const gtinFor = (upc?: string | null): Record<string, string> => {
+  const digits = (upc ?? "").replace(/\D/g, "");
+  if (digits.length === 12) return { gtin12: digits };
+  if (digits.length === 13) return { gtin13: digits };
+  return {};
+};
+
+/** Offers stay valid for a year from the build; every daily rebuild refreshes it. */
+const priceValidUntil = (): string => {
+  const d = new Date();
+  d.setUTCFullYear(d.getUTCFullYear() + 1);
+  return d.toISOString().slice(0, 10);
 };
 
 export const storeProduct = (item: StoreItemLike): Node => {
   const context = `"${item.title}" (${item.slug || item.id})`;
+  // The Offer URL is where the purchase actually happens (the elasticStage
+  // purchase link); only fall back to /store when no link exists.
   const offerUrl = absoluteUrl(item.purchaseLink || "/store");
-  const availability = availabilityUrl(item);
+  const availability = availabilityUrl(item, context);
+  const validUntil = priceValidUntil();
+  const gtin = gtinFor(item.release?.upc);
 
   const priced = item.formats
     .map((format) => ({ format, parsed: parsePrice(item.prices[format] ?? "", context) }))
@@ -688,7 +716,9 @@ export const storeProduct = (item: StoreItemLike): Node => {
     priceCurrency: parsed.priceCurrency,
     availability,
     itemCondition: "https://schema.org/NewCondition",
+    priceValidUntil: validUntil,
     url: offerUrl,
+    ...gtin,
     seller: { "@type": "Organization", name: SITE_NAME, url: absoluteUrl("/") },
   }));
 
@@ -705,6 +735,7 @@ export const storeProduct = (item: StoreItemLike): Node => {
           offerCount: offers.length,
           availability,
           itemCondition: "https://schema.org/NewCondition",
+          priceValidUntil: validUntil,
           url: offerUrl,
           offers,
         }
@@ -716,7 +747,8 @@ export const storeProduct = (item: StoreItemLike): Node => {
     name: item.artist?.name ? `${item.title} — ${item.artist.name}` : item.title,
     ...(item.description ? { description: item.description } : {}),
     ...(url(item.productImage) ? { image: url(item.productImage) } : {}),
-    ...(item.slug ? { sku: item.slug } : {}),
+    ...(item.catalogueNumber ? { sku: item.catalogueNumber } : item.slug ? { sku: item.slug } : {}),
+    ...gtin,
     ...(item.formats.length ? { material: item.formats.join(", ") } : {}),
     brand: { "@type": "Brand", name: SITE_LEGAL_NAME },
     ...(item.artist?.name
