@@ -24,16 +24,8 @@ export default async function handler(_req: unknown, res: ApiResponse) {
       const titleField =
         props["Track Title"] ??
         Object.values(props).find((p: any) => p?.type === "title");
-      const title = (() => {
-        if (!titleField) return "";
-        if (Array.isArray(titleField?.rich_text)) {
-          return titleField.rich_text.map((x: any) => x.plain_text).join("").trim();
-        }
-        if (Array.isArray(titleField?.title)) {
-          return titleField.title.map((x: any) => x.plain_text).join("").trim();
-        }
-        return "";
-      })();
+      const title = notionText(titleField);
+
       trackLookup.set(t.id, { id: t.id, title });
     }
 

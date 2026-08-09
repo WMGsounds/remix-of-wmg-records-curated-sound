@@ -40,7 +40,11 @@ export type Artist = {
   artistLinks?: ArtistLinks;
   // Reserved for future expansion; kept for backwards-compat.
   streamingLinks?: StreamingLinks;
+  // Authored CMS metadata (Notion formula properties) — used verbatim when set.
+  seoTitle?: string;
+  seoDescription?: string;
 };
+
 
 export type Release = {
   id: string;
@@ -65,7 +69,11 @@ export type Release = {
   upc?: string | null;
   parentAlbumId?: string | null;
   parentAlbum?: { id: string; title: string; slug: string | null } | null;
+  // Authored CMS metadata (Notion formula properties) — used verbatim when set.
+  seoTitle?: string;
+  seoDescription?: string;
 };
+
 
 export type Track = {
   id: string;
