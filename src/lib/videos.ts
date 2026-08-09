@@ -81,3 +81,35 @@ export const thumbnailUrl = (videoId: string) => `https://i.ytimg.com/vi/${video
 export const embedUrl = (videoId: string) =>
   `https://www.youtube-nocookie.com/embed/${videoId}?autoplay=1&rel=0&modestbranding=1`;
 export const watchUrl = (videoId: string) => `https://www.youtube.com/watch?v=${videoId}`;
+
+/**
+ * H2 section label for a Video Type. Derived from the data value itself so a
+ * brand-new Notion Video Type gets its own section automatically — nothing is
+ * hardcoded per type.
+ */
+export const videoTypeSectionLabel = (videoType: string): string => {
+  const label = (videoType || "Other").trim();
+  if (/^other$/i.test(label)) return "Other Videos";
+  if (/videos?$/i.test(label)) return label.replace(/video$/i, "Videos");
+  return /s$/i.test(label) ? label : `${label}s`;
+};
+
+/**
+ * Split a list into sections keyed by Video Type, preserving both the incoming
+ * order of the list and the order in which each type first appears.
+ */
+export const groupVideosByType = (
+  videos: VideoItem[],
+): { type: string; label: string; videos: VideoItem[] }[] => {
+  const map = new Map<string, { type: string; label: string; videos: VideoItem[] }>();
+  videos.forEach((v) => {
+    const type = (v.videoType || "Other").trim() || "Other";
+    if (!map.has(type)) map.set(type, { type, label: videoTypeSectionLabel(type), videos: [] });
+    map.get(type)!.videos.push(v);
+  });
+  return [...map.values()];
+};
+
+/** Slug used for section ids / aria wiring. */
+export const videoTypeSlug = (videoType: string): string =>
+  (videoType || "other").toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "") || "other";
