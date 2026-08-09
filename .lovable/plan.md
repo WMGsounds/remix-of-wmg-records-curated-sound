@@ -23,7 +23,7 @@ Supporting pieces in the same module:
 - `genre: ["Soul","R&B","Blues","Reggae","Country"]`
 - No `foundingDate` (none supplied).
 
-**WebSite** — gains a `potentialAction` SearchAction targeting `https://www.wmgsounds.com/search?q={search_term_string}`.
+**WebSite** — name and url only. No `potentialAction` SearchAction: Google retired the Sitelinks Search Box on 21 November 2024, so it produces no rich result.
 
 **Duplicate homepage blocks** — Organization and WebSite move out of `<Seo>`/`seoConfig` into the root layout, so no page can emit them. The current homepage emits four blocks; the cause is not yet confirmed (a single emitter exists in `Seo.tsx`, so it is likely pre-rendered HTML plus a client-side re-injection). First step of the work is to reproduce and confirm the cause in the built output, then verify the layout-only change reduces the homepage to exactly one Organization and one WebSite.
 
