@@ -12,9 +12,7 @@ import { matchesSearch } from "@/lib/search";
 import {
   artistNames,
   embedUrl,
-  groupVideosByType,
   thumbnailUrl,
-  videoTypeSlug,
   watchUrl,
   type VideoItem,
 } from "@/lib/videos";
