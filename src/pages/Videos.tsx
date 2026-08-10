@@ -330,13 +330,15 @@ const Videos = () => {
 
 
   /* Per-video pages deliberately do not exist, so the ItemList identifies each
-     video by its YouTube watch URL. */
+     video by its YouTube watch URL. The default view is deliberately unordered,
+     so the markup says so; positions follow the rendered order. */
   const videosItemList = useMemo(
     () =>
       visible.length
         ? itemList({
             path: "/videos",
             name: "WMG Videos",
+            order: "Unordered",
             items: visible.map((v) => ({ name: v.title, path: watchUrl(v.youtubeId) })),
           })
         : null,
