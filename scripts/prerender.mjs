@@ -45,7 +45,45 @@ if (template.includes('data-rh="true"') || !template.includes('<div id="root"></
  *
  * Instead we bundle api/notion/_dispatch.ts and call the very same serverless
  * handlers in this process, straight against Notion. */
+
+// Local runs: pick up Notion credentials from .env (Vercel injects its own).
+if (existsSync(path.join(root, ".env"))) {
+  for (const line of (await fs.readFile(path.join(root, ".env"), "utf8")).split("\n")) {
+    const m = /^\s*(?:export\s+)?([A-Z0-9_]+)\s*=\s*(.*)\s*$/.exec(line);
+    if (m && !process.env[m[1]]) process.env[m[1]] = m[2].replace(/^["']|["']$/g, "");
+  }
+}
+
+const REQUIRED_CMS_ENV = [
+  "NOTION_TOKEN",
+  "NOTION_ARTISTS_DB_ID",
+  "NOTION_RELEASES_DB_ID",
+  "NOTION_TRACKS_DB_ID",
+  "NOTION_RELEASE_TRACKS_DB_ID",
+  "NOTION_JOURNAL_DB_ID",
+  "NOTION_STORE_DB_ID",
+  "NOTION_GALLERY_DATABASE_ID",
+  "NOTION_VIDEOS_DATABASE_ID",
+];
+const missingCmsEnv = REQUIRED_CMS_ENV.filter((n) => !process.env[n]);
+const isDeploymentBuild = Boolean(process.env.VERCEL || process.env.CI);
+
+if (missingCmsEnv.length && isDeploymentBuild) {
+  throw new Error(
+    `[prerender] Missing Notion environment variables: ${missingCmsEnv.join(", ")}. ` +
+      "A deployment build must read Notion directly — it must never fall back to fetching the previously deployed site.",
+  );
+}
+
 const dispatchOut = path.join(root, "dist-api", "dispatch.mjs");
+if (missingCmsEnv.length) {
+  // Local convenience only, never on a deployment build (guarded above).
+  console.warn(
+    `[prerender] WARNING: no Notion credentials (${missingCmsEnv.join(", ")}). ` +
+      "Falling back to the deployed API over HTTP — output may be stale. Deployment builds fail instead.",
+  );
+} else {
+
 await esbuild.build({
   entryPoints: [path.join(root, "api", "notion", "_dispatch.ts")],
   outfile: dispatchOut,
