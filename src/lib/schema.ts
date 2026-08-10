@@ -668,7 +668,10 @@ export type StoreItemLike = {
     slug?: string | null;
     upc?: string | null;
     catalogueId?: string | null;
+    /** Number of tracks on the linked release; drives the schema type. */
+    trackCount?: number | null;
   } | null;
+
 };
 
 /**
