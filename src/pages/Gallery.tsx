@@ -26,8 +26,10 @@ const Gallery = () => {
   const [searchQuery, setSearchQuery] = useState<string>("");
   const [sort, setSort] = useState<(typeof sortOptions)[number]>("Curated");
   const [lightboxIndex, setLightboxIndex] = useState<number | null>(null);
-  // Stable for the whole visit; changes once per day.
-  const [curationSeed] = useState(() => dailySeed());
+  /* Fixed seed: the curated default must be byte-identical in the pre-rendered
+     HTML and in the browser, so it must not depend on the current date. */
+  const [curationSeed] = useState(() => GALLERY_CURATION_SEED);
+
   const [visibleCount, setVisibleCount] = useState<number>(GALLERY_BATCH_SIZE);
 
   const artistOptions = useMemo(() => {
