@@ -308,6 +308,17 @@ type TrackLike = {
   duration?: string | null;
   spotifyUrl?: string | null;
   isrc?: string | null;
+  lyrics?: string | null;
+};
+
+/**
+ * Lyrics are our own original content, so they are asserted on the recording.
+ * Emitted only when there is real text — never an empty CreativeWork.
+ */
+const lyricsNode = (t?: TrackLike | null): Node | undefined => {
+  const text = (t?.lyrics ?? "").trim();
+  if (!text) return undefined;
+  return { "@type": "CreativeWork", text };
 };
 
 export type ReleaseSchemaInput = {
@@ -358,6 +369,7 @@ const trackNode = (t: TrackLike, i: number, input: ReleaseSchemaInput): Node => 
   ...(trackUrl(t, input.release) ? { url: trackUrl(t, input.release) } : {}),
   ...(isoDuration(t.duration) ? { duration: isoDuration(t.duration) } : {}),
   ...(t.isrc ? { isrcCode: t.isrc } : {}),
+  ...(lyricsNode(t) ? { lyrics: lyricsNode(t) } : {}),
   ...(byArtistNode(input) ? { byArtist: byArtistNode(input) } : {}),
   inLanguage: SITE_LANGUAGE,
 });
@@ -428,6 +440,7 @@ export const musicRecording = (input: ReleaseSchemaInput): Node => {
     "@type": "MusicRecording",
     ...(duration ? { duration } : {}),
     ...(t?.isrc ? { isrcCode: t.isrc } : {}),
+    ...(lyricsNode(t) ? { lyrics: lyricsNode(t) } : {}),
     ...(inAlbum ? { inAlbum } : {}),
   };
 };

@@ -159,8 +159,25 @@ const TrackRow = ({
           />
         </div>
       )}
-      {hasLyrics && lyricsOpen && (
-        <div className="lg:hidden pb-6 pl-12 pr-4">
+      {/*
+        PERMANENT RULE — DO NOT REINTRODUCE CONDITIONAL RENDERING HERE.
+        Lyrics are our own original content and lyric searches are high volume.
+        They must exist in the server-rendered HTML on first load so crawlers
+        index them. The open/closed state is a purely visual CSS collapse; if
+        this is ever switched back to `{lyricsOpen && <div>…</div>}` (or to a
+        container that only mounts on click) the lyrics disappear from the DOM
+        and the page silently loses that content from search.
+        Site-wide principle: any text behind a tab, accordion, "read more" or
+        modal is rendered into the HTML and hidden with CSS, never mounted on
+        interaction.
+      */}
+      {hasLyrics && (
+        <div
+          className={`lg:hidden overflow-hidden transition-all duration-300 ${
+            lyricsOpen ? "max-h-[4000px] opacity-100 pb-6" : "max-h-0 opacity-0"
+          } pl-12 pr-4`}
+          aria-hidden={!lyricsOpen}
+        >
           <p className="eyebrow text-gold-soft mb-3">Lyrics</p>
           <div className="text-ivory/80 whitespace-pre-line font-serif text-base leading-relaxed">
             {track.lyrics}
@@ -392,27 +409,39 @@ const ReleasePage = () => {
             )}
           </div>
           <div className="hidden lg:block lg:col-span-5">
-            {(() => {
-              const activeTrack = tracks.find((t) => t.id === openLyricsTrackId);
-              if (!activeTrack || !activeTrack.lyrics) {
-                return (
+            {/*
+              Every track's lyrics are rendered here on load and revealed with
+              CSS only. Never gate these blocks behind `openLyricsTrackId &&`.
+            */}
+            {tracks.filter((t) => t.lyrics && t.lyrics.trim()).length === 0 ? null : (
+              <>
+                {!tracks.some((t) => t.id === openLyricsTrackId && t.lyrics) && (
                   <p className="text-ivory/75 italic text-sm">
                     Select “Lyrics” on a track to view them here.
                   </p>
-                );
-              }
-              return (
-                <div>
-                  <p className="eyebrow text-gold-soft mb-4">Lyrics</p>
-                  <h3 className="font-serif text-2xl md:text-3xl mb-6 text-ivory">
-                    {activeTrack.trackTitle}
-                  </h3>
-                  <div className="text-ivory/80 whitespace-pre-line font-serif text-base leading-relaxed">
-                    {activeTrack.lyrics}
-                  </div>
-                </div>
-              );
-            })()}
+                )}
+                {tracks
+                  .filter((t) => t.lyrics && t.lyrics.trim())
+                  .map((t) => {
+                    const active = t.id === openLyricsTrackId;
+                    return (
+                      <div
+                        key={t.id}
+                        className={active ? "block" : "sr-only"}
+                        aria-hidden={!active}
+                      >
+                        <p className="eyebrow text-gold-soft mb-4">Lyrics</p>
+                        <h3 className="font-serif text-2xl md:text-3xl mb-6 text-ivory">
+                          {t.trackTitle}
+                        </h3>
+                        <div className="text-ivory/80 whitespace-pre-line font-serif text-base leading-relaxed">
+                          {t.lyrics}
+                        </div>
+                      </div>
+                    );
+                  })}
+              </>
+            )}
           </div>
         </div>
       </section>
