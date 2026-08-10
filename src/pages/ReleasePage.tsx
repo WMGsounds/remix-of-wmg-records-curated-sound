@@ -409,27 +409,39 @@ const ReleasePage = () => {
             )}
           </div>
           <div className="hidden lg:block lg:col-span-5">
-            {(() => {
-              const activeTrack = tracks.find((t) => t.id === openLyricsTrackId);
-              if (!activeTrack || !activeTrack.lyrics) {
-                return (
+            {/*
+              Every track's lyrics are rendered here on load and revealed with
+              CSS only. Never gate these blocks behind `openLyricsTrackId &&`.
+            */}
+            {tracks.filter((t) => t.lyrics && t.lyrics.trim()).length === 0 ? null : (
+              <>
+                {!tracks.some((t) => t.id === openLyricsTrackId && t.lyrics) && (
                   <p className="text-ivory/75 italic text-sm">
                     Select “Lyrics” on a track to view them here.
                   </p>
-                );
-              }
-              return (
-                <div>
-                  <p className="eyebrow text-gold-soft mb-4">Lyrics</p>
-                  <h3 className="font-serif text-2xl md:text-3xl mb-6 text-ivory">
-                    {activeTrack.trackTitle}
-                  </h3>
-                  <div className="text-ivory/80 whitespace-pre-line font-serif text-base leading-relaxed">
-                    {activeTrack.lyrics}
-                  </div>
-                </div>
-              );
-            })()}
+                )}
+                {tracks
+                  .filter((t) => t.lyrics && t.lyrics.trim())
+                  .map((t) => {
+                    const active = t.id === openLyricsTrackId;
+                    return (
+                      <div
+                        key={t.id}
+                        className={active ? "block" : "sr-only"}
+                        aria-hidden={!active}
+                      >
+                        <p className="eyebrow text-gold-soft mb-4">Lyrics</p>
+                        <h3 className="font-serif text-2xl md:text-3xl mb-6 text-ivory">
+                          {t.trackTitle}
+                        </h3>
+                        <div className="text-ivory/80 whitespace-pre-line font-serif text-base leading-relaxed">
+                          {t.lyrics}
+                        </div>
+                      </div>
+                    );
+                  })}
+              </>
+            )}
           </div>
         </div>
       </section>
