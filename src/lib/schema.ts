@@ -308,6 +308,17 @@ type TrackLike = {
   duration?: string | null;
   spotifyUrl?: string | null;
   isrc?: string | null;
+  lyrics?: string | null;
+};
+
+/**
+ * Lyrics are our own original content, so they are asserted on the recording.
+ * Emitted only when there is real text — never an empty CreativeWork.
+ */
+const lyricsNode = (t?: TrackLike | null): Node | undefined => {
+  const text = (t?.lyrics ?? "").trim();
+  if (!text) return undefined;
+  return { "@type": "CreativeWork", text };
 };
 
 export type ReleaseSchemaInput = {
