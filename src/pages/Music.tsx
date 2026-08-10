@@ -263,9 +263,8 @@ const TrackRow = ({
               <p className="eyebrow mb-5 text-gold-soft">Lyrics</p>
               <Lyrics lyrics={track.lyrics} />
             </div>
-          </div>
         </div>
-      )}
+      </div>
     </li>
   );
 };
