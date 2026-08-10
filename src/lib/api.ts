@@ -26,10 +26,31 @@ import { getMockDataForPath } from "./mockData";
 const API_BASE = import.meta.env.VITE_API_BASE_URL ?? "";
 const ALLOW_MOCK_DATA = import.meta.env.DEV;
 
+/**
+ * Build-time transport. scripts/prerender.mjs installs an in-process
+ * dispatcher on globalThis that calls the /api/notion/* handlers directly
+ * against Notion. Without it the build would fetch the PREVIOUS deployment
+ * over HTTP, so any API response-shape change took two deploys to appear in
+ * the pre-rendered HTML, and a slow/down site baked wrong content silently.
+ * In the browser this global never exists and normal fetch is used.
+ */
+type LocalApi = (path: string) => Promise<{ status: number; headers: Record<string, string>; body: string }>;
+const localApi = (): LocalApi | undefined =>
+  (globalThis as { __WMG_LOCAL_API__?: LocalApi }).__WMG_LOCAL_API__;
+
 async function fetchJson<T>(path: string): Promise<T> {
+  const local = localApi();
+  if (local) {
+    const result = await local(path);
+    if (result.status !== 200) throw new Error(`Request failed (${result.status}): ${path}`);
+    if (result.headers["X-Data-Source"] === "mock-fallback")
+      throw new Error(`[cms-api] ${path} returned mock fallback data at build time — refusing to pre-render it`);
+    return JSON.parse(result.body) as T;
+  }
   const res = await fetch(`${API_BASE}${path}`, {
     headers: { Accept: "application/json" },
   });
+
   if (!res.ok) {
     const mock = getMockDataForPath(path);
     if (ALLOW_MOCK_DATA && mock !== null) {

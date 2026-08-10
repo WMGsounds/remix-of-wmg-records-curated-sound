@@ -16,9 +16,12 @@
  * Run after `vite build` + the SSR bundle build.
  */
 import fs from "node:fs/promises";
+import { existsSync } from "node:fs";
 import path from "node:path";
 import { execFileSync } from "node:child_process";
 import { pathToFileURL } from "node:url";
+import * as esbuild from "esbuild";
+
 
 
 const root = process.cwd();
@@ -33,8 +36,91 @@ if (template.includes('data-rh="true"') || !template.includes('<div id="root"></
   );
 }
 
+/* ---------------- In-process CMS access --------------------------------- *
+ * The pre-render must NOT read the deployed site: during a Vercel build the
+ * live deployment is still the previous one, so fetching it baked stale
+ * response shapes into the new HTML (a change to the API only showed up on the
+ * NEXT deploy) and turned a slow/failing site into silently wrong content
+ * instead of a failed build.
+ *
+ * Instead we bundle api/notion/_dispatch.ts and call the very same serverless
+ * handlers in this process, straight against Notion. */
+
+// Local runs: pick up Notion credentials from .env (Vercel injects its own).
+if (existsSync(path.join(root, ".env"))) {
+  for (const line of (await fs.readFile(path.join(root, ".env"), "utf8")).split("\n")) {
+    const m = /^\s*(?:export\s+)?([A-Z0-9_]+)\s*=\s*(.*)\s*$/.exec(line);
+    if (m && !process.env[m[1]]) process.env[m[1]] = m[2].replace(/^["']|["']$/g, "");
+  }
+}
+
+const REQUIRED_CMS_ENV = [
+  "NOTION_TOKEN",
+  "NOTION_ARTISTS_DB_ID",
+  "NOTION_RELEASES_DB_ID",
+  "NOTION_TRACKS_DB_ID",
+  "NOTION_RELEASE_TRACKS_DB_ID",
+  "NOTION_JOURNAL_DB_ID",
+  "NOTION_STORE_DB_ID",
+  "NOTION_GALLERY_DATABASE_ID",
+  "NOTION_VIDEOS_DATABASE_ID",
+];
+const missingCmsEnv = REQUIRED_CMS_ENV.filter((n) => !process.env[n]);
+const isDeploymentBuild = Boolean(process.env.VERCEL || process.env.CI);
+
+if (missingCmsEnv.length && isDeploymentBuild) {
+  throw new Error(
+    `[prerender] Missing Notion environment variables: ${missingCmsEnv.join(", ")}. ` +
+      "A deployment build must read Notion directly — it must never fall back to fetching the previously deployed site.",
+  );
+}
+
+const dispatchOut = path.join(root, "dist-api", "dispatch.mjs");
+if (missingCmsEnv.length) {
+  // Local convenience only, never on a deployment build (guarded above).
+  console.warn(
+    `[prerender] WARNING: no Notion credentials (${missingCmsEnv.join(", ")}). ` +
+      "Falling back to the deployed API over HTTP — output may be stale. Deployment builds fail instead.",
+  );
+  const remoteBase = process.env.VITE_API_BASE_URL || "https://www.wmgsounds.com";
+  globalThis.__WMG_LOCAL_API__ = async (p) => {
+    const res = await fetch(`${remoteBase}${p}`, { headers: { Accept: "application/json" } });
+    return { status: res.status, headers: {}, body: await res.text() };
+  };
+} else {
+  await esbuild.build({
+    entryPoints: [path.join(root, "api", "notion", "_dispatch.ts")],
+    outfile: dispatchOut,
+    bundle: true,
+    format: "esm",
+    platform: "node",
+    target: "node20",
+    packages: "external",
+    logLevel: "silent",
+    plugins: [
+      {
+        // Handlers import siblings with a ".js" specifier (NodeNext style);
+        // on disk they are ".ts".
+        name: "js-to-ts",
+        setup(build) {
+          build.onResolve({ filter: /^\.{1,2}\/.*\.js$/ }, (args) => {
+            const candidate = path.resolve(args.resolveDir, args.path.replace(/\.js$/, ".ts"));
+            return existsSync(candidate) ? { path: candidate } : undefined;
+          });
+        },
+      },
+    ],
+  });
+
+  const { callApi } = await import(pathToFileURL(dispatchOut).href);
+  globalThis.__WMG_LOCAL_API__ = (p) => callApi(p);
+  console.log("[prerender] CMS access: in-process Notion handlers (no HTTP to the deployed site)");
+}
+
+
 const server = await import(pathToFileURL(ssrEntry).href);
 await server.preloadAllPages();
+
 
 const problems = [];
 const fail = (msg) => problems.push(msg);
