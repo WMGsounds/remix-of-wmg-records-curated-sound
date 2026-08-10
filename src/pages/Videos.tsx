@@ -278,15 +278,11 @@ const Videos = () => {
     [artistGroups, openArtists, expandedArtists],
   );
 
-  /* H2 sections come from the Video Type values present in the data, so a new
-     Notion Video Type creates its own section with no code change. */
-  const typeSections = useMemo(
-    () => (groupedByArtist ? [] : groupVideosByType(displayed)),
-    [displayed, groupedByArtist],
-  );
-  const sectionedList = useMemo(() => typeSections.flatMap((s) => s.videos), [typeSections]);
+  /* The default view is a single flat grid (users segment by Video Type with
+     the filter bar). One descriptive H2 introduces it; each card title is an H3
+     beneath, so the outline stays H1 > H2 > H3 with no skipped levels. */
+  const playerList = groupedByArtist ? groupedPlayerList : displayed;
 
-  const playerList = groupedByArtist ? groupedPlayerList : sectionedList;
 
   /* VideoObject requires only name, thumbnailUrl and uploadDate. duration is
      recommended: emit it when present, warn when absent, never suppress markup.
