@@ -82,35 +82,41 @@ if (missingCmsEnv.length) {
     `[prerender] WARNING: no Notion credentials (${missingCmsEnv.join(", ")}). ` +
       "Falling back to the deployed API over HTTP — output may be stale. Deployment builds fail instead.",
   );
+  const remoteBase = process.env.VITE_API_BASE_URL || "https://www.wmgsounds.com";
+  globalThis.__WMG_LOCAL_API__ = async (p) => {
+    const res = await fetch(`${remoteBase}${p}`, { headers: { Accept: "application/json" } });
+    return { status: res.status, headers: {}, body: await res.text() };
+  };
 } else {
-
-await esbuild.build({
-  entryPoints: [path.join(root, "api", "notion", "_dispatch.ts")],
-  outfile: dispatchOut,
-  bundle: true,
-  format: "esm",
-  platform: "node",
-  target: "node20",
-  packages: "external",
-  logLevel: "silent",
-  plugins: [
-    {
-      // Handlers import siblings with a ".js" specifier (NodeNext style);
-      // on disk they are ".ts".
-      name: "js-to-ts",
-      setup(build) {
-        build.onResolve({ filter: /^\.{1,2}\/.*\.js$/ }, (args) => {
-          const candidate = path.resolve(args.resolveDir, args.path.replace(/\.js$/, ".ts"));
-          return existsSync(candidate) ? { path: candidate } : undefined;
-        });
+  await esbuild.build({
+    entryPoints: [path.join(root, "api", "notion", "_dispatch.ts")],
+    outfile: dispatchOut,
+    bundle: true,
+    format: "esm",
+    platform: "node",
+    target: "node20",
+    packages: "external",
+    logLevel: "silent",
+    plugins: [
+      {
+        // Handlers import siblings with a ".js" specifier (NodeNext style);
+        // on disk they are ".ts".
+        name: "js-to-ts",
+        setup(build) {
+          build.onResolve({ filter: /^\.{1,2}\/.*\.js$/ }, (args) => {
+            const candidate = path.resolve(args.resolveDir, args.path.replace(/\.js$/, ".ts"));
+            return existsSync(candidate) ? { path: candidate } : undefined;
+          });
+        },
       },
-    },
-  ],
-});
+    ],
+  });
 
-const { callApi } = await import(pathToFileURL(dispatchOut).href);
-globalThis.__WMG_LOCAL_API__ = (p) => callApi(p);
-console.log("[prerender] CMS access: in-process Notion handlers (no HTTP to the deployed site)");
+  const { callApi } = await import(pathToFileURL(dispatchOut).href);
+  globalThis.__WMG_LOCAL_API__ = (p) => callApi(p);
+  console.log("[prerender] CMS access: in-process Notion handlers (no HTTP to the deployed site)");
+}
+
 
 const server = await import(pathToFileURL(ssrEntry).href);
 await server.preloadAllPages();
