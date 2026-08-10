@@ -208,16 +208,25 @@ export type ItemListInput = {
   path?: string;
   name?: string;
   items: { name?: string; path: string; image?: string | null }[];
+  /**
+   * Set "Unordered" for listings whose rendered order carries no ranking
+   * (e.g. the deliberately unordered /videos and /gallery default views).
+   */
+  order?: "Ascending" | "Descending" | "Unordered";
 };
 
 /** ItemList for a listing page; entries derive from the rendered content. */
-export const itemList = ({ path, name, items }: ItemListInput): Node => ({
+export const itemList = ({ path, name, items, order = "Ascending" }: ItemListInput): Node => ({
   ...ctx,
   "@type": "ItemList",
   ...(name ? { name } : {}),
   ...(path ? { url: absoluteUrl(path) } : {}),
   numberOfItems: items.length,
-  itemListOrder: "https://schema.org/ItemListOrderAscending",
+  itemListOrder:
+    order === "Unordered"
+      ? "https://schema.org/ItemListUnordered"
+      : `https://schema.org/ItemListOrder${order}`,
+
   itemListElement: items.map((item, i) => ({
     "@type": "ListItem",
     position: i + 1,
