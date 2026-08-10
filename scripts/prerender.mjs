@@ -16,9 +16,12 @@
  * Run after `vite build` + the SSR bundle build.
  */
 import fs from "node:fs/promises";
+import { existsSync } from "node:fs";
 import path from "node:path";
 import { execFileSync } from "node:child_process";
 import { pathToFileURL } from "node:url";
+import * as esbuild from "esbuild";
+
 
 
 const root = process.cwd();
@@ -33,8 +36,47 @@ if (template.includes('data-rh="true"') || !template.includes('<div id="root"></
   );
 }
 
+/* ---------------- In-process CMS access --------------------------------- *
+ * The pre-render must NOT read the deployed site: during a Vercel build the
+ * live deployment is still the previous one, so fetching it baked stale
+ * response shapes into the new HTML (a change to the API only showed up on the
+ * NEXT deploy) and turned a slow/failing site into silently wrong content
+ * instead of a failed build.
+ *
+ * Instead we bundle api/notion/_dispatch.ts and call the very same serverless
+ * handlers in this process, straight against Notion. */
+const dispatchOut = path.join(root, "dist-api", "dispatch.mjs");
+await esbuild.build({
+  entryPoints: [path.join(root, "api", "notion", "_dispatch.ts")],
+  outfile: dispatchOut,
+  bundle: true,
+  format: "esm",
+  platform: "node",
+  target: "node20",
+  packages: "external",
+  logLevel: "silent",
+  plugins: [
+    {
+      // Handlers import siblings with a ".js" specifier (NodeNext style);
+      // on disk they are ".ts".
+      name: "js-to-ts",
+      setup(build) {
+        build.onResolve({ filter: /^\.{1,2}\/.*\.js$/ }, (args) => {
+          const candidate = path.resolve(args.resolveDir, args.path.replace(/\.js$/, ".ts"));
+          return existsSync(candidate) ? { path: candidate } : undefined;
+        });
+      },
+    },
+  ],
+});
+
+const { callApi } = await import(pathToFileURL(dispatchOut).href);
+globalThis.__WMG_LOCAL_API__ = (p) => callApi(p);
+console.log("[prerender] CMS access: in-process Notion handlers (no HTTP to the deployed site)");
+
 const server = await import(pathToFileURL(ssrEntry).href);
 await server.preloadAllPages();
+
 
 const problems = [];
 const fail = (msg) => problems.push(msg);
