@@ -369,6 +369,7 @@ const trackNode = (t: TrackLike, i: number, input: ReleaseSchemaInput): Node => 
   ...(trackUrl(t, input.release) ? { url: trackUrl(t, input.release) } : {}),
   ...(isoDuration(t.duration) ? { duration: isoDuration(t.duration) } : {}),
   ...(t.isrc ? { isrcCode: t.isrc } : {}),
+  ...(lyricsNode(t) ? { lyrics: lyricsNode(t) } : {}),
   ...(byArtistNode(input) ? { byArtist: byArtistNode(input) } : {}),
   inLanguage: SITE_LANGUAGE,
 });
