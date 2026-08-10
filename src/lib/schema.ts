@@ -440,6 +440,7 @@ export const musicRecording = (input: ReleaseSchemaInput): Node => {
     "@type": "MusicRecording",
     ...(duration ? { duration } : {}),
     ...(t?.isrc ? { isrcCode: t.isrc } : {}),
+    ...(lyricsNode(t) ? { lyrics: lyricsNode(t) } : {}),
     ...(inAlbum ? { inAlbum } : {}),
   };
 };
