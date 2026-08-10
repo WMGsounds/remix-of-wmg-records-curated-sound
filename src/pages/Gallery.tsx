@@ -219,31 +219,18 @@ const Gallery = () => {
           </div>
         ) : (
           <>
-            <div className="space-y-20">
-              {typeSections.map((section, si) => {
-                const offset = typeSections
-                  .slice(0, si)
-                  .reduce((sum, s) => sum + s.images.length, 0);
-                return (
-                  <section key={section.type} aria-labelledby={`gallery-${sectionSlug(section.type)}`}>
-                    <h2
-                      id={`gallery-${sectionSlug(section.type)}`}
-                      className="mb-8 border-b border-gold/25 pb-4 font-serif text-2xl text-ivory md:text-3xl"
-                    >
-                      {section.label}
-                      <span className="ml-4 align-middle text-[11px] uppercase tracking-[0.24em] text-ivory/40">
-                        {section.images.length} {section.images.length === 1 ? "image" : "images"}
-                      </span>
-                    </h2>
-                    <GalleryGrid
-                      images={section.images}
-                      indexOffset={offset}
-                      onSelect={setLightboxIndex}
-                    />
-                  </section>
-                );
-              })}
-            </div>
+            <section aria-labelledby="gallery-all">
+              <div className="mb-8 flex flex-wrap items-baseline justify-between gap-4 border-b border-gold/25 pb-4">
+                <h2 id="gallery-all" className="font-serif text-2xl text-ivory md:text-3xl">
+                  Artist Portraits, Studio Sessions, Live Photography and Artwork
+                </h2>
+                <span className="text-[11px] uppercase tracking-[0.24em] text-ivory/40">
+                  {visible.length} {visible.length === 1 ? "image" : "images"}
+                </span>
+              </div>
+              <GalleryGrid images={displayed} onSelect={setLightboxIndex} />
+            </section>
+
             {visible.length > displayed.length && (
               <div className="mt-12 flex justify-center">
                 <button
