@@ -63,8 +63,14 @@ export default async function handler(_req: unknown, res: ApiResponse) {
       if (!rest.release) return rest;
       const linked = releaseLookup.get(rest.release.id);
       const eligible = linked ? isReleasePublished(linked) : false;
-      return eligible ? rest : { ...rest, release: { ...rest.release, slug: "" } };
+      const release = {
+        ...rest.release,
+        slug: eligible ? rest.release.slug : "",
+        trackCount: trackCountByRelease.get(rest.release.id) ?? 0,
+      };
+      return { ...rest, release };
     });
+
 
     logApiSuccess(route, {
       storePageCount: storePages.length,
