@@ -481,28 +481,28 @@ const Videos = () => {
               const panelId = `videos-artist-panel-${group.key}`;
               return (
                 <section key={group.key} aria-label={group.name}>
-                  <h2>
-                    <button
-                      type="button"
-                      aria-expanded={open}
-                      aria-controls={panelId}
-                      onClick={() => toggleArtist(group.key)}
-                      className="group flex w-full items-center justify-between gap-6 border-b border-gold/25 py-6 text-left transition-colors hover:border-gold/50 focus:outline-none focus-visible:ring-1 focus-visible:ring-gold"
-                    >
-                      <span className="min-w-0">
-                        <span className="block break-words text-[13px] uppercase tracking-[0.3em] text-gold-soft transition-colors group-hover:text-gold md:text-[14px]">
-                          {group.name}
-                        </span>
-                        <span className="mt-2 block text-[11px] uppercase tracking-[0.24em] text-ivory/40">
-                          {group.videos.length} {group.videos.length === 1 ? "video" : "videos"}
-                        </span>
+                  <h2 className="sr-only">{group.name}</h2>
+                  <button
+                    type="button"
+                    aria-expanded={open}
+                    aria-controls={panelId}
+                    onClick={() => toggleArtist(group.key)}
+                    className="group flex w-full items-center justify-between gap-6 border-b border-gold/25 py-6 text-left transition-colors hover:border-gold/50 focus:outline-none focus-visible:ring-1 focus-visible:ring-gold"
+                  >
+                    <span className="min-w-0">
+                      <span className="block break-words text-[13px] uppercase tracking-[0.3em] text-gold-soft transition-colors group-hover:text-gold md:text-[14px]">
+                        {group.name}
                       </span>
-                      <ChevronDown
-                        aria-hidden="true"
-                        className={`h-4 w-4 flex-none text-ivory/50 transition-transform duration-300 ${open ? "rotate-180" : ""}`}
-                      />
-                    </button>
-                  </h2>
+                      <span className="mt-2 block text-[11px] uppercase tracking-[0.24em] text-ivory/40">
+                        {group.videos.length} {group.videos.length === 1 ? "video" : "videos"}
+                      </span>
+                    </span>
+                    <ChevronDown
+                      aria-hidden="true"
+                      className={`h-4 w-4 flex-none text-ivory/50 transition-transform duration-300 ${open ? "rotate-180" : ""}`}
+                    />
+                  </button>
+
 
                   <div id={panelId} hidden={!open} className="overflow-hidden animate-in fade-in-0 duration-300">
                     <div className="grid grid-cols-1 gap-8 pt-8 sm:grid-cols-2 lg:grid-cols-3">
