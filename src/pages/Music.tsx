@@ -207,8 +207,20 @@ const TrackRow = ({
         </span>
       </div>
 
-      {expanded && (
-        <div id={panelId} className="border-t border-ivory/10 bg-ivory/[0.02] px-1 py-10 md:px-6 md:py-12">
+      {/*
+        SITE-WIDE RULE — never gate this panel behind `{expanded && …}`.
+        Lyrics and track copy are our own content and must be present in the
+        server-rendered HTML on load; the accordion is a CSS-only collapse.
+      */}
+      <div
+        id={panelId}
+        aria-hidden={!expanded}
+        className={`overflow-hidden transition-all duration-300 ${
+          expanded
+            ? "max-h-[6000px] opacity-100 border-t border-ivory/10 bg-ivory/[0.02] px-1 py-10 md:px-6 md:py-12"
+            : "max-h-0 opacity-0"
+        }`}
+      >
           <div className="grid gap-12 md:grid-cols-2 md:gap-24">
             <div className="space-y-10">
               <div>
