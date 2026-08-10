@@ -159,8 +159,25 @@ const TrackRow = ({
           />
         </div>
       )}
-      {hasLyrics && lyricsOpen && (
-        <div className="lg:hidden pb-6 pl-12 pr-4">
+      {/*
+        PERMANENT RULE — DO NOT REINTRODUCE CONDITIONAL RENDERING HERE.
+        Lyrics are our own original content and lyric searches are high volume.
+        They must exist in the server-rendered HTML on first load so crawlers
+        index them. The open/closed state is a purely visual CSS collapse; if
+        this is ever switched back to `{lyricsOpen && <div>…</div>}` (or to a
+        container that only mounts on click) the lyrics disappear from the DOM
+        and the page silently loses that content from search.
+        Site-wide principle: any text behind a tab, accordion, "read more" or
+        modal is rendered into the HTML and hidden with CSS, never mounted on
+        interaction.
+      */}
+      {hasLyrics && (
+        <div
+          className={`lg:hidden overflow-hidden transition-all duration-300 ${
+            lyricsOpen ? "max-h-[4000px] opacity-100 pb-6" : "max-h-0 opacity-0"
+          } pl-12 pr-4`}
+          aria-hidden={!lyricsOpen}
+        >
           <p className="eyebrow text-gold-soft mb-3">Lyrics</p>
           <div className="text-ivory/80 whitespace-pre-line font-serif text-base leading-relaxed">
             {track.lyrics}
