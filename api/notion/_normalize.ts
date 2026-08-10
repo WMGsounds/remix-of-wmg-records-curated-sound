@@ -209,6 +209,12 @@ export function normalizeRelease(page: any, artistLookup: Map<string, any>) {
     upc: text(findProp(props, "UPC", "Upc", "upc")) || null,
     parentAlbumId: parentAlbumRel,
     parentAlbum: null as null | { id: string; title: string; slug: string | null },
+    /**
+     * Releases whose parent-album relation points AT this release (the singles
+     * lifted off it). Filled in per-request by the release route; declared here
+     * so the property genuinely exists on the normaliser's return type.
+     */
+    childSingles: [] as { id: string; title: string; slug: string | null }[],
     // Notion formula properties — read through the shared reader (formula.string).
     seoTitle: text(props["SEO Title"]),
     seoDescription: text(props["SEO Description"]),
