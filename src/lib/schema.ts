@@ -208,16 +208,25 @@ export type ItemListInput = {
   path?: string;
   name?: string;
   items: { name?: string; path: string; image?: string | null }[];
+  /**
+   * Set "Unordered" for listings whose rendered order carries no ranking
+   * (e.g. the deliberately unordered /videos and /gallery default views).
+   */
+  order?: "Ascending" | "Descending" | "Unordered";
 };
 
 /** ItemList for a listing page; entries derive from the rendered content. */
-export const itemList = ({ path, name, items }: ItemListInput): Node => ({
+export const itemList = ({ path, name, items, order = "Ascending" }: ItemListInput): Node => ({
   ...ctx,
   "@type": "ItemList",
   ...(name ? { name } : {}),
   ...(path ? { url: absoluteUrl(path) } : {}),
   numberOfItems: items.length,
-  itemListOrder: "https://schema.org/ItemListOrderAscending",
+  itemListOrder:
+    order === "Unordered"
+      ? "https://schema.org/ItemListUnordered"
+      : `https://schema.org/ItemListOrder${order}`,
+
   itemListElement: items.map((item, i) => ({
     "@type": "ListItem",
     position: i + 1,
@@ -659,7 +668,10 @@ export type StoreItemLike = {
     slug?: string | null;
     upc?: string | null;
     catalogueId?: string | null;
+    /** Number of tracks on the linked release; drives the schema type. */
+    trackCount?: number | null;
   } | null;
+
 };
 
 /**
@@ -768,14 +780,18 @@ export const storeProduct = (item: StoreItemLike): Node => {
     ...gtin,
     brand: { "@type": "Brand", name: SITE_LEGAL_NAME },
     /* isRelatedTo (a valid Product property; `author` is CreativeWork-only)
-       points at the album this item packages. Emitted only when the release
-       actually has a published page — the store API blanks the slug until then. */
+       points at the release this item packages. Emitted only when the release
+       actually has a published page — the store API blanks the slug until then.
+       The @type is DERIVED from the release's real track count, using the same
+       rule as the release page generator, so the same URL is never typed
+       MusicAlbum here and MusicRecording there. */
     ...(item.release?.slug
       ? {
           isRelatedTo: {
-            "@type": "MusicAlbum",
+            "@type": (item.release.trackCount ?? 0) > 1 ? "MusicAlbum" : "MusicRecording",
             name: item.release.title,
             url: absoluteUrl(`/releases/${item.release.slug}`),
+
             ...(item.artist?.name
               ? {
                   byArtist: {

@@ -12,9 +12,7 @@ import { matchesSearch } from "@/lib/search";
 import {
   artistNames,
   embedUrl,
-  groupVideosByType,
   thumbnailUrl,
-  videoTypeSlug,
   watchUrl,
   type VideoItem,
 } from "@/lib/videos";
@@ -278,15 +276,11 @@ const Videos = () => {
     [artistGroups, openArtists, expandedArtists],
   );
 
-  /* H2 sections come from the Video Type values present in the data, so a new
-     Notion Video Type creates its own section with no code change. */
-  const typeSections = useMemo(
-    () => (groupedByArtist ? [] : groupVideosByType(displayed)),
-    [displayed, groupedByArtist],
-  );
-  const sectionedList = useMemo(() => typeSections.flatMap((s) => s.videos), [typeSections]);
+  /* The default view is a single flat grid (users segment by Video Type with
+     the filter bar). One descriptive H2 introduces it; each card title is an H3
+     beneath, so the outline stays H1 > H2 > H3 with no skipped levels. */
+  const playerList = groupedByArtist ? groupedPlayerList : displayed;
 
-  const playerList = groupedByArtist ? groupedPlayerList : sectionedList;
 
   /* VideoObject requires only name, thumbnailUrl and uploadDate. duration is
      recommended: emit it when present, warn when absent, never suppress markup.
@@ -334,13 +328,15 @@ const Videos = () => {
 
 
   /* Per-video pages deliberately do not exist, so the ItemList identifies each
-     video by its YouTube watch URL. */
+     video by its YouTube watch URL. The default view is deliberately unordered,
+     so the markup says so; positions follow the rendered order. */
   const videosItemList = useMemo(
     () =>
       visible.length
         ? itemList({
             path: "/videos",
             name: "WMG Videos",
+            order: "Unordered",
             items: visible.map((v) => ({ name: v.title, path: watchUrl(v.youtubeId) })),
           })
         : null,
@@ -485,28 +481,28 @@ const Videos = () => {
               const panelId = `videos-artist-panel-${group.key}`;
               return (
                 <section key={group.key} aria-label={group.name}>
-                  <h2>
-                    <button
-                      type="button"
-                      aria-expanded={open}
-                      aria-controls={panelId}
-                      onClick={() => toggleArtist(group.key)}
-                      className="group flex w-full items-center justify-between gap-6 border-b border-gold/25 py-6 text-left transition-colors hover:border-gold/50 focus:outline-none focus-visible:ring-1 focus-visible:ring-gold"
-                    >
-                      <span className="min-w-0">
-                        <span className="block break-words text-[13px] uppercase tracking-[0.3em] text-gold-soft transition-colors group-hover:text-gold md:text-[14px]">
-                          {group.name}
-                        </span>
-                        <span className="mt-2 block text-[11px] uppercase tracking-[0.24em] text-ivory/40">
-                          {group.videos.length} {group.videos.length === 1 ? "video" : "videos"}
-                        </span>
+                  <h2 className="sr-only">{group.name}</h2>
+                  <button
+                    type="button"
+                    aria-expanded={open}
+                    aria-controls={panelId}
+                    onClick={() => toggleArtist(group.key)}
+                    className="group flex w-full items-center justify-between gap-6 border-b border-gold/25 py-6 text-left transition-colors hover:border-gold/50 focus:outline-none focus-visible:ring-1 focus-visible:ring-gold"
+                  >
+                    <span className="min-w-0">
+                      <span className="block break-words text-[13px] uppercase tracking-[0.3em] text-gold-soft transition-colors group-hover:text-gold md:text-[14px]">
+                        {group.name}
                       </span>
-                      <ChevronDown
-                        aria-hidden="true"
-                        className={`h-4 w-4 flex-none text-ivory/50 transition-transform duration-300 ${open ? "rotate-180" : ""}`}
-                      />
-                    </button>
-                  </h2>
+                      <span className="mt-2 block text-[11px] uppercase tracking-[0.24em] text-ivory/40">
+                        {group.videos.length} {group.videos.length === 1 ? "video" : "videos"}
+                      </span>
+                    </span>
+                    <ChevronDown
+                      aria-hidden="true"
+                      className={`h-4 w-4 flex-none text-ivory/50 transition-transform duration-300 ${open ? "rotate-180" : ""}`}
+                    />
+                  </button>
+
 
                   <div id={panelId} hidden={!open} className="overflow-hidden animate-in fade-in-0 duration-300">
                     <div className="grid grid-cols-1 gap-8 pt-8 sm:grid-cols-2 lg:grid-cols-3">
@@ -547,32 +543,26 @@ const Videos = () => {
           </div>
         ) : (
           <>
-            <div className="space-y-20">
-              {typeSections.map((section) => (
-                <section key={section.type} aria-labelledby={`videos-${videoTypeSlug(section.type)}`}>
-                  <h2
-                    id={`videos-${videoTypeSlug(section.type)}`}
-                    className="mb-8 border-b border-gold/25 pb-4 font-serif text-2xl text-ivory md:text-3xl"
-                  >
-                    {section.label}
-                    <span className="ml-4 align-middle text-[11px] uppercase tracking-[0.24em] text-ivory/40">
-                      {section.videos.length} {section.videos.length === 1 ? "video" : "videos"}
-                    </span>
-                  </h2>
-                  <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-3">
-                    {section.videos.map((video) => (
-                      <VideoCard
-                        key={video.id}
-                        video={video}
-                        onSelect={() =>
-                          setPlayerIndex(sectionedList.findIndex((v) => v.id === video.id))
-                        }
-                      />
-                    ))}
-                  </div>
-                </section>
-              ))}
-            </div>
+            <section aria-labelledby="videos-all">
+              <div className="mb-8 flex flex-wrap items-baseline justify-between gap-4 border-b border-gold/25 pb-4">
+                <h2 id="videos-all" className="font-serif text-2xl text-ivory md:text-3xl">
+                  Official Videos, Lyric Videos and Official Audio
+                </h2>
+                <span className="text-[11px] uppercase tracking-[0.24em] text-ivory/40">
+                  {visible.length} {visible.length === 1 ? "video" : "videos"}
+                </span>
+              </div>
+              <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-3">
+                {displayed.map((video) => (
+                  <VideoCard
+                    key={video.id}
+                    video={video}
+                    onSelect={() => setPlayerIndex(displayed.findIndex((v) => v.id === video.id))}
+                  />
+                ))}
+              </div>
+            </section>
+
             {visible.length > displayed.length && (
               <div className="mt-12 flex justify-center">
                 <button

@@ -6,18 +6,30 @@ import { notionText } from "./_notionText.js";
 export default async function handler(_req: unknown, res: ApiResponse) {
   const route = "/api/notion/store";
   try {
-    requireEnv(route, ["NOTION_TOKEN", "NOTION_ARTISTS_DB_ID", "NOTION_RELEASES_DB_ID", "NOTION_TRACKS_DB_ID", "NOTION_STORE_DB_ID"]);
-    const [artistPages, releasePages, trackPages, storePages] = await Promise.all([
+    requireEnv(route, ["NOTION_TOKEN", "NOTION_ARTISTS_DB_ID", "NOTION_RELEASES_DB_ID", "NOTION_TRACKS_DB_ID", "NOTION_STORE_DB_ID", "NOTION_RELEASE_TRACKS_DB_ID"]);
+    const [artistPages, releasePages, trackPages, storePages, releaseTrackPages] = await Promise.all([
       loadAll(notion, DBS.artists),
       loadAll(notion, DBS.releases),
       loadAll(notion, DBS.tracks),
       loadAll(notion, DBS.storeItems),
+      loadAll(notion, DBS.releaseTracks),
     ]);
+
+    // Real track count per release, from the Release Tracks pivot. The store
+    // Product schema derives MusicAlbum vs MusicRecording from this, never from
+    // the release-type label.
+    const trackCountByRelease = new Map<string, number>();
+    for (const rt of releaseTrackPages) {
+      const releaseId = (rt as any)?.properties?.["Release"]?.relation?.[0]?.id;
+      if (!releaseId) continue;
+      trackCountByRelease.set(releaseId, (trackCountByRelease.get(releaseId) ?? 0) + 1);
+    }
 
     const artistLookup = new Map(artistPages.map((p) => [p.id, normalizeArtist(p)]));
     const releaseLookup = new Map(
       releasePages.map((p) => [p.id, normalizeRelease(p, artistLookup)]),
     );
+
     const trackLookup = new Map<string, { id: string; title: string }>();
     for (const t of trackPages) {
       const props = t.properties ?? {};
@@ -51,8 +63,14 @@ export default async function handler(_req: unknown, res: ApiResponse) {
       if (!rest.release) return rest;
       const linked = releaseLookup.get(rest.release.id);
       const eligible = linked ? isReleasePublished(linked) : false;
-      return eligible ? rest : { ...rest, release: { ...rest.release, slug: "" } };
+      const release = {
+        ...rest.release,
+        slug: eligible ? rest.release.slug : "",
+        trackCount: trackCountByRelease.get(rest.release.id) ?? 0,
+      };
+      return { ...rest, release };
     });
+
 
     logApiSuccess(route, {
       storePageCount: storePages.length,

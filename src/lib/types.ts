@@ -203,6 +203,9 @@ export type StoreItem = {
     title: string;
     upc?: string | null;
     catalogueId?: string | null;
+    /** Track count of the linked release; drives the Product isRelatedTo type. */
+    trackCount?: number | null;
+
   } | null;
   relatedTracks: { id: string; title: string }[];
   formats: StoreFormat[];
