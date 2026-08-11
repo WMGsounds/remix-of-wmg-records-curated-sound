@@ -347,7 +347,10 @@ const ReleasePage = () => {
                 {artist.name}
               </Link>
             )}
-            <p className="text-sm text-ivory/60 mt-6">{dateLabel}</p>
+            <p className="text-sm text-ivory/60 mt-6">
+              {releaseDate && !Number.isNaN(releaseDate.getTime()) ? `Released: ${dateLabel}` : dateLabel}
+            </p>
+
             {(release.fullDescription || release.shortDescription) && (
               <p className="mt-8 text-sm md:text-base leading-relaxed text-ivory/75 max-w-2xl">
                 {release.fullDescription || release.shortDescription}
