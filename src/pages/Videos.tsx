@@ -276,6 +276,18 @@ const Videos = () => {
     [artistGroups, openArtists, expandedArtists],
   );
 
+  /* Heading for the flat grid, derived from the video types actually present
+     in the data (never a hardcoded list). Selecting a type in the filter bar
+     narrows the heading so it describes exactly what is shown. */
+  const pluralType = (t: string) => (/(video)$/i.test(t) ? `${t}s` : t);
+  const gridHeading = useMemo(() => {
+    if (type !== ALL) return pluralType(type);
+    const labels = typeOptions.map(pluralType);
+    if (labels.length === 0) return "Videos";
+    if (labels.length === 1) return labels[0];
+    return `${labels.slice(0, -1).join(", ")} and ${labels[labels.length - 1]}`;
+  }, [type, typeOptions]);
+
   /* The default view is a single flat grid (users segment by Video Type with
      the filter bar). One descriptive H2 introduces it; each card title is an H3
      beneath, so the outline stays H1 > H2 > H3 with no skipped levels. */
@@ -335,7 +347,7 @@ const Videos = () => {
       visible.length
         ? itemList({
             path: "/videos",
-            name: "WMG Videos",
+            name: type !== ALL ? `WMG ${pluralType(type)}` : "WMG Videos",
             order: "Unordered",
             items: visible.map((v) => ({ name: v.title, path: watchUrl(v.youtubeId) })),
           })
@@ -546,7 +558,7 @@ const Videos = () => {
             <section aria-labelledby="videos-all">
               <div className="mb-8 flex flex-wrap items-baseline justify-between gap-4 border-b border-gold/25 pb-4">
                 <h2 id="videos-all" className="font-serif text-2xl text-ivory md:text-3xl">
-                  Official Videos, Lyric Videos and Official Audio
+                  {gridHeading}
                 </h2>
                 <span className="text-[11px] uppercase tracking-[0.24em] text-ivory/40">
                   {visible.length} {visible.length === 1 ? "video" : "videos"}
