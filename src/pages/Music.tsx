@@ -324,7 +324,7 @@ const Music = () => {
 
   return (
     <div className="bg-ink text-ivory pb-32">
-      <Seo {...staticSeo("music")} />
+      <Seo {...staticSeo("music")} jsonLd={musicJsonLd} />
 
       <section className="relative overflow-hidden bg-ink pt-40 pb-24 md:pb-28">
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_74%_38%,hsl(var(--golden-brown)/0.38),transparent_34%),radial-gradient(circle_at_18%_78%,hsl(var(--gold)/0.16),transparent_28%)]" aria-hidden="true" />
