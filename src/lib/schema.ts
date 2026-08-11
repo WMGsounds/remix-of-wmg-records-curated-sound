@@ -452,6 +452,53 @@ export const musicRecording = (input: ReleaseSchemaInput): Node => {
 export const release = (input: ReleaseSchemaInput): Node =>
   (input.tracks || []).length > 1 ? musicAlbum(input) : musicRecording(input);
 
+/* ------------------------------------------------------------------ *
+ * Catalogue recording (/music) — one MusicRecording per catalogue track.
+ * The track's own URL is the release it appears on (there are no per-track
+ * pages); taken from the appearances actually present in the data.
+ * ------------------------------------------------------------------ */
+
+export type CatalogueRecordingInput = {
+  title: string;
+  duration?: string | null;
+  isrc?: string | null;
+  lyrics?: string | null;
+  artists?: { name: string; slug?: string | null }[];
+  appearsOn?: { slug?: string | null; title?: string | null }[];
+};
+
+/** Release URL a catalogue track points at — first appearance with a slug. */
+export const catalogueTrackUrl = (t: CatalogueRecordingInput): string | undefined => {
+  const slug = (t.appearsOn || []).find((a) => (a?.slug ?? "").trim())?.slug;
+  return slug ? absoluteUrl(`/releases/${slug}`) : undefined;
+};
+
+export const catalogueRecording = (t: CatalogueRecordingInput): Node => {
+  const artist = (t.artists || []).find((a) => (a?.name ?? "").trim());
+  const duration = isoDuration(t.duration);
+  const lyrics = lyricsNode({ trackTitle: t.title, lyrics: t.lyrics });
+  const trackUrl = catalogueTrackUrl(t);
+  return {
+    ...ctx,
+    "@type": "MusicRecording",
+    name: t.title,
+    ...(artist
+      ? {
+          byArtist: {
+            "@type": "MusicGroup",
+            name: artist.name,
+            ...(artist.slug ? { url: absoluteUrl(`/artists/${artist.slug}`) } : {}),
+          },
+        }
+      : {}),
+    ...(duration ? { duration } : {}),
+    ...(t.isrc && t.isrc.trim() ? { isrcCode: t.isrc.trim() } : {}),
+    ...(trackUrl ? { url: trackUrl } : {}),
+    ...(lyrics ? { lyrics } : {}),
+    inLanguage: SITE_LANGUAGE,
+  };
+};
+
 export type MusicGroupInput = {
   artist: ArtistLike;
   discography?: { title: string; slug: string; coverArt?: string | null; releaseDate?: string | null }[];
