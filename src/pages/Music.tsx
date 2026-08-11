@@ -5,6 +5,7 @@ import { SiSpotify, SiApplemusic } from "react-icons/si";
 import type { ComponentType, SVGProps } from "react";
 import { Seo } from "@/components/Seo";
 import { staticSeo } from "@/lib/seoConfig";
+import { catalogueRecording, catalogueTrackUrl, itemList } from "@/lib/schema";
 
 import { useCatalogue } from "@/lib/queries";
 import { InlineSkeleton, PageError } from "@/components/UIStates";
