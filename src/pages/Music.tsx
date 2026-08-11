@@ -320,6 +320,34 @@ const Music = () => {
   const artistCount = groups.filter((g) => g.key !== "all").length;
   const isFiltered = searchQuery.trim().length > 0;
 
+  /* Structured data describes the full catalogue, not the current filter view:
+     the whole list is in the DOM and the filters are client-side only. */
+  const musicJsonLd = useMemo(() => {
+    if (!tracks.length) return undefined;
+    const recordings = tracks.map((t) =>
+      catalogueRecording({
+        title: t.title,
+        duration: t.duration,
+        isrc: t.isrc,
+        lyrics: t.lyrics,
+        artists: t.artists,
+        appearsOn: t.appearsOn,
+      }),
+    );
+    const list = itemList({
+      path: "/music",
+      name: "WMG Music Catalogue",
+      order: "Unordered",
+      items: tracks.map((t) => ({
+        name: t.title,
+        path:
+          catalogueTrackUrl({ title: t.title, appearsOn: t.appearsOn }) ?? "/music",
+      })),
+    });
+    return [list, ...recordings];
+  }, [tracks]);
+
+
   if (isError) return <PageError message="Couldn't load the catalogue." />;
 
   return (
