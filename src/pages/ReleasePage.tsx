@@ -315,9 +315,11 @@ const ReleasePage = () => {
                     {release.pLine && <p>{"\u2117\uFE0E"} {release.pLine}</p>}
                     {release.cLine && <p>{"\u00A9\uFE0E"} {release.cLine}</p>}
                     {release.upc && <p>UPC: {release.upc}</p>}
+                    <p>Release Date: {dateLabel}</p>
                     <p className="pt-1 text-ivory/55">All rights reserved.</p>
                   </div>
                 )}
+
               </div>
             )}
           </div>
