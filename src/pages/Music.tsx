@@ -5,6 +5,7 @@ import { SiSpotify, SiApplemusic } from "react-icons/si";
 import type { ComponentType, SVGProps } from "react";
 import { Seo } from "@/components/Seo";
 import { staticSeo } from "@/lib/seoConfig";
+import { catalogueRecording, catalogueTrackUrl, itemList } from "@/lib/schema";
 
 import { useCatalogue } from "@/lib/queries";
 import { InlineSkeleton, PageError } from "@/components/UIStates";
@@ -320,11 +321,39 @@ const Music = () => {
   const artistCount = groups.filter((g) => g.key !== "all").length;
   const isFiltered = searchQuery.trim().length > 0;
 
+  /* Structured data describes the full catalogue, not the current filter view:
+     the whole list is in the DOM and the filters are client-side only. */
+  const musicJsonLd = useMemo(() => {
+    if (!tracks.length) return undefined;
+    const recordings = tracks.map((t) =>
+      catalogueRecording({
+        title: t.title,
+        duration: t.duration,
+        isrc: t.isrc,
+        lyrics: t.lyrics,
+        artists: t.artists,
+        appearsOn: t.appearsOn,
+      }),
+    );
+    const list = itemList({
+      path: "/music",
+      name: "WMG Music Catalogue",
+      order: "Unordered",
+      items: tracks.map((t) => ({
+        name: t.title,
+        path:
+          catalogueTrackUrl({ title: t.title, appearsOn: t.appearsOn }) ?? "/music",
+      })),
+    });
+    return [list, ...recordings];
+  }, [tracks]);
+
+
   if (isError) return <PageError message="Couldn't load the catalogue." />;
 
   return (
     <div className="bg-ink text-ivory pb-32">
-      <Seo {...staticSeo("music")} />
+      <Seo {...staticSeo("music")} jsonLd={musicJsonLd} />
 
       <section className="relative overflow-hidden bg-ink pt-40 pb-24 md:pb-28">
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_74%_38%,hsl(var(--golden-brown)/0.38),transparent_34%),radial-gradient(circle_at_18%_78%,hsl(var(--gold)/0.16),transparent_28%)]" aria-hidden="true" />

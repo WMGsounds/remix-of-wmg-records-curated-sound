@@ -299,7 +299,7 @@ const ReleasePage = () => {
                 <div className="h-full w-full bg-ivory/10 flex items-center justify-center text-ivory/60">Artwork coming soon.</div>
               )}
             </div>
-            {(release.pLine || release.cLine || release.upc) && (
+            {(release.pLine || release.cLine || release.upc || release.releaseDate) && (
               <div className="w-full max-w-[620px] mx-auto lg:mx-0 mt-4">
                 <button
                   type="button"
@@ -315,9 +315,13 @@ const ReleasePage = () => {
                     {release.pLine && <p>{"\u2117\uFE0E"} {release.pLine}</p>}
                     {release.cLine && <p>{"\u00A9\uFE0E"} {release.cLine}</p>}
                     {release.upc && <p>UPC: {release.upc}</p>}
+                    {releaseDate && !Number.isNaN(releaseDate.getTime()) && (
+                      <p>Release Date: {dateLabel}</p>
+                    )}
                     <p className="pt-1 text-ivory/55">All rights reserved.</p>
                   </div>
                 )}
+
               </div>
             )}
           </div>
@@ -345,7 +349,10 @@ const ReleasePage = () => {
                 {artist.name}
               </Link>
             )}
-            <p className="text-sm text-ivory/60 mt-6">{dateLabel}</p>
+            <p className="text-sm text-ivory/60 mt-6">
+              {releaseDate && !Number.isNaN(releaseDate.getTime()) ? `Released: ${dateLabel}` : dateLabel}
+            </p>
+
             {(release.fullDescription || release.shortDescription) && (
               <p className="mt-8 text-sm md:text-base leading-relaxed text-ivory/75 max-w-2xl">
                 {release.fullDescription || release.shortDescription}

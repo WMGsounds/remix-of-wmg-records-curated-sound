@@ -179,10 +179,23 @@ async function handleCatalogue(res: ApiResponse) {
     );
     const releaseTrackLookup = new Map(releaseTrackPages.map((p: any) => [p.id, p]));
 
-    const tracks = trackPages
-      .map((p: any) =>
-        normalizeCatalogueTrack(p, { artistLookup, releaseTrackLookup, releaseLookup, youtubeByTrackId }),
-      )
+    const normalizedTracks = trackPages.map((p: any) =>
+      normalizeCatalogueTrack(p, { artistLookup, releaseTrackLookup, releaseLookup, youtubeByTrackId }),
+    );
+
+    // ISRC is required for the catalogue (it is the recording's identifier in
+    // MusicRecording schema). Name every track dropped for a missing ISRC so
+    // the gap is visible in the logs instead of silently shrinking /music.
+    const missingIsrc = normalizedTracks
+      .filter((t) => Boolean(t.title) && !(t as any).isrc?.trim())
+      .map((t) => t.title);
+    if (missingIsrc.length) {
+      console.warn(
+        `[notion-api] ${route} — ${missingIsrc.length} track(s) excluded from the catalogue for a missing ISRC: ${missingIsrc.join("; ")}`,
+      );
+    }
+
+    const tracks = normalizedTracks
       .filter((t) => Boolean(t.title) && Boolean((t as any).isrc?.trim()))
 
       .sort(
@@ -195,6 +208,7 @@ async function handleCatalogue(res: ApiResponse) {
     logApiSuccess(route, {
       trackPageCount: trackPages.length,
       catalogueCount: tracks.length,
+      tracksMissingIsrc: missingIsrc.length,
       tracksWithYouTube: youtubeByTrackId.size,
     });
     res.writeHead(200, RELEASE_CACHE_HEADERS).end(JSON.stringify(tracks));
