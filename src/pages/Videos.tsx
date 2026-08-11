@@ -352,7 +352,7 @@ const Videos = () => {
             items: visible.map((v) => ({ name: v.title, path: watchUrl(v.youtubeId) })),
           })
         : null,
-    [visible],
+    [visible, type],
   );
 
 
