@@ -264,6 +264,10 @@ export function normalizeReleaseTrack(page: any, trackPageLookup: Map<string, an
     duration: relatedDuration,
     // Carry through useful per-track metadata so the Release page UI keeps working.
     lyrics: text(trackProps["Lyrics"]) || null,
+    // ISRC lives only on the Tracks DB. It must ride along with every reshape
+    // of a release track, or release-page MusicRecording loses isrcCode while
+    // /music (which reads the Tracks DB directly) keeps it.
+    isrc: text(findProp(trackProps, "ISRC", "Isrc")) || null,
     // Per-release Spotify URL only — never fall back to the Tracks DB URL,
     // so a track on multiple releases links to the correct version each time.
     spotifyUrl: url(props["Spotify URL (Release-Specific)"]) || null,
