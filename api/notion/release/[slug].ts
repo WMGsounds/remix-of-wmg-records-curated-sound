@@ -60,6 +60,9 @@ export default async function handler(req: ApiRequest, res: ApiResponse) {
         lyrics: rt.lyrics,
         isrc: rt.isrc,
         spotifyUrl: rt.spotifyUrl,
+        youtubeOfficialAudio: rt.youtubeOfficialAudio,
+        youtubeLyricVideo: rt.youtubeLyricVideo,
+        youtubeMusicVideo: rt.youtubeMusicVideo,
         side: rt.side,
         versionLabel: rt.versionLabel,
       }));
