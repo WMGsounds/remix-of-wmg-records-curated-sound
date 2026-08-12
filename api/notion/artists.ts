@@ -95,6 +95,7 @@ async function handleTracks(res: ApiResponse) {
           trackNumber: rt.trackNumber,
           duration: rt.duration,
           lyrics: rt.lyrics,
+          isrc: rt.isrc,
           spotifyUrl: rt.spotifyUrl,
           youtubeOfficialAudio: rt.youtubeOfficialAudio,
           youtubeLyricVideo: rt.youtubeLyricVideo,

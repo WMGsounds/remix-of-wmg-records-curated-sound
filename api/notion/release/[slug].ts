@@ -58,6 +58,7 @@ export default async function handler(req: ApiRequest, res: ApiResponse) {
         trackNumber: rt.trackNumber,
         duration: rt.duration,
         lyrics: rt.lyrics,
+        isrc: rt.isrc,
         spotifyUrl: rt.spotifyUrl,
         side: rt.side,
         versionLabel: rt.versionLabel,
