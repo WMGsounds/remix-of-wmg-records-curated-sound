@@ -113,3 +113,12 @@ describe("selectTrackYouTubeUrls", () => {
     expect(map.size).toBe(2);
   });
 });
+
+describe("one-day publication delay", () => {
+  it("hides a video released today and shows one released yesterday", () => {
+    expect(pick([video({ id: "today", type: "Official Music Video", date: iso(0) })])).toBeUndefined();
+    expect(pick([video({ id: "yday", type: "Official Music Video", date: iso(-1) })])).toBe(
+      "https://www.youtube.com/watch?v=abcdefghijk",
+    );
+  });
+});
