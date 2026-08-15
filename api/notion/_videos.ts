@@ -153,7 +153,7 @@ export function normalizeVideo(
 
   const releaseDate = findProp(props, "Release Date")?.date?.start ?? "";
   if (!releaseDate) return null;
-  const instant = resolvePublishInstant(releaseDate);
+  const instant = resolveVideoVisibleInstant(releaseDate);
   if (instant === null || instant > now) return null;
 
   const artistIds = relationIds(findProp(props, "Artists", "Artist"));
@@ -242,7 +242,7 @@ export function selectTrackYouTubeUrls(videoPages: any[], now: number): Map<stri
       if (rank === undefined) continue;
 
       const releaseDate = findProp(props, "Release Date")?.date?.start ?? "";
-      const instant = resolvePublishInstant(releaseDate);
+      const instant = resolveVideoVisibleInstant(releaseDate);
       if (instant === null || instant > now) continue;
 
       const sortOrderProp = findProp(props, "Sort Order");
