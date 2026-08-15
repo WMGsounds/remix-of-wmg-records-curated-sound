@@ -111,6 +111,27 @@ export function readDuration(prop: any): string {
   return h ? `${h}:${pad(m)}:${pad(s)}` : `${m}:${pad(s)}`;
 }
 
+/**
+ * Videos go live the day AFTER their Release Date (one-day delay).
+ * Date-only values become 00:00 Europe/London on the following calendar day;
+ * values carrying a time are shifted by 24 hours. Null when unparseable.
+ */
+export function resolveVideoVisibleInstant(releaseDate: string | null | undefined): number | null {
+  if (!releaseDate) return null;
+  const raw = String(releaseDate).trim();
+  if (!raw) return null;
+
+  if (/^\d{4}-\d{2}-\d{2}$/.test(raw)) {
+    const next = new Date(`${raw}T00:00:00Z`);
+    if (Number.isNaN(next.getTime())) return null;
+    next.setUTCDate(next.getUTCDate() + 1);
+    return resolvePublishInstant(next.toISOString().slice(0, 10));
+  }
+
+  const instant = resolvePublishInstant(raw);
+  return instant === null ? null : instant + 86_400_000;
+}
+
 
 /**
  * Normalise one Videos row. Returns null when the record must stay unpublished
