@@ -145,7 +145,7 @@ const problemsHeader = "[prerender]";
   }
 }
 
-const { routes, sitemap } = await server.collectSite();
+const { routes, sitemap, videos } = await server.collectSite();
 console.log(`[prerender] ${routes.length} routes`);
 
 /* ---------------- lastmod for static routes, from git ------------------- *
@@ -203,6 +203,8 @@ const outFileFor = (route) =>
 let ok = 0;
 let failed = 0;
 const written = new Set();
+/** route -> internal hrefs found in the rendered HTML (internal-linking audit). */
+const linksByRoute = new Map();
 const warnings = [];
 
 /* Which routes may raise a title-length WARNING (never an error).
@@ -278,6 +280,10 @@ for (const route of routes) {
     const outFile = outFileFor(route);
     await fs.mkdir(path.dirname(outFile), { recursive: true });
     await fs.writeFile(outFile, page, "utf8");
+    linksByRoute.set(
+      route,
+      new Set([...html.matchAll(/href="(\/[^"#?]*)"/g)].map((m) => m[1].replace(/\/$/, "") || "/")),
+    );
     written.add(route);
     ok += 1;
   } catch (error) {
@@ -307,6 +313,32 @@ for (const entry of sitemap) {
 }
 await fs.writeFile(path.join(distDir, "sitemap.xml"), server.renderSitemap(sitemapEntries), "utf8");
 console.log(`[prerender] wrote sitemap.xml (${sitemapEntries.length} urls)`);
+
+/* -------- Video sitemap, from the same in-process CMS read -------------- */
+if (videos?.length) {
+  await fs.writeFile(
+    path.join(distDir, "video-sitemap.xml"),
+    server.renderVideoSitemap(videos),
+    "utf8",
+  );
+  console.log(`[prerender] wrote video-sitemap.xml (${videos.length} videos)`);
+} else {
+  warnings.push("no published videos found — video-sitemap.xml was not written");
+}
+
+/* -------- Internal linking: every release page must be reachable -------- *
+ * A release nobody links to is orphaned for crawlers. Advisory (a release can
+ * legitimately be published before its artist page copy catches up), but loud. */
+{
+  const linkSources = [...linksByRoute.entries()].filter(
+    ([r]) => r.startsWith("/artists/") || r.startsWith("/journal/") || r === "/releases",
+  );
+  for (const route of routes) {
+    if (!route.startsWith("/releases/")) continue;
+    if (!linkSources.some(([, links]) => links.has(route)))
+      warnings.push(`release "${route}" is not linked from any artist, journal or releases page`);
+  }
+}
 
 // Static 404 document. Vercel serves dist/404.html with a real HTTP 404 status
 // for any path that does not match a file, rewrite or redirect.
