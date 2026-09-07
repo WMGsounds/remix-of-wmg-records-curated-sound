@@ -1,16 +1,6 @@
 User-agent: *
 Allow: /
-
-User-agent: Googlebot
-Allow: /
-
-User-agent: Bingbot
-Allow: /
-
-User-agent: Twitterbot
-Allow: /
-
-User-agent: facebookexternalhit
-Allow: /
+Disallow: /api/
 
 Sitemap: https://www.wmgsounds.com/sitemap.xml
+Sitemap: https://www.wmgsounds.com/video-sitemap.xml
