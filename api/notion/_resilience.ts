@@ -19,11 +19,33 @@ import { createHash } from "node:crypto";
 import fs from "node:fs";
 import path from "node:path";
 
-/** Notion's documented limit is ~3 requests/second per integration. */
-const MAX_RPS = 3;
-const MAX_ATTEMPTS = 5;
+/** Notion documents ~3 rps; 5 is the ceiling we allow ourselves in bursts. */
+const MAX_RPS = 5;
+const MAX_ATTEMPTS = 3;
 const BASE_DELAY_MS = 1000;
+const MAX_DELAY_MS = 4000;
+/** Hard ceiling on total time spent talking to Notion in one process. */
+const TIME_BUDGET_MS = 15 * 60 * 1000;
 const RETRY_STATUS = new Set([429, 500, 502, 503, 504]);
+
+const startedAt = Date.now();
+const elapsedMs = () => Date.now() - startedAt;
+const elapsed = () => `${(elapsedMs() / 1000).toFixed(1)}s elapsed`;
+let budgetExhaustedLogged = false;
+
+/** True once the whole-process Notion time budget is spent: stop retrying. */
+export function notionBudgetExhausted(): boolean {
+  const spent = elapsedMs() >= TIME_BUDGET_MS;
+  if (spent && !budgetExhaustedLogged) {
+    budgetExhaustedLogged = true;
+    console.error(
+      `[notion] time budget of ${TIME_BUDGET_MS / 60000} minutes exhausted (${elapsed()}); ` +
+        "no further retries — remaining pages use cache or are skipped.",
+    );
+  }
+  return spent;
+}
+
 
 export type NotionContext = { pageId?: string; slug?: string; label?: string };
 
