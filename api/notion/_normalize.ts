@@ -62,6 +62,8 @@ export function normalizeArtist(page: any) {
     id: page.id,
     slug: artistSlug,
     name: artistName,
+    // Real content timestamp — drives <lastmod> in sitemap.xml (never a build date).
+    lastEditedTime: version,
     genre: multiSelect(props["Genre"]) || select(props["Genre"]) || text(props["Genre"]),
     shortDescription: text(props["Short Description"]),
     fullBio: paragraphs(props["Full Bio"]),
@@ -174,6 +176,8 @@ export function normalizeRelease(page: any, artistLookup: Map<string, any>) {
     id: page.id,
     slug: text(props["Slug"]),
     title: text(titleProp(props)),
+    // Real content timestamp — drives <lastmod> in sitemap.xml (never a build date).
+    lastEditedTime: String(page.last_edited_time ?? ""),
     artistId: artistRel,
     artistSlug: artist?.slug ?? "",
     artistName: artist?.name ?? "",

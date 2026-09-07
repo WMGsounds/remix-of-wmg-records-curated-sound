@@ -8,6 +8,7 @@ import { preloadAllPages, pageNames } from "./routes";
 import { resolveRoutes, resolveSitemapRoutes, routeRegistry, type RouteContent } from "@/lib/routeRegistry";
 import { seoKeys } from "@/lib/seoConfig";
 import { SITE_URL } from "@/lib/seo";
+import { thumbnailUrl, artistNames } from "@/lib/videos";
 import {
   fetchArtists,
   fetchReleases,
@@ -39,7 +40,33 @@ export const registry = { routeRegistry, seoKeys, pageNames };
 
 export type SitemapImage = { loc: string; title?: string; caption?: string };
 export type SitemapEntry = { path: string; lastmod?: string; images: SitemapImage[] };
-export type SiteRoutes = { routes: string[]; sitemap: SitemapEntry[] };
+export type SiteRoutes = { routes: string[]; sitemap: SitemapEntry[]; videos: VideoSitemapEntry[] };
+
+/** One <video:video> record inside /video-sitemap.xml. */
+export type VideoSitemapEntry = {
+  /** Page that embeds the video (videos have no page of their own). */
+  path: string;
+  title: string;
+  description: string;
+  thumbnailLoc: string;
+  playerLoc: string;
+  publicationDate?: string;
+  /** Seconds; omitted when Notion has no duration for the video. */
+  duration?: number;
+};
+
+const durationSeconds = (clock?: string): number | undefined => {
+  if (!clock) return undefined;
+  const parts = clock.split(":").map((n) => Number.parseInt(n, 10));
+  if (parts.some((n) => !Number.isFinite(n))) return undefined;
+  const secs =
+    parts.length === 3
+      ? parts[0] * 3600 + parts[1] * 60 + parts[2]
+      : parts.length === 2
+        ? parts[0] * 60 + parts[1]
+        : parts[0];
+  return secs > 0 ? secs : undefined;
+};
 
 const mediaImages = (
   items: { url?: string; title?: string; caption?: string }[],
@@ -51,12 +78,13 @@ const mediaImages = (
     .map(({ loc, title, caption }) => ({ loc, title: title || undefined, caption: caption || undefined }));
 
 export async function collectSite(): Promise<SiteRoutes> {
-  const [artists, releases, journal, gallery, store] = await Promise.all([
+  const [artists, releases, journal, gallery, store, videos] = await Promise.all([
     fetchArtists().catch(() => []),
     fetchReleases().catch(() => []),
     fetchJournal().catch(() => []),
     fetchGallery().catch(() => []),
     fetchStoreItems().catch(() => []),
+    fetchVideos().catch(() => []),
   ]);
 
   const content = {
@@ -116,7 +144,28 @@ export async function collectSite(): Promise<SiteRoutes> {
     );
   }
 
+  /* Video sitemap: every published video, all of which are embedded on
+     /videos. Description falls back to a factual line built from the video's
+     own fields — never invented copy — because a video sitemap entry without
+     a description is rejected. */
+  const videoEntries: VideoSitemapEntry[] = (videos as any[])
+    .filter((v) => v?.youtubeId && v.title)
+    .map((v) => ({
+      path: "/videos",
+      title: v.title,
+      description:
+        (v.description || "").trim() ||
+        [v.title, artistNames(v) ? `by ${artistNames(v)}` : "", `— ${v.videoType || "video"} from Wareham Music Group.`]
+          .filter(Boolean)
+          .join(" "),
+      thumbnailLoc: thumbnailUrl(v.youtubeId),
+      playerLoc: `https://www.youtube.com/embed/${v.youtubeId}`,
+      publicationDate: v.releaseDate || undefined,
+      duration: durationSeconds(v.duration),
+    }));
+
   return {
+    videos: videoEntries,
     routes: resolveRoutes(content).map((r) => r.path),
     sitemap: resolveSitemapRoutes(content).map((r) => ({
       path: r.path,
@@ -141,6 +190,40 @@ const escapeXml = (s: string) =>
   s.replace(/[<>&'"]/g, (c) =>
     ({ "<": "&lt;", ">": "&gt;", "&": "&amp;", "'": "&apos;", '"': "&quot;" })[c] as string,
   );
+
+/** video-sitemap.xml — one <video:video> per published video. */
+export function renderVideoSitemap(entries: VideoSitemapEntry[], base = SITE_URL): string {
+  const byPath = new Map<string, VideoSitemapEntry[]>();
+  for (const e of entries) byPath.set(e.path, [...(byPath.get(e.path) || []), e]);
+
+  const urls = [...byPath.entries()].map(([path, vids]) => {
+    const body = vids
+      .map((v) =>
+        [
+          `    <video:video>`,
+          `      <video:thumbnail_loc>${escapeXml(v.thumbnailLoc)}</video:thumbnail_loc>`,
+          `      <video:title>${escapeXml(v.title)}</video:title>`,
+          `      <video:description>${escapeXml(v.description)}</video:description>`,
+          `      <video:player_loc>${escapeXml(v.playerLoc)}</video:player_loc>`,
+          v.duration ? `      <video:duration>${v.duration}</video:duration>` : null,
+          v.publicationDate
+            ? `      <video:publication_date>${escapeXml(v.publicationDate)}</video:publication_date>`
+            : null,
+          `      <video:family_friendly>yes</video:family_friendly>`,
+          `    </video:video>`,
+        ]
+          .filter(Boolean)
+          .join("\n"),
+      )
+      .join("\n");
+    return `  <url>\n    <loc>${escapeXml(base + path)}</loc>\n${body}\n  </url>`;
+  });
+
+  return `<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:video="http://www.google.com/schemas/sitemap-video/1.1">
+${urls.join("\n")}
+</urlset>`;
+}
 
 /** sitemap.xml, built from the exact list of routes that were pre-rendered. */
 export function renderSitemap(entries: SitemapEntry[], base = SITE_URL): string {

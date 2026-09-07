@@ -43,8 +43,8 @@ export type ResolvedRoute = {
 
 /** Minimal shape of the CMS content needed to expand dynamic routes. */
 export type RouteContent = {
-  artists: { slug: string }[];
-  releases: { slug: string; releaseDate?: string }[];
+  artists: { slug: string; lastEditedTime?: string }[];
+  releases: { slug: string; artistSlug?: string; releaseDate?: string; lastEditedTime?: string }[];
   journal: { slug: string; category?: string; lastEditedTime?: string; publishedDate?: string }[];
 };
 
@@ -59,6 +59,13 @@ export type RouteEntry = {
   sitemap?: boolean;
   /** Expand a dynamic pattern into concrete URLs. */
   expand?: (content: RouteContent) => ResolvedRoute[];
+  /**
+   * Content-derived <lastmod> for a STATIC hub page whose contents change with
+   * the CMS, not with its source file. Never a build date. When it returns
+   * undefined, scripts/prerender.mjs falls back to the source file's last git
+   * commit date.
+   */
+  lastmodFrom?: (content: RouteContent) => string | undefined;
 };
 
 export const slugify = (s: string): string =>
@@ -92,16 +99,67 @@ export const journalCategoryLastmod = (
 };
 
 
+/** Newest of a set of ISO timestamps, ignoring blanks. */
+const newest = (dates: (string | undefined)[]): string | undefined => {
+  const valid = dates.filter((d): d is string => Boolean(d)).sort();
+  return valid.length ? valid[valid.length - 1] : undefined;
+};
+
+/** A release's own last-modified date: CMS edit time, else its release date. */
+const releaseLastmod = (r: { releaseDate?: string; lastEditedTime?: string }) =>
+  r.lastEditedTime || r.releaseDate;
+
+/**
+ * An artist page's last-modified date: the artist's own CMS edit time, else
+ * the newest release shown on the page (the discography is the page's other
+ * content). Never a build date.
+ */
+const artistLastmod = (
+  a: { slug: string; lastEditedTime?: string },
+  content: RouteContent,
+): string | undefined =>
+  a.lastEditedTime ||
+  newest(
+    content.releases
+      .filter((r) => (r as { artistSlug?: string }).artistSlug === a.slug)
+      .map(releaseLastmod),
+  );
+
 export const routeRegistry: RouteEntry[] = [
-  { path: "/", page: "Index", seo: "home" },
-  { path: "/artists", page: "Artists", seo: "artists" },
+  {
+    path: "/",
+    page: "Index",
+    seo: "home",
+    lastmodFrom: (c) =>
+      newest([
+        ...c.artists.map((a) => a.lastEditedTime),
+        ...c.releases.map(releaseLastmod),
+        ...c.journal.map((a) => a.lastEditedTime || a.publishedDate),
+      ]),
+  },
+  {
+    path: "/artists",
+    page: "Artists",
+    seo: "artists",
+    lastmodFrom: (c) => newest(c.artists.map((a) => a.lastEditedTime)),
+  },
   {
     path: "/artists/:slug",
     page: "ArtistPage",
     seo: "artist",
-    expand: (c) => c.artists.map((a) => ({ path: `/artists/${a.slug}`, seo: "artist" as SeoKey })),
+    expand: (c) =>
+      c.artists.map((a) => ({
+        path: `/artists/${a.slug}`,
+        seo: "artist" as SeoKey,
+        lastmod: artistLastmod(a, c),
+      })),
   },
-  { path: "/releases", page: "Releases", seo: "releases" },
+  {
+    path: "/releases",
+    page: "Releases",
+    seo: "releases",
+    lastmodFrom: (c) => newest(c.releases.map(releaseLastmod)),
+  },
   {
     path: "/releases/:slug",
     page: "ReleasePage",
@@ -110,13 +168,18 @@ export const routeRegistry: RouteEntry[] = [
       c.releases.map((r) => ({
         path: `/releases/${r.slug}`,
         seo: "release" as SeoKey,
-        lastmod: r.releaseDate,
+        lastmod: releaseLastmod(r),
       })),
   },
   { path: "/gallery", page: "Gallery", seo: "gallery" },
   { path: "/videos", page: "Videos", seo: "videos" },
   { path: "/music", page: "Music", seo: "music" },
-  { path: "/journal", page: "Journal", seo: "journal" },
+  {
+    path: "/journal",
+    page: "Journal",
+    seo: "journal",
+    lastmodFrom: (c) => newest(c.journal.map((a) => a.lastEditedTime || a.publishedDate)),
+  },
   {
     path: "/journal/category/:slug",
     page: "JournalCategory",
@@ -144,11 +207,14 @@ export const routeRegistry: RouteEntry[] = [
 
   { path: "/about", page: "About", seo: "about" },
   { path: "/contact", page: "Contact", seo: "contact" },
-  { path: "/newsletter", page: "Newsletter", seo: "newsletter" },
+  // Thin, non-editorial utility pages: still pre-rendered and reachable, but
+  // deliberately absent from sitemap.xml (nothing for Google to rank).
+  { path: "/newsletter", page: "Newsletter", seo: "newsletter", sitemap: false },
   {
     path: "/legal/:doc",
     page: "Legal",
     seo: "legal",
+    sitemap: false,
     expand: () =>
       Object.keys(LEGAL_DOCS).map((doc) => ({ path: `/legal/${doc}`, seo: "legal" as SeoKey })),
   },
@@ -167,7 +233,12 @@ export const resolveRoutes = (content: RouteContent): ResolvedRoute[] => {
   for (const entry of routeRegistry) {
     if (!isPrerendered(entry)) continue;
     if (entry.expand) out.push(...entry.expand(content));
-    else out.push({ path: entry.path, seo: entry.seo });
+    else
+      out.push({
+        path: entry.path,
+        seo: entry.seo,
+        lastmod: entry.lastmodFrom?.(content),
+      });
   }
   const seen = new Set<string>();
   return out.filter((r) => Boolean(r.path) && !seen.has(r.path) && seen.add(r.path));
