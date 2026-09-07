@@ -20,7 +20,7 @@ export default async function handler(req: ApiRequest, res: ApiResponse) {
     if (!article || !isJournalPublished(article)) return res.status(404).json(null);
 
 
-    const blocks = await fetchPageBlocks(notion, article.id, { slug: article.slug, title: article.title });
+    const blocks = await fetchPageBlocks(notion, article.id, { slug: article.slug, title: article.title, lastEditedTime: article.lastEditedTime });
 
     const artists = artistPages.map(normalizeArtist);
     const artistMap = new Map(artists.map((a) => [a.id, a]));

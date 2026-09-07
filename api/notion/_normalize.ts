@@ -2,6 +2,7 @@
 import { resolvePublishInstant } from "./_schedule.js";
 import { artistImageUrl, releaseArtworkUrl, storeImageUrl } from "./_mediaUrls.js";
 import { notionText, findNotionProp } from "./_notionText.js";
+import { notionRequest } from "./_resilience.js";
 
 // Property → string reading lives in ./_notionText.ts (handles formulas, which
 // are NOT rich text). Never re-implement it locally.
@@ -327,7 +328,10 @@ async function resolveDataSourceId(notion: any, dbId: string) {
       if (!notion.databases?.retrieve) return dbId;
 
       try {
-        const database = await notion.databases.retrieve({ database_id: databaseId });
+        const database = await notionRequest<any>(
+          () => notion.databases.retrieve({ database_id: databaseId }),
+          { pageId: databaseId, label: "databases.retrieve" },
+        );
         const dataSourceId = database?.data_sources?.[0]?.id;
         if (!dataSourceId) {
           throw new Error(`No data sources found for Notion database ${databaseId}`);
@@ -351,11 +355,11 @@ export async function loadAll(notion: any, dbId: string) {
   const databaseId = formatNotionUuid(dbId);
   const useDatabaseQuery = async () => {
     do {
-      const r = await notion.databases.query({
-        database_id: databaseId,
-        start_cursor: cursor,
-        page_size: 100,
-      });
+      const at = cursor;
+      const r = await notionRequest<any>(
+        () => notion.databases.query({ database_id: databaseId, start_cursor: at, page_size: 100 }),
+        { pageId: databaseId, label: "databases.query" },
+      );
       results.push(...r.results);
       cursor = r.has_more ? r.next_cursor : undefined;
     } while (cursor);
@@ -367,11 +371,11 @@ export async function loadAll(notion: any, dbId: string) {
   const dataSourceId = await resolveDataSourceId(notion, databaseId);
   do {
     try {
-      const r = await notion.dataSources.query({
-        data_source_id: dataSourceId,
-        start_cursor: cursor,
-        page_size: 100,
-      });
+      const at = cursor;
+      const r = await notionRequest<any>(
+        () => notion.dataSources.query({ data_source_id: dataSourceId, start_cursor: at, page_size: 100 }),
+        { pageId: dataSourceId, label: "dataSources.query" },
+      );
       results.push(...r.results);
       cursor = r.has_more ? r.next_cursor : undefined;
     } catch (error: unknown) {
