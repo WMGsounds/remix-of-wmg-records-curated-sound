@@ -44,7 +44,7 @@ export type ResolvedRoute = {
 /** Minimal shape of the CMS content needed to expand dynamic routes. */
 export type RouteContent = {
   artists: { slug: string; lastEditedTime?: string }[];
-  releases: { slug: string; releaseDate?: string; lastEditedTime?: string }[];
+  releases: { slug: string; artistSlug?: string; releaseDate?: string; lastEditedTime?: string }[];
   journal: { slug: string; category?: string; lastEditedTime?: string; publishedDate?: string }[];
 };
 
@@ -109,6 +109,22 @@ const newest = (dates: (string | undefined)[]): string | undefined => {
 const releaseLastmod = (r: { releaseDate?: string; lastEditedTime?: string }) =>
   r.lastEditedTime || r.releaseDate;
 
+/**
+ * An artist page's last-modified date: the artist's own CMS edit time, else
+ * the newest release shown on the page (the discography is the page's other
+ * content). Never a build date.
+ */
+const artistLastmod = (
+  a: { slug: string; lastEditedTime?: string },
+  content: RouteContent,
+): string | undefined =>
+  a.lastEditedTime ||
+  newest(
+    content.releases
+      .filter((r) => (r as { artistSlug?: string }).artistSlug === a.slug)
+      .map(releaseLastmod),
+  );
+
 export const routeRegistry: RouteEntry[] = [
   {
     path: "/",
@@ -135,7 +151,7 @@ export const routeRegistry: RouteEntry[] = [
       c.artists.map((a) => ({
         path: `/artists/${a.slug}`,
         seo: "artist" as SeoKey,
-        lastmod: a.lastEditedTime,
+        lastmod: artistLastmod(a, c),
       })),
   },
   {

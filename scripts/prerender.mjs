@@ -326,6 +326,10 @@ if (videos?.length) {
   warnings.push("no published videos found — video-sitemap.xml was not written");
 }
 
+for (const entry of sitemapEntries) {
+  if (!entry.lastmod) warnings.push(`sitemap entry "${entry.path}" has no <lastmod>`);
+}
+
 /* -------- Internal linking: every release page must be reachable -------- *
  * A release nobody links to is orphaned for crawlers. Advisory (a release can
  * legitimately be published before its artist page copy catches up), but loud. */
