@@ -139,18 +139,21 @@ export async function notionRequest<T>(
       lastError = error;
       const status = statusOf(error);
       const where = describe(ctx);
-      if (!isRetryable(error) || attempt === MAX_ATTEMPTS) {
+      const outOfTime = notionBudgetExhausted();
+      if (!isRetryable(error) || attempt === MAX_ATTEMPTS || outOfTime) {
         console.error(
-          `[notion] request failed (status ${status ?? "?"}) after ${attempt} attempt(s) ${where}: ${
-            (error as Error)?.message ?? error
-          }`,
+          `[notion] request failed (status ${status ?? "?"}) after ${attempt} attempt(s) ${where} [${elapsed()}]${
+            outOfTime ? " — time budget exhausted, not retrying" : ""
+          }: ${(error as Error)?.message ?? error}`,
         );
         break;
       }
-      // Exponential backoff with full jitter: 1s, 2s, 4s, 8s (± jitter).
-      const delay = Math.round(BASE_DELAY_MS * 2 ** (attempt - 1) * (0.5 + Math.random()));
+      // Exponential backoff with full jitter, capped at 4s: 1s, 2s (± jitter).
+      const delay = Math.round(
+        Math.min(BASE_DELAY_MS * 2 ** (attempt - 1), MAX_DELAY_MS) * (0.5 + Math.random()),
+      );
       console.warn(
-        `[notion] attempt ${attempt}/${MAX_ATTEMPTS} failed (status ${status ?? "?"}) ${where}; retrying in ${delay}ms`,
+        `[notion] attempt ${attempt}/${MAX_ATTEMPTS} failed (status ${status ?? "?"}) ${where} [${elapsed()}]; retrying in ${delay}ms`,
       );
       await sleep(delay);
     }
@@ -159,10 +162,11 @@ export async function notionRequest<T>(
   if (cacheKey) {
     const cached = readCache<T>(cacheKey);
     if (cached !== undefined) {
-      console.warn(`[notion] serving cached copy after repeated failures ${describe(ctx)}`);
+      console.warn(`[notion] serving cached copy after repeated failures ${describe(ctx)} [${elapsed()}]`);
       return cached;
     }
   }
+
 
   throw lastError;
 }
