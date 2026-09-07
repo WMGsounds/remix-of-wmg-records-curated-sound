@@ -8,7 +8,7 @@ import { preloadAllPages, pageNames } from "./routes";
 import { resolveRoutes, resolveSitemapRoutes, routeRegistry, type RouteContent } from "@/lib/routeRegistry";
 import { seoKeys } from "@/lib/seoConfig";
 import { SITE_URL } from "@/lib/seo";
-import { thumbnailUrl, watchUrl, artistNames, isoDurationFromClock } from "@/lib/videos";
+import { thumbnailUrl, artistNames } from "@/lib/videos";
 import {
   fetchArtists,
   fetchReleases,
