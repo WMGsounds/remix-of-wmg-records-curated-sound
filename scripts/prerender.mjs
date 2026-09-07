@@ -357,7 +357,7 @@ console.log(`[prerender] wrote ${ok} pages, ${failed} failed`);
 
 // Advisory only — an over-length title is not a build error.
 if (warnings.length) {
-  console.warn(`\n[prerender] ${warnings.length} title-length warning(s) (editable pages only):`);
+  console.warn(`\n[prerender] ${warnings.length} SEO warning(s) (advisory):`);
   for (const w of warnings) console.warn(`  - ${w}`);
 }
 
