@@ -19,11 +19,33 @@ import { createHash } from "node:crypto";
 import fs from "node:fs";
 import path from "node:path";
 
-/** Notion's documented limit is ~3 requests/second per integration. */
-const MAX_RPS = 3;
-const MAX_ATTEMPTS = 5;
+/** Notion documents ~3 rps; 5 is the ceiling we allow ourselves in bursts. */
+const MAX_RPS = 5;
+const MAX_ATTEMPTS = 3;
 const BASE_DELAY_MS = 1000;
+const MAX_DELAY_MS = 4000;
+/** Hard ceiling on total time spent talking to Notion in one process. */
+const TIME_BUDGET_MS = 15 * 60 * 1000;
 const RETRY_STATUS = new Set([429, 500, 502, 503, 504]);
+
+const startedAt = Date.now();
+const elapsedMs = () => Date.now() - startedAt;
+const elapsed = () => `${(elapsedMs() / 1000).toFixed(1)}s elapsed`;
+let budgetExhaustedLogged = false;
+
+/** True once the whole-process Notion time budget is spent: stop retrying. */
+export function notionBudgetExhausted(): boolean {
+  const spent = elapsedMs() >= TIME_BUDGET_MS;
+  if (spent && !budgetExhaustedLogged) {
+    budgetExhaustedLogged = true;
+    console.error(
+      `[notion] time budget of ${TIME_BUDGET_MS / 60000} minutes exhausted (${elapsed()}); ` +
+        "no further retries — remaining pages use cache or are skipped.",
+    );
+  }
+  return spent;
+}
+
 
 export type NotionContext = { pageId?: string; slug?: string; label?: string };
 
@@ -117,18 +139,21 @@ export async function notionRequest<T>(
       lastError = error;
       const status = statusOf(error);
       const where = describe(ctx);
-      if (!isRetryable(error) || attempt === MAX_ATTEMPTS) {
+      const outOfTime = notionBudgetExhausted();
+      if (!isRetryable(error) || attempt === MAX_ATTEMPTS || outOfTime) {
         console.error(
-          `[notion] request failed (status ${status ?? "?"}) after ${attempt} attempt(s) ${where}: ${
-            (error as Error)?.message ?? error
-          }`,
+          `[notion] request failed (status ${status ?? "?"}) after ${attempt} attempt(s) ${where} [${elapsed()}]${
+            outOfTime ? " — time budget exhausted, not retrying" : ""
+          }: ${(error as Error)?.message ?? error}`,
         );
         break;
       }
-      // Exponential backoff with full jitter: 1s, 2s, 4s, 8s (± jitter).
-      const delay = Math.round(BASE_DELAY_MS * 2 ** (attempt - 1) * (0.5 + Math.random()));
+      // Exponential backoff with full jitter, capped at 4s: 1s, 2s (± jitter).
+      const delay = Math.round(
+        Math.min(BASE_DELAY_MS * 2 ** (attempt - 1), MAX_DELAY_MS) * (0.5 + Math.random()),
+      );
       console.warn(
-        `[notion] attempt ${attempt}/${MAX_ATTEMPTS} failed (status ${status ?? "?"}) ${where}; retrying in ${delay}ms`,
+        `[notion] attempt ${attempt}/${MAX_ATTEMPTS} failed (status ${status ?? "?"}) ${where} [${elapsed()}]; retrying in ${delay}ms`,
       );
       await sleep(delay);
     }
@@ -137,10 +162,11 @@ export async function notionRequest<T>(
   if (cacheKey) {
     const cached = readCache<T>(cacheKey);
     if (cached !== undefined) {
-      console.warn(`[notion] serving cached copy after repeated failures ${describe(ctx)}`);
+      console.warn(`[notion] serving cached copy after repeated failures ${describe(ctx)} [${elapsed()}]`);
       return cached;
     }
   }
+
 
   throw lastError;
 }
@@ -163,7 +189,7 @@ export async function withCacheFallback<T>(
     const cached = readCache<T>(cacheKey);
     if (cached !== undefined) {
       console.warn(
-        `[notion] using cached copy after failure ${describe(ctx)}: ${(error as Error)?.message ?? error}`,
+        `[notion] using cached copy after failure ${describe(ctx)} [${elapsed()}]: ${(error as Error)?.message ?? error}`,
       );
       return cached;
     }
