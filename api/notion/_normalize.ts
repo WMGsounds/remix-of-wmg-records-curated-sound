@@ -361,7 +361,8 @@ export async function loadAll(notion: any, dbId: string) {
   if (process.env.WMG_BUILD_DATASET_CACHE !== "1") return loadAllUncached(notion, dbId);
   const key = formatNotionUuid(dbId);
   if (!datasetCache.has(key)) datasetCache.set(key, loadAllUncached(notion, dbId));
-  return datasetCache.get(key)!;
+  // Shallow copy: callers may sort/splice their own view of the dataset.
+  return [...(await datasetCache.get(key)!)];
 }
 
 async function loadAllUncached(notion: any, dbId: string) {
