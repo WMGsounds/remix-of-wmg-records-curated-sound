@@ -53,8 +53,6 @@ export type Artist = {
   // Authored CMS metadata (Notion formula properties) — used verbatim when set.
   seoTitle?: string;
   seoDescription?: string;
-  /** Notion last_edited_time — the sitemap <lastmod> source. */
-  lastEditedTime?: string;
 };
 
 
@@ -66,8 +64,6 @@ export type Release = {
   artistSlug: string;
   artistName: string;
   releaseDate: string; // ISO
-  /** Notion last_edited_time — the sitemap <lastmod> source. */
-  lastEditedTime?: string;
   releaseType: ReleaseType;
   coverArt: string;
   shortDescription: string;

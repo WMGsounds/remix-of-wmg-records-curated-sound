@@ -46,38 +46,7 @@ export async function preloadAllPages(): Promise<void> {
 }
 
 const lazyCache: Partial<Record<PageName, ComponentType<unknown>>> = {};
-
-/**
- * A new deploy replaces the hashed chunk files, so an open tab holding the old
- * index chunk asks for a page chunk that no longer exists. Retry once (the
- * browser may simply have hit a transient network error), then force a single
- * hard reload to pick up the fresh asset manifest.
- */
-const RELOAD_FLAG = "wmg:chunk-reloaded";
-
-const resilientLoader = (load: Loader): Loader => async () => {
-  try {
-    const mod = await load();
-    sessionStorage?.removeItem?.(RELOAD_FLAG);
-    return mod;
-  } catch (error) {
-    try {
-      return await load();
-    } catch {
-      const alreadyReloaded = sessionStorage?.getItem?.(RELOAD_FLAG) === "1";
-      if (typeof window !== "undefined" && !alreadyReloaded) {
-        sessionStorage?.setItem?.(RELOAD_FLAG, "1");
-        window.location.reload();
-        // Never resolves; the reload takes over.
-        return await new Promise<never>(() => {});
-      }
-      throw error;
-    }
-  }
-};
-
-const getLazy = (name: PageName) => (lazyCache[name] ??= lazy(resilientLoader(loaders[name])));
-
+const getLazy = (name: PageName) => (lazyCache[name] ??= lazy(loaders[name]));
 
 const Page = ({ name }: { name: PageName }) => {
   const Ready = preloaded[name];

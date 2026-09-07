@@ -24,10 +24,8 @@ import * as esbuild from "esbuild";
 
 
 
-
 const root = process.cwd();
 const distDir = path.join(root, "dist");
-
 const ssrEntry = path.join(root, "dist-ssr", "entry-server.js");
 
 const template = await fs.readFile(path.join(distDir, "index.html"), "utf8");
@@ -38,67 +36,86 @@ if (template.includes('data-rh="true"') || !template.includes('<div id="root"></
   );
 }
 
-/* ---------------- CMS access: Notion, in-process, fetched ONCE ----------- *
- * The pre-render calls the /api/notion/* handlers directly in this process
- * (same handler code and normalisers as production, no dependency on the
- * previously deployed site).
+/* ---------------- In-process CMS access --------------------------------- *
+ * The pre-render must NOT read the deployed site: during a Vercel build the
+ * live deployment is still the previous one, so fetching it baked stale
+ * response shapes into the new HTML (a change to the API only showed up on the
+ * NEXT deploy) and turned a slow/failing site into silently wrong content
+ * instead of a failed build.
  *
- * Every dataset is fetched EXACTLY ONCE per build: each API path is resolved
- * at most once and its response is held in memory, so the 68 routes share one
- * artists / releases / journal / videos / store / gallery / tracks /
- * catalogue read instead of repeating them per route. Retry, backoff and
- * throttling live in api/notion/_resilience.ts and are unchanged. */
-process.env.WMG_BUILD_DATASET_CACHE = "1";
-process.env.WMG_NOTION_CACHE_DIR ||= path.join(root, "node_modules", ".cache", "wmg-notion");
+ * Instead we bundle api/notion/_dispatch.ts and call the very same serverless
+ * handlers in this process, straight against Notion. */
+
+// Local runs: pick up Notion credentials from .env (Vercel injects its own).
+if (existsSync(path.join(root, ".env"))) {
+  for (const line of (await fs.readFile(path.join(root, ".env"), "utf8")).split("\n")) {
+    const m = /^\s*(?:export\s+)?([A-Z0-9_]+)\s*=\s*(.*)\s*$/.exec(line);
+    if (m && !process.env[m[1]]) process.env[m[1]] = m[2].replace(/^["']|["']$/g, "");
+  }
+}
+
+const REQUIRED_CMS_ENV = [
+  "NOTION_TOKEN",
+  "NOTION_ARTISTS_DB_ID",
+  "NOTION_RELEASES_DB_ID",
+  "NOTION_TRACKS_DB_ID",
+  "NOTION_RELEASE_TRACKS_DB_ID",
+  "NOTION_JOURNAL_DB_ID",
+  "NOTION_STORE_DB_ID",
+  "NOTION_GALLERY_DATABASE_ID",
+  "NOTION_VIDEOS_DATABASE_ID",
+];
+const missingCmsEnv = REQUIRED_CMS_ENV.filter((n) => !process.env[n]);
+const isDeploymentBuild = Boolean(process.env.VERCEL || process.env.CI);
+
+if (missingCmsEnv.length && isDeploymentBuild) {
+  throw new Error(
+    `[prerender] Missing Notion environment variables: ${missingCmsEnv.join(", ")}. ` +
+      "A deployment build must read Notion directly — it must never fall back to fetching the previously deployed site.",
+  );
+}
 
 const dispatchOut = path.join(root, "dist-api", "dispatch.mjs");
-await esbuild.build({
-  entryPoints: [path.join(root, "api", "notion", "_dispatch.ts")],
-  outfile: dispatchOut,
-  bundle: true,
-  format: "esm",
-  platform: "node",
-  target: "node20",
-  packages: "external",
-  logLevel: "silent",
-  plugins: [
-    {
-      name: "js-to-ts",
-      setup(build) {
-        build.onResolve({ filter: /^\.{1,2}\/.*\.js$/ }, (args) => {
-          const candidate = path.resolve(args.resolveDir, args.path.replace(/\.js$/, ".ts"));
-          return existsSync(candidate) ? { path: candidate } : undefined;
-        });
+if (missingCmsEnv.length) {
+  // Local convenience only, never on a deployment build (guarded above).
+  console.warn(
+    `[prerender] WARNING: no Notion credentials (${missingCmsEnv.join(", ")}). ` +
+      "Falling back to the deployed API over HTTP — output may be stale. Deployment builds fail instead.",
+  );
+  const remoteBase = process.env.VITE_API_BASE_URL || "https://www.wmgsounds.com";
+  globalThis.__WMG_LOCAL_API__ = async (p) => {
+    const res = await fetch(`${remoteBase}${p}`, { headers: { Accept: "application/json" } });
+    return { status: res.status, headers: {}, body: await res.text() };
+  };
+} else {
+  await esbuild.build({
+    entryPoints: [path.join(root, "api", "notion", "_dispatch.ts")],
+    outfile: dispatchOut,
+    bundle: true,
+    format: "esm",
+    platform: "node",
+    target: "node20",
+    packages: "external",
+    logLevel: "silent",
+    plugins: [
+      {
+        // Handlers import siblings with a ".js" specifier (NodeNext style);
+        // on disk they are ".ts".
+        name: "js-to-ts",
+        setup(build) {
+          build.onResolve({ filter: /^\.{1,2}\/.*\.js$/ }, (args) => {
+            const candidate = path.resolve(args.resolveDir, args.path.replace(/\.js$/, ".ts"));
+            return existsSync(candidate) ? { path: candidate } : undefined;
+          });
+        },
       },
-    },
-  ],
-});
-const { callApi } = await import(pathToFileURL(dispatchOut).href);
+    ],
+  });
 
-/** apiPath -> in-flight or settled promise. One request per path per build. */
-const apiCache = new Map();
-let apiCalls = 0;
-
-globalThis.__WMG_LOCAL_API__ = (p) => {
-  if (!apiCache.has(p)) {
-    apiCalls += 1;
-    apiCache.set(
-      p,
-      callApi(p).catch((error) => {
-        // Do not memoise a rejection as a permanently poisoned entry silently:
-        // keep it (so one broken page fails once, fast) but make it visible.
-        console.error(`[prerender] CMS read failed for "${p}": ${error?.message ?? error}`);
-        throw error;
-      }),
-    );
-  }
-  return apiCache.get(p);
-};
-
-console.log("[prerender] CMS access: Notion in-process, one request per API path");
-
-
-
+  const { callApi } = await import(pathToFileURL(dispatchOut).href);
+  globalThis.__WMG_LOCAL_API__ = (p) => callApi(p);
+  console.log("[prerender] CMS access: in-process Notion handlers (no HTTP to the deployed site)");
+}
 
 
 const server = await import(pathToFileURL(ssrEntry).href);
@@ -128,9 +145,8 @@ const problemsHeader = "[prerender]";
   }
 }
 
-const { routes, sitemap, videos } = await server.collectSite();
+const { routes, sitemap } = await server.collectSite();
 console.log(`[prerender] ${routes.length} routes`);
-console.log(`[prerender] Notion API paths fetched so far: ${apiCalls}`);
 
 /* ---------------- lastmod for static routes, from git ------------------- *
  * CMS-backed routes carry a real content timestamp. Static pages take the
@@ -186,11 +202,7 @@ const outFileFor = (route) =>
 
 let ok = 0;
 let failed = 0;
-/** Routes whose CMS read failed outright — skipped, not fatal. */
-const skipped = new Set();
 const written = new Set();
-/** route -> internal hrefs found in the rendered HTML (internal-linking audit). */
-const linksByRoute = new Map();
 const warnings = [];
 
 /* Which routes may raise a title-length WARNING (never an error).
@@ -266,29 +278,16 @@ for (const route of routes) {
     const outFile = outFileFor(route);
     await fs.mkdir(path.dirname(outFile), { recursive: true });
     await fs.writeFile(outFile, page, "utf8");
-    linksByRoute.set(
-      route,
-      new Set([...html.matchAll(/href="(\/[^"#?]*)"/g)].map((m) => m[1].replace(/\/$/, "") || "/")),
-    );
     written.add(route);
     ok += 1;
   } catch (error) {
-    /* One unreachable CMS page must not block deployment of all the others:
-     * skip it, drop it from the sitemap for this build, and log it loudly. */
     failed += 1;
-    skipped.add(route);
-    const slug = route.split("/").filter(Boolean).pop() ?? route;
-    console.error(
-      `[prerender] SKIPPED ${route} (slug="${slug}") — excluded from this build's sitemap: ${
-        error?.message ?? error
-      }`,
-    );
+    console.error(`[prerender] FAILED ${route}:`, error?.message ?? error);
   }
 }
 
 /* -------- Assertion 3: output file set must match the route set --------- */
 for (const route of routes) {
-  if (skipped.has(route)) continue;
   if (!written.has(route)) {
     fail(`route "${route}" produced no pre-rendered file`);
     continue;
@@ -303,43 +302,11 @@ for (const route of routes) {
 /* -------- Sitemap, from the exact list of routes just rendered ---------- */
 const sitemapEntries = sitemap.filter((e) => written.has(e.path));
 for (const entry of sitemap) {
-  if (written.has(entry.path)) continue;
-  if (skipped.has(entry.path))
-    warnings.push(`sitemap entry "${entry.path}" was skipped this build (CMS unreachable)`);
-  else fail(`sitemap entry "${entry.path}" has no pre-rendered page (it would 404)`);
+  if (!written.has(entry.path))
+    fail(`sitemap entry "${entry.path}" has no pre-rendered page (it would 404)`);
 }
 await fs.writeFile(path.join(distDir, "sitemap.xml"), server.renderSitemap(sitemapEntries), "utf8");
 console.log(`[prerender] wrote sitemap.xml (${sitemapEntries.length} urls)`);
-
-/* -------- Video sitemap, from the same in-process CMS read -------------- */
-if (videos?.length) {
-  await fs.writeFile(
-    path.join(distDir, "video-sitemap.xml"),
-    server.renderVideoSitemap(videos),
-    "utf8",
-  );
-  console.log(`[prerender] wrote video-sitemap.xml (${videos.length} videos)`);
-} else {
-  warnings.push("no published videos found — video-sitemap.xml was not written");
-}
-
-for (const entry of sitemapEntries) {
-  if (!entry.lastmod) warnings.push(`sitemap entry "${entry.path}" has no <lastmod>`);
-}
-
-/* -------- Internal linking: every release page must be reachable -------- *
- * A release nobody links to is orphaned for crawlers. Advisory (a release can
- * legitimately be published before its artist page copy catches up), but loud. */
-{
-  const linkSources = [...linksByRoute.entries()].filter(
-    ([r]) => r.startsWith("/artists/") || r.startsWith("/journal/") || r === "/releases",
-  );
-  for (const route of routes) {
-    if (!route.startsWith("/releases/")) continue;
-    if (!linkSources.some(([, links]) => links.has(route)))
-      warnings.push(`release "${route}" is not linked from any artist, journal or releases page`);
-  }
-}
 
 // Static 404 document. Vercel serves dist/404.html with a real HTTP 404 status
 // for any path that does not match a file, rewrite or redirect.
@@ -358,7 +325,7 @@ console.log(`[prerender] wrote ${ok} pages, ${failed} failed`);
 
 // Advisory only — an over-length title is not a build error.
 if (warnings.length) {
-  console.warn(`\n[prerender] ${warnings.length} SEO warning(s) (advisory):`);
+  console.warn(`\n[prerender] ${warnings.length} title-length warning(s) (editable pages only):`);
   for (const w of warnings) console.warn(`  - ${w}`);
 }
 
@@ -368,12 +335,4 @@ if (problems.length) {
   for (const p of problems) console.error(`  - ${p}`);
   process.exitCode = 1;
 }
-/* Skipping the odd page is survivable; losing a large share of the site is not.
- * Fail the build only when more than 10% of routes could not be rendered. */
-if (failed > 0) {
-  console.warn(`[prerender] ${failed} route(s) skipped: ${[...skipped].join(", ")}`);
-  if (failed > Math.max(1, Math.floor(routes.length * 0.1))) {
-    console.error(`[prerender] too many routes failed (${failed} of ${routes.length}) — failing the build`);
-    process.exitCode = 1;
-  }
-}
+if (failed > 0) process.exitCode = 1;

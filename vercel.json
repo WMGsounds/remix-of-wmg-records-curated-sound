@@ -6,18 +6,7 @@
     }
   ],
   "rewrites": [
-    {
-      "source": "/releases/if-the-road-asks",
-      "destination": "/api/gone"
-    },
-    {
-      "source": "/artists/iris-naoko",
-      "destination": "/api/gone"
-    },
-    {
-      "source": "/artists/marcus-vale",
-      "destination": "/api/gone"
-    },
+
     {
       "source": "/api/notion/tracks",
       "destination": "/api/notion/artists?dataset=tracks"
@@ -72,11 +61,6 @@
     }
   ],
   "redirects": [
-    {
-      "source": "/artists/kofi-river",
-      "destination": "/artists/kofi-rivers",
-      "permanent": true
-    },
     {
       "source": "/spotify",
       "destination": "https://open.spotify.com/user/315vlgpfq47hf6pebgugkm6rbgxq",

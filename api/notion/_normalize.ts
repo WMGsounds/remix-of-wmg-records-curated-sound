@@ -2,7 +2,6 @@
 import { resolvePublishInstant } from "./_schedule.js";
 import { artistImageUrl, releaseArtworkUrl, storeImageUrl } from "./_mediaUrls.js";
 import { notionText, findNotionProp } from "./_notionText.js";
-import { notionRequest } from "./_resilience.js";
 
 // Property → string reading lives in ./_notionText.ts (handles formulas, which
 // are NOT rich text). Never re-implement it locally.
@@ -63,8 +62,6 @@ export function normalizeArtist(page: any) {
     id: page.id,
     slug: artistSlug,
     name: artistName,
-    // Real content timestamp — drives <lastmod> in sitemap.xml (never a build date).
-    lastEditedTime: version,
     genre: multiSelect(props["Genre"]) || select(props["Genre"]) || text(props["Genre"]),
     shortDescription: text(props["Short Description"]),
     fullBio: paragraphs(props["Full Bio"]),
@@ -177,8 +174,6 @@ export function normalizeRelease(page: any, artistLookup: Map<string, any>) {
     id: page.id,
     slug: text(props["Slug"]),
     title: text(titleProp(props)),
-    // Real content timestamp — drives <lastmod> in sitemap.xml (never a build date).
-    lastEditedTime: String(page.last_edited_time ?? ""),
     artistId: artistRel,
     artistSlug: artist?.slug ?? "",
     artistName: artist?.name ?? "",
@@ -328,10 +323,7 @@ async function resolveDataSourceId(notion: any, dbId: string) {
       if (!notion.databases?.retrieve) return dbId;
 
       try {
-        const database = await notionRequest<any>(
-          () => notion.databases.retrieve({ database_id: databaseId }),
-          { pageId: databaseId, label: "databases.retrieve" },
-        );
+        const database = await notion.databases.retrieve({ database_id: databaseId });
         const dataSourceId = database?.data_sources?.[0]?.id;
         if (!dataSourceId) {
           throw new Error(`No data sources found for Notion database ${databaseId}`);
@@ -349,34 +341,17 @@ async function resolveDataSourceId(notion: any, dbId: string) {
   return dataSourceIdCache.get(databaseId)!;
 }
 
-/**
- * Build-time dataset memo. During the pre-render (WMG_BUILD_DATASET_CACHE=1)
- * each Notion database is queried EXACTLY ONCE for the whole build and every
- * route reads the same in-memory result. Disabled at runtime, where a warm
- * serverless instance must never serve a stale dataset.
- */
-const datasetCache = new Map<string, Promise<any[]>>();
-
 export async function loadAll(notion: any, dbId: string) {
-  if (process.env.WMG_BUILD_DATASET_CACHE !== "1") return loadAllUncached(notion, dbId);
-  const key = formatNotionUuid(dbId);
-  if (!datasetCache.has(key)) datasetCache.set(key, loadAllUncached(notion, dbId));
-  // Shallow copy: callers may sort/splice their own view of the dataset.
-  return [...(await datasetCache.get(key)!)];
-}
-
-async function loadAllUncached(notion: any, dbId: string) {
-
   const results: any[] = [];
   let cursor: string | undefined;
   const databaseId = formatNotionUuid(dbId);
   const useDatabaseQuery = async () => {
     do {
-      const at = cursor;
-      const r = await notionRequest<any>(
-        () => notion.databases.query({ database_id: databaseId, start_cursor: at, page_size: 100 }),
-        { pageId: databaseId, label: "databases.query" },
-      );
+      const r = await notion.databases.query({
+        database_id: databaseId,
+        start_cursor: cursor,
+        page_size: 100,
+      });
       results.push(...r.results);
       cursor = r.has_more ? r.next_cursor : undefined;
     } while (cursor);
@@ -388,11 +363,11 @@ async function loadAllUncached(notion: any, dbId: string) {
   const dataSourceId = await resolveDataSourceId(notion, databaseId);
   do {
     try {
-      const at = cursor;
-      const r = await notionRequest<any>(
-        () => notion.dataSources.query({ data_source_id: dataSourceId, start_cursor: at, page_size: 100 }),
-        { pageId: dataSourceId, label: "dataSources.query" },
-      );
+      const r = await notion.dataSources.query({
+        data_source_id: dataSourceId,
+        start_cursor: cursor,
+        page_size: 100,
+      });
       results.push(...r.results);
       cursor = r.has_more ? r.next_cursor : undefined;
     } catch (error: unknown) {
