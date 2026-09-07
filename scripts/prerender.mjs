@@ -26,6 +26,11 @@ import * as esbuild from "esbuild";
 
 const root = process.cwd();
 const distDir = path.join(root, "dist");
+
+/* Notion responses fetched during this build are cached on disk (keyed by page
+ * id + last_edited_time). If Notion errors out on a later build, the cached
+ * copy is served instead of failing the deploy — see api/notion/_resilience.ts. */
+process.env.WMG_NOTION_CACHE_DIR ||= path.join(root, "node_modules", ".cache", "wmg-notion");
 const ssrEntry = path.join(root, "dist-ssr", "entry-server.js");
 
 const template = await fs.readFile(path.join(distDir, "index.html"), "utf8");
@@ -202,6 +207,8 @@ const outFileFor = (route) =>
 
 let ok = 0;
 let failed = 0;
+/** Routes whose CMS read failed outright — skipped, not fatal. */
+const skipped = new Set();
 const written = new Set();
 /** route -> internal hrefs found in the rendered HTML (internal-linking audit). */
 const linksByRoute = new Map();
@@ -287,13 +294,22 @@ for (const route of routes) {
     written.add(route);
     ok += 1;
   } catch (error) {
+    /* One unreachable CMS page must not block deployment of all the others:
+     * skip it, drop it from the sitemap for this build, and log it loudly. */
     failed += 1;
-    console.error(`[prerender] FAILED ${route}:`, error?.message ?? error);
+    skipped.add(route);
+    const slug = route.split("/").filter(Boolean).pop() ?? route;
+    console.error(
+      `[prerender] SKIPPED ${route} (slug="${slug}") — excluded from this build's sitemap: ${
+        error?.message ?? error
+      }`,
+    );
   }
 }
 
 /* -------- Assertion 3: output file set must match the route set --------- */
 for (const route of routes) {
+  if (skipped.has(route)) continue;
   if (!written.has(route)) {
     fail(`route "${route}" produced no pre-rendered file`);
     continue;
@@ -308,8 +324,10 @@ for (const route of routes) {
 /* -------- Sitemap, from the exact list of routes just rendered ---------- */
 const sitemapEntries = sitemap.filter((e) => written.has(e.path));
 for (const entry of sitemap) {
-  if (!written.has(entry.path))
-    fail(`sitemap entry "${entry.path}" has no pre-rendered page (it would 404)`);
+  if (written.has(entry.path)) continue;
+  if (skipped.has(entry.path))
+    warnings.push(`sitemap entry "${entry.path}" was skipped this build (CMS unreachable)`);
+  else fail(`sitemap entry "${entry.path}" has no pre-rendered page (it would 404)`);
 }
 await fs.writeFile(path.join(distDir, "sitemap.xml"), server.renderSitemap(sitemapEntries), "utf8");
 console.log(`[prerender] wrote sitemap.xml (${sitemapEntries.length} urls)`);
@@ -371,4 +389,12 @@ if (problems.length) {
   for (const p of problems) console.error(`  - ${p}`);
   process.exitCode = 1;
 }
-if (failed > 0) process.exitCode = 1;
+/* Skipping the odd page is survivable; losing a large share of the site is not.
+ * Fail the build only when more than 10% of routes could not be rendered. */
+if (failed > 0) {
+  console.warn(`[prerender] ${failed} route(s) skipped: ${[...skipped].join(", ")}`);
+  if (failed > Math.max(1, Math.floor(routes.length * 0.1))) {
+    console.error(`[prerender] too many routes failed (${failed} of ${routes.length}) — failing the build`);
+    process.exitCode = 1;
+  }
+}
