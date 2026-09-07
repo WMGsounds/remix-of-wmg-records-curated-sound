@@ -189,7 +189,7 @@ export async function withCacheFallback<T>(
     const cached = readCache<T>(cacheKey);
     if (cached !== undefined) {
       console.warn(
-        `[notion] using cached copy after failure ${describe(ctx)}: ${(error as Error)?.message ?? error}`,
+        `[notion] using cached copy after failure ${describe(ctx)} [${elapsed()}]: ${(error as Error)?.message ?? error}`,
       );
       return cached;
     }
