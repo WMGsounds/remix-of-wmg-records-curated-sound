@@ -144,3 +144,29 @@ export async function notionRequest<T>(
 
   throw lastError;
 }
+
+/**
+ * Run a whole multi-request operation, falling back to its cached result if
+ * the operation fails outright. Individual requests inside `fn` should still
+ * use notionRequest() for throttling and retries.
+ */
+export async function withCacheFallback<T>(
+  cacheKey: string,
+  fn: () => Promise<T>,
+  ctx: NotionContext = {},
+): Promise<T> {
+  try {
+    const result = await fn();
+    writeCache(cacheKey, result);
+    return result;
+  } catch (error) {
+    const cached = readCache<T>(cacheKey);
+    if (cached !== undefined) {
+      console.warn(
+        `[notion] using cached copy after failure ${describe(ctx)}: ${(error as Error)?.message ?? error}`,
+      );
+      return cached;
+    }
+    throw error;
+  }
+}
