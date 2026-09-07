@@ -48,6 +48,7 @@ if (template.includes('data-rh="true"') || !template.includes('<div id="root"></
  * artists / releases / journal / videos / store / gallery / tracks /
  * catalogue read instead of repeating them per route. Retry, backoff and
  * throttling live in api/notion/_resilience.ts and are unchanged. */
+process.env.WMG_BUILD_DATASET_CACHE = "1";
 process.env.WMG_NOTION_CACHE_DIR ||= path.join(root, "node_modules", ".cache", "wmg-notion");
 
 const dispatchOut = path.join(root, "dist-api", "dispatch.mjs");
