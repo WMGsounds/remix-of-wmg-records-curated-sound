@@ -20,7 +20,7 @@ import { existsSync } from "node:fs";
 import path from "node:path";
 import { execFileSync } from "node:child_process";
 import { pathToFileURL } from "node:url";
-import * as esbuild from "esbuild";
+
 
 
 
