@@ -349,7 +349,24 @@ async function resolveDataSourceId(notion: any, dbId: string) {
   return dataSourceIdCache.get(databaseId)!;
 }
 
+/**
+ * Build-time dataset memo. During the pre-render (WMG_BUILD_DATASET_CACHE=1)
+ * each Notion database is queried EXACTLY ONCE for the whole build and every
+ * route reads the same in-memory result. Disabled at runtime, where a warm
+ * serverless instance must never serve a stale dataset.
+ */
+const datasetCache = new Map<string, Promise<any[]>>();
+
 export async function loadAll(notion: any, dbId: string) {
+  if (process.env.WMG_BUILD_DATASET_CACHE !== "1") return loadAllUncached(notion, dbId);
+  const key = formatNotionUuid(dbId);
+  if (!datasetCache.has(key)) datasetCache.set(key, loadAllUncached(notion, dbId));
+  // Shallow copy: callers may sort/splice their own view of the dataset.
+  return [...(await datasetCache.get(key)!)];
+}
+
+async function loadAllUncached(notion: any, dbId: string) {
+
   const results: any[] = [];
   let cursor: string | undefined;
   const databaseId = formatNotionUuid(dbId);

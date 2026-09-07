@@ -20,6 +20,7 @@ import { existsSync } from "node:fs";
 import path from "node:path";
 import { execFileSync } from "node:child_process";
 import { pathToFileURL } from "node:url";
+import * as esbuild from "esbuild";
 
 
 
@@ -37,59 +38,65 @@ if (template.includes('data-rh="true"') || !template.includes('<div id="root"></
   );
 }
 
-/* ---------------- CMS access: committed /content snapshot ---------------- *
- * The build makes ZERO network calls to Notion. All CMS data comes from the
- * JSON files in /content, produced by `npm run sync:content` on a developer
- * machine or a manual GitHub Action and committed to git. A Notion outage,
- * rate limit or 502 therefore cannot break a deployment.
+/* ---------------- CMS access: Notion, in-process, fetched ONCE ----------- *
+ * The pre-render calls the /api/notion/* handlers directly in this process
+ * (same handler code and normalisers as production, no dependency on the
+ * previously deployed site).
  *
- * If /content is missing or malformed the build fails loudly — it must never
- * silently deploy a site without CMS content. */
-const contentDir = path.join(root, "content");
-const manifestFile = path.join(contentDir, "manifest.json");
+ * Every dataset is fetched EXACTLY ONCE per build: each API path is resolved
+ * at most once and its response is held in memory, so the 68 routes share one
+ * artists / releases / journal / videos / store / gallery / tracks /
+ * catalogue read instead of repeating them per route. Retry, backoff and
+ * throttling live in api/notion/_resilience.ts and are unchanged. */
+process.env.WMG_BUILD_DATASET_CACHE = "1";
+process.env.WMG_NOTION_CACHE_DIR ||= path.join(root, "node_modules", ".cache", "wmg-notion");
 
-if (!existsSync(manifestFile)) {
-  throw new Error(
-    "[prerender] /content/manifest.json is missing. The build reads CMS data only from the committed " +
-      "/content snapshot. Run `npm run sync:content` locally and commit /content.",
-  );
-}
+const dispatchOut = path.join(root, "dist-api", "dispatch.mjs");
+await esbuild.build({
+  entryPoints: [path.join(root, "api", "notion", "_dispatch.ts")],
+  outfile: dispatchOut,
+  bundle: true,
+  format: "esm",
+  platform: "node",
+  target: "node20",
+  packages: "external",
+  logLevel: "silent",
+  plugins: [
+    {
+      name: "js-to-ts",
+      setup(build) {
+        build.onResolve({ filter: /^\.{1,2}\/.*\.js$/ }, (args) => {
+          const candidate = path.resolve(args.resolveDir, args.path.replace(/\.js$/, ".ts"));
+          return existsSync(candidate) ? { path: candidate } : undefined;
+        });
+      },
+    },
+  ],
+});
+const { callApi } = await import(pathToFileURL(dispatchOut).href);
 
-let contentManifest;
-try {
-  contentManifest = JSON.parse(await fs.readFile(manifestFile, "utf8"));
-} catch (error) {
-  throw new Error(`[prerender] /content/manifest.json is malformed: ${error?.message ?? error}`);
-}
-if (!contentManifest?.entries || typeof contentManifest.entries !== "object" || !Object.keys(contentManifest.entries).length) {
-  throw new Error(
-    "[prerender] /content/manifest.json has no entries. Run `npm run sync:content` and commit /content.",
-  );
-}
+/** apiPath -> in-flight or settled promise. One request per path per build. */
+const apiCache = new Map();
+let apiCalls = 0;
 
-globalThis.__WMG_LOCAL_API__ = async (p) => {
-  const entry = contentManifest.entries[p];
-  if (!entry) {
-    throw new Error(
-      `[prerender] no snapshot in /content for "${p}". Run \`npm run sync:content\` and commit /content.`,
+globalThis.__WMG_LOCAL_API__ = (p) => {
+  if (!apiCache.has(p)) {
+    apiCalls += 1;
+    apiCache.set(
+      p,
+      callApi(p).catch((error) => {
+        // Do not memoise a rejection as a permanently poisoned entry silently:
+        // keep it (so one broken page fails once, fast) but make it visible.
+        console.error(`[prerender] CMS read failed for "${p}": ${error?.message ?? error}`);
+        throw error;
+      }),
     );
   }
-  const file = path.join(root, entry.file);
-  let body;
-  try {
-    body = await fs.readFile(file, "utf8");
-    JSON.parse(body);
-  } catch (error) {
-    throw new Error(`[prerender] content snapshot "${entry.file}" is missing or malformed: ${error?.message ?? error}`);
-  }
-  return { status: 200, headers: { "Content-Type": "application/json" }, body };
+  return apiCache.get(p);
 };
 
-console.log(
-  `[prerender] CMS access: /content snapshot (${Object.keys(contentManifest.entries).length} files, synced ${
-    contentManifest.generatedAt ?? "unknown"
-  }) — no Notion requests during this build`,
-);
+console.log("[prerender] CMS access: Notion in-process, one request per API path");
+
 
 
 
@@ -123,6 +130,7 @@ const problemsHeader = "[prerender]";
 
 const { routes, sitemap, videos } = await server.collectSite();
 console.log(`[prerender] ${routes.length} routes`);
+console.log(`[prerender] Notion API paths fetched so far: ${apiCalls}`);
 
 /* ---------------- lastmod for static routes, from git ------------------- *
  * CMS-backed routes carry a real content timestamp. Static pages take the
