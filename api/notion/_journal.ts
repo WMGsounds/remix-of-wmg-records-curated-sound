@@ -4,6 +4,7 @@ import { resolvePublishInstant } from "./_schedule.js";
 import { journalCoverUrl, journalBlockImageUrl } from "./_mediaUrls.js";
 import { truncateAtWord } from "../../src/lib/truncate.js";
 import { notionText } from "./_notionText.js";
+import { notionRequest, withCacheFallback, type NotionContext } from "./_resilience.js";
 
 
 // Property → string reading lives in ./_notionText.ts (formulas are not rich text).
