@@ -130,6 +130,7 @@ const problemsHeader = "[prerender]";
 
 const { routes, sitemap, videos } = await server.collectSite();
 console.log(`[prerender] ${routes.length} routes`);
+console.log(`[prerender] Notion API paths fetched so far: ${apiCalls}`);
 
 /* ---------------- lastmod for static routes, from git ------------------- *
  * CMS-backed routes carry a real content timestamp. Static pages take the
