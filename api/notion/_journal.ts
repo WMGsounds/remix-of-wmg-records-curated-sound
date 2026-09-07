@@ -139,11 +139,15 @@ const richFrom = (rt: any[] = []): RichText[] =>
 
 const plainCaption = (rt: any[] = []): string => rt.map((t: any) => t.plain_text ?? "").join("");
 
-async function listChildren(notion: any, blockId: string): Promise<any[]> {
+async function listChildren(notion: any, blockId: string, ctx: NotionContext = {}): Promise<any[]> {
   const out: any[] = [];
   let cursor: string | undefined;
   do {
-    const r = await notion.blocks.children.list({ block_id: blockId, start_cursor: cursor, page_size: 100 });
+    const at = cursor;
+    const r = await notionRequest(
+      () => notion.blocks.children.list({ block_id: blockId, start_cursor: at, page_size: 100 }),
+      { ...ctx, pageId: ctx.pageId ?? blockId, label: ctx.label ?? "blocks.children.list" },
+    );
     out.push(...r.results);
     cursor = r.has_more ? r.next_cursor : undefined;
   } while (cursor);
@@ -153,9 +157,16 @@ async function listChildren(notion: any, blockId: string): Promise<any[]> {
 export async function fetchPageBlocks(
   notion: any,
   pageId: string,
-  article?: { slug?: string; title?: string },
+  article?: { slug?: string; title?: string; lastEditedTime?: string },
 ): Promise<ArticleBlock[]> {
-  const raw = await listChildren(notion, pageId);
+  const ctx: NotionContext = { pageId, slug: article?.slug, label: "fetchPageBlocks" };
+  // Cache key carries the content version, so a cached copy can never be
+  // older than the live page — it is only ever used when Notion is failing.
+  const raw = await withCacheFallback(
+    `blocks:${pageId}:${article?.lastEditedTime ?? "unversioned"}`,
+    () => listChildren(notion, pageId, ctx),
+    ctx,
+  );
   const blocks: ArticleBlock[] = [];
 
   // Group consecutive list items.
