@@ -328,7 +328,7 @@ async function resolveDataSourceId(notion: any, dbId: string) {
       if (!notion.databases?.retrieve) return dbId;
 
       try {
-        const database = await notionRequest(
+        const database = await notionRequest<any>(
           () => notion.databases.retrieve({ database_id: databaseId }),
           { pageId: databaseId, label: "databases.retrieve" },
         );
@@ -356,7 +356,7 @@ export async function loadAll(notion: any, dbId: string) {
   const useDatabaseQuery = async () => {
     do {
       const at = cursor;
-      const r = await notionRequest(
+      const r = await notionRequest<any>(
         () => notion.databases.query({ database_id: databaseId, start_cursor: at, page_size: 100 }),
         { pageId: databaseId, label: "databases.query" },
       );
@@ -372,7 +372,7 @@ export async function loadAll(notion: any, dbId: string) {
   do {
     try {
       const at = cursor;
-      const r = await notionRequest(
+      const r = await notionRequest<any>(
         () => notion.dataSources.query({ data_source_id: dataSourceId, start_cursor: at, page_size: 100 }),
         { pageId: dataSourceId, label: "dataSources.query" },
       );

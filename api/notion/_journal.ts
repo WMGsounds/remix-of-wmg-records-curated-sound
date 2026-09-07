@@ -145,7 +145,7 @@ async function listChildren(notion: any, blockId: string, ctx: NotionContext = {
   let cursor: string | undefined;
   do {
     const at = cursor;
-    const r = await notionRequest(
+    const r = await notionRequest<any>(
       () => notion.blocks.children.list({ block_id: blockId, start_cursor: at, page_size: 100 }),
       { ...ctx, pageId: ctx.pageId ?? blockId, label: ctx.label ?? "blocks.children.list" },
     );
