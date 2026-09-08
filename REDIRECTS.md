@@ -23,6 +23,11 @@ document: do not change `redirects` in `vercel.json` without reading this.
 5. Redirects do not apply under `vite dev`. That is expected; verify them on a
    Vercel preview deployment or production, which both apply `vercel.json`.
 
+## Removed URLs
+
+The obsolete Iris Naoko, Marcus Vale and If the Road Asks URLs intentionally
+return HTTP 404 and do not require a dedicated serverless function.
+
 ## Current redirects
 
 | Source | Destination | Why |
