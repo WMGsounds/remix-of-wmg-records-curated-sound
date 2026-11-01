@@ -35,7 +35,7 @@ export function StoreRegionSelector({ storeRegion: r }: Props) {
         ) : r.wantsEstimate ? (
           <p>{r.loadingRates ? "Loading local currency estimates. Showing US dollar prices for now." : "Local currency estimates are unavailable. Showing US dollar prices."}</p>
         ) : <p>Prices shown in {r.effective.currency === "GBP" ? "pounds sterling" : r.effective.currency === "EUR" ? "euros" : "US dollars"}.</p>}
-        <p>Vinyl and CD prices are supplied by elasticStage. Check your shipping country on the purchase page; delivery and any additional charges are confirmed at checkout.</p>
+        <p>Check your shipping country on the purchase page; delivery and any additional charges are confirmed at checkout.</p>
       </div>
     </section>
   );
