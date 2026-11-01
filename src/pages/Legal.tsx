@@ -18,7 +18,7 @@ const Legal = () => {
             <p key={i}>{p}</p>
           ))}
         </div>
-        <p className="text-sm text-muted-foreground mt-16">Last updated: April 2026</p>
+        <p className="text-sm text-muted-foreground mt-16">Last updated: {key === "terms" ? "April 2026" : "November 2026"}</p>
       </div>
     </div>
   );

@@ -163,6 +163,7 @@ export const LEGAL_DOCS: Record<
       "This Privacy Policy describes how Wareham Music Group ('WMG', 'we', 'our') collects, uses and protects information you provide when using this website.",
       "We collect only the minimum information required to operate the site and our services, including email addresses submitted to our newsletter and messages submitted via our contact form.",
       "We do not sell your personal data. For any privacy enquiry, contact privacy@wmgsounds.com.",
+      "The store uses country information supplied by our website host to choose a default region and currency. You can change that choice at any time. Exchange-rate requests contain currency information only; we do not send your IP address or location to the exchange-rate provider.",
     ],
   },
   terms: {
@@ -179,6 +180,7 @@ export const LEGAL_DOCS: Record<
     description: "Information about how WMG uses cookies on this website.",
     body: [
       "This site uses a small number of essential cookies to operate properly. Optional analytics cookies may be used to help us understand how the site is used. You can control cookies through your browser settings.",
+      "When you choose a store region or display currency, we remember that preference in this browser using local storage. Select 'Use my location' in the store to clear the saved choice, or clear this website's data in your browser. The preference is not used for advertising.",
     ],
   },
 };

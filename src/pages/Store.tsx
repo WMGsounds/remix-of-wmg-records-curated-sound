@@ -6,6 +6,9 @@ import { storeProduct, itemList, type StoreItemLike } from "@/lib/schema";
 import { useStoreItems } from "@/lib/queries";
 import { InlineSkeleton, PageError } from "@/components/UIStates";
 import { StoreCard } from "@/components/StoreCard";
+import { StoreRegionSelector } from "@/components/StoreRegionSelector";
+import { useStoreRegion } from "@/hooks/use-store-region";
+import { localizeStoreItem } from "@/lib/storePricing";
 import { Select, SelectContent, SelectItem, SelectSeparator, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { FilterField, SearchInput } from "@/components/FilterBar";
 import { matchesSearch } from "@/lib/search";
@@ -39,7 +42,12 @@ function sortItems(list: StoreItem[], sort: SortOption): StoreItem[] {
 }
 
 const Store = () => {
-  const { data: items = [], isLoading, isError } = useStoreItems();
+  const { data: sourceItems, isLoading, isError } = useStoreItems();
+  const storeRegion = useStoreRegion();
+  const { effective, rate } = storeRegion;
+  const items = useMemo(() => (sourceItems ?? []).map(item => localizeStoreItem(item, effective, rate)),
+    [sourceItems, effective.region, effective.currency, rate]);
+  const estimated = effective.region === "INTL" && effective.currency !== "USD";
   // formatTypeFilter encodes: "All" | "fmt:Vinyl" | "type:Album"
   const [formatTypeFilter, setFormatTypeFilter] = useState<string>("All");
   const [sort, setSort] = useState<SortOption>("Latest");
@@ -124,9 +132,11 @@ const Store = () => {
           image: i.productImage || undefined,
         })),
       }),
-      ...visible.map((i) => storeProduct(i as StoreItemLike)),
+      // Approximate currency conversions are not retailer offers. Keep Product
+      // identity, but omit Offer markup until a fixed-price region is selected.
+      ...visible.map((i) => storeProduct((estimated ? { ...i, prices: {} } : i) as StoreItemLike)),
     ];
-  }, [items]);
+  }, [items, estimated]);
 
 
 
@@ -172,6 +182,7 @@ const Store = () => {
       </section>
 
       <div className="container-editorial pt-16">
+        <StoreRegionSelector storeRegion={storeRegion} />
         {isLoading ? (
           <InlineSkeleton count={6} />
         ) : !hasAnyVisible ? (

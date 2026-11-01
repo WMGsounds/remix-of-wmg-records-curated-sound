@@ -469,6 +469,15 @@ export function normalizeStoreItem(
   }
 
   const displayPriceSummary = bool(props["Display Price Summary"]);
+  const regionalPrices: Partial<Record<"USD" | "EUR", Partial<Record<StoreFormatLocal, string>>>> = {};
+  for (const currency of ["USD", "EUR"] as const) {
+    const regional: Partial<Record<StoreFormatLocal, string>> = {};
+    for (const f of STORE_FORMATS) {
+      const raw = text(props[`${FORMAT_TO_PRICE_PROP[f]} - ${currency}`]);
+      if (raw) regional[f] = raw;
+    }
+    regionalPrices[currency] = regional;
+  }
   const priceSummary = displayPriceSummary ? buildPriceSummary(formats, prices) : null;
 
   // Own Product Image gets a permanent store URL; when it's blank we reuse the
@@ -502,6 +511,7 @@ export function normalizeStoreItem(
     formats,
     prices,
     displayPriceSummary,
+    regionalPrices,
     priceSummary,
     purchaseLink: purchaseLinkRaw ?? null,
     productImage,

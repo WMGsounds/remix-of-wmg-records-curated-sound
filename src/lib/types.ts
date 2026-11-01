@@ -210,6 +210,8 @@ export type StoreItem = {
   relatedTracks: { id: string; title: string }[];
   formats: StoreFormat[];
   prices: Partial<Record<StoreFormat, string>>;
+  /** Fixed retailer prices from Notion; absent fields are never FX estimates. */
+  regionalPrices?: Partial<Record<"USD" | "EUR", Partial<Record<StoreFormat, string>>>>;
   displayPriceSummary: boolean;
   priceSummary: string | null;
   purchaseLink: string | null;

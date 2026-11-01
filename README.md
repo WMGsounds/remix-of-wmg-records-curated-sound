@@ -2,6 +2,50 @@
 
 Editorial site for the WMG Records label.
 
+## Regional store pricing — 1 November 2026
+
+The store has four public regions: United Kingdom (GBP), European Union (EUR),
+United States (USD), and International. EU means the 27 member states, including
+those outside the euro area. The host's country header selects the default;
+unknown countries fall back to International/USD. Explicit visitor choices win
+over automatic detection and are saved in `wmg-store-region-v1` local storage.
+“Use my location” clears that preference. Browser language is not treated as country.
+
+Fixed prices come from the existing WMG Sounds Notion Store database. Existing
+`Price - Vinyl`, `Price - CD`, etc. remain GBP. The new rich-text properties are
+`Price - Vinyl - USD`, `Price - Vinyl - EUR`, `Price - CD - USD`, and
+`Price - CD - EUR`, with explicit symbols (`US$31.90`, `€32.90`). The normalizer
+also supports this suffix convention for other existing formats, if verified
+regional price fields are added later. Missing regional values show “See purchase
+page”; UK iTunes values are not relabelled or converted into US/EU retailer prices.
+
+All eight current releases' physical prices were checked on elasticStage in GBP,
+USD and EUR on 1 November 2026, using United Kingdom, United States and Germany
+shipping settings (Reggae also cross-checked in France). 28 new values were saved
+to Notion. Original fields, identities, visibility, pre-orders and links remain.
+elasticStage uses the same release URL in each region and selects prices by its
+own shipping-country setting. No unverified currency URL parameters are appended;
+visitors are reminded to check their shipping country on the purchase page.
+
+International visitors get local-currency estimates where supported, derived from
+the Notion USD prices using Frankfurter's public daily rates. Estimated prices
+carry `≈`, a rate date and checkout explanation, and are excluded from structured
+Offer markup. Missing/invalid/rates older than seven days fall back to explicitly
+labelled USD. Rates are fetched by our server, without forwarding visitor IP or
+country. The rate response is cached for an hour. Country responses are private,
+uncached and separate from the shared catalogue response. No new serverless
+function is required: `/api/notion/store?context=region` and `?context=rates` use
+the existing store function.
+
+Development root: `C:\Users\tomwa\Projects\WMG\wmg-sounds-site`.
+Selected evidence/output root: the established private OneDrive WMG folder,
+`Project Setup/Website/Store Regions/2026-11-01`. Run WMG's standard
+`Tools/backup-source.py` after source changes; see the parent README and
+ROLLING-BACKUPS.md for verification and latest-plus-previous retention.
+Dependencies, builds and previews stay local. The current Bun lockfile is used
+for installation (`bun install --frozen-lockfile`); the historical npm lockfile
+is out of date. Validation: `npm test`, `npm run typecheck`, `npm run build`.
+
 ## SEO conventions
 
 ### Default Open Graph image

@@ -26,6 +26,16 @@ import { getMockDataForPath } from "./mockData";
 const API_BASE = import.meta.env.VITE_API_BASE_URL ?? "";
 const ALLOW_MOCK_DATA = import.meta.env.DEV;
 
+/** Browser-only public context, deliberately separate from cached catalogue data. */
+export async function fetchStoreContext(context: "region" | "rates", signal: AbortSignal): Promise<unknown> {
+  const response = await fetch(`${API_BASE}/api/notion/store?context=${context}`, {
+    signal, cache: context === "region" ? "no-store" : "default",
+    headers: { Accept: "application/json" },
+  });
+  if (!response.ok) throw new Error("Store context unavailable");
+  return response.json();
+}
+
 /**
  * Build-time transport. scripts/prerender.mjs installs an in-process
  * dispatcher on globalThis that calls the /api/notion/* handlers directly

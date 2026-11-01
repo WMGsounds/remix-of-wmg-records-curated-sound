@@ -2,8 +2,10 @@ import { notion, DBS, CACHE_HEADERS, logApiError, logApiFallback, logApiSuccess,
 import { FALLBACK_HEADERS, fallbackStoreItems } from "./_fallback.js";
 import { loadAll, normalizeArtist, normalizeRelease, normalizeStoreItem, isReleasePublished } from "./_normalize.js";
 import { notionText } from "./_notionText.js";
+import { handleStoreContext } from "./_storeRegion.js";
 
-export default async function handler(_req: unknown, res: ApiResponse) {
+export default async function handler(req: Parameters<typeof handleStoreContext>[0], res: ApiResponse) {
+  if (await handleStoreContext(req, res)) return;
   const route = "/api/notion/store";
   try {
     requireEnv(route, ["NOTION_TOKEN", "NOTION_ARTISTS_DB_ID", "NOTION_RELEASES_DB_ID", "NOTION_TRACKS_DB_ID", "NOTION_STORE_DB_ID", "NOTION_RELEASE_TRACKS_DB_ID"]);
