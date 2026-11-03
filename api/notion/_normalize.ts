@@ -514,6 +514,7 @@ export function normalizeStoreItem(
     regionalPrices,
     priceSummary,
     purchaseLink: purchaseLinkRaw ?? null,
+    appleMusicUrl: releaseRaw?.streamingLinks?.appleMusic ?? null,
     productImage,
     description: text(props["Store Description"]),
     availability,

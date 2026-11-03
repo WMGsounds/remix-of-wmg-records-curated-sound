@@ -180,7 +180,7 @@ export const LEGAL_DOCS: Record<
     description: "Information about how WMG uses cookies on this website.",
     body: [
       "This site uses a small number of essential cookies to operate properly. Optional analytics cookies may be used to help us understand how the site is used. You can control cookies through your browser settings.",
-      "When you choose a store region, we remember that preference in this browser using local storage. Select 'Use my location' in the store to clear the saved choice, or clear this website's data in your browser. The preference is not used for advertising.",
+      "When you choose a physical store region or an iTunes store country, we remember those separate preferences in this browser using local storage. Select the relevant 'Use my location' option in the store to clear a saved choice, or clear this website's data in your browser. These preferences are not used for advertising.",
     ],
   },
 };

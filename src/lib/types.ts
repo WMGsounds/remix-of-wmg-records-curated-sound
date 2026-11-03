@@ -215,6 +215,10 @@ export type StoreItem = {
   displayPriceSummary: boolean;
   priceSummary: string | null;
   purchaseLink: string | null;
+  appleMusicUrl?: string | null;
+  itunesOffer?: { amount: number; currency: string; url: string };
+  itunesCountry?: string | null;
+  itunesPurchaseLink?: string;
   productImage: string;
   description: string;
   availability: StoreAvailability;

@@ -33,7 +33,7 @@ describe("published price buckets", () => {
   it("uses fixed USD and EUR amounts, never exchange conversions", () => {
     expect(localizeStoreItem(item, { region: "US", currency: "USD" }).prices.Vinyl).toBe("US$31.90");
     expect(localizeStoreItem(item, { region: "EU", currency: "EUR" }).prices.Vinyl).toBe("€32.90");
-    expect(localizeStoreItem(item, { region: "UK", currency: "GBP" }).prices.iTunes).toBe("£7.99");
+    expect(localizeStoreItem(item, { region: "UK", currency: "GBP" }).prices.iTunes).toBeUndefined();
   });
   it("does not invent regional iTunes prices or alter source data", () => {
     const localized = localizeStoreItem(item, { region: "US", currency: "USD" });

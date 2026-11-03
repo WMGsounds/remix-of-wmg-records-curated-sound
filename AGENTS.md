@@ -24,6 +24,12 @@ Website regional-store evidence is under `Project Setup/Website/Store Regions/20
 - elasticStage uses one release URL and its own shipping-country selection.
   Do not invent currency parameters or promise the WMG choice sets its checkout.
 - Apply pricing consistently in the Store and the store cards on artist pages.
+- iTunes is separate: use exact linked-release Apple IDs and actual country prices,
+  with an independent persisted country selector. Apple cache lifetime is at most
+  24 hours, refreshed on demand by ordinary website code, never by AI. Fail closed
+  on expired/missing/mismatched quotes. Never fall back to stale Notion iTunes values,
+  silently change storefronts, compare mixed currencies in price summaries or mark
+  Apple prices as elasticStage Offers. Preserve physical GBP/EUR/USD buckets.
 - Check the `notion_wmg` workspace identity before writes; preserve unrelated
   properties, record identities, visibility, approvals and original price values.
 

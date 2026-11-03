@@ -20,6 +20,7 @@ export function localizeStoreItem(item: StoreItem, preference: StorePreference):
   const prices: Partial<Record<StoreFormat, string>> = {};
   const amounts: number[] = [];
   for (const format of item.formats) {
+    if (format === "iTunes") continue;
     const amount = priceAmount(source?.[format], currency);
     if (amount === null) continue;
     prices[format] = money(amount, currency);

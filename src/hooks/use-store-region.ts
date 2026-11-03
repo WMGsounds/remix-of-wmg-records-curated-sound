@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { fetchStoreContext } from "@/lib/api";
+import { storeCountry } from "@/lib/itunes";
 import { validPreference, fixedCurrency, type StorePreference, type StoreRegion } from "@/lib/storeRegion";
 
 export const STORE_REGION_KEY = "wmg-store-region-v1";
@@ -11,6 +12,7 @@ export function useStoreRegion() {
   const [preference, setPreference] = useState<StorePreference | null>(null);
   const [detecting, setDetecting] = useState(true);
   const [detectedLocation, setDetectedLocation] = useState(false);
+  const [detectedCountry, setDetectedCountry] = useState<string | null>(null);
   useEffect(() => {
     try {
       let saved = JSON.parse(localStorage.getItem(STORE_REGION_KEY) ?? "null");
@@ -24,7 +26,10 @@ export function useStoreRegion() {
     const timer = setTimeout(() => controller.abort(), 5000);
     let active = true;
     fetchStoreContext("region", controller.signal).then(value => {
-      if (active && validPreference(value)) { setDetected(value); setDetectedLocation(true); }
+      if (active && validPreference(value)) {
+        setDetected(value); setDetectedLocation(true);
+        setDetectedCountry(storeCountry((value as { country?: unknown }).country));
+      }
     }).catch(() => {}).finally(() => {
       clearTimeout(timer);
       if (active) setDetecting(false);
@@ -45,6 +50,6 @@ export function useStoreRegion() {
   return {
     selected, selectRegion,
     automatic: preference === null, useLocation: () => save(null),
-    detecting, detectedLocation,
+    detecting, detectedLocation, detectedCountry,
   };
 }

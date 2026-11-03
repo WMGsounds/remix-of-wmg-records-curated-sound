@@ -16,8 +16,8 @@ Fixed prices come from the existing WMG Sounds Notion Store database. Existing
 `Price - Vinyl - USD`, `Price - Vinyl - EUR`, `Price - CD - USD`, and
 `Price - CD - EUR`, with explicit symbols (`US$31.90`, `€32.90`). The normalizer
 also supports this suffix convention for other existing formats, if verified
-regional price fields are added later. Missing regional values show “See purchase
-page”; UK iTunes values are not relabelled or converted into US/EU retailer prices.
+regional price fields are added later. Missing physical regional values show
+“See purchase page”. iTunes values are now supplied separately by Apple below.
 
 All eight current releases' physical prices were checked on elasticStage in GBP,
 USD and EUR on 1 November 2026, using United Kingdom, United States and Germany
@@ -47,6 +47,45 @@ ROLLING-BACKUPS.md for verification and latest-plus-previous retention.
 Dependencies, builds and previews stay local. The current Bun lockfile is used
 for installation (`bun install --frozen-lockfile`); the historical npm lockfile
 is out of date. Validation: `npm test`, `npm run typecheck`, `npm run build`.
+
+## iTunes country prices — 3 November 2026
+
+Apple prices use the actual visitor country, independently of the four physical
+price buckets. A separate iTunes store-country selector overrides detection and
+persists in `wmg-itunes-country-v1`; its location reset clears only that preference.
+Unknown location requires a choice rather than silently using another storefront.
+Country choices do not promise iTunes availability in every territory.
+
+`/api/notion/store?context=itunes&country=PL` reads the current public catalogue,
+extracts exact album/song IDs from the linked release's existing Apple Music URL,
+and batches them into Apple's public Lookup API. The normalizer exposes this as
+`appleMusicUrl`; no Notion price fields or approval records are overwritten.
+Album links use collectionPrice; song links use trackPrice. Wrong IDs, storefront
+URLs, negative/unavailable prices and invalid responses are rejected. Apple
+purchase links use the same country as the quote and request `app=itunes`.
+
+Refresh is automatic on demand after a maximum 24-hour cache lifetime, not an AI
+task or a fixed-time sweep of every country. Vercel caches each explicit country
+URL for the remaining lifetime; country detection itself remains private/no-store.
+The bounded warm-instance cache coalesces concurrent requests, spaces upstream
+calls by 3.5 seconds and never supplies an expired quote after an error. This is
+not a global rate-limit guarantee across server instances; Apple throttling fails
+closed. The browser rechecks the cached endpoint every five minutes while active
+and at quote expiry. No new cron, credentials, paid storage or PC service is needed.
+
+Old Notion iTunes prices are suppressed even in the UK. On an unavailable or expired
+quote, show “See price on iTunes” with the selected-country link where possible;
+never invent a price or reuse another country's quote. Apple currency labels are
+explicit (e.g. PLN 29.99). Physical price summaries exclude iTunes so mixed
+currencies are not compared. Apple prices are excluded from elasticStage Offer
+schema. International physical disclaimer sits above the separate iTunes row.
+
+Validation includes live WMG country lookups, cache expiry/concurrency/failure
+tests, exact song-vs-album prices, country override persistence, physical currency
+independence, full build and browser/mobile checks. Selected evidence uses private
+OneDrive `Project Setup/Website/iTunes Prices/2026-11-03`.
+
+Reference: https://performance-partners.apple.com/search-api
 
 ## SEO conventions
 

@@ -10,7 +10,7 @@ export function StoreRegionSelector({ storeRegion: r }: Props) {
     <section aria-label="Store region and currency" className="mb-12 border-y border-gold/25 py-6">
       <div className="flex flex-wrap items-end gap-5">
         <div className="w-full sm:w-auto">
-          <label htmlFor="store-region" className="mb-2 block text-xs uppercase tracking-[0.18em] text-gold-soft">Your region</label>
+          <label htmlFor="store-region" className="mb-2 block text-xs uppercase tracking-[0.18em] text-gold-soft">Vinyl &amp; CD region</label>
           <select id="store-region" value={findingRegion ? "" : r.selected.region} onChange={e => r.selectRegion(e.target.value as StoreRegion)} className={selectClass}>
             {findingRegion && <option value="" disabled>Detecting your region…</option>}
             {REGIONS.map(region => <option key={region.value} value={region.value}>{region.label}</option>)}
@@ -21,7 +21,7 @@ export function StoreRegionSelector({ storeRegion: r }: Props) {
       <div role="status" aria-live="polite" className="mt-3 space-y-2 text-sm leading-relaxed text-ivory/65">
         {r.automatic && r.detecting ? <p>Finding your region… You can also choose it above.</p> : null}
         {r.automatic && !r.detecting && !r.detectedLocation ? <p>We couldn’t detect your region. Choose it above; prices currently show in US dollars.</p> : null}
-        <p>Prices shown in {r.selected.currency === "GBP" ? "pounds sterling" : r.selected.currency === "EUR" ? "euros" : "US dollars"}.</p>
+        <p>Vinyl and CD prices shown in {r.selected.currency === "GBP" ? "pounds sterling" : r.selected.currency === "EUR" ? "euros" : "US dollars"}.</p>
         <p>Check your shipping country on the purchase page; delivery and any additional charges are confirmed at checkout.</p>
       </div>
     </section>

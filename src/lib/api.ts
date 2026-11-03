@@ -21,10 +21,17 @@ import type {
   CatalogueTrack,
 } from "./types";
 import type { VideoItem } from "./videos";
+import type { ItunesPrices } from "./itunes";
 import { getMockDataForPath } from "./mockData";
 
 const API_BASE = import.meta.env.VITE_API_BASE_URL ?? "";
 const ALLOW_MOCK_DATA = import.meta.env.DEV;
+
+export async function fetchItunesPrices(country: string, signal: AbortSignal): Promise<ItunesPrices> {
+  const response = await fetch(`${API_BASE}/api/notion/store?context=itunes&country=${encodeURIComponent(country)}`, { signal });
+  if (!response.ok) throw new Error("iTunes prices unavailable");
+  return response.json();
+}
 
 /** Browser-only public context, deliberately separate from cached catalogue data. */
 export async function fetchStoreContext(context: "region", signal: AbortSignal): Promise<unknown> {

@@ -784,6 +784,7 @@ export const storeProduct = (item: StoreItemLike): Node => {
   const sku = item.catalogueNumber || item.release?.catalogueId || item.slug || "";
 
   const priced = item.formats
+    .filter(format => format !== "iTunes") // Apple quotes must never become elasticStage offers.
     .map((format) => ({ format, parsed: parsePrice(item.prices[format] ?? "", context) }))
     .filter((p): p is { format: string; parsed: ParsedPrice } => p.parsed !== null);
 

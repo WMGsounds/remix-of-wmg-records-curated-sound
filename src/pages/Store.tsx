@@ -9,6 +9,9 @@ import { StoreCard } from "@/components/StoreCard";
 import { StoreRegionSelector } from "@/components/StoreRegionSelector";
 import { useStoreRegion } from "@/hooks/use-store-region";
 import { localizeStoreItem } from "@/lib/storePricing";
+import { useItunesPrices } from "@/hooks/use-itunes-prices";
+import { applyItunesPrices } from "@/lib/itunes";
+import { ItunesCountrySelector } from "@/components/ItunesCountrySelector";
 import { Select, SelectContent, SelectItem, SelectSeparator, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { FilterField, SearchInput } from "@/components/FilterBar";
 import { matchesSearch } from "@/lib/search";
@@ -45,8 +48,10 @@ const Store = () => {
   const { data: sourceItems, isLoading, isError } = useStoreItems();
   const storeRegion = useStoreRegion();
   const { selected } = storeRegion;
-  const items = useMemo(() => (sourceItems ?? []).map(item => localizeStoreItem(item, selected)),
-    [sourceItems, selected]);
+  const hasItunes = (sourceItems ?? []).some(item => item.formats.includes("iTunes"));
+  const itunes = useItunesPrices(storeRegion.detectedCountry, hasItunes);
+  const items = useMemo(() => (sourceItems ?? []).map(item => applyItunesPrices(localizeStoreItem(item, selected), itunes.data, itunes.country)),
+    [sourceItems, selected, itunes.data, itunes.country]);
   const international = selected.region === "INTL";
   // formatTypeFilter encodes: "All" | "fmt:Vinyl" | "type:Album"
   const [formatTypeFilter, setFormatTypeFilter] = useState<string>("All");
@@ -183,6 +188,7 @@ const Store = () => {
 
       <div className="container-editorial pt-16">
         <StoreRegionSelector storeRegion={storeRegion} />
+        {hasItunes && <ItunesCountrySelector itunes={itunes} />}
         {isLoading ? (
           <InlineSkeleton count={6} />
         ) : !hasAnyVisible ? (

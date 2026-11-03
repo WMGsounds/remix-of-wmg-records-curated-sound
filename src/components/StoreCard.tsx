@@ -151,7 +151,7 @@ export const StoreCard = ({ item, variant = "grid", international = false }: Sto
 
   const PriceList = orderedFormats.length > 0 && (
     <dl className="flex w-full flex-col gap-2 text-[15px]">
-      {orderedFormats.map((f) => {
+      {orderedFormats.filter(f => f !== "iTunes").map((f) => {
         const raw = item.prices[f]?.trim();
         return (
           <div
@@ -168,10 +168,25 @@ export const StoreCard = ({ item, variant = "grid", international = false }: Sto
     </dl>
   );
 
-  const RegionalPriceNote = international && orderedFormats.some(f => item.prices[f]?.trim()) ? (
+  const RegionalPriceNote = international && orderedFormats.some(f => f !== "iTunes" && item.prices[f]?.trim()) ? (
     <p className="text-xs leading-relaxed text-ivory/65">
       Regional prices may vary. See the checkout page for exact prices.
     </p>
+  ) : null;
+
+  const ItunesPrice = orderedFormats.includes("iTunes") ? (
+    <dl className="mt-2 w-full text-[15px]">
+      <div className="flex items-baseline justify-between gap-4 border-b border-ivory/10 pb-2">
+        <dt className="text-ivory/65">iTunes</dt>
+        <dd className="text-right">
+          {item.itunesPurchaseLink ? <a href={item.itunesPurchaseLink} target="_blank" rel="noopener noreferrer"
+            aria-label={`Buy ${item.title} on iTunes${item.itunesCountry ? ` (${item.itunesCountry})` : ""}`}
+            className="text-gold underline underline-offset-4 focus-visible:outline focus-visible:outline-gold">
+            {item.prices.iTunes || "See price on iTunes"}
+          </a> : <span className="italic text-ivory/50">Price unavailable</span>}
+        </dd>
+      </div>
+    </dl>
   ) : null;
 
   const isPreorder =
@@ -300,6 +315,7 @@ export const StoreCard = ({ item, variant = "grid", international = false }: Sto
                   </p>
                   {PriceList}
                   {RegionalPriceNote}
+                  {ItunesPrice}
                   {item.comments && (
                     <p className="-mt-0.5 text-[11px] italic leading-snug text-ivory/55">
                       {item.comments}
@@ -410,6 +426,7 @@ export const StoreCard = ({ item, variant = "grid", international = false }: Sto
             <div className="flex flex-col gap-2">
               {PriceList}
               {RegionalPriceNote}
+              {ItunesPrice}
               {CommentsBlock}
             </div>
           )}

@@ -1,4 +1,5 @@
 import { regionForCountry } from "../../src/lib/storeRegion.js";
+import { storeCountry } from "../../src/lib/itunes.js";
 
 type Request = { query?: Record<string, unknown>; headers?: Record<string, string | string[] | undefined> };
 type Response = { writeHead: (status: number, headers: Record<string, string>) => { end: (body: string) => void } };
@@ -19,6 +20,6 @@ export async function handleStoreContext(req: Request, res: Response): Promise<b
     "Cache-Control": "private, no-store",
     "Vercel-CDN-Cache-Control": "no-store",
     Vary: "X-Vercel-IP-Country",
-  }).end(JSON.stringify(preference));
+  }).end(JSON.stringify({ ...preference, country: storeCountry(country) }));
   return true;
 }
