@@ -335,7 +335,11 @@ async function resolveDataSourceId(notion: any, dbId: string) {
         }
         return databaseId;
       }
-    })());
+    })().catch(error => {
+      // A transient 429/timeout must not poison every later request in this instance.
+      dataSourceIdCache.delete(databaseId);
+      throw error;
+    }));
   }
 
   return dataSourceIdCache.get(databaseId)!;

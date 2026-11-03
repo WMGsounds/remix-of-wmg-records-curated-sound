@@ -1,29 +1,20 @@
-import { notion, DBS, CACHE_HEADERS, logApiError, logApiFallback, logApiSuccess, requireEnv, type ApiResponse } from "./_client.js";
-import { FALLBACK_HEADERS, fallbackStoreItems } from "./_fallback.js";
+import { notion, DBS, CACHE_HEADERS, logApiError, logApiSuccess, requireEnv, type ApiResponse } from "./_client.js";
 import { loadAll, normalizeArtist, normalizeRelease, normalizeStoreItem, isReleasePublished } from "./_normalize.js";
 import { notionText } from "./_notionText.js";
 import { handleStoreContext } from "./_storeRegion.js";
+import { catalogueCache } from "./_catalogueCache.js";
 import { getItunesPrices } from "./_itunes.js";
 import { storeCountry } from "../../src/lib/itunes.js";
 
-export default async function handler(req: Parameters<typeof handleStoreContext>[0], res: ApiResponse) {
-  if (await handleStoreContext(req, res)) return;
-  const itunesRequest = req.query?.context === "itunes";
-  const country = storeCountry(req.query?.country);
-  if (itunesRequest && !country) {
-    res.writeHead(400, { "Content-Type": "application/json", "Cache-Control": "no-store" }).end(JSON.stringify({ error: "Choose a valid store country" }));
-    return;
-  }
-  const route = "/api/notion/store";
-  try {
-    requireEnv(route, ["NOTION_TOKEN", "NOTION_ARTISTS_DB_ID", "NOTION_RELEASES_DB_ID", "NOTION_TRACKS_DB_ID", "NOTION_STORE_DB_ID", "NOTION_RELEASE_TRACKS_DB_ID"]);
-    const [artistPages, releasePages, trackPages, storePages, releaseTrackPages] = await Promise.all([
-      loadAll(notion, DBS.artists),
-      loadAll(notion, DBS.releases),
-      loadAll(notion, DBS.tracks),
-      loadAll(notion, DBS.storeItems),
-      loadAll(notion, DBS.releaseTracks),
-    ]);
+const loadCatalogue = catalogueCache(async () => {
+    requireEnv("/api/notion/store", ["NOTION_TOKEN", "NOTION_ARTISTS_DB_ID", "NOTION_RELEASES_DB_ID", "NOTION_TRACKS_DB_ID", "NOTION_STORE_DB_ID", "NOTION_RELEASE_TRACKS_DB_ID"]);
+    // Keep cold catalogue loading within a modest request burst. Country requests
+    // share this one load instead of each querying all five Notion databases.
+    const artistPages = await loadAll(notion, DBS.artists);
+    const releasePages = await loadAll(notion, DBS.releases);
+    const trackPages = await loadAll(notion, DBS.tracks);
+    const storePages = await loadAll(notion, DBS.storeItems);
+    const releaseTrackPages = await loadAll(notion, DBS.releaseTracks);
 
     // Real track count per release, from the Release Tracks pivot. The store
     // Product schema derives MusicAlbum vs MusicRecording from this, never from
@@ -81,6 +72,20 @@ export default async function handler(req: Parameters<typeof handleStoreContext>
       return { ...rest, release };
     });
 
+    return payload;
+});
+
+export default async function handler(req: Parameters<typeof handleStoreContext>[0], res: ApiResponse) {
+  if (await handleStoreContext(req, res)) return;
+  const itunesRequest = req.query?.context === "itunes";
+  const country = storeCountry(req.query?.country);
+  if (itunesRequest && !country) {
+    res.writeHead(400, { "Content-Type": "application/json", "Cache-Control": "no-store" }).end(JSON.stringify({ error: "Choose a valid store country" }));
+    return;
+  }
+  const route = "/api/notion/store";
+  try {
+    const payload = await loadCatalogue();
 
     if (itunesRequest) {
       const prices = await getItunesPrices(payload, country!);
@@ -93,7 +98,6 @@ export default async function handler(req: Parameters<typeof handleStoreContext>
       return;
     }
     logApiSuccess(route, {
-      storePageCount: storePages.length,
       itemCount: payload.length,
     });
     res.writeHead(200, CACHE_HEADERS).end(JSON.stringify(payload));
@@ -104,7 +108,8 @@ export default async function handler(req: Parameters<typeof handleStoreContext>
         .end(JSON.stringify({ error: "iTunes prices temporarily unavailable" }));
       return;
     }
-    logApiFallback(route, e, { fallbackStoreCount: fallbackStoreItems.length });
-    res.writeHead(200, FALLBACK_HEADERS).end(JSON.stringify(fallbackStoreItems));
+    // Never present sample products as real releases during a CMS outage.
+    res.writeHead(503, { "Content-Type": "application/json", "Cache-Control": "no-store", "Vercel-CDN-Cache-Control": "no-store", "Retry-After": "60" })
+      .end(JSON.stringify({ error: "Store temporarily unavailable. Please try again shortly." }));
   }
 }

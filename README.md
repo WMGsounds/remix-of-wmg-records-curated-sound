@@ -148,3 +148,13 @@ ISO allowlist are in `src/lib/shippingCountries.ts`. Automatic detection keeps t
 actual country (including unsupported destinations for digital pricing); show a
 physical delivery notice for destinations absent from the list. Do not imply
 shipping to every country. Recheck the delivery source when updating the list.
+
+## Catalogue recovery — 3 November 2026
+
+Transient Notion database-resolution failures are evicted from the promise cache
+so a 429/timeout can recover on the next request. The store shares a five-minute
+successful catalogue cache across physical and iTunes country requests, coalesces
+concurrent loads, and reads its five databases sequentially. Failed refreshes do
+not reuse expired data. Store API failures return an uncached 503, never sample
+products. Apple quote lifetime remains at most 24 hours. Regression tests cover
+rate-limit recovery, coalescing, expiry and retry after failures.
