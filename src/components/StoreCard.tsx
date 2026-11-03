@@ -248,7 +248,7 @@ export const StoreCard = ({ item, variant = "grid", international = false }: Sto
   if (variant === "featured") {
     return (
       <article className="group grid grid-cols-1 overflow-hidden border border-gold/25 bg-ink/60 backdrop-blur-sm transition-all duration-500 hover:border-gold/55 hover:shadow-[0_30px_60px_-30px_hsl(var(--gold)/0.4)] md:grid-cols-[minmax(0,0.42fr)_minmax(0,0.58fr)] md:items-stretch md:gap-4 md:[container-type:inline-size]">
-        <div className="relative aspect-square overflow-hidden bg-ink md:h-full">
+        <div className="relative min-w-0 aspect-square overflow-hidden bg-ink md:aspect-auto md:h-full">
           {item.productImage ? (
             <LazyImage
               src={item.productImage}
@@ -256,6 +256,7 @@ export const StoreCard = ({ item, variant = "grid", international = false }: Sto
               width={1200}
               height={1200}
               displayWidth={640}
+              fill
               sizes="(min-width: 768px) 40vw, 100vw"
               className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-[1.03]"
             />
