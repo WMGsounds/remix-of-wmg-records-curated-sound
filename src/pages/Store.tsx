@@ -11,7 +11,6 @@ import { useStoreRegion } from "@/hooks/use-store-region";
 import { localizeStoreItem } from "@/lib/storePricing";
 import { useItunesPrices } from "@/hooks/use-itunes-prices";
 import { applyItunesPrices } from "@/lib/itunes";
-import { ItunesCountrySelector } from "@/components/ItunesCountrySelector";
 import { Select, SelectContent, SelectItem, SelectSeparator, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { FilterField, SearchInput } from "@/components/FilterBar";
 import { matchesSearch } from "@/lib/search";
@@ -49,7 +48,7 @@ const Store = () => {
   const storeRegion = useStoreRegion();
   const { selected } = storeRegion;
   const hasItunes = (sourceItems ?? []).some(item => item.formats.includes("iTunes"));
-  const itunes = useItunesPrices(storeRegion.detectedCountry, hasItunes);
+  const itunes = useItunesPrices(storeRegion.country, hasItunes);
   const items = useMemo(() => (sourceItems ?? []).map(item => applyItunesPrices(localizeStoreItem(item, selected), itunes.data, itunes.country)),
     [sourceItems, selected, itunes.data, itunes.country]);
   const international = selected.region === "INTL";
@@ -167,7 +166,7 @@ const Store = () => {
               item's dedicated store page.
             </p>
             <p className="mt-8 text-[13px] uppercase tracking-[0.24em] font-bold text-gold">
-              Available to purchase and ship worldwide!
+              International delivery available.
             </p>
           </div>
           <div className="relative hidden min-h-[360px] lg:block">
@@ -188,7 +187,6 @@ const Store = () => {
 
       <div className="container-editorial pt-16">
         <StoreRegionSelector storeRegion={storeRegion} />
-        {hasItunes && <ItunesCountrySelector itunes={itunes} />}
         {isLoading ? (
           <InlineSkeleton count={6} />
         ) : !hasAnyVisible ? (

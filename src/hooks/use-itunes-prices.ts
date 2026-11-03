@@ -1,22 +1,14 @@
 import { useEffect, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { storeCountry, freshItunesPrices, type ItunesPrices } from "@/lib/itunes";
+import { freshItunesPrices, type ItunesPrices } from "@/lib/itunes";
 import { fetchItunesPrices } from "@/lib/api";
 
-export const ITUNES_COUNTRY_KEY = "wmg-itunes-country-v1";
-export function useItunesPrices(detectedCountry: string | null, enabled: boolean) {
-  const [saved, setSaved] = useState<string | null>(null);
-  const [ready, setReady] = useState(false);
+export function useItunesPrices(country: string | null, enabled: boolean) {
   const [now, setNow] = useState(Date.now);
-  useEffect(() => {
-    try { setSaved(storeCountry(localStorage.getItem(ITUNES_COUNTRY_KEY))); } catch { /* Optional storage. */ }
-    setReady(true);
-  }, []);
-  const country = saved ?? detectedCountry;
   const query = useQuery<ItunesPrices>({
     queryKey: ["itunes-prices", country],
     queryFn: ({ signal }) => fetchItunesPrices(country!, signal),
-    enabled: ready && enabled && !!country,
+    enabled: enabled && !!country,
     staleTime: 5 * 60 * 1000, retry: false,
     refetchInterval: 5 * 60 * 1000,
   });
@@ -31,16 +23,8 @@ export function useItunesPrices(detectedCountry: string | null, enabled: boolean
     window.addEventListener("focus", onFocus);
     return () => { clearTimeout(timer); window.removeEventListener("focus", onFocus); };
   }, [query.data, country, enabled, refetch]);
-  function choose(value: string | null) {
-    const valid = storeCountry(value);
-    setSaved(valid);
-    try {
-      if (valid) localStorage.setItem(ITUNES_COUNTRY_KEY, valid);
-      else localStorage.removeItem(ITUNES_COUNTRY_KEY);
-    } catch { /* In-memory selector remains usable. */ }
-  }
   return {
-    country, choose, automatic: saved === null,
+    country,
     data: freshItunesPrices(query.data, country, Math.max(now, Date.now())) ? query.data : undefined,
     loading: !!country && query.isPending, failed: query.isError,
   };

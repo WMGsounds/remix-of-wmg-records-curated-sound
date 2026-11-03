@@ -1,55 +1,59 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { fetchStoreContext } from "@/lib/api";
 import { storeCountry } from "@/lib/itunes";
-import { validPreference, fixedCurrency, type StorePreference, type StoreRegion } from "@/lib/storeRegion";
+import { regionForCountry } from "@/lib/storeRegion";
 
-export const STORE_REGION_KEY = "wmg-store-region-v1";
-const DEFAULT: StorePreference = { region: "INTL", currency: "USD" };
+export const STORE_COUNTRY_KEY = "wmg-store-country-v1";
+const LEGACY_REGION_KEY = "wmg-store-region-v1";
+const LEGACY_ITUNES_KEY = "wmg-itunes-country-v1";
 
 export function useStoreRegion() {
-  // Same initial state on the server and browser: no hydration mismatch.
-  const [detected, setDetected] = useState<StorePreference>(DEFAULT);
-  const [preference, setPreference] = useState<StorePreference | null>(null);
+  // Identical initial state on the server and browser prevents hydration mismatch.
+  const [preference, setPreference] = useState<string | null>(null);
   const [detecting, setDetecting] = useState(true);
-  const [detectedLocation, setDetectedLocation] = useState(false);
   const [detectedCountry, setDetectedCountry] = useState<string | null>(null);
   useEffect(() => {
     try {
-      let saved = JSON.parse(localStorage.getItem(STORE_REGION_KEY) ?? "null");
-      // Migrate saved international display currencies to the USD bucket.
-      if (saved?.region === "INTL" && typeof saved.currency === "string") {
-        saved = { region: "INTL", currency: "USD" };
+      let saved = storeCountry(localStorage.getItem(STORE_COUNTRY_KEY));
+      if (!saved) {
+        saved = storeCountry(localStorage.getItem(LEGACY_ITUNES_KEY));
+        if (!saved) {
+          try {
+            const old = JSON.parse(localStorage.getItem(LEGACY_REGION_KEY) ?? "null");
+            saved = old?.region === "UK" ? "GB" : old?.region === "US" ? "US" : null;
+          } catch { /* An aggregate region cannot identify an individual country. */ }
+        }
       }
-      if (validPreference(saved)) setPreference(saved);
-    } catch { /* Storage may be disabled or malformed; the selector still works. */ }
+      if (saved) {
+        setPreference(saved);
+        localStorage.setItem(STORE_COUNTRY_KEY, saved);
+      }
+      localStorage.removeItem(LEGACY_REGION_KEY);
+      localStorage.removeItem(LEGACY_ITUNES_KEY);
+    } catch { /* Storage is optional; in-memory selection still works. */ }
     const controller = new AbortController();
     const timer = setTimeout(() => controller.abort(), 5000);
     let active = true;
     fetchStoreContext("region", controller.signal).then(value => {
-      if (active && validPreference(value)) {
-        setDetected(value); setDetectedLocation(true);
-        setDetectedCountry(storeCountry((value as { country?: unknown }).country));
-      }
+      if (active) setDetectedCountry(storeCountry((value as { country?: unknown })?.country));
     }).catch(() => {}).finally(() => {
       clearTimeout(timer);
       if (active) setDetecting(false);
     });
     return () => { active = false; clearTimeout(timer); controller.abort(); };
   }, []);
-  const selected = preference ?? detected;
-  function save(value: StorePreference | null) {
-    setPreference(value);
+  const country = preference ?? detectedCountry;
+  const selected = useMemo(() => regionForCountry(country), [country]);
+  function chooseCountry(value: string | null) {
+    const valid = storeCountry(value);
+    if (value !== null && !valid) return;
+    setPreference(valid);
     try {
-      if (value) localStorage.setItem(STORE_REGION_KEY, JSON.stringify(value));
-      else localStorage.removeItem(STORE_REGION_KEY);
+      if (valid) localStorage.setItem(STORE_COUNTRY_KEY, valid);
+      else localStorage.removeItem(STORE_COUNTRY_KEY);
+      localStorage.removeItem(LEGACY_REGION_KEY);
+      localStorage.removeItem(LEGACY_ITUNES_KEY);
     } catch { /* In-memory choice remains usable. */ }
   }
-  function selectRegion(region: StoreRegion) {
-    save({ region, currency: fixedCurrency(region) });
-  }
-  return {
-    selected, selectRegion,
-    automatic: preference === null, useLocation: () => save(null),
-    detecting, detectedLocation, detectedCountry,
-  };
+  return { country, selected, chooseCountry, automatic: preference === null, detecting };
 }

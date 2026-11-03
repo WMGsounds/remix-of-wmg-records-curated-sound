@@ -8,7 +8,6 @@ import { useStoreRegion } from "@/hooks/use-store-region";
 import { localizeStoreItem } from "@/lib/storePricing";
 import { useItunesPrices } from "@/hooks/use-itunes-prices";
 import { applyItunesPrices } from "@/lib/itunes";
-import { ItunesCountrySelector } from "@/components/ItunesCountrySelector";
 import { ArtistLinks } from "@/components/ArtistLinks";
 import { formatJournalDate } from "@/components/JournalArticle";
 import { ArtistGalleryPreview } from "@/components/ArtistGalleryPreview";
@@ -28,7 +27,7 @@ const ArtistPage = () => {
   const { data: journalArticles = [] } = useJournal();
   const storeRegion = useStoreRegion();
   const hasItunes = storeItems.some(item => item.artist?.slug === slug && item.formats.includes("iTunes"));
-  const itunes = useItunesPrices(storeRegion.detectedCountry, hasItunes);
+  const itunes = useItunesPrices(storeRegion.country, hasItunes);
 
   if (isLoading) return <PageLoading label="Opening artist" />;
   if (isError) return <PageError />;
@@ -199,7 +198,6 @@ const ArtistPage = () => {
             <p className="eyebrow mb-4 text-gold-soft">Store</p>
             <h2 className="display-serif text-4xl md:text-6xl mb-12">Available from the Store</h2>
             <StoreRegionSelector storeRegion={storeRegion} />
-            {hasItunes && <ItunesCountrySelector itunes={itunes} />}
             <div className="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-3 md:gap-10">
               {artistStoreItems.map((item) => (
                 <StoreCard key={item.id} item={item} international={storeRegion.selected.region === "INTL"} />

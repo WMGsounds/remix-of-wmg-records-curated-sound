@@ -8,8 +8,9 @@ The store has four public regions: United Kingdom (GBP), European Union (EUR),
 United States (USD), and International. EU means the 27 member states, including
 those outside the euro area. The host's country header selects the default;
 unknown countries fall back to International/USD. Explicit visitor choices win
-over automatic detection and are saved in `wmg-store-region-v1` local storage.
-“Use my location” clears that preference. Browser language is not treated as country.
+over automatic detection and are saved in `wmg-store-country-v1` local storage.
+“Use my location automatically” clears that preference. One compact Change region
+control opens the searchable full delivery-country list, with UK and US in a pinned section. Browser language is not treated as country.
 
 Fixed prices come from the existing WMG Sounds Notion Store database. Existing
 `Price - Vinyl`, `Price - CD`, etc. remain GBP. The new rich-text properties are
@@ -32,7 +33,9 @@ list includes: "Regional prices may vary. See the checkout page for exact prices
 There are no exchange-rate conversions, currency selectors or provider requests.
 International reference prices are excluded from structured Offer markup because
 checkout prices can differ by country. UK/US/EU offers use their published buckets.
-Saved International currency choices from the earlier preview resolve to USD.
+Legacy exact Apple country choices migrate to the shared preference, then legacy
+UK/US regions if no exact country exists. Aggregate EU/International choices return
+to automatic detection because they cannot identify a country.
 This supersedes the 1 November estimate design following the owner's 3 November
 instruction and their report that ElasticStage cannot supply a direct price feed.
 Country responses are private, uncached and separate from the shared catalogue.
@@ -50,9 +53,10 @@ is out of date. Validation: `npm test`, `npm run typecheck`, `npm run build`.
 
 ## iTunes country prices — 3 November 2026
 
-Apple prices use the actual visitor country, independently of the four physical
-price buckets. A separate iTunes store-country selector overrides detection and
-persists in `wmg-itunes-country-v1`; its location reset clears only that preference.
+Apple prices use the same selected or automatically detected country as the
+physical store. The single country preference controls both: for example Poland
+uses the EUR physical bucket and Polish iTunes prices, while Canada uses the
+International USD physical bucket and Canadian iTunes prices.
 Unknown location requires a choice rather than silently using another storefront.
 Country choices do not promise iTunes availability in every territory.
 
@@ -81,8 +85,8 @@ currencies are not compared. Apple prices are excluded from elasticStage Offer
 schema. International physical disclaimer sits above the separate iTunes row.
 
 Validation includes live WMG country lookups, cache expiry/concurrency/failure
-tests, exact song-vs-album prices, country override persistence, physical currency
-independence, full build and browser/mobile checks. Selected evidence uses private
+tests, exact song-vs-album prices, country override persistence, shared country selection and correct physical currency
+buckets, full build and browser/mobile checks. Selected evidence uses private
 OneDrive `Project Setup/Website/iTunes Prices/2026-11-03`.
 
 Reference: https://performance-partners.apple.com/search-api
@@ -136,3 +140,11 @@ canonical, OG/Twitter tags, JSON-LD and H1 count.
 Cormorant Garamond + Inter are loaded non-blocking from `index.html` with
 `display=swap` and preconnect hints. Do not re-add `@import url(...)` in
 `src/index.css` — that pattern blocks rendering.
+
+Delivery-country choices must match elasticStage delivery destinations, verified
+3 November 2026 against its live shipping-country selector (92 destinations).
+Russia appears in the help article but not the live list, so is excluded. The source and
+ISO allowlist are in `src/lib/shippingCountries.ts`. Automatic detection keeps the
+actual country (including unsupported destinations for digital pricing); show a
+physical delivery notice for destinations absent from the list. Do not imply
+shipping to every country. Recheck the delivery source when updating the list.

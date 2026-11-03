@@ -25,7 +25,9 @@ Website regional-store evidence is under `Project Setup/Website/Store Regions/20
   Do not invent currency parameters or promise the WMG choice sets its checkout.
 - Apply pricing consistently in the Store and the store cards on artist pages.
 - iTunes is separate: use exact linked-release Apple IDs and actual country prices,
-  with an independent persisted country selector. Apple cache lifetime is at most
+  with one shared persisted country selector for all formats. Pin UK and US in
+  their own section above the full searchable delivery-country list; default automatically
+  from the host country header. Apple cache lifetime is at most
   24 hours, refreshed on demand by ordinary website code, never by AI. Fail closed
   on expired/missing/mismatched quotes. Never fall back to stale Notion iTunes values,
   silently change storefronts, compare mixed currencies in price summaries or mark
@@ -40,3 +42,11 @@ lockfile for dependencies. After source/instruction changes run the parent
 remote proof before rotation, legacy/protected archives retained. Local OneDrive
 copy verification alone does not prove remote upload. `dist` and `dist-ssr` are
 reproducible build output and excluded from source archives.
+
+Delivery-country choices must match elasticStage delivery destinations, verified
+3 November 2026 against its live shipping-country selector (92 destinations).
+Russia appears in the help article but not the live list, so is excluded. The source and
+ISO allowlist are in `src/lib/shippingCountries.ts`. Automatic detection keeps the
+actual country (including unsupported destinations for digital pricing); show a
+physical delivery notice for destinations absent from the list. Do not imply
+shipping to every country. Recheck the delivery source when updating the list.

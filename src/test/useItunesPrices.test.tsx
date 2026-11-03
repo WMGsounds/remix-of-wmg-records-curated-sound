@@ -1,45 +1,53 @@
 import { act, cleanup, renderHook, waitFor } from "@testing-library/react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { afterEach, beforeEach, expect, it, vi } from "vitest";
-import { useItunesPrices, ITUNES_COUNTRY_KEY } from "../hooks/use-itunes-prices";
-import { fetchItunesPrices } from "../lib/api";
-import { STORE_REGION_KEY } from "../hooks/use-store-region";
-vi.mock("../lib/api", () => ({ fetchItunesPrices: vi.fn() }));
+import { useItunesPrices } from "../hooks/use-itunes-prices";
+import { fetchItunesPrices, fetchStoreContext } from "../lib/api";
+import { useStoreRegion, STORE_COUNTRY_KEY } from "../hooks/use-store-region";
+vi.mock("../lib/api", () => ({ fetchItunesPrices: vi.fn(), fetchStoreContext: vi.fn() }));
 const fetchPrices = vi.mocked(fetchItunesPrices);
 function wrapper({ children }: { children: React.ReactNode }) {
-  const client = new QueryClient({ defaultOptions: { queries: { retry: false, gcTime: 0 } } });
+  const [client] = React.useState(() => new QueryClient({ defaultOptions: { queries: { retry: false, gcTime: 0 } } }));
   return <QueryClientProvider client={client}>{children}</QueryClientProvider>;
 }
-beforeEach(() => { localStorage.clear(); fetchPrices.mockReset(); fetchPrices.mockImplementation(async country => ({ country, checkedAt: new Date().toISOString(), expiresAt: new Date(Date.now() + 86400000).toISOString(), offers: {} })); });
+import React from "react";
+beforeEach(() => {
+  localStorage.clear(); fetchPrices.mockReset();
+  vi.mocked(fetchStoreContext).mockResolvedValue({ country: "PL" });
+  fetchPrices.mockImplementation(async country => { const now = Date.now(); return { country, checkedAt: new Date(now).toISOString(), expiresAt: new Date(now + 86400000).toISOString(), offers: {} }; });
+});
 afterEach(() => { cleanup(); vi.restoreAllMocks(); });
-
-it("uses the actual country, persists an override and leaves physical preferences untouched", async () => {
-  const physical = JSON.stringify({ region: "EU", currency: "EUR" });
-  localStorage.setItem(STORE_REGION_KEY, physical);
-  const { result, rerender } = renderHook(({ detected }) => useItunesPrices(detected, true), { initialProps: { detected: "PL" }, wrapper });
-  await waitFor(() => expect(result.current.data?.country).toBe("PL"));
-  act(() => result.current.choose("CA"));
-  expect(result.current.data).toBeUndefined();
-  await waitFor(() => expect(result.current.data?.country).toBe("CA"));
-  rerender({ detected: "US" });
-  expect(result.current.country).toBe("CA");
-  expect(localStorage.getItem(ITUNES_COUNTRY_KEY)).toBe("CA");
-  expect(localStorage.getItem(STORE_REGION_KEY)).toBe(physical);
-  act(() => result.current.choose(null));
-  await waitFor(() => expect(result.current.data?.country).toBe("US"));
+function useShop() {
+  const region = useStoreRegion();
+  return { region, itunes: useItunesPrices(region.country, true) };
+}
+it("changes physical buckets and the Apple storefront together, retaining country-specific currencies", async () => {
+  const { result } = renderHook(useShop, { wrapper });
+  await waitFor(() => expect(result.current.itunes.data?.country).toBe("PL"));
+  expect(result.current.region.selected.currency).toBe("EUR");
+  act(() => result.current.region.chooseCountry("CA"));
+  expect(result.current.itunes.data).toBeUndefined();
+  await waitFor(() => expect(result.current.itunes.data?.country).toBe("CA"));
+  expect(result.current.region.selected).toEqual({ region: "INTL", currency: "USD" });
+  expect(localStorage.getItem(STORE_COUNTRY_KEY)).toBe("CA");
+  act(() => result.current.region.chooseCountry("US"));
+  await waitFor(() => expect(result.current.itunes.data?.country).toBe("US"));
+  expect(result.current.region.selected.region).toBe("US");
+  act(() => result.current.region.chooseCountry(null));
+  await waitFor(() => expect(result.current.itunes.data?.country).toBe("PL"));
+  expect(result.current.region.selected.currency).toBe("EUR");
 });
-it("restores a saved Apple store independently of geolocation", async () => {
-  localStorage.setItem(ITUNES_COUNTRY_KEY, "JP");
-  const { result } = renderHook(() => useItunesPrices("GB", true), { wrapper });
-  await waitFor(() => expect(result.current.data?.country).toBe("JP"));
-  expect(fetchPrices.mock.calls.every(call => call[0] === "JP")).toBe(true);
+it("restores one saved country for both formats", async () => {
+  localStorage.setItem(STORE_COUNTRY_KEY, "GB");
+  const { result } = renderHook(useShop, { wrapper });
+  await waitFor(() => expect(result.current.itunes.data?.country).toBe("GB"));
+  expect(result.current.region.selected.currency).toBe("GBP");
+  expect(fetchPrices.mock.calls.every(call => call[0] === "GB")).toBe(true);
 });
-it("does not silently use the US store when location is unknown", async () => {
+it("does not silently use the US Apple store when location is unknown", async () => {
   const { result } = renderHook(() => useItunesPrices(null, true), { wrapper });
   expect(result.current.country).toBeNull();
   expect(fetchPrices).not.toHaveBeenCalled();
-  act(() => result.current.choose("GB"));
-  await waitFor(() => expect(result.current.data?.country).toBe("GB"));
 });
 it("hides expired responses", async () => {
   fetchPrices.mockResolvedValue({ country: "GB", checkedAt: "2020-01-01T00:00:00Z", expiresAt: "2020-01-02T00:00:00Z", offers: {} });
