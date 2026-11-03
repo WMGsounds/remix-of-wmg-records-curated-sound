@@ -53,9 +53,10 @@ function statusLabelClass(availability: StoreItem["availability"]): string {
 type StoreCardProps = {
   item: StoreItem;
   variant?: "grid" | "featured";
+  international?: boolean;
 };
 
-export const StoreCard = ({ item, variant = "grid" }: StoreCardProps) => {
+export const StoreCard = ({ item, variant = "grid", international = false }: StoreCardProps) => {
   const { data: allTracks = [] } = useTracks();
   const { data: allReleases = [] } = useReleases();
   const isMobile = useIsMobile();
@@ -166,6 +167,12 @@ export const StoreCard = ({ item, variant = "grid" }: StoreCardProps) => {
       })}
     </dl>
   );
+
+  const RegionalPriceNote = international && orderedFormats.some(f => item.prices[f]?.trim()) ? (
+    <p className="text-xs leading-relaxed text-ivory/65">
+      Regional prices may vary. See the checkout page for exact prices.
+    </p>
+  ) : null;
 
   const isPreorder =
     item.availability === "Coming Soon" && item.preOrder && !!item.purchaseLink;
@@ -291,6 +298,7 @@ export const StoreCard = ({ item, variant = "grid" }: StoreCardProps) => {
                     Formats
                   </p>
                   {PriceList}
+                  {RegionalPriceNote}
                   {item.comments && (
                     <p className="-mt-0.5 text-[11px] italic leading-snug text-ivory/55">
                       {item.comments}
@@ -400,6 +408,7 @@ export const StoreCard = ({ item, variant = "grid" }: StoreCardProps) => {
           {!isUnavailable && (PriceList || CommentsBlock) && (
             <div className="flex flex-col gap-2">
               {PriceList}
+              {RegionalPriceNote}
               {CommentsBlock}
             </div>
           )}

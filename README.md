@@ -2,7 +2,7 @@
 
 Editorial site for the WMG Records label.
 
-## Regional store pricing — 1 November 2026
+## Regional store pricing — 3 November 2026
 
 The store has four public regions: United Kingdom (GBP), European Union (EUR),
 United States (USD), and International. EU means the 27 member states, including
@@ -27,19 +27,21 @@ elasticStage uses the same release URL in each region and selects prices by its
 own shipping-country setting. No unverified currency URL parameters are appended;
 visitors are reminded to check their shipping country on the purchase page.
 
-International visitors get local-currency estimates where supported, derived from
-the Notion USD prices using Frankfurter's public daily rates. Estimated prices
-carry `≈`, a rate date and checkout explanation, and are excluded from structured
-Offer markup. Missing/invalid/rates older than seven days fall back to explicitly
-labelled USD. Rates are fetched by our server, without forwarding visitor IP or
-country. The rate response is cached for an hour. Country responses are private,
-uncached and separate from the shared catalogue response. No new serverless
-function is required: `/api/notion/store?context=region` and `?context=rates` use
-the existing store function.
+International visitors use the published Notion USD bucket. Each visible price
+list includes: "Regional prices may vary. See the checkout page for exact prices."
+There are no exchange-rate conversions, currency selectors or provider requests.
+International reference prices are excluded from structured Offer markup because
+checkout prices can differ by country. UK/US/EU offers use their published buckets.
+Saved International currency choices from the earlier preview resolve to USD.
+This supersedes the 1 November estimate design following the owner's 3 November
+instruction and their report that ElasticStage cannot supply a direct price feed.
+Country responses are private, uncached and separate from the shared catalogue.
+`/api/notion/store?context=region` uses the existing store function; the retired
+`?context=rates` route returns 410 without contacting a provider or the CMS.
 
 Development root: `C:\Users\tomwa\Projects\WMG\wmg-sounds-site`.
 Selected evidence/output root: the established private OneDrive WMG folder,
-`Project Setup/Website/Store Regions/2026-11-01`. Run WMG's standard
+`Project Setup/Website/Store Regions/2026-11-03`. Run WMG's standard
 `Tools/backup-source.py` after source changes; see the parent README and
 ROLLING-BACKUPS.md for verification and latest-plus-previous retention.
 Dependencies, builds and previews stay local. The current Bun lockfile is used

@@ -44,10 +44,10 @@ function sortItems(list: StoreItem[], sort: SortOption): StoreItem[] {
 const Store = () => {
   const { data: sourceItems, isLoading, isError } = useStoreItems();
   const storeRegion = useStoreRegion();
-  const { effective, rate } = storeRegion;
-  const items = useMemo(() => (sourceItems ?? []).map(item => localizeStoreItem(item, effective, rate)),
-    [sourceItems, effective.region, effective.currency, rate]);
-  const estimated = effective.region === "INTL" && effective.currency !== "USD";
+  const { selected } = storeRegion;
+  const items = useMemo(() => (sourceItems ?? []).map(item => localizeStoreItem(item, selected)),
+    [sourceItems, selected]);
+  const international = selected.region === "INTL";
   // formatTypeFilter encodes: "All" | "fmt:Vinyl" | "type:Album"
   const [formatTypeFilter, setFormatTypeFilter] = useState<string>("All");
   const [sort, setSort] = useState<SortOption>("Latest");
@@ -132,11 +132,11 @@ const Store = () => {
           image: i.productImage || undefined,
         })),
       }),
-      // Approximate currency conversions are not retailer offers. Keep Product
-      // identity, but omit Offer markup until a fixed-price region is selected.
-      ...visible.map((i) => storeProduct((estimated ? { ...i, prices: {} } : i) as StoreItemLike)),
+      // International USD prices are a reference; checkout prices may vary.
+      // Keep Product identity without asserting a country-specific Offer.
+      ...visible.map((i) => storeProduct((international ? { ...i, prices: {} } : i) as StoreItemLike)),
     ];
-  }, [items, estimated]);
+  }, [items, international]);
 
 
 
@@ -204,7 +204,7 @@ const Store = () => {
                 </div>
                 <div className="grid grid-cols-1 gap-8">
                   {featured.map((item) => (
-                    <StoreCard key={item.id} item={item} variant="featured" />
+                    <StoreCard key={item.id} item={item} international={storeRegion.selected.region === "INTL"} variant="featured" />
                   ))}
                 </div>
                 <div className="mt-10 h-px w-full bg-gradient-to-r from-transparent via-gold/30 to-transparent" aria-hidden="true" />
@@ -284,7 +284,7 @@ const Store = () => {
                 </div>
                 <div className="grid grid-cols-1 items-stretch gap-8 md:grid-cols-2 lg:grid-cols-3 md:gap-10">
                   {rest.map((item) => (
-                    <StoreCard key={item.id} item={item} />
+                    <StoreCard key={item.id} item={item} international={storeRegion.selected.region === "INTL"} />
                   ))}
                 </div>
               </section>

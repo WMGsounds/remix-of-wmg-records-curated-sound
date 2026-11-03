@@ -45,7 +45,7 @@ const ArtistPage = () => {
       return a.title.localeCompare(b.title);
     })
     .slice(0, 6)
-    .map(item => localizeStoreItem(item, storeRegion.effective, storeRegion.rate));
+    .map(item => localizeStoreItem(item, storeRegion.selected));
 
   const artistJournal = journalArticles
     .filter(
@@ -196,7 +196,7 @@ const ArtistPage = () => {
             <StoreRegionSelector storeRegion={storeRegion} />
             <div className="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-3 md:gap-10">
               {artistStoreItems.map((item) => (
-                <StoreCard key={item.id} item={item} />
+                <StoreCard key={item.id} item={item} international={storeRegion.selected.region === "INTL"} />
               ))}
             </div>
             <div className="mt-12">

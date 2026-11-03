@@ -1,5 +1,5 @@
 import type { StoreFormat, StoreItem } from "./types";
-import { fixedCurrency, usableRate, type ExchangeRate, type StorePreference } from "./storeRegion";
+import { fixedCurrency, type StorePreference } from "./storeRegion";
 
 /** Reject mismatched/ambiguous currencies instead of silently relabelling prices. */
 export function priceAmount(raw: string | undefined, currency: string): number | null {
@@ -14,24 +14,21 @@ export function money(amount: number, currency: string): string {
   if (currency === "USD") return `US$${amount.toFixed(2)}`;
   return new Intl.NumberFormat("en", { style: "currency", currency, currencyDisplay: "code" }).format(amount);
 }
-export function localizeStoreItem(item: StoreItem, preference: StorePreference, rate?: ExchangeRate): StoreItem {
-  const estimated = preference.region === "INTL" && preference.currency !== "USD";
-  const currency = estimated ? preference.currency : fixedCurrency(preference.region);
-  const sourceCurrency = estimated ? "USD" : currency;
-  const source = sourceCurrency === "GBP" ? item.prices : item.regionalPrices?.[sourceCurrency];
+export function localizeStoreItem(item: StoreItem, preference: StorePreference): StoreItem {
+  const currency = fixedCurrency(preference.region);
+  const source = currency === "GBP" ? item.prices : item.regionalPrices?.[currency];
   const prices: Partial<Record<StoreFormat, string>> = {};
   const amounts: number[] = [];
   for (const format of item.formats) {
-    const amount = priceAmount(source?.[format], sourceCurrency);
-    if (amount === null || (estimated && !usableRate(rate))) continue;
-    const displayed = amount * (estimated ? rate!.rate : 1);
-    prices[format] = `${estimated ? "≈ " : ""}${money(displayed, currency)}`;
-    amounts.push(displayed);
+    const amount = priceAmount(source?.[format], currency);
+    if (amount === null) continue;
+    prices[format] = money(amount, currency);
+    amounts.push(amount);
   }
   return {
     ...item,
     prices,
     priceSummary: item.displayPriceSummary && amounts.length
-      ? `From ${estimated ? "≈ " : ""}${money(Math.min(...amounts), currency)}` : null,
+      ? `From ${money(Math.min(...amounts), currency)}` : null,
   };
 }

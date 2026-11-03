@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
-import { useQuery } from "@tanstack/react-query";
 import { fetchStoreContext } from "@/lib/api";
-import { validPreference, usableRate, fixedCurrency, type ExchangeRates, type StorePreference, type StoreRegion } from "@/lib/storeRegion";
+import { validPreference, fixedCurrency, type StorePreference, type StoreRegion } from "@/lib/storeRegion";
 
 export const STORE_REGION_KEY = "wmg-store-region-v1";
 const DEFAULT: StorePreference = { region: "INTL", currency: "USD" };
@@ -14,7 +13,11 @@ export function useStoreRegion() {
   const [detectedLocation, setDetectedLocation] = useState(false);
   useEffect(() => {
     try {
-      const saved = JSON.parse(localStorage.getItem(STORE_REGION_KEY) ?? "null");
+      let saved = JSON.parse(localStorage.getItem(STORE_REGION_KEY) ?? "null");
+      // Migrate saved international display currencies to the USD bucket.
+      if (saved?.region === "INTL" && typeof saved.currency === "string") {
+        saved = { region: "INTL", currency: "USD" };
+      }
       if (validPreference(saved)) setPreference(saved);
     } catch { /* Storage may be disabled or malformed; the selector still works. */ }
     const controller = new AbortController();
@@ -29,20 +32,6 @@ export function useStoreRegion() {
     return () => { active = false; clearTimeout(timer); controller.abort(); };
   }, []);
   const selected = preference ?? detected;
-  const wantsEstimate = selected.region === "INTL" && selected.currency !== "USD";
-  const rates = useQuery({
-    queryKey: ["store-exchange-rates"],
-    queryFn: async () => {
-      const result = await fetchStoreContext("rates", AbortSignal.timeout(6000)) as { rates?: ExchangeRates };
-      return result.rates ?? {};
-    },
-    enabled: wantsEstimate, staleTime: 3600000, retry: false,
-  });
-  const candidate = rates.data?.[selected.currency];
-  const rate = usableRate(candidate) ? candidate : undefined;
-  // A failed/stale rate must never masquerade as a local-currency price.
-  const effective = wantsEstimate && !rate ? { ...selected, currency: "USD" } : selected;
-
   function save(value: StorePreference | null) {
     setPreference(value);
     try {
@@ -51,15 +40,11 @@ export function useStoreRegion() {
     } catch { /* In-memory choice remains usable. */ }
   }
   function selectRegion(region: StoreRegion) {
-    save({ region, currency: region === "INTL" ? (detected.region === "INTL" ? detected.currency : "USD") : fixedCurrency(region) });
-  }
-  function selectCurrency(currency: string) {
-    const next: StorePreference = { region: "INTL", currency };
-    if (validPreference(next)) save(next);
+    save({ region, currency: fixedCurrency(region) });
   }
   return {
-    selected, effective, rate, selectRegion, selectCurrency,
+    selected, selectRegion,
     automatic: preference === null, useLocation: () => save(null),
-    detecting, detectedLocation, wantsEstimate, loadingRates: wantsEstimate && rates.isPending,
+    detecting, detectedLocation,
   };
 }

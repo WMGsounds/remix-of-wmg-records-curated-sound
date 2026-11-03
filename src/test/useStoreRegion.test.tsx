@@ -40,13 +40,23 @@ it("still allows selection when local storage is blocked", async () => {
   act(() => result.current.selectRegion("EU"));
   expect(result.current.selected.region).toBe("EU");
 });
-it("falls back to labelled USD when an international rate request fails", async () => {
-  fetchContext.mockImplementation(async context => {
-    if (context === "region") return { region: "INTL", currency: "CAD" };
-    throw new Error("offline");
-  });
+it("migrates a saved international currency to USD and never requests rates", async () => {
+  localStorage.setItem(STORE_REGION_KEY, JSON.stringify({ region: "INTL", currency: "CAD" }));
+  fetchContext.mockResolvedValue({ region: "UK", currency: "GBP" });
   const { result } = renderHook(useStoreRegion, { wrapper });
-  await waitFor(() => expect(result.current.wantsEstimate && !result.current.loadingRates).toBe(true));
-  expect(result.current.selected).toEqual({ region: "INTL", currency: "CAD" });
-  expect(result.current.effective).toEqual({ region: "INTL", currency: "USD" });
+  await waitFor(() => expect(result.current.detecting).toBe(false));
+  expect(result.current.selected).toEqual({ region: "INTL", currency: "USD" });
+  expect(result.current.automatic).toBe(false);
+  expect(fetchContext).toHaveBeenCalledTimes(1);
+  expect(fetchContext.mock.calls[0][0]).toBe("region");
+  act(() => result.current.useLocation());
+  expect(result.current.selected).toEqual({ region: "UK", currency: "GBP" });
+});
+it("defaults International to USD and preserves the manual region choice", async () => {
+  fetchContext.mockResolvedValue({ region: "INTL", currency: "USD" });
+  const { result } = renderHook(useStoreRegion, { wrapper });
+  await waitFor(() => expect(result.current.detecting).toBe(false));
+  expect(result.current.selected).toEqual({ region: "INTL", currency: "USD" });
+  act(() => result.current.selectRegion("INTL"));
+  expect(JSON.parse(localStorage.getItem(STORE_REGION_KEY)!)).toEqual({ region: "INTL", currency: "USD" });
 });
