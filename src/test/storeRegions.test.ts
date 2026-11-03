@@ -93,3 +93,12 @@ it("reads fixed regional prices directly from the Notion columns", () => {
   expect(result.prices.CD).toBe("£13.90");
   expect(result.regionalPrices).toEqual({ USD: { CD: "US$15.90" }, EUR: { CD: "€16.40" } });
 });
+
+it("uses the automatic store slug, including when it is blank", () => {
+  const rich = (content: string) => ({ type: "rich_text", rich_text: [{ plain_text: content }] });
+  const normalize = (auto: string) => normalizeStoreItem({ id: "fixture", properties: {
+    "Store Slug": rich("old-slug"), "🔄 Store Slug": { type: "formula", formula: { type: "string", string: auto } },
+  } }, { artistLookup: new Map(), releaseLookup: new Map(), trackLookup: new Map() });
+  expect(normalize("artist-release").slug).toBe("artist-release");
+  expect(normalize("").slug).toBeNull();
+});

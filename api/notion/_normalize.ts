@@ -435,7 +435,7 @@ export function normalizeStoreItem(
   const { artistLookup, releaseLookup, trackLookup } = lookups;
 
   const title = text(titleProp(props));
-  const slugText = text(findProp(props, "Store Slug", "Slug"));
+  const slugText = text(findProp(props, "🔄 Store Slug", "Store Slug", "Slug"));
   const slug = slugText || null;
 
   const artistRelId = props["Artist"]?.relation?.[0]?.id ?? "";

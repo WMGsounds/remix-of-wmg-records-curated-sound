@@ -503,8 +503,10 @@ async function handleStoreImage(req: ImageProxyRequest, res: ImageProxyResponse,
     requireEnv(route, ["NOTION_TOKEN", "NOTION_STORE_DB_ID"]);
     const pages = await loadAll(notion, DBS.storeItems);
     const page = pages.find((p: any) => {
-      const slug = keySegment(propertyTextOf(p, "Store Slug", "Slug"));
-      return (slug && slug === key) || compactId(String(p.id)) === compactId(key);
+      const slug = keySegment(propertyTextOf(p, "🔄 Store Slug", "Store Slug", "Slug"));
+      // Previously published image URLs may use a manually maintained slug.
+      const legacySlug = keySegment(propertyTextOf(p, "Store Slug"));
+      return (slug && slug === key) || (legacySlug && legacySlug === key) || compactId(String(p.id)) === compactId(key);
     });
     if (!page) return sendMediaError(res, 404, "Not found.");
 
