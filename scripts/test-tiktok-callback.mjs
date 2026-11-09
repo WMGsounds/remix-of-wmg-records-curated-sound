@@ -49,7 +49,12 @@ test('standalone page has no analytics, embedded secret, storage or dynamic retu
   assert(!/fetch\(|localStorage|sessionStorage|client_secret|access_token/.test(source));
   const config = JSON.parse(readFileSync(new URL('../vercel.json', import.meta.url), 'utf8'));
   assert(config.rewrites.some(x => x.source === '/tiktok/callback/' && x.destination === '/tiktok/callback/index.html'));
-  const headers = config.headers.find(x => x.source === '/tiktok/callback/:path*').headers;
+  const rule = config.headers.find(x => x.source === '/tiktok/callback(.*)');
+  // Include the bare route, trailing slash and assets (Vercel normalizes directory routes).
+  for (const path of ['/tiktok/callback', '/tiktok/callback/', '/tiktok/callback/callback.js']) {
+    assert(new RegExp('^' + rule.source + '$').test(path));
+  }
+  const headers = rule.headers;
   assert(headers.some(x => x.key === 'Cache-Control' && x.value === 'no-store'));
   assert(headers.some(x => x.key === 'Content-Security-Policy' && x.value.includes("frame-ancestors 'none'")));
 });
