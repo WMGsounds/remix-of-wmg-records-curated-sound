@@ -2,6 +2,24 @@
 
 Editorial site for the WMG Records label.
 
+## TikTok account callback — 9 November 2026
+
+`/tiktok/callback/` is a standalone return page for the TikTok Business Accounts
+API. Register the exact HTTPS address `https://www.wmgsounds.com/tiktok/callback/`,
+including the trailing slash, as the **TikTok account holder redirect URL**.
+It is separate from the advertiser redirect URL. The page has no analytics,
+third-party scripts, app secret, token exchange or token storage. It clears the
+incoming query and offers a fixed loopback link carrying the short-lived code in
+a fragment to the owner's local connection session. State validation, one-time
+exchange, account verification and encrypted credentials belong to that local
+application. An ordinary visit without an authorization response is inert.
+
+Security headers and the explicit trailing-slash rewrite are in `vercel.json`.
+Keep the page outside the React application shell and sitemap. Run
+`node --test scripts/test-tiktok-callback.mjs` and the standard site build after
+changes. A public callback page alone does not enable publication or establish
+that TikTok has approved the app.
+
 ## Regional store pricing — 3 November 2026
 
 The store has four public regions: United Kingdom (GBP), European Union (EUR),
