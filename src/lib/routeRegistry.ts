@@ -8,8 +8,8 @@
 // that same expansion. Adding a page means adding one entry here (and its
 // matching key in seoConfig.ts) — nothing else.
 
-import type { SeoKey } from "./seoConfig";
-import { LEGAL_DOCS } from "./seoConfig";
+import { LEGAL_DOCS, type SeoKey } from "./seoConfig";
+import { SITE_URL } from "./seo";
 
 export type PageName =
   | "Index"
@@ -45,7 +45,7 @@ export type ResolvedRoute = {
 export type RouteContent = {
   artists: { slug: string }[];
   releases: { slug: string; releaseDate?: string }[];
-  journal: { slug: string; category?: string; lastEditedTime?: string; publishedDate?: string }[];
+  journal: { slug: string; category?: string; lastEditedTime?: string; publishedDate?: string; canonicalUrl?: string }[];
 };
 
 export type RouteEntry = {
@@ -180,5 +180,9 @@ export const resolveSitemapRoutes = (content: RouteContent): ResolvedRoute[] => 
       entry.expand ? entry.expand(content).map((r) => r.path) : [entry.path],
     ),
   );
+  for (const article of content.journal) {
+    const path = `/journal/${article.slug}`;
+    if (article.canonicalUrl && article.canonicalUrl !== SITE_URL + path) allowed.delete(path);
+  }
   return resolveRoutes(content).filter((r) => allowed.has(r.path));
 };

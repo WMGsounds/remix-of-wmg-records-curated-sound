@@ -23,7 +23,7 @@ import {
   fetchCatalogue,
 } from "@/lib/api";
 
-export { preloadAllPages };
+export { preloadAllPages, SITE_URL };
 
 /** Consistency inputs consumed by the build assertions in scripts/prerender.mjs. */
 export const registry = { routeRegistry, seoKeys, pageNames };
@@ -52,11 +52,11 @@ const mediaImages = (
 
 export async function collectSite(): Promise<SiteRoutes> {
   const [artists, releases, journal, gallery, store] = await Promise.all([
-    fetchArtists().catch(() => []),
-    fetchReleases().catch(() => []),
-    fetchJournal().catch(() => []),
+    fetchArtists(),
+    fetchReleases(),
+    fetchJournal(),
     fetchGallery().catch(() => []),
-    fetchStoreItems().catch(() => []),
+    fetchStoreItems(),
   ]);
 
   const content = {
