@@ -146,6 +146,8 @@ export function isReleasePublished(
  */
 export const RELEASE_PARENT_ALBUM_PROP = "parentAlbum";
 
+const releaseAppleMusicUrl = (props: any) => url(props["Apple Music URL"]);
+
 export function normalizeRelease(page: any, artistLookup: Map<string, any>) {
   const props = page.properties;
   const artistRel = props["Artist"]?.relation?.[0]?.id ?? "";
@@ -195,7 +197,7 @@ export function normalizeRelease(page: any, artistLookup: Map<string, any>) {
     showOnWebsite,
     streamingLinks: {
       spotify: url(props["Spotify URL"]),
-      appleMusic: url(props["Apple Music URL"]),
+      appleMusic: releaseAppleMusicUrl(props),
       bandcamp: url(props["Bandcamp URL"]),
       tidal: url(props["Tidal URL"]),
       youtube: url(props["YouTube Music URL"]) || url(props["YouTube URL"]),
@@ -389,6 +391,28 @@ export async function loadAll(notion: any, dbId: string) {
 const STORE_FORMATS = ["Vinyl", "CD", "iTunes", "Digital", "Merch", "Other"] as const;
 type StoreFormatLocal = (typeof STORE_FORMATS)[number];
 const STORE_AVAILABILITIES = ["Available Now", "Coming Soon", "Sold Out", "Hidden"] as const;
+const storeItemFormats = (props: any): StoreFormatLocal[] =>
+  (props["Format"]?.multi_select ?? [])
+    .map((option: { name: string }) => option.name)
+    .filter((name: string) => (STORE_FORMATS as readonly string[]).includes(name));
+
+function storeItemAvailability(props: any): (typeof STORE_AVAILABILITIES)[number] {
+  const value = select(props["Availability"]);
+  return STORE_AVAILABILITIES.find((availability) => availability === value) ?? "Coming Soon";
+}
+
+/** Price lookups only need published Store records and their exact linked Apple URLs. */
+export function normalizeItunesStoreItems(storePages: any[], releasePages: any[]) {
+  const appleUrls = new Map(releasePages.map((page) => [page.id, releaseAppleMusicUrl(page.properties)]));
+  return storePages
+    .filter(({ properties }) => bool(properties["Published"]) && storeItemAvailability(properties) !== "Hidden")
+    .map(({ id, properties }) => ({
+      id,
+      formats: storeItemFormats(properties),
+      appleMusicUrl: appleUrls.get(properties["Release"]?.relation?.[0]?.id),
+    }))
+    .filter(({ formats }) => formats.includes("iTunes"));
+}
 
 const FORMAT_TO_PRICE_PROP: Record<StoreFormatLocal, string> = {
   Vinyl: "Price - Vinyl",
@@ -461,10 +485,7 @@ export function normalizeStoreItem(
     .map((id) => trackLookup.get(id))
     .filter((t): t is { id: string; title: string } => Boolean(t));
 
-  const formatNames: string[] = (props["Format"]?.multi_select ?? []).map((o: any) => o.name);
-  const formats = formatNames.filter((n): n is StoreFormatLocal =>
-    (STORE_FORMATS as readonly string[]).includes(n),
-  );
+  const formats = storeItemFormats(props);
 
   const prices: Partial<Record<StoreFormatLocal, string>> = {};
   for (const f of STORE_FORMATS) {
@@ -496,10 +517,7 @@ export function normalizeStoreItem(
       }) || ownProductImage
     : (releaseRaw?.coverArt ?? "") || "";
 
-  const availRaw = select(props["Availability"]);
-  const availability = (STORE_AVAILABILITIES as readonly string[]).includes(availRaw)
-    ? (availRaw as (typeof STORE_AVAILABILITIES)[number])
-    : "Coming Soon";
+  const availability = storeItemAvailability(props);
 
   const purchaseLinkRaw = url(props["Purchase Link"]);
   const buttonTextRaw = text(props["Button Text"]);

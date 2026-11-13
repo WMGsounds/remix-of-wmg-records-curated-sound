@@ -54,9 +54,10 @@ type StoreCardProps = {
   item: StoreItem;
   variant?: "grid" | "featured";
   international?: boolean;
+  itunesPriceLoading?: boolean;
 };
 
-export const StoreCard = ({ item, variant = "grid", international = false }: StoreCardProps) => {
+export const StoreCard = ({ item, variant = "grid", international = false, itunesPriceLoading = false }: StoreCardProps) => {
   const { data: allTracks = [] } = useTracks();
   const { data: allReleases = [] } = useReleases();
   const isMobile = useIsMobile();
@@ -178,11 +179,11 @@ export const StoreCard = ({ item, variant = "grid", international = false }: Sto
     <dl className="mt-2 w-full text-[15px]">
       <div className="flex items-baseline justify-between gap-4 border-b border-ivory/10 pb-2">
         <dt className="text-ivory/65">iTunes</dt>
-        <dd className="text-right">
+        <dd className="text-right" aria-busy={itunesPriceLoading && !!item.itunesPurchaseLink}>
           {item.itunesPurchaseLink ? <a href={item.itunesPurchaseLink} target="_blank" rel="noopener noreferrer"
-            aria-label={`Buy ${item.title} on iTunes${item.itunesCountry ? ` (${item.itunesCountry})` : ""}`}
+            aria-label={`Buy ${item.title} on iTunes${item.itunesCountry ? ` (${item.itunesCountry})` : ""}${itunesPriceLoading ? " (checking price)" : ""}`}
             className="text-gold underline underline-offset-4 focus-visible:outline focus-visible:outline-gold">
-            {item.prices.iTunes || "See price on iTunes"}
+            {itunesPriceLoading ? "Checking price…" : item.prices.iTunes || "See price on iTunes"}
           </a> : <span className="italic text-ivory/50">Price unavailable</span>}
         </dd>
       </div>

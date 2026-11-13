@@ -47,7 +47,8 @@ const Store = () => {
   const { data: sourceItems, isLoading, isError } = useStoreItems();
   const storeRegion = useStoreRegion();
   const { selected } = storeRegion;
-  const hasItunes = (sourceItems ?? []).some(item => item.formats.includes("iTunes"));
+  // Start the country lookup alongside the Store catalogue on entry.
+  const hasItunes = !sourceItems || sourceItems.some(item => item.formats.includes("iTunes"));
   const itunes = useItunesPrices(storeRegion.country, hasItunes);
   const items = useMemo(() => (sourceItems ?? []).map(item => applyItunesPrices(localizeStoreItem(item, selected), itunes.data, itunes.country)),
     [sourceItems, selected, itunes.data, itunes.country]);
@@ -199,7 +200,7 @@ const Store = () => {
                 </div>
                 <div className="grid grid-cols-1 gap-8">
                   {featured.map((item) => (
-                    <StoreCard key={item.id} item={item} international={storeRegion.selected.region === "INTL"} variant="featured" />
+                    <StoreCard key={item.id} item={item} international={storeRegion.selected.region === "INTL"} itunesPriceLoading={itunes.loading} variant="featured" />
                   ))}
                 </div>
                 <div className="mt-10 h-px w-full bg-gradient-to-r from-transparent via-gold/30 to-transparent" aria-hidden="true" />
@@ -279,7 +280,7 @@ const Store = () => {
                 </div>
                 <div className="grid grid-cols-1 items-stretch gap-8 md:grid-cols-2 lg:grid-cols-3 md:gap-10">
                   {rest.map((item) => (
-                    <StoreCard key={item.id} item={item} international={storeRegion.selected.region === "INTL"} />
+                    <StoreCard key={item.id} item={item} international={storeRegion.selected.region === "INTL"} itunesPriceLoading={itunes.loading} />
                   ))}
                 </div>
               </section>

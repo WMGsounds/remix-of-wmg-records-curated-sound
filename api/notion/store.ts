@@ -1,20 +1,31 @@
 import { notion, DBS, CACHE_HEADERS, logApiError, logApiSuccess, requireEnv, type ApiResponse } from "./_client.js";
-import { loadAll, normalizeArtist, normalizeRelease, normalizeStoreItem, isReleasePublished } from "./_normalize.js";
+import { loadAll, normalizeArtist, normalizeRelease, normalizeStoreItem, normalizeItunesStoreItems, isReleasePublished } from "./_normalize.js";
 import { notionText } from "./_notionText.js";
 import { handleStoreContext } from "./_storeRegion.js";
 import { catalogueCache } from "./_catalogueCache.js";
 import { getItunesPrices } from "./_itunes.js";
 import { storeCountry } from "../../src/lib/itunes.js";
 
-const loadCatalogue = catalogueCache(async () => {
-    requireEnv("/api/notion/store", ["NOTION_TOKEN", "NOTION_ARTISTS_DB_ID", "NOTION_RELEASES_DB_ID", "NOTION_TRACKS_DB_ID", "NOTION_STORE_DB_ID", "NOTION_RELEASE_TRACKS_DB_ID"]);
-    // Keep cold catalogue loading within a modest request burst. Country requests
-    // share this one load instead of each querying all five Notion databases.
-    const artistPages = await loadAll(notion, DBS.artists);
-    const releasePages = await loadAll(notion, DBS.releases);
-    const trackPages = await loadAll(notion, DBS.tracks);
+const loadStoreSource = catalogueCache(async () => {
+    requireEnv("/api/notion/store", ["NOTION_TOKEN", "NOTION_RELEASES_DB_ID", "NOTION_STORE_DB_ID"]);
     const storePages = await loadAll(notion, DBS.storeItems);
+    const releasePages = await loadAll(notion, DBS.releases);
+    return { storePages, releasePages };
+});
+
+// Store cards also need artist and track data. Apple lookups can proceed
+// once the shared Store and Releases records are ready.
+const loadStoreDetails = catalogueCache(async () => {
+    requireEnv("/api/notion/store", ["NOTION_ARTISTS_DB_ID", "NOTION_TRACKS_DB_ID", "NOTION_RELEASE_TRACKS_DB_ID"]);
+    const artistPages = await loadAll(notion, DBS.artists);
+    const trackPages = await loadAll(notion, DBS.tracks);
     const releaseTrackPages = await loadAll(notion, DBS.releaseTracks);
+    return { artistPages, trackPages, releaseTrackPages };
+});
+
+async function loadCatalogue() {
+    const { storePages, releasePages } = await loadStoreSource();
+    const { artistPages, trackPages, releaseTrackPages } = await loadStoreDetails();
 
     // Real track count per release, from the Release Tracks pivot. The store
     // Product schema derives MusicAlbum vs MusicRecording from this, never from
@@ -73,7 +84,7 @@ const loadCatalogue = catalogueCache(async () => {
     });
 
     return payload;
-});
+}
 
 export default async function handler(req: Parameters<typeof handleStoreContext>[0], res: ApiResponse) {
   if (await handleStoreContext(req, res)) return;
@@ -85,10 +96,9 @@ export default async function handler(req: Parameters<typeof handleStoreContext>
   }
   const route = "/api/notion/store";
   try {
-    const payload = await loadCatalogue();
-
     if (itunesRequest) {
-      const prices = await getItunesPrices(payload, country!);
+      const { storePages, releasePages } = await loadStoreSource();
+      const prices = await getItunesPrices(normalizeItunesStoreItems(storePages, releasePages), country!);
       const remaining = Math.max(0, Math.floor((Date.parse(prices.expiresAt) - Date.now()) / 1000));
       res.writeHead(200, {
         "Content-Type": "application/json",
@@ -97,6 +107,7 @@ export default async function handler(req: Parameters<typeof handleStoreContext>
       }).end(JSON.stringify(prices));
       return;
     }
+    const payload = await loadCatalogue();
     logApiSuccess(route, {
       itemCount: payload.length,
     });

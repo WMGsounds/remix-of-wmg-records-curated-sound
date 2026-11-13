@@ -78,10 +78,10 @@ International USD physical bucket and Canadian iTunes prices.
 Unknown location requires a choice rather than silently using another storefront.
 Country choices do not promise iTunes availability in every territory.
 
-`/api/notion/store?context=itunes&country=PL` reads the current public catalogue,
-extracts exact album/song IDs from the linked release's existing Apple Music URL,
-and batches them into Apple's public Lookup API. The normalizer exposes this as
-`appleMusicUrl`; no Notion price fields or approval records are overwritten.
+`/api/notion/store?context=itunes&country=PL` uses the cached Store and Releases
+records to resolve the exact album/song IDs from each linked Apple Music URL.
+Apple's public Lookup API receives one batch per country. The full Store cards
+fetch artist and track details separately, so those reads do not delay the quote.
 Album links use collectionPrice; song links use trackPrice. Wrong IDs, storefront
 URLs, negative/unavailable prices and invalid responses are rejected. Apple
 purchase links use the same country as the quote and request `app=itunes`.
@@ -92,11 +92,14 @@ URL for the remaining lifetime; country detection itself remains private/no-stor
 The bounded warm-instance cache coalesces concurrent requests, spaces upstream
 calls by 3.5 seconds and never supplies an expired quote after an error. This is
 not a global rate-limit guarantee across server instances; Apple throttling fails
-closed. The browser rechecks the cached endpoint every five minutes while active
-and at quote expiry. No new cron, credentials, paid storage or PC service is needed.
+closed. The Store starts the selected country's quote request as soon as it knows
+the country. The browser rechecks every five minutes while active and at quote
+expiry. It retains recently visited country responses for 30 minutes in memory,
+subject to the same quote expiry.
 
-Old Notion iTunes prices are suppressed even in the UK. On an unavailable or expired
-quote, show “See price on iTunes” with the selected-country link where possible;
+Old Notion iTunes prices are suppressed even in the UK. A pending request shows
+“Checking price…” with the selected-country link where possible. If a quote is
+unavailable once the request finishes, the link reads “See price on iTunes”;
 never invent a price or reuse another country's quote. Apple currency labels are
 explicit (e.g. PLN 29.99). Physical price summaries exclude iTunes so mixed
 currencies are not compared. Apple prices are excluded from elasticStage Offer

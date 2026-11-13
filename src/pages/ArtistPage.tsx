@@ -200,7 +200,7 @@ const ArtistPage = () => {
             <StoreRegionSelector storeRegion={storeRegion} />
             <div className="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-3 md:gap-10">
               {artistStoreItems.map((item) => (
-                <StoreCard key={item.id} item={item} international={storeRegion.selected.region === "INTL"} />
+                <StoreCard key={item.id} item={item} international={storeRegion.selected.region === "INTL"} itunesPriceLoading={itunes.loading} />
               ))}
             </div>
             <div className="mt-12">

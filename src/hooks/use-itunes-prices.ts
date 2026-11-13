@@ -9,7 +9,9 @@ export function useItunesPrices(country: string | null, enabled: boolean) {
     queryKey: ["itunes-prices", country],
     queryFn: ({ signal }) => fetchItunesPrices(country!, signal),
     enabled: enabled && !!country,
-    staleTime: 5 * 60 * 1000, retry: false,
+    staleTime: 5 * 60 * 1000,
+    gcTime: 30 * 60 * 1000,
+    retry: false,
     refetchInterval: 5 * 60 * 1000,
   });
   const { refetch } = query;
@@ -23,9 +25,10 @@ export function useItunesPrices(country: string | null, enabled: boolean) {
     window.addEventListener("focus", onFocus);
     return () => { clearTimeout(timer); window.removeEventListener("focus", onFocus); };
   }, [query.data, country, enabled, refetch]);
+  const data = freshItunesPrices(query.data, country, Math.max(now, Date.now())) ? query.data : undefined;
   return {
     country,
-    data: freshItunesPrices(query.data, country, Math.max(now, Date.now())) ? query.data : undefined,
-    loading: !!country && query.isPending, failed: query.isError,
+    data,
+    loading: enabled && !!country && !data && query.isFetching,
   };
 }
