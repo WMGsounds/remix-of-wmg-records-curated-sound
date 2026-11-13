@@ -34,5 +34,6 @@ return HTTP 404 and do not require a dedicated serverless function.
 | --- | --- | --- |
 | `/spotify` | WMG Spotify profile | Vanity URL used in print and on the About page |
 | `/artists/jack-rivers` | `/artists` | Removed artist page |
+| `/artists/kofi-river` | `/artists/kofi-rivers` | Former spelling of the Kofi Rivers artist URL |
 | `wmgsounds.com/*` | `https://www.wmgsounds.com/*` | Apex to canonical www host |
 | `wmgr-soundscapes.lovable.app/*` | `https://www.wmgsounds.com/*` | Legacy Lovable host to canonical domain |

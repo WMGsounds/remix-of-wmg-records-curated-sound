@@ -144,9 +144,12 @@ When adding a new artist, release or journal hero image, name the file using:
 ### Routes & sitemap
 
 - `public/robots.txt` references `https://www.wmgsounds.com/sitemap.xml`.
-- `api/sitemap.ts` dynamically lists all static pages, published artists,
-  releases, journal articles and journal categories. Items marked `noindex`
-  or unpublished in Notion are excluded.
+- `scripts/prerender.mjs` generates the sitemap and static HTML from the same
+  route registry and published Notion content. The sitemap lists indexable
+  canonical pages.
+- `/store` uses `ItemList` structured data for its catalogue. Google product
+  rich results are intended for pages focused on a single product, with a
+  distinct URL for each offered currency.
 
 ### Diagnostics
 

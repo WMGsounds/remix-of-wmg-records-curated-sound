@@ -88,6 +88,11 @@
       "permanent": true
     },
     {
+      "source": "/artists/kofi-river",
+      "destination": "/artists/kofi-rivers",
+      "permanent": true
+    },
+    {
       "source": "/(.*)",
       "has": [
         {

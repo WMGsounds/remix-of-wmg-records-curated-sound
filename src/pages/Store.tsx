@@ -1,7 +1,7 @@
 import { useMemo, useState } from "react";
 import { Seo } from "@/components/Seo";
 import { staticSeo } from "@/lib/seoConfig";
-import { storeProduct, itemList, type StoreItemLike } from "@/lib/schema";
+import { itemList } from "@/lib/schema";
 
 import { useStoreItems } from "@/lib/queries";
 import { InlineSkeleton, PageError } from "@/components/UIStates";
@@ -51,7 +51,6 @@ const Store = () => {
   const itunes = useItunesPrices(storeRegion.country, hasItunes);
   const items = useMemo(() => (sourceItems ?? []).map(item => applyItunesPrices(localizeStoreItem(item, selected), itunes.data, itunes.country)),
     [sourceItems, selected, itunes.data, itunes.country]);
-  const international = selected.region === "INTL";
   // formatTypeFilter encodes: "All" | "fmt:Vinyl" | "type:Album"
   const [formatTypeFilter, setFormatTypeFilter] = useState<string>("All");
   const [sort, setSort] = useState<SortOption>("Latest");
@@ -118,11 +117,8 @@ const Store = () => {
     [featured, rest],
   );
 
-  // Product/Offer JSON-LD generated from the SAME store item objects that
-  // render the visible prices, so schema and page cannot drift. Built from all
-  // visible items (not the filtered view) so client-side filtering never
-  // changes the markup. parsePrice throws at build time on an unusable price.
-  const productSchema = useMemo(() => {
+  // The store lists multiple releases and displays region-dependent prices.
+  const storeSchema = useMemo(() => {
     const visible = items.filter((i) => i.availability !== "Hidden");
     return [
       itemList({
@@ -136,13 +132,8 @@ const Store = () => {
           image: i.productImage || undefined,
         })),
       }),
-      // International USD prices are a reference; checkout prices may vary.
-      // Keep Product identity without asserting a country-specific Offer.
-      ...visible.map((i) => storeProduct((international ? { ...i, prices: {} } : i) as StoreItemLike)),
     ];
-  }, [items, international]);
-
-
+  }, [items]);
 
   const hasAnyVisible = featured.length + items.filter((i) => i.availability !== "Hidden" && !i.featured).length > 0;
 
@@ -150,7 +141,7 @@ const Store = () => {
 
   return (
     <div className="bg-ink text-ivory pb-32">
-      <Seo {...staticSeo("store")} images={productImages} jsonLd={productSchema} />
+      <Seo {...staticSeo("store")} images={productImages} jsonLd={storeSchema} />
 
       <section className="relative overflow-hidden bg-ink pt-40 pb-24 md:pb-28">
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_74%_38%,hsl(var(--golden-brown)/0.38),transparent_34%),radial-gradient(circle_at_18%_78%,hsl(var(--gold)/0.16),transparent_28%)]" aria-hidden="true" />
