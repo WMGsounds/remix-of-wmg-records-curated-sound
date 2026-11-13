@@ -10,7 +10,7 @@ export function useItunesPrices(country: string | null, enabled: boolean) {
     queryFn: ({ signal }) => fetchItunesPrices(country!, signal),
     enabled: enabled && !!country,
     staleTime: 5 * 60 * 1000,
-    gcTime: 30 * 60 * 1000,
+    gcTime: typeof window === "undefined" ? Infinity : 30 * 60 * 1000,
     retry: false,
     refetchInterval: 5 * 60 * 1000,
   });
