@@ -146,10 +146,17 @@ When adding a new artist, release or journal hero image, name the file using:
 - `public/robots.txt` references `https://www.wmgsounds.com/sitemap.xml`.
 - `scripts/prerender.mjs` generates the sitemap and static HTML from the same
   route registry and published Notion content. The sitemap lists indexable
-  canonical pages.
+  canonical pages. A published journal article with an alternate canonical
+  still gets its own HTML page and is omitted from the sitemap.
 - `/store` uses `ItemList` structured data for its catalogue. Google product
   rich results are intended for pages focused on a single product, with a
   distinct URL for each offered currency.
+- Every deployment, including the daily Notion rebuild, checks the rendered
+  pages for a title, description and one main heading. Sitemap pages must
+  allow indexing and declare their own canonical URL. The build requires a
+  Store `ItemList` and rejects Product and Offer markup across the current
+  catalogue and editorial pages. A catalogue fetch error stops the build
+  before it can drop pages from the sitemap.
 
 ### Diagnostics
 

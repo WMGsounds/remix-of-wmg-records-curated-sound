@@ -21,6 +21,7 @@ import path from "node:path";
 import { execFileSync } from "node:child_process";
 import { pathToFileURL } from "node:url";
 import * as esbuild from "esbuild";
+import { checkPageSeo } from "./prerender-seo.mjs";
 
 
 
@@ -85,7 +86,11 @@ if (missingCmsEnv.length) {
   const remoteBase = process.env.VITE_API_BASE_URL || "https://www.wmgsounds.com";
   globalThis.__WMG_LOCAL_API__ = async (p) => {
     const res = await fetch(`${remoteBase}${p}`, { headers: { Accept: "application/json" } });
-    return { status: res.status, headers: {}, body: await res.text() };
+    return {
+      status: res.status,
+      headers: { "X-Data-Source": res.headers.get("x-data-source") },
+      body: await res.text(),
+    };
   };
 } else {
   await esbuild.build({
@@ -146,6 +151,7 @@ const problemsHeader = "[prerender]";
 }
 
 const { routes, sitemap } = await server.collectSite();
+const sitemapPaths = new Set(sitemap.map((entry) => entry.path));
 console.log(`[prerender] ${routes.length} routes`);
 
 /* ---------------- lastmod for static routes, from git ------------------- *
@@ -238,17 +244,24 @@ for (const route of routes) {
      * objects (BlogPosting.publisher is an Organization, MusicAlbum.byArtist
      * is a MusicGroup) are deliberately ignored — counting them would fail
      * every article. */
-    const blocks = [...head.matchAll(/<script[^>]*application\/ld\+json[^>]*>([\s\S]*?)<\/script>/g)]
-      .map((m) => m[1])
+    let page = injectHead(template, head);
+    page = injectBody(page, html);
+    const blocks = [...page.matchAll(/<script\b[^>]*\stype\s*=\s*(["'])application\/ld\+json\1[^>]*>([\s\S]*?)<\/script>/gi)]
+      .map((m) => m[2])
       .map((raw) => {
         try {
-          return JSON.parse(raw.replace(/&quot;/g, '"').replace(/&amp;/g, "&").replace(/&#x27;/g, "'"));
+          return JSON.parse(raw);
         } catch {
           fail(`route "${route}" emitted invalid JSON-LD`);
           return null;
         }
       })
       .filter(Boolean);
+
+    const expectedCanonical = sitemapPaths.has(route) ? server.SITE_URL + route : undefined;
+    for (const problem of checkPageSeo({ html, head: page.split("</head>", 1)[0], blocks, route, expectedCanonical })) {
+      fail(`route "${route}" ${problem}`);
+    }
 
     const topTypes = blocks.flatMap((b) => (Array.isArray(b) ? b : [b])).map((b) => b?.["@type"]);
     const count = (t) => topTypes.filter((x) => x === t).length;
@@ -273,8 +286,6 @@ for (const route of routes) {
       fail(`route "${route}" has a query string in an on-site JSON-LD URL: ${m[1]}`);
 
 
-    let page = injectHead(template, head);
-    page = injectBody(page, html);
     const outFile = outFileFor(route);
     await fs.mkdir(path.dirname(outFile), { recursive: true });
     await fs.writeFile(outFile, page, "utf8");
