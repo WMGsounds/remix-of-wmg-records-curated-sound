@@ -15,6 +15,14 @@ function run(query) {
   return {status, link, history};
 }
 const state = 's'.repeat(43);
+test('current TikTok code/scopes return normalizes without trusting query grants', () => {
+  const result = run(`?code=synthetic-code&scopes=video.publish%2Ccomment.list&state=${state}`);
+  assert.equal(result.link.hidden, false);
+  assert.deepEqual(JSON.parse(decodeURIComponent(new URL(result.link.href).hash.slice(1))), {state, auth_code:'synthetic-code'});
+  for (const query of [`?state=${state}&code=a&auth_code=b`, `?state=${state}&code=a&code=b`, `?state=${state}&code=a&error=denied`]) {
+    assert.equal(run(query).link.hidden, true);
+  }
+});
 test('valid callback returns only to fixed loopback with fragment and clears public query', () => {
   const result = run(`?state=${state}&auth_code=synthetic-code`);
   const link = new URL(result.link.href);

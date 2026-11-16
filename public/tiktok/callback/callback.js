@@ -8,10 +8,13 @@ try {
   const params = new URLSearchParams(query);
   if (!query) throw new Error();
   const keys = [...params.keys()];
-  if (new Set(keys).size !== keys.length || keys.some(k => !['state','auth_code','error','error_description'].includes(k))) throw new Error();
+  if (new Set(keys).size !== keys.length || keys.some(k => !['state','auth_code','code','scopes','error','error_description'].includes(k))) throw new Error();
   const state = params.get('state');
   if (!/^[A-Za-z0-9_-]{43}$/.test(state || '')) throw new Error();
-  const code = params.get('auth_code');
+  if (params.has('auth_code') && params.has('code')) throw new Error();
+  // TikTok's current account-holder flow returns code and scopes. Scope grants
+  // are verified from the token response locally, never trusted from this query.
+  const code = params.get('auth_code') || params.get('code');
   const error = params.get('error');
   if (Boolean(code) === Boolean(error) || (code && (code.length > 2048 || /[\x00-\x1f]/.test(code)))) throw new Error();
   const payload = error ? {state, error:'access_denied'} : {state, auth_code:code};
