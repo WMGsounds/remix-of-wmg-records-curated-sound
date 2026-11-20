@@ -1,4 +1,6 @@
 import sharp from "sharp";
+import { GET as deliveryGET, HEAD as deliveryHEAD } from './notion/_tiktokDelivery.js';
+import { once } from 'node:events';
 import { notion, DBS, logApiError, logApiSuccess, requireEnv, type ApiRequest, type ApiResponse } from "./notion/_client.js";
 import { loadAll, normalizeArtist, normalizeRelease, isReleasePublished } from "./notion/_normalize.js";
 import { normalizeJournal, isJournalPublished } from "./notion/_journal.js";
@@ -32,6 +34,11 @@ const ALLOWED_WIDTHS = [16, 320, 480, 640, 960, 1280, 1600, 1920];
 const DEFAULT_QUALITY = 72;
 
 type ImageProxyResponse = ApiResponse & {
+  write?: (chunk: Uint8Array) => boolean;
+  once?: (event: string, callback: () => void) => unknown;
+  removeListener?: (event: string, callback: () => void) => unknown;
+  destroy?: () => void;
+  writableEnded?: boolean;
   setHeader?: (name: string, value: string) => void;
   status?: (code: number) => { json: (body: unknown) => void; end?: (body?: string) => void };
   end?: (body?: Buffer | string) => void;
@@ -609,6 +616,30 @@ async function handleJournalImage(
 
 
 export default async function handler(req: ImageProxyRequest, res: ImageProxyResponse) {
+  if(Object.hasOwn(req.query,'deliverySha')){
+    // Reuse this existing function slot. No storage credential is installed on
+    // the website; R2 validates the short-lived capability independently.
+    const q=new URLSearchParams();
+    for(const [key,value] of Object.entries(req.query)){
+      for(const item of Array.isArray(value)?value:[value])q.append(key==='deliverySha'?'sha':key,item??'');
+    }
+    const request=new Request('https://www.wmgsounds.com/api/image-proxy?'+q,{method:req.method||'GET',
+      headers:headerValue(req,'range')?{'Range':headerValue(req,'range')}:{}});
+    const result=await (req.method==='HEAD'?deliveryHEAD:deliveryGET)(request);
+    const headers=Object.fromEntries(result.headers.entries());res.writeHead(result.status,headers);
+    if(!result.body){res.end?.();return}
+    const reader=result.body.getReader();
+    const closed=()=>{void reader.cancel()};res.once?.('close',closed);
+    try{
+      for(;;){const next=await reader.read();if(next.done)break;
+        if(!res.write)throw Error('delivery_stream_unavailable');
+        if(!res.write(next.value))await once(res as any,'drain');
+      }
+      res.end?.();
+    }catch{res.destroy?.()}
+    finally{res.removeListener?.('close',closed);reader.releaseLock()}
+    return;
+  }
   const releaseSlug = getQueryValue(req.query.releaseSlug);
   if (releaseSlug) return handleReleaseArtwork(req, res, releaseSlug);
 
