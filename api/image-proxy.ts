@@ -1,5 +1,5 @@
 import sharp from "sharp";
-import { GET as deliveryGET, HEAD as deliveryHEAD } from './notion/_tiktokDelivery.js';
+import { GET as deliveryGET, HEAD as deliveryHEAD, deliveryRequest } from './notion/_tiktokDelivery.js';
 import { once } from 'node:events';
 import { notion, DBS, logApiError, logApiSuccess, requireEnv, type ApiRequest, type ApiResponse } from "./notion/_client.js";
 import { loadAll, normalizeArtist, normalizeRelease, isReleasePublished } from "./notion/_normalize.js";
@@ -619,12 +619,7 @@ export default async function handler(req: ImageProxyRequest, res: ImageProxyRes
   if(Object.hasOwn(req.query,'deliverySha')){
     // Reuse this existing function slot. No storage credential is installed on
     // the website; R2 validates the short-lived capability independently.
-    const q=new URLSearchParams();
-    for(const [key,value] of Object.entries(req.query)){
-      for(const item of Array.isArray(value)?value:[value])q.append(key==='deliverySha'?'sha':key,item??'');
-    }
-    const request=new Request('https://www.wmgsounds.com/api/image-proxy?'+q,{method:req.method||'GET',
-      headers:headerValue(req,'range')?{'Range':headerValue(req,'range')}:{}});
+    const request=deliveryRequest(req.query,req.method||'GET',headerValue(req,'range'));
     const result=await (req.method==='HEAD'?deliveryHEAD:deliveryGET)(request);
     const headers=Object.fromEntries(result.headers.entries());res.writeHead(result.status,headers);
     if(!result.body){res.end?.();return}

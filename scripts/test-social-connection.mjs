@@ -42,6 +42,11 @@ test('delivery fixes the private bucket/object and refuses injection, duplicates
     assert.throws(()=>delivery.deliveryTarget(request(),Date.now()+901_000));assert.equal(calls,0);
   }finally{globalThis.fetch=saved}
 });
+test('rewrite source parameters normalize only when they match exactly',()=>{
+  const query=Object.fromEntries(new URL(request().url).searchParams);const sha=query.sha;delete query.sha;query.deliverySha=sha;
+  assert.equal(delivery.deliveryTarget(delivery.deliveryRequest({...query,sha})).sha,sha);
+  for(const value of ['b'.repeat(64),[sha,sha]])assert.throws(()=>delivery.deliveryTarget(delivery.deliveryRequest({...query,sha:value})));
+});
 test('delivery streams more than 4.5 MB without buffering and supports HEAD/cancellation',async()=>{
   const saved=globalThis.fetch;const bytes=Buffer.alloc(6*1024*1024,37);let cancelled=false;
   globalThis.fetch=async(url,options)=>{

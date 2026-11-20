@@ -5,6 +5,18 @@ const MAX_BYTES=100_000_000;
 const KEYS=['X-Amz-Algorithm','X-Amz-Credential','X-Amz-Date','X-Amz-Expires','X-Amz-SignedHeaders','X-Amz-Signature'];
 const security={'Cache-Control':'private, no-store, max-age=0','Referrer-Policy':'no-referrer','X-Content-Type-Options':'nosniff','X-Robots-Tag':'noindex, nofollow, noarchive'};
 
+export function deliveryRequest(query:Record<string,string|string[]|undefined>,method='GET',range=''){
+  const params=new URLSearchParams();
+  for(const [key,value] of Object.entries(query)){
+    // Vercel may also expose the matched rewrite parameter by its source name.
+    // Ignore only that exact scalar match; conflicting/duplicate values survive
+    // into the strict validator and are refused.
+    if(key==='sha'&&typeof value==='string'&&value===query.deliverySha)continue;
+    for(const item of Array.isArray(value)?value:[value])params.append(key==='deliverySha'?'sha':key,item??'');
+  }
+  return new Request('https://www.wmgsounds.com/api/image-proxy?'+params,{method,headers:range?{Range:range}:{}});
+}
+
 export function deliveryTarget(request:Request,now=Date.now()){
   const url=new URL(request.url),params=url.searchParams,keys=[...params.keys()];
   if(keys.length!==7||new Set(keys).size!==keys.length||keys.some(k=>k!=='sha'&&!KEYS.includes(k)))throw Error('invalid_delivery');
@@ -24,12 +36,12 @@ export function deliveryTarget(request:Request,now=Date.now()){
 async function delivery(request:Request,head=false){
   if(!['GET','HEAD'].includes(request.method))return new Response('Unavailable',{status:405,headers:security});
   let target:ReturnType<typeof deliveryTarget>;
-  try{target=deliveryTarget(request)}catch{return new Response('Unavailable',{status:404,headers:security})}
+  try{target=deliveryTarget(request)}catch{return new Response('delivery_invalid_request',{status:404,headers:security})}
   const abort=new AbortController(),deadline=setTimeout(()=>abort.abort(),240_000);
   try{
     const upstream=await fetch(target.url,{method:'GET',redirect:'error',signal:abort.signal,
       headers:target.range?{Range:target.range}:{}});
-    if(![200,206].includes(upstream.status)||!upstream.body){await upstream.body?.cancel();clearTimeout(deadline);return new Response('Unavailable',{status:404,headers:security})}
+    if(![200,206].includes(upstream.status)||!upstream.body){await upstream.body?.cancel();clearTimeout(deadline);return new Response('delivery_storage_unavailable',{status:404,headers:security})}
     const size=upstream.headers.get('content-length'),range=upstream.headers.get('content-range');
     if(!size||!/^\d+$/.test(size)||Number(size)<1||Number(size)>MAX_BYTES||range&&(!/^bytes \d+-\d+\/\d+$/.test(range)||Number(range.split('/')[1])>MAX_BYTES)){
       await upstream.body.cancel();clearTimeout(deadline);return new Response('Unavailable',{status:502,headers:security});
